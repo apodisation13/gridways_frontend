@@ -48,39 +48,39 @@ const mutations = {
 }
 
 const actions = {
-  async post_deck({ getters, dispatch }, body) {
+  async post_deck({ getters, dispatch, commit }, body) {
     try {
       let header = getters["getHeader"]
-      await axios.post(post_deck, body, header)
+      const response = await axios.post(post_deck, body, header)
       toast.success("Успешно добавили колоду")
-      await dispatch("get_user_database")
+      commit("set_decks", response.data)
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при добавлении деки")
     }
   },
 
-  async delete_deck({ getters, dispatch }, deck_id) {
+  async delete_deck({ getters, dispatch, commit }, deck_id) {
     try {
       let header = getters["getHeader"]
       let url = `${post_deck}${deck_id}`
-      await axios.delete(url, header)
+      const response = await axios.delete(url, header)
       toast.success("Успешно удалили колоду")
-      await dispatch("get_user_database")
+      commit("set_decks", response.data)
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при удалении деки")
     }
   },
 
-  async patch_deck({ getters, dispatch }, deck) {
+  async patch_deck({ getters, dispatch, commit }, deck) {
     // ВНИМАНИЕ: в PATCH методе не забыть поставть слэш в конце!
     try {
       let header = getters["getHeader"]
       let url = `${post_deck}${deck.id}/`
-      await axios.patch(url, deck, header)
+      const response = await axios.patch(url, deck, header)
       toast.success("Успешно изменили колоду")
-      await dispatch("get_user_database")
+      commit("set_decks", response.data)
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при изменении деки")
@@ -144,6 +144,7 @@ const actions = {
           { user: user_id, card: card.card.id },
           header
         )
+        toast.success("Успешно создали карту")
         commit("set_cards", response.data.cards)
       } catch (err) {
         dispatch("error_action", err)
@@ -155,9 +156,10 @@ const actions = {
         let url = `${craft_card}${card.id}/`
         const response = await axios.patch(
           url,
-          { user: user_id, card: card.card.id, count: card.count },
+          { user: user_id, card: card.card.id },
           header
         )
+        toast.success("Успешно создали карту")
         commit("set_cards", response.data.cards)
       } catch (err) {
         dispatch("error_action", err)
@@ -177,6 +179,7 @@ const actions = {
           { user: user_id, leader: card.card.id },
           header
         )
+        toast.success("Успешно создали лидера")
         commit("set_leaders", response.data.leaders)
       } catch (err) {
         dispatch("error_action", err)
@@ -188,9 +191,10 @@ const actions = {
         let url = `${craft_leader}${card.id}/`
         const response = await axios.patch(
           url,
-          { user: user_id, leader: card.card.id, count: card.count },
+          { user: user_id, leader: card.card.id },
           header
         )
+        toast.success("Успешно создали лидера")
         commit("set_leaders", response.data.leaders)
       } catch (err) {
         dispatch("error_action", err)
@@ -212,9 +216,10 @@ const actions = {
     try {
       const response = await axios.patch(
         url,
-        { user: user_id, card: user_card.card.id, count: user_card.count },
+        { user: user_id, card: user_card.card.id },
         header
       )
+      toast.success("Успешно уничтожили карту")
       commit("set_cards", response.data.cards)
     } catch (err) {
       dispatch("error_action", err)
@@ -229,9 +234,10 @@ const actions = {
     try {
       const response = await axios.patch(
         url,
-        { user: user_id, leader: user_card.card.id, count: user_card.count },
+        { user: user_id, leader: user_card.card.id },
         header
       )
+      toast.success("Успешно уничтожили лидера")
       commit("set_leaders", response.data.leaders)
     } catch (err) {
       dispatch("error_action", err)
