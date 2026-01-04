@@ -1,25 +1,39 @@
-import { all_news } from "@/store/const/api_urls"
-import axios from "axios"
+import { LIST_NEWS } from "@/store/const/api_urls"
+import { callApi, GET } from "@/lib/api/api"
 
 const state = {
   news: null,
 }
 
 const getters = {
-  all_news: state => state.news,
+  allNews: state => state.news,
 }
 
 const mutations = {
-  set_news(state, payload) {
-    state.news = payload
+  /**
+   * Обновляет список новостей в хранилище Vuex
+   * @param {Object} state - Состояние Vuex хранилища модуля новостей
+   * @param {Array} news - Массив объектов новостей
+   * @property {number} news[].id - id новости
+   * @property {string} news[].title - Заголовок новости
+   * @property {string} news[].text - Текст новости
+   * @property {string} news[].updated_at - Дата обновления ("2026-01-04T09:17:19.146495Z")
+   */
+  setNews(state, news) {
+    state.news = news
   },
 }
 
 const actions = {
-  fetchNews({ commit }) {
+  async fetchNews({ commit }) {
     try {
-      axios.get(all_news).then(response => commit("set_news", response.data))
+      const response = await callApi({
+        method: GET,
+        url: LIST_NEWS,
+      })
+      commit("setNews", response.data)
     } catch (err) {
+      console.error("Ошибка при загрузке новостей:", err)
       throw new Error("Ошибка при загрузке новостей")
     }
   },

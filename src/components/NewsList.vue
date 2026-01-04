@@ -12,6 +12,7 @@
         :items-to-show="1.4"
         :wrap-around="true"
         :touchDrag="false"
+        v-if="news"
       >
         <slide v-for="element in news" :key="element.id">
           <div class="news__item">
@@ -19,18 +20,18 @@
               <p class="news__title-text">{{ element.title }}</p>
             </div>
             <div class="news__text">
-              {{ element.description }}
+              {{ element.text }}
             </div>
             <div class="rombica">
               <div class="rombica__wrapper">
                 <div class="rombica__date">
                   <span class="rombica__text">{{
-                    this.setDay(element.created_at, "day")
+                    this.setDay(element.updated_at, "day")
                   }}</span>
                 </div>
                 <div class="rombica__date rombica__bottom-date">
                   <span class="rombica__text">{{
-                    this.setDay(element.created_at, "month")
+                    this.setDay(element.updated_at, "month")
                   }}</span>
                 </div>
               </div>
@@ -53,7 +54,7 @@ export default {
   name: "news-list",
   computed: {
     news() {
-      return this.$store.getters["all_news"]
+      return this.$store.getters["allNews"]
     },
   },
   data() {
