@@ -222,8 +222,8 @@ export default {
       if (this.error) return
 
       try {
-        await this.$store.dispatch("login", {
-          username: this.email,
+        await this.$store.dispatch("userLogin", {
+          email: this.email,
           password: this.password,
         })
         await this.$router.push("/loading")
