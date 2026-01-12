@@ -30,7 +30,7 @@ export default {
       this.show_dialog = !this.show_dialog
     },
     logoutProcess() {
-      this.$store.dispatch("logout")
+      this.$store.dispatch("logOut")
       this.$router.push("/main")
     },
   },
