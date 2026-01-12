@@ -1,6 +1,6 @@
-import axios from "axios"
 import { useToast } from "vue-toastification"
-import { check_auth_url, register_url } from "@/store/const/api_urls"
+import { USER_LOGIN, USER_REGISTER } from "@/store/const/api_urls"
+import { callApi, POST } from "@/lib/api/api"
 
 const toast = useToast()
 
@@ -19,13 +19,13 @@ const getters = {
 }
 
 const mutations = {
-  logged_in(state, user) {
+  logIn(state, user) {
     state.user = user
     state.is_logged_in = true
-    state.header = { headers: { Authorization: `Token ${state.user.token}` } }
+    state.header = { headers: { Authorization: `Bearer ${state.user.token}` } }
     localStorage.setItem("user", JSON.stringify(user))
   },
-  logged_out(state) {
+  logOut(state) {
     state.is_logged_in = false
     state.header = ""
     state.user = ""
@@ -39,13 +39,15 @@ const mutations = {
 }
 
 const actions = {
-  async check_auth({ getters, dispatch, commit }) {
-    commit("set_auth_state", true) // пошел процесс загрузки, флаг
+  async checkAuth({ getters, dispatch, commit }) {
     try {
       let user = getters["getUser"]
-      await dispatch("login", { username: user.email, password: user.password })
+      await dispatch("userLogin", {
+        email: user.email || "",
+        password: user.password || "",
+      })
     } catch (err) {
-      commit("logged_out")
+      commit("logOut")
       toast.warning(
         "По сохранённым ранее данным юзера не получилось авторизоваться, попробуйте вручную!"
       )
@@ -56,41 +58,45 @@ const actions = {
       commit("set_auth_state", false) // не важно, каков итог, в любом случае флаг снимем
     }
   },
-  async login({ commit }, userObj) {
+  async userLogin({ commit }, userObj) {
     try {
-      const response = await axios.post(check_auth_url, userObj)
-      commit("logged_in", {
-        email: response.data.email,
-        token: response.data.token,
-        username: response.data.username,
-        user_id: response.data.user_id,
+      const response = await callApi({
+        method: POST,
+        url: USER_LOGIN,
+        data: userObj,
+      })
+      commit("logIn", {
+        email: userObj.email,
         password: userObj.password,
+        token: response.data.token.access_token,
+        username: response.data.username,
+        user_id: response.data.id,
       })
       toast.success("Успешно вошли!")
-      return response.data.token
     } catch (err) {
-      commit("logged_out")
-      toast.warning("Произошла ошибка!")
+      commit("logOut")
       throw new Error("Ошибка авторизации, проверьте пароль")
     }
   },
   // eslint-disable-next-line no-unused-vars
   async userRegister({ commit }, userObj) {
     try {
-      const response = await axios.post(register_url, userObj)
+      await callApi({
+        method: POST,
+        url: USER_REGISTER,
+        data: userObj,
+      })
       toast.success(
         "Успешно зарегистрированы, а теперь войдите, используя свои данные"
       )
-      return response.data
+      // return response.data
     } catch (err) {
       toast.error("Произошла ошибка!")
-      let error_message = err.response.data
-      if (error_message.length > 50) error_message = "Ошибка регистрации"
-      throw new Error(error_message)
+      throw new Error("Ошибка регистрации")
     }
   },
-  logout({ commit }) {
-    commit("logged_out")
+  logOut({ commit }) {
+    commit("logOut")
   },
 }
 
