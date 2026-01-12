@@ -37,7 +37,7 @@ export default {
     this.$store.dispatch("fetchNews")
     await this.$router.push("/")
     try {
-      await this.$store.dispatch("check_auth") // пытаемся послать запрос на логин с данными из локалсторадж
+      await this.$store.dispatch("checkAuth") // пытаемся послать запрос на логин с данными из локалсторадж
     } catch (err) {
       console.log(err)
       throw err
