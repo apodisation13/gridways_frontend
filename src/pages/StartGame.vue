@@ -26,6 +26,7 @@
 import DeckSelection from "@/components/DeckSelection"
 import SelectedDeck from "@/components/Pages/LevelPage/SelectedDeck"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
+import { PayResourcesSubtype } from "@/store/const/const"
 export default {
   name: "StartGame",
   components: { ThemedButton, SelectedDeck, DeckSelection },
@@ -35,6 +36,7 @@ export default {
     }
   },
   computed: {
+    // теперь это используется только для отображения, и всё равно мы на бэке всё валидируем
     play_price() {
       const diff = this.$store.state.game.level.difficulty
       const price = this.$store.state.user_actions.game_prices
@@ -48,8 +50,10 @@ export default {
     async start_game() {
       this.loading = true
       try {
+        // вот здесь мы присылаем level.id, на бэке всё вычислим тоже, сколько нужно заплатить
         await this.$store.dispatch("pay_resource", {
-          wood: this.$store.getters["resource"].wood + this.play_price,
+          subtype: PayResourcesSubtype.startSeasonLevel,
+          data: { level_id: this.$store.state.game.level.id },
         })
         this.$store.commit("set_start_game_redirect", true)
         setTimeout(() => {
