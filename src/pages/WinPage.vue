@@ -47,6 +47,7 @@
 
 <script>
 import { getRewardForLevel } from "@/logic/random_rewards"
+import { PayResourcesSubtype } from "@/store/const/const"
 export default {
   name: "win-page",
   computed: {
@@ -79,14 +80,23 @@ export default {
     // оплата ресурсов за прохождение уровня
     async pay_resources() {
       this.pay_data = getRewardForLevel(this.win_price)
+      console.log(82, "-------------", this.pay_data)
+
+      let data = {
+        wood: this.pay_data.wood,
+        scraps: this.pay_data.scraps,
+        keys: this.pay_data.keys,
+      }
+      if (this.pay_data.kegs) {
+        data.kegs = this.pay_data.kegs
+      }
+      if (this.pay_data.big_kegs) {
+        data.big_kegs = this.pay_data.big_kegs
+      }
 
       await this.$store.dispatch("pay_resource", {
-        wood: this.$store.getters["resource"].wood + this.pay_data.wood,
-        scraps: this.$store.getters["resource"].scraps + this.pay_data.scraps,
-        kegs: this.$store.getters["resource"].kegs + this.pay_data.kegs,
-        big_kegs:
-          this.$store.getters["resource"].big_kegs + this.pay_data.big_kegs,
-        keys: this.$store.getters["resource"].keys + this.pay_data.keys,
+        subtype: PayResourcesSubtype.winSeasonLevel,
+        data: data,
       })
     },
     // открытие всех связанных уровней при прохождении уровня
@@ -98,7 +108,7 @@ export default {
       const level = season.levels.find(lev => lev.level.id === currentLevel.id) // ищем уровень из списка уровней сезона
       if (!level || level.finished) return // если уровень УЖЕ пройден, то нет смысла открывать его детей
 
-      this.related_levels = level.level.related_levels
+      this.related_levels = level.level.related_levels || []
       if (this.related_levels.length === 0) return // если связанных уровней нет, открывать нечего
 
       const seasonIndex = this.all_seasons.findIndex(sea => sea === season)
