@@ -5,10 +5,12 @@ import {
   mill_card,
   mill_leader,
   patch_levels,
-  post_deck,
+  CREATE_USER_DECK,
   user_resource,
+  ALTER_USER_DECK,
 } from "@/store/const/api_urls"
 import { useToast } from "vue-toastification"
+import { callApi, DELETE, PATCH, POST } from "@/lib/api/api"
 
 const toast = useToast()
 
@@ -49,40 +51,57 @@ const mutations = {
 }
 
 const actions = {
-  async post_deck({ getters, dispatch, commit }, body) {
+  async createUserDeck({ getters, dispatch, commit }, body) {
     try {
-      let header = getters["getHeader"]
-      const response = await axios.post(post_deck, body, header)
+      const userId = getters["getUser"].user_id
+      const response = await callApi({
+        method: POST,
+        url: CREATE_USER_DECK.replace("{userId}", userId),
+        data: body,
+      })
       toast.success("Успешно добавили колоду")
-      commit("set_decks", response.data)
+      commit("set_decks", response.data.decks)
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при добавлении деки")
     }
   },
 
-  async delete_deck({ getters, dispatch, commit }, deck_id) {
+  async deleteUserDeck({ getters, dispatch, commit }, deckId) {
     try {
-      let header = getters["getHeader"]
-      let url = `${post_deck}${deck_id}`
-      const response = await axios.delete(url, header)
+      const userId = getters["getUser"].user_id
+      const response = await callApi({
+        method: DELETE,
+        url: ALTER_USER_DECK.replace("{userId}", userId).replace(
+          "{deckId}",
+          deckId
+        ),
+        data: {},
+      })
       toast.success("Успешно удалили колоду")
-      commit("set_decks", response.data)
-      dispatch("set_deck_in_play") // после удаления колоды, устанавливаем базовую деку для игры
+      commit("set_decks", response.data.decks)
+      // после удаления колоды, устанавливаем базовую деку для игры (вдруг мы удалили ту которая была)
+      dispatch("set_deck_in_play")
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при удалении деки")
     }
   },
 
-  async patch_deck({ getters, dispatch, commit }, deck) {
-    // ВНИМАНИЕ: в PATCH методе не забыть поставть слэш в конце!
+  async patchUserDeck({ getters, dispatch, commit }, deck) {
     try {
-      let header = getters["getHeader"]
-      let url = `${post_deck}${deck.id}/`
-      const response = await axios.patch(url, deck, header)
+      const userId = getters["getUser"].user_id
+      const { deck_id, ...deck_body } = deck
+      const response = await callApi({
+        method: PATCH,
+        url: ALTER_USER_DECK.replace("{userId}", userId).replace(
+          "{deckId}",
+          deck_id
+        ),
+        data: deck_body,
+      })
       toast.success("Успешно изменили колоду")
-      commit("set_decks", response.data)
+      commit("set_decks", response.data.decks)
       // после изменения колоды тоже, устанавливаем базовую деку для игры (вдруг мы изменили ту, которая уже была)
       dispatch("set_deck_in_play")
     } catch (err) {
