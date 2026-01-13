@@ -73,7 +73,7 @@ export default {
     async confirm_delete() {
       this.show_yesno = false
       try {
-        await this.$store.dispatch("delete_deck", this.deck_id)
+        await this.$store.dispatch("deleteUserDeck", this.deck_id)
       } catch (err) {
         console.log(err)
         throw err
