@@ -124,9 +124,9 @@ export default {
 
   methods: {
     // триггеры показа дополнительных окон
-    startDeckBuilding() {
-      this.showNewDeckFactionSelect = true
-    },
+    // startDeckBuilding() {
+    //   this.showNewDeckFactionSelect = true
+    // },
 
     trigger_decks_list_modal(value) {
       this.show_decks_list_modal = value
@@ -181,7 +181,7 @@ export default {
       }
       if (this.can_add_card(card)) {
         this.deck.deck_is_progress.push(card)
-        this.deck.deck_body.push({ card: card.card.id })
+        this.deck.deck_body.push(card.card.id)
         this.deck.health += card.card.hp
         return
       }
@@ -198,7 +198,7 @@ export default {
         1
       )
       this.deck.deck_body.splice(
-        this.deck.deck_body.findIndex(c => c.card === card.card.id),
+        this.deck.deck_body.findIndex(card_id => card_id === card.card.id),
         1
       )
     },
@@ -231,10 +231,9 @@ export default {
       if (this.deck.deck_name.trim() === "") {
         return this.toast.warning("Введите имя колоды")
       }
-      this.send_data_to_store("post_deck", {
-        name: this.deck.deck_name,
-        health: this.deck.health,
-        d: this.deck.deck_body,
+      await this.send_data_to_store("createUserDeck", {
+        deck_name: this.deck.deck_name,
+        cards: this.deck.deck_body,
         leader_id: this.deck.leader.id,
       })
     },
@@ -252,10 +251,7 @@ export default {
       ) {
         return false
       }
-      if (this.query.faction === "") {
-        return false
-      }
-      return true
+      return this.query.faction !== ""
     },
     // фильтр карт и лидеров по фракции по нажатию на кнопку фракции
     select_faction(prop, value) {
@@ -272,7 +268,7 @@ export default {
       ;(this.deck.deck_id = deck.id),
         (this.deck.deck_name = deck.name),
         (this.deck.deck_is_progress = [...deck.cards]), // колода в процессе - целиком объекты, для отображения
-        (this.deck.deck_body = [...deck.d]), // только {card = id} для пост-запроса
+        (this.deck.deck_body = [...deck.cards.map(card => card.card.id)]), // только {card = id} для пост-запроса
         (this.deck.leader = deck.leader), // сам выбранный лидер
         (this.deck.health = deck.health), // жизни текущей деки
         (this.query.faction = deck.leader.faction)
@@ -280,12 +276,11 @@ export default {
     },
 
     async patch_deck() {
-      this.send_data_to_store("patch_deck", {
-        name: this.deck.deck_name,
-        health: this.deck.health,
-        d: this.deck.deck_body,
+      await this.send_data_to_store("patchUserDeck", {
+        deck_name: this.deck.deck_name,
+        cards: this.deck.deck_body,
         leader_id: this.deck.leader.id,
-        id: this.deck.deck_id,
+        deck_id: this.deck.deck_id,
       })
     },
 
@@ -342,6 +337,10 @@ export default {
 </script>
 
 <style scoped>
+:root {
+  --vh: 1vh;
+}
+
 .deck_builder_page-wrapper {
   display: flex;
   flex-direction: column;
@@ -367,7 +366,7 @@ export default {
 .database_of_cards {
   width: 100%;
   background: #3c4d60;
-  box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7);
   padding-top: 5px;
   padding-bottom: 5px;
   overflow-y: scroll;
