@@ -15,10 +15,11 @@ export const USER_LOGIN = `${getDomain()}/users/login-user`
 export const USER_REGISTER = `${getDomain()}/users/register-user/`
 
 // user_database for database.js
-export const USER_DATABASE = `${getDomain()}/user-progress/`
+export const USER_DATABASE = `${getDomain()}/user-progress/{userId}`
 
 // post deck, + carddecks + userdeck, user_actions: post_deck
-export const post_deck = `${getDomain()}/api/v1/decks/`
+export const CREATE_USER_DECK = `${getDomain()}/user-progress/{userId}/create-deck`
+export const ALTER_USER_DECK = `${getDomain()}/user-progress/{userId}/alter-deck/{deckId}`
 
 // patch user_resource
 export const user_resource = `${getDomain()}/api/v1/user_resource/`
