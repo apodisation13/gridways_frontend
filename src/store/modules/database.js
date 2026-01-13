@@ -114,12 +114,12 @@ const mutations = {
 const actions = {
   // в ответе user_database: cards,leaders,u_d(колоды),levels, resources: тут ресурсы
   async get_user_database({ commit, getters, dispatch }) {
-    let user_id = getters["getUser"].user_id
+    let userId = getters["getUser"].user_id
 
     try {
       let response = await callApi({
         method: GET,
-        url: `${USER_DATABASE}${user_id}`,
+        url: USER_DATABASE.replace("{userId}", userId),
       })
 
       const {
