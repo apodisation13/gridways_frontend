@@ -57,7 +57,6 @@
 <script>
 import {
   border_for_card,
-  background_color,
   border_leader,
   background_color_leader,
   background_color_hp,
@@ -69,6 +68,7 @@ import YesnoModal from "@/components/ModalWindows/YesnoModal"
 import CardUi from "@/components/Cards/CardUi"
 import EnemyUi from "@/components/Cards/EnemyUi"
 import CardDescriptions from "@/components/Cards/CardDescriptions"
+import { CraftMillCardActionSubtype } from "@/store/const/const"
 export default {
   name: "card-modal",
   components: {
@@ -143,9 +143,6 @@ export default {
     border(card) {
       return this.is_leader ? border_leader(card) : border_for_card(card)
     },
-    background_color(e) {
-      return background_color(e)
-    },
     background_color_triangle(color) {
       return this.is_leader
         ? background_color_leader(this.card.faction)
@@ -177,18 +174,27 @@ export default {
     },
     async confirm_mill() {
       this.show_yesno_mill = false
-      let result = await this.$store.dispatch("pay_resource", {
-        scraps: this.$store.getters["resource"].scraps + this.resource_value,
-      })
-      if (result) await this.$store.dispatch("mill_card_action", this.user_card)
+      const subtypeCardAction =
+        this.user_card?.card?.color !== undefined
+          ? CraftMillCardActionSubtype.millCard
+          : CraftMillCardActionSubtype.millLeader
+      const data = {
+        cardId: this.user_card.card.id,
+        subtype: subtypeCardAction,
+      }
+      await this.$store.dispatch("craft_card_action", data)
     },
     async confirm_craft() {
       this.show_yesno_craft = false
-      let result = await this.$store.dispatch("pay_resource", {
-        scraps: this.$store.getters["resource"].scraps + this.resource_value,
-      })
-      if (result)
-        await this.$store.dispatch("craft_card_action", this.user_card)
+      const subtypeCardAction =
+        this.user_card?.card?.color !== undefined
+          ? CraftMillCardActionSubtype.craftCard
+          : CraftMillCardActionSubtype.craftLeader
+      const data = {
+        cardId: this.user_card.card.id,
+        subtype: subtypeCardAction,
+      }
+      await this.$store.dispatch("craft_card_action", data)
     },
   },
   emits: ["close_card_modal"],
