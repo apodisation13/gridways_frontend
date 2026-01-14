@@ -102,24 +102,22 @@ export default {
     // открытие всех связанных уровней при прохождении уровня
     async open_levels() {
       const currentLevel = this.$store.getters["currentLevel"]
-      if (currentLevel.random) return // при рандомном уровне сразу выходим отсюда
 
-      const season = this.$store.getters["get_season"] // выбранный сезон из стора, выбирается по открытию дерева
-      const level = season.levels.find(lev => lev.level.id === currentLevel.id) // ищем уровень из списка уровней сезона
-      if (!level || level.finished) return // если уровень УЖЕ пройден, то нет смысла открывать его детей
+      // при рандомном уровне сразу выходим отсюда
+      if (currentLevel.random) return
 
-      this.related_levels = level.level.related_levels || []
-      if (this.related_levels.length === 0) return // если связанных уровней нет, открывать нечего
+      // выбранный сезон из стора, выбирается по открытию дерева
+      const season = this.$store.getters["get_season"]
 
-      const seasonIndex = this.all_seasons.findIndex(sea => sea === season)
-      const data = {
-        finished_level: level.level.id, // если он приходит, то открываем уровни, иначе удаляем все кроме первого
-        related_levels: this.related_levels, // список [1,2,3] id уровней, которые надо открыть
-        finished_user_level_id: level.id, // id записи UserLevel, ей поставим finished=true
-        season_id: season.id,
-        seasonIndex: seasonIndex,
-      }
-      await this.$store.dispatch("open_new_levels", data)
+      // ищем уровень из списка уровней сезона
+      const userLevel = season.levels.find(
+        lev => lev.level.id === currentLevel.id
+      )
+
+      // если уровень УЖЕ пройден, то нет смысла открывать его детей
+      if (!userLevel || userLevel.finished) return
+
+      await this.$store.dispatch("openRelatedLevels", userLevel.id)
     },
   },
 }
