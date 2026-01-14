@@ -116,7 +116,7 @@ const actions = {
     // в body придет обязательно subtype, data
     // data: { level_id: level.id } - для оплаты игры на уровне сезона
     // data: { wood: 201, scraps: 185, etc } - для получения ресурсов после прохождения уровня сезона
-    // data: { card_id: card.id/leader.id } - для крафт/милл карты/лидера
+    // data: { wood: -100 } - для получения и списания ресурсов на странице бонусов
     console.log(114114114114, body)
     const userId = getters["getUser"].user_id
 
