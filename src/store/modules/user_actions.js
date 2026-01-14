@@ -1,9 +1,5 @@
 import axios from "axios"
 import {
-  // craft_card,
-  // craft_leader,
-  // mill_card,
-  // mill_leader,
   patch_levels,
   CREATE_USER_DECK,
   ALTER_USER_DECK,
@@ -112,12 +108,11 @@ const actions = {
     }
   },
 
-  async pay_resource({ commit, getters, dispatch }, body) {
+  async processResources({ commit, getters, dispatch }, body) {
     // в body придет обязательно subtype, data
     // data: { level_id: level.id } - для оплаты игры на уровне сезона
     // data: { wood: 201, scraps: 185, etc } - для получения ресурсов после прохождения уровня сезона
     // data: { wood: -100 } - для получения и списания ресурсов на странице бонусов
-    console.log(114114114114, body)
     const userId = getters["getUser"].user_id
 
     try {
@@ -134,7 +129,7 @@ const actions = {
     }
   },
 
-  calculate_value({ state }, obj) {
+  calculateCraftMillCardValue({ state }, obj) {
     // процесс крафта: по цвету, или если цвета нет, то крафтим лидера значит
     if (obj.process === "craft") {
       if (obj.card.color === "Bronze") return state.game_prices.craft_bronze
@@ -147,7 +142,7 @@ const actions = {
     if (obj.process === "mill") {
       // нельзя: если карт 0, или если карт 1 и при этом она в стартовом наборе (unlocked, то есть)
       if (obj.count === 0 || (obj.count === 1 && obj.card.unlocked)) {
-        toast.error(
+        toast.warning(
           "Нельзя размиллить карту из стартового набора (или карту которой у вас и так нет, ха-ха)"
         )
         return
@@ -159,8 +154,7 @@ const actions = {
     }
   },
 
-  async craft_card_action({ getters, commit, dispatch }, body) {
-    console.log(159, body)
+  async processCraftMillCard({ getters, commit, dispatch }, body) {
     let userId = getters["getUser"].user_id
     const subtype = body.subtype
     try {
@@ -191,83 +185,6 @@ const actions = {
       throw new Error("Какая-то ошибка при создании карты")
     }
   },
-
-  // async craft_leader({ dispatch, getters, commit }, card) {
-  //   let header = getters["getHeader"]
-  //   let user_id = getters["getUser"].user_id
-  //
-  //   if (card.count === 0) {
-  //     try {
-  //       const response = await axios.post(
-  //         craft_leader,
-  //         { user: user_id, leader: card.card.id },
-  //         header
-  //       )
-  //       toast.success("Успешно создали лидера")
-  //       commit("set_leaders", response.data.leaders)
-  //     } catch (err) {
-  //       dispatch("error_action", err)
-  //       throw new Error("Какая-то ошибка при создании лидера")
-  //     }
-  //   } else if (card.count >= 1) {
-  //     try {
-  //       // card.id - id записи, которую надо патчить (usercard), card.card.id - id самой карты
-  //       let url = `${craft_leader}${card.id}/`
-  //       const response = await axios.patch(
-  //         url,
-  //         { user: user_id, leader: card.card.id },
-  //         header
-  //       )
-  //       toast.success("Успешно создали лидера")
-  //       commit("set_leaders", response.data.leaders)
-  //     } catch (err) {
-  //       dispatch("error_action", err)
-  //       throw new Error("Какая-то ошибка при создании лидера")
-  //     }
-  //   }
-  // },
-  //
-  // async mill_card_action({ dispatch }, user_card) {
-  //   if (user_card.card.color) await dispatch("mill_card", user_card)
-  //   else await dispatch("mill_leader", user_card)
-  // },
-  //
-  // async mill_card({ dispatch, getters, commit }, user_card) {
-  //   let header = getters["getHeader"]
-  //   let user_id = getters["getUser"].user_id
-  //   let url = `${mill_card}${user_card.id}/`
-  //
-  //   try {
-  //     const response = await axios.patch(
-  //       url,
-  //       { user: user_id, card: user_card.card.id },
-  //       header
-  //     )
-  //     toast.success("Успешно уничтожили карту")
-  //     commit("set_cards", response.data.cards)
-  //   } catch (err) {
-  //     dispatch("error_action", err)
-  //     throw new Error("Какая-то ошибка при размалывании карты")
-  //   }
-  // },
-  //
-  // async mill_leader({ dispatch, getters, commit }, user_card) {
-  //   let header = getters["getHeader"]
-  //   let user_id = getters["getUser"].user_id
-  //   let url = `${mill_leader}${user_card.id}/`
-  //   try {
-  //     const response = await axios.patch(
-  //       url,
-  //       { user: user_id, leader: user_card.card.id },
-  //       header
-  //     )
-  //     toast.success("Успешно уничтожили лидера")
-  //     commit("set_leaders", response.data.leaders)
-  //   } catch (err) {
-  //     dispatch("error_action", err)
-  //     throw new Error("Какая-то ошибка при размалывании лидера")
-  //   }
-  // },
 
   // тестоввый экшен, сбрасывает все уровни юзера кроме первого
   async reset_levels({ dispatch, getters }) {

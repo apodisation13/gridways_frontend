@@ -25,10 +25,6 @@ export const ALTER_USER_DECK = `${getDomain()}/user-progress/{userId}/alter-deck
 export const USER_RESOURCE = `${getDomain()}/user-progress/{userId}/resource/`
 
 // craft card, means POST user:id, card:id
-export const craft_card = `${getDomain()}/api/v1/patchcards/craft_user_cards/`
-export const mill_card = `${getDomain()}/api/v1/patchcards/mill_user_cards/`
-export const craft_leader = `${getDomain()}/api/v1/patchleaders/craft_user_leaders/`
-export const mill_leader = `${getDomain()}/api/v1/patchleaders/mill_user_leaders/`
 export const CARD_ACTION = `${getDomain()}/user-progress/{userId}/card/{cardId}/`
 
 // PATCH запрос - пришло finished_levels - открытие уровней, не пришло - сброс (нужен id записи UserLevel)

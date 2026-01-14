@@ -153,7 +153,7 @@ export default {
       this.show_yesno_craft = false
     },
     async mill() {
-      let can_mill = await this.$store.dispatch("calculate_value", {
+      let can_mill = await this.$store.dispatch("calculateCraftMillCardValue", {
         card: this.card,
         process: "mill",
         count: this.count,
@@ -163,11 +163,14 @@ export default {
       this.show_yesno_mill = true
     },
     async craft() {
-      let can_craft = await this.$store.dispatch("calculate_value", {
-        card: this.card,
-        process: "craft",
-        count: this.count,
-      })
+      let can_craft = await this.$store.dispatch(
+        "calculateCraftMillCardValue",
+        {
+          card: this.card,
+          process: "craft",
+          count: this.count,
+        }
+      )
       if (!can_craft) return
       this.resource_value = can_craft
       this.show_yesno_craft = true
@@ -182,7 +185,7 @@ export default {
         cardId: this.user_card.card.id,
         subtype: subtypeCardAction,
       }
-      await this.$store.dispatch("craft_card_action", data)
+      await this.$store.dispatch("processCraftMillCard", data)
     },
     async confirm_craft() {
       this.show_yesno_craft = false
@@ -194,7 +197,7 @@ export default {
         cardId: this.user_card.card.id,
         subtype: subtypeCardAction,
       }
-      await this.$store.dispatch("craft_card_action", data)
+      await this.$store.dispatch("processCraftMillCard", data)
     },
   },
   emits: ["close_card_modal"],
