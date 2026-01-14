@@ -51,7 +51,7 @@ export default {
       this.loading = true
       try {
         // вот здесь мы присылаем level.id, на бэке всё вычислим тоже, сколько нужно заплатить
-        await this.$store.dispatch("pay_resource", {
+        await this.$store.dispatch("processResources", {
           subtype: PayResourcesSubtype.startSeasonLevel,
           data: { level_id: this.$store.state.game.level.id },
         })

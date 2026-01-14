@@ -87,7 +87,7 @@ export default {
       }
       console.log(88, card)
       // В противном случае мы выполним эмит только после окончания запроса! (потому что там карты перезагрузятся!)
-      await this.$store.dispatch("craft_card_action", {
+      await this.$store.dispatch("processCraftMillCard", {
         subtype: CraftMillCardActionSubtype.craftCard,
         cardId: card.card.id,
       })
@@ -99,7 +99,7 @@ export default {
     async accept_chest_reward() {
       if (this.name !== "chests") return
       for (const elem of this.reward) {
-        await this.$store.dispatch("craft_card_action", {
+        await this.$store.dispatch("processCraftMillCard", {
           subtype: CraftMillCardActionSubtype.craftCard,
           cardId: elem.card.id,
         })

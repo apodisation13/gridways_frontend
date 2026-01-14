@@ -94,7 +94,7 @@ export default {
         data.big_kegs = this.pay_data.big_kegs
       }
 
-      await this.$store.dispatch("pay_resource", {
+      await this.$store.dispatch("processResources", {
         subtype: PayResourcesSubtype.winSeasonLevel,
         data: data,
       })

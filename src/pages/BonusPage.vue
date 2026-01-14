@@ -128,7 +128,7 @@ export default {
     },
 
     async pay_resource(data) {
-      await this.$store.dispatch("pay_resource", {
+      await this.$store.dispatch("processResources", {
         subtype: this.subtype,
         data: data,
       })
