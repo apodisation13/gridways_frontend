@@ -5,6 +5,7 @@ import {
   ALTER_USER_DECK,
   USER_RESOURCE,
   CARD_ACTION,
+  OPEN_RELATED_LEVELS,
 } from "@/store/const/api_urls"
 import { useToast } from "vue-toastification"
 import { callApi, DELETE, PATCH, POST } from "@/lib/api/api"
@@ -203,25 +204,22 @@ const actions = {
   },
 
   // открывает related_levels для текущего, а текущему ставит finished,
-  // возвращает полный список уровней ДАННОГО СЕЗОНА
-  async open_new_levels({ dispatch, getters, commit }, data) {
-    let header = getters["getHeader"]
-    let url = `${patch_levels}${data.finished_user_level_id}/`
-
+  // возвращает полный список всех сезонов
+  async openRelatedLevels({ dispatch, getters, commit }, userLevelId) {
+    const userId = getters["getUser"].user_id
     try {
-      const response = await axios.patch(
-        url,
-        {
-          finished_level: data.finished_level,
-          related_levels: data.related_levels,
-          season_id: data.season_id,
-        },
-        header
-      )
-      commit("set_updated_season", {
-        levels: response.data.levels,
-        index: data.seasonIndex,
+      const response = await callApi({
+        method: PATCH,
+        url: OPEN_RELATED_LEVELS.replace("{userId}", userId).replace(
+          "{userLevelId}",
+          userLevelId
+        ),
+        data: {},
       })
+      const seasons = response.data.seasons
+      commit("set_seasons", seasons)
+      commit("set_season", seasons[0])
+      dispatch("set_level_in_play", seasons[0].levels[0])
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при открытии уровней")

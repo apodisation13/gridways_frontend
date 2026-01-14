@@ -29,3 +29,4 @@ export const CARD_ACTION = `${getDomain()}/user-progress/{userId}/card/{cardId}/
 
 // PATCH запрос - пришло finished_levels - открытие уровней, не пришло - сброс (нужен id записи UserLevel)
 export const patch_levels = `${getDomain()}/api/v1/unlock_levels/`
+export const OPEN_RELATED_LEVELS = `${getDomain()}/user-progress/{userId}/open-related-levels/{userLevelId}/`
