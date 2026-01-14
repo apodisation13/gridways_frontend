@@ -61,6 +61,7 @@ import { getRandomReward } from "@/logic/random_rewards"
 import { choice } from "@/lib/utils"
 import BonusPageResource from "@/components/UI/BonusPageResource"
 import RewardComp from "@/components/Pages/BonusPage/RewardComp.vue"
+import { PayResourcesSubtype } from "@/store/const/const"
 export default {
   components: { BonusPageResource, RewardComp },
   created() {
@@ -96,6 +97,7 @@ export default {
       random_reward_choice: null, // выбор рандомной награды из ключа
       reward_name: "",
       show_reward_page: false,
+      subtype: PayResourcesSubtype.bonusReward,
     }
   },
   methods: {
@@ -125,12 +127,19 @@ export default {
       this.show_reward_page = false
     },
 
+    async pay_resource(data) {
+      await this.$store.dispatch("pay_resource", {
+        subtype: this.subtype,
+        data: data,
+      })
+    },
+
     async add_kegs(quantity) {
       const final_price = quantity * this.kegs_price
       if (!this.is_enough_wood(final_price)) return
-      await this.$store.dispatch("pay_resource", {
-        wood: this.resource.wood - final_price,
-        kegs: this.resource.kegs + quantity,
+      await this.pay_resource({
+        wood: -final_price,
+        kegs: quantity,
       })
     },
 
@@ -143,17 +152,15 @@ export default {
       for (let i = 0; i < this.keg_len; i++) {
         this.random_cards.push(this.pool[choice(this.pool)])
       }
-      await this.$store.dispatch("pay_resource", {
-        kegs: this.resource.kegs - 1,
-      })
+      await this.pay_resource({ kegs: -1 })
     },
 
     async add_big_kegs(quantity) {
       const final_price = quantity * this.big_kegs_price
       if (!this.is_enough_wood(final_price)) return
-      await this.$store.dispatch("pay_resource", {
-        wood: this.resource.wood - final_price,
-        big_kegs: this.resource.big_kegs + quantity,
+      await this.pay_resource({
+        wood: -final_price,
+        big_kegs: quantity,
       })
     },
 
@@ -166,17 +173,15 @@ export default {
       for (let i = 0; i < this.keg_len; i++) {
         this.random_cards.push(this.pool[choice(this.pool)])
       }
-      await this.$store.dispatch("pay_resource", {
-        big_kegs: this.resource.big_kegs - 1,
-      })
+      await this.pay_resource({ big_kegs: -1 })
     },
 
     async add_chests(quantity) {
       const final_price = quantity * this.chests_price
       if (!this.is_enough_wood(final_price)) return
-      await this.$store.dispatch("pay_resource", {
-        wood: this.resource.wood - final_price,
-        chests: this.resource.chests + quantity,
+      await this.pay_resource({
+        wood: -final_price,
+        chests: quantity,
       })
     },
     async open_chest() {
@@ -188,16 +193,12 @@ export default {
       for (let i = 0; i < this.keg_len; i++) {
         this.random_cards.push(this.pool[choice(this.pool)])
       }
-      await this.$store.dispatch("pay_resource", {
-        chests: this.resource.chests - 1,
-      })
+      await this.pay_resource({ chests: -1 })
     },
 
     async open_key() {
       if (this.resource.keys <= 0) return
-      await this.$store.dispatch("pay_resource", {
-        keys: this.resource.keys - 1,
-      })
+      await this.pay_resource({ keys: -1 })
       const key_reward = []
       for (let i = 0; i < 3; i++) {
         key_reward.push(getRandomReward())
@@ -211,8 +212,8 @@ export default {
     async accept_random_reward(res) {
       const { resource, value } = res
       let reward = {}
-      reward[resource] = this.resource[resource] + value
-      await this.$store.dispatch("pay_resource", reward)
+      reward[resource] = value
+      await this.pay_resource(reward)
       this.clear_reward()
     },
   },
