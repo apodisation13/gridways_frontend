@@ -6,6 +6,7 @@ import {
   USER_RESOURCE,
   CARD_ACTION,
   OPEN_RELATED_LEVELS,
+  CRAFT_BONUS_CARD,
 } from "@/store/const/api_urls"
 import { useToast } from "vue-toastification"
 import { callApi, DELETE, PATCH, POST } from "@/lib/api/api"
@@ -181,6 +182,22 @@ const actions = {
       ) {
         commit("set_leaders", response.data.cards)
       }
+    } catch (err) {
+      dispatch("error_action", err)
+      throw new Error("Какая-то ошибка при создании карты")
+    }
+  },
+
+  async processCraftBonusCard({ getters, commit, dispatch }, cardsIds) {
+    let userId = getters["getUser"].user_id
+    try {
+      const response = await callApi({
+        method: POST,
+        url: CRAFT_BONUS_CARD.replace("{userId}", userId),
+        data: { cards_ids: cardsIds },
+      })
+      toast.success("Успешно создали карту")
+      commit("set_cards", response.data.cards)
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при создании карты")
