@@ -46,7 +46,6 @@
 <script>
 import CardListComponent from "@/components/Cards/CardListComponent"
 import ResourceCountRombus from "@/components/UI/ResourceCountRombus"
-import { CraftMillCardActionSubtype } from "@/store/const/const"
 export default {
   components: { CardListComponent, ResourceCountRombus },
   name: "reward-comp",
@@ -85,12 +84,12 @@ export default {
         this.$emit("clear_reward")
         return
       }
-      console.log(88, card)
       // В противном случае мы выполним эмит только после окончания запроса! (потому что там карты перезагрузятся!)
-      await this.$store.dispatch("processCraftMillCard", {
-        subtype: CraftMillCardActionSubtype.craftCard,
-        cardId: card.card.id,
-      })
+      // await this.$store.dispatch("processCraftMillCard", {
+      //   subtype: CraftMillCardActionSubtype.craftBonusCard,
+      //   cardId: card.card.id,
+      // })
+      await this.$store.dispatch("processCraftBonusCard", [card.card.id])
       this.$emit("clear_reward")
     },
     async accept_random_reward(res) {
@@ -98,12 +97,8 @@ export default {
     },
     async accept_chest_reward() {
       if (this.name !== "chests") return
-      for (const elem of this.reward) {
-        await this.$store.dispatch("processCraftMillCard", {
-          subtype: CraftMillCardActionSubtype.craftCard,
-          cardId: elem.card.id,
-        })
-      }
+      const cardIds = this.reward.map(elem => elem.card.id)
+      await this.$store.dispatch("processCraftBonusCard", cardIds)
       setTimeout(() => this.$emit("clear_reward"), 10000)
     },
     clear_reward() {
