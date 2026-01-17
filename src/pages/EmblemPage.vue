@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import { getEnv } from "@/store/const/const"
+
 export default {
   name: "EmblemPage",
   data() {
@@ -30,7 +32,7 @@ export default {
     toggleApi() {
       // окно перехода в полноэкранный режим, запрашивается 1 раз при первичной загрузке приложения,
       // дальнейшая логика взаимодействия с полноэкранным режимом реализована в AppWrapperFullscreen
-      this.$fullscreen.toggle()
+      if (getEnv() !== "development_local") this.$fullscreen.toggle()
       // выставляем триггер в строр для разрешения открытия модального окна с запросом перехода в полноэкранный режим
       this.$store.commit("gameStarting")
       this.goFullScreen()
