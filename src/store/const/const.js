@@ -1,3 +1,7 @@
+export function getEnv() {
+  return process.env.VUE_APP_CUSTOM_ENV
+}
+
 export const PayResourcesSubtype = {
   startSeasonLevel: "start_season_level",
   winSeasonLevel: "win_season_level",
