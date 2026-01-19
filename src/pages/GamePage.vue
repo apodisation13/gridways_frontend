@@ -57,6 +57,7 @@
       :hand="gameObj.hand"
       :field="gameObj.field"
       :enemy_leader="gameObj.enemy_leader"
+      :player_cards_active="isActive.player_cards"
       @chose_player_card="chose_player_card"
       @target_enemy="exec_damage_enemy_card"
       @target_enemy_leader="exec_damage_enemy_leader"
