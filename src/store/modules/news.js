@@ -32,6 +32,7 @@ const actions = {
         url: LIST_NEWS,
       })
       commit("setNews", response.data)
+      console.log(response.data)
     } catch (err) {
       console.error("Ошибка при загрузке новостей:", err)
       throw new Error("Ошибка при загрузке новостей")

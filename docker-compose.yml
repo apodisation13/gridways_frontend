@@ -1,0 +1,18 @@
+services:
+  frontend:
+    container_name: gridways-frontend
+    restart: unless-stopped
+    build:
+      context: .
+      args:
+        - VUE_APP_CUSTOM_ENV=${VUE_APP_CUSTOM_ENV}
+        - VUE_APP_DOMAIN=${VUE_APP_DOMAIN}
+    networks:
+      - app-network
+    ports:
+      - "8080:8080"
+
+
+networks:
+  app-network:
+    external: true

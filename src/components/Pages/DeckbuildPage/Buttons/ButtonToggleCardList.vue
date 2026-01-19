@@ -64,7 +64,8 @@ export default {
     #282d33 109.53%
   );
   border: 2px solid #facf5d;
-  box-shadow: 5px 9px 20px rgba(0, 0, 0, 0.25),
+  box-shadow:
+    5px 9px 20px rgba(0, 0, 0, 0.25),
     inset -5px -5px 5px rgba(0, 0, 0, 0.25),
     inset 5px 5px 5px rgba(0, 0, 0, 0.25);
 }
@@ -84,12 +85,7 @@ export default {
 }
 
 .button-active .button-text {
-  background: linear-gradient(
-    183.6deg,
-    #edb13e 2.96%,
-    #f4d977 65.79%,
-    #eeb850 129.95%
-  );
+  background: var(--primary-gold-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

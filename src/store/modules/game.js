@@ -3,6 +3,7 @@ const state = {
   hand_size: undefined, // СКОЛЬКО КАРТ В РУКЕ
 
   current_deck: [], // дека выбранная для игры, deck.cards
+  current_deck_index: undefined, // индекс деки в списке дек
   health: 0, // жизни деки, из деки, deck.health
   leader: null, // текущий лидер для игры из деки, deck.leader
 
@@ -12,7 +13,6 @@ const state = {
 
   ppa_end_turn: false, // true - значит они сейчас в процессе
   ai_move: false, // true - значит они сейчас ходят
-  leader_ai_move: false,
   epa_end_turn: false,
   player_turn: true,
 
@@ -21,6 +21,7 @@ const state = {
 
 const getters = {
   get_season: state => state.season,
+  currentLevel: state => state.level,
 }
 
 const mutations = {
@@ -32,6 +33,10 @@ const mutations = {
   set_current_deck(state, deck) {
     // записать деку для игры
     state.current_deck = deck
+  },
+  // запомнить индекс деки из общего списка колод
+  set_current_deck_index(state, index) {
+    state.current_deck_index = index
   },
   set_health(state, param) {
     // установить здоровье из deck.health
@@ -66,9 +71,6 @@ const mutations = {
   set_ai_move(state, payload) {
     state.ai_move = payload
   },
-  set_leader_ai_move(state, payload) {
-    state.leader_ai_move = payload
-  },
   set_epa_end_turn(state, payload) {
     state.epa_end_turn = payload
   },
@@ -82,14 +84,34 @@ const mutations = {
 }
 
 const actions = {
-  set_deck_in_play({ commit }, deck) {
+  // устанавливает колоду для игры и запоминает её индекс в списке дек
+  // если дека пришла (из выбора дек), то запоминает её для игры, иначе просто базовую (которая последняя в списке)
+  set_deck_in_play({ commit, getters }, deck = null) {
+    let index = undefined
+    if (deck) {
+      index = getters["all_decks"].findIndex(d => d.id === deck.id)
+    }
+    if (!deck) {
+      deck = getters["all_decks"].at(-1)
+      index = getters["all_decks"].length - 1
+    }
     commit("set_current_deck", deck.deck.cards)
+    commit("set_current_deck_index", index)
     commit("set_health", deck.deck.health)
     commit("set_leader", deck.deck.leader)
   },
   set_level_in_play({ commit }, level) {
     commit("set_level", level.level)
     commit("set_enemy_leader", level.level.enemy_leader)
+  },
+  // после выигрыша, проигрыша или ухода со страницы игры, вызываем этот экшен и повторяем выбор деки
+  re_set_deck({ state, getters, dispatch }) {
+    const deck = getters["all_decks"][state.current_deck_index]
+    if (!deck) return
+    setTimeout(() => {
+      dispatch("set_deck_in_play", deck)
+      console.log("переустановка колоды!")
+    }, 3000)
   },
 }
 

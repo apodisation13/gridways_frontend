@@ -1,14 +1,16 @@
 import axios from "axios"
 import {
-  craft_card,
-  craft_leader,
-  mill_card,
-  mill_leader,
   patch_levels,
-  post_deck,
-  user_resource,
+  CREATE_USER_DECK,
+  ALTER_USER_DECK,
+  USER_RESOURCE,
+  CARD_ACTION,
+  OPEN_RELATED_LEVELS,
+  CRAFT_BONUS_CARD,
 } from "@/store/const/api_urls"
 import { useToast } from "vue-toastification"
+import { callApi, DELETE, PATCH, POST } from "@/lib/api/api"
+import { CraftMillCardActionSubtype } from "@/store/const/const"
 
 const toast = useToast()
 
@@ -18,7 +20,24 @@ const state = {
   win_redirect: false,
 }
 
-const getters = {}
+const getters = {
+  get_kegs_price: () => {
+    return state.game_prices.pay_for_kegs
+      ? state.game_prices.pay_for_kegs * -1
+      : 0
+  },
+  get_big_kegs_price: () => {
+    return state.game_prices.pay_for_big_kegs
+      ? state.game_prices.pay_for_big_kegs * -1
+      : 0
+  },
+  get_chests_price: () => {
+    return state.game_prices.pay_for_chests
+      ? state.game_prices.pay_for_chests * -1
+      : 0
+  },
+  game_prices: state => state.game_prices,
+}
 
 const mutations = {
   // устанавливаем все игровые цены на крафт, милл итп
@@ -32,52 +51,78 @@ const mutations = {
 }
 
 const actions = {
-  async post_deck({ getters, dispatch }, body) {
+  async createUserDeck({ getters, dispatch, commit }, body) {
     try {
-      let header = getters["getHeader"]
-      await axios.post(post_deck, body, header)
+      const userId = getters["getUser"].user_id
+      const response = await callApi({
+        method: POST,
+        url: CREATE_USER_DECK.replace("{userId}", userId),
+        data: body,
+      })
       toast.success("Успешно добавили колоду")
-      await dispatch("get_user_database")
+      commit("set_decks", response.data.decks)
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при добавлении деки")
     }
   },
 
-  async delete_deck({ getters, dispatch }, deck_id) {
+  async deleteUserDeck({ getters, dispatch, commit }, deckId) {
     try {
-      let header = getters["getHeader"]
-      let url = `${post_deck}${deck_id}`
-      await axios.delete(url, header)
+      const userId = getters["getUser"].user_id
+      const response = await callApi({
+        method: DELETE,
+        url: ALTER_USER_DECK.replace("{userId}", userId).replace(
+          "{deckId}",
+          deckId
+        ),
+        data: {},
+      })
       toast.success("Успешно удалили колоду")
-      await dispatch("get_user_database")
+      commit("set_decks", response.data.decks)
+      // после удаления колоды, устанавливаем базовую деку для игры (вдруг мы удалили ту которая была)
+      dispatch("set_deck_in_play")
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при удалении деки")
     }
   },
 
-  async patch_deck({ getters, dispatch }, deck) {
-    // ВНИМАНИЕ: в PATCH методе не забыть поставть слэш в конце!
+  async patchUserDeck({ getters, dispatch, commit }, deck) {
     try {
-      let header = getters["getHeader"]
-      let url = `${post_deck}${deck.id}/`
-      await axios.patch(url, deck, header)
+      const userId = getters["getUser"].user_id
+      const { deck_id, ...deck_body } = deck
+      const response = await callApi({
+        method: PATCH,
+        url: ALTER_USER_DECK.replace("{userId}", userId).replace(
+          "{deckId}",
+          deck_id
+        ),
+        data: deck_body,
+      })
       toast.success("Успешно изменили колоду")
-      await dispatch("get_user_database")
+      commit("set_decks", response.data.decks)
+      // после изменения колоды тоже, устанавливаем базовую деку для игры (вдруг мы изменили ту, которая уже была)
+      dispatch("set_deck_in_play")
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при изменении деки")
     }
   },
 
-  async pay_resource({ commit, getters, dispatch }, body) {
-    let header = getters["getHeader"]
-    let user_id = getters["getUser"].user_id
-    const url = `${user_resource}${user_id}/`
+  async processResources({ commit, getters, dispatch }, body) {
+    // в body придет обязательно subtype, data
+    // data: { level_id: level.id } - для оплаты игры на уровне сезона
+    // data: { wood: 201, scraps: 185, etc } - для получения ресурсов после прохождения уровня сезона
+    // data: { wood: -100 } - для получения и списания ресурсов на странице бонусов
+    const userId = getters["getUser"].user_id
 
     try {
-      const response = await axios.patch(url, body, header)
+      const response = await callApi({
+        method: PATCH,
+        url: USER_RESOURCE.replace("{userId}", userId),
+        data: body,
+      })
       commit("set_resource", response.data)
       return response.data
     } catch (err) {
@@ -86,7 +131,7 @@ const actions = {
     }
   },
 
-  calculate_value({ state }, obj) {
+  calculateCraftMillCardValue({ state }, obj) {
     // процесс крафта: по цвету, или если цвета нет, то крафтим лидера значит
     if (obj.process === "craft") {
       if (obj.card.color === "Bronze") return state.game_prices.craft_bronze
@@ -99,7 +144,7 @@ const actions = {
     if (obj.process === "mill") {
       // нельзя: если карт 0, или если карт 1 и при этом она в стартовом наборе (unlocked, то есть)
       if (obj.count === 0 || (obj.count === 1 && obj.card.unlocked)) {
-        toast.error(
+        toast.warning(
           "Нельзя размиллить карту из стартового набора (или карту которой у вас и так нет, ха-ха)"
         )
         return
@@ -111,116 +156,51 @@ const actions = {
     }
   },
 
-  async craft_card_action({ dispatch }, card) {
-    // если у карты есть цвет, значит это карта, идём на экшен craft_card, иначе это лидер и идём на craft_leader
-    if (card.card.color) await dispatch("craft_card", card)
-    else await dispatch("craft_leader", card)
-  },
-
-  async craft_card({ dispatch, getters }, card) {
-    let header = getters["getHeader"]
-    let user_id = getters["getUser"].user_id
-
-    if (card.count === 0) {
-      try {
-        await axios.post(
-          craft_card,
-          { user: user_id, card: card.card.id },
-          header
-        )
-        await dispatch("get_user_database")
-      } catch (err) {
-        dispatch("error_action", err)
-        throw new Error("Какая-то ошибка при создании карты")
-      }
-    } else if (card.count >= 1) {
-      try {
-        // card.id - id записи, которую надо патчить (usercard), card.card.id - id самой карты
-        let url = `${craft_card}${card.id}/`
-        await axios.patch(
-          url,
-          { user: user_id, card: card.card.id, count: card.count },
-          header
-        )
-        await dispatch("get_user_database")
-      } catch (err) {
-        dispatch("error_action", err)
-        throw new Error("Какая-то ошибка при создании карты")
-      }
-    }
-  },
-
-  async craft_leader({ dispatch, getters }, card) {
-    let header = getters["getHeader"]
-    let user_id = getters["getUser"].user_id
-
-    if (card.count === 0) {
-      try {
-        await axios.post(
-          craft_leader,
-          { user: user_id, leader: card.card.id },
-          header
-        )
-        await dispatch("get_user_database")
-      } catch (err) {
-        dispatch("error_action", err)
-        throw new Error("Какая-то ошибка при создании лидера")
-      }
-    } else if (card.count >= 1) {
-      try {
-        // card.id - id записи, которую надо патчить (usercard), card.card.id - id самой карты
-        let url = `${craft_leader}${card.id}/`
-        await axios.patch(
-          url,
-          { user: user_id, leader: card.card.id, count: card.count },
-          header
-        )
-        await dispatch("get_user_database")
-      } catch (err) {
-        dispatch("error_action", err)
-        throw new Error("Какая-то ошибка при создании лидера")
-      }
-    }
-  },
-
-  async mill_card_action({ dispatch }, user_card) {
-    if (user_card.card.color) await dispatch("mill_card", user_card)
-    else await dispatch("mill_leader", user_card)
-  },
-
-  async mill_card({ dispatch, getters }, user_card) {
-    let header = getters["getHeader"]
-    let user_id = getters["getUser"].user_id
-    let url = `${mill_card}${user_card.id}/`
-
+  async processCraftMillCard({ getters, commit, dispatch }, body) {
+    let userId = getters["getUser"].user_id
+    const subtype = body.subtype
     try {
-      await axios.patch(
-        url,
-        { user: user_id, card: user_card.card.id, count: user_card.count },
-        header
-      )
-      await dispatch("get_user_database")
+      const response = await callApi({
+        method: POST,
+        url: CARD_ACTION.replace("{userId}", userId).replace(
+          "{cardId}",
+          body.cardId
+        ),
+        data: { subtype: subtype },
+      })
+      toast.success("Успешно создали карту")
+
+      commit("set_resource", response.data.resources)
+      if (
+        subtype === CraftMillCardActionSubtype.craftCard ||
+        subtype === CraftMillCardActionSubtype.millCard
+      ) {
+        commit("set_cards", response.data.cards)
+      } else if (
+        subtype === CraftMillCardActionSubtype.craftLeader ||
+        subtype === CraftMillCardActionSubtype.millLeader
+      ) {
+        commit("set_leaders", response.data.cards)
+      }
     } catch (err) {
       dispatch("error_action", err)
-      throw new Error("Какая-то ошибка при размалывании карты")
+      throw new Error("Какая-то ошибка при создании карты")
     }
   },
 
-  async mill_leader({ dispatch, getters }, user_card) {
-    let header = getters["getHeader"]
-    let user_id = getters["getUser"].user_id
-    let url = `${mill_leader}${user_card.id}/`
-
+  async processCraftBonusCard({ getters, commit, dispatch }, cardsIds) {
+    let userId = getters["getUser"].user_id
     try {
-      await axios.patch(
-        url,
-        { user: user_id, leader: user_card.card.id, count: user_card.count },
-        header
-      )
-      await dispatch("get_user_database")
+      const response = await callApi({
+        method: POST,
+        url: CRAFT_BONUS_CARD.replace("{userId}", userId),
+        data: { cards_ids: cardsIds },
+      })
+      toast.success("Успешно создали карту")
+      commit("set_cards", response.data.cards)
     } catch (err) {
       dispatch("error_action", err)
-      throw new Error("Какая-то ошибка при размалывании лидера")
+      throw new Error("Какая-то ошибка при создании карты")
     }
   },
 
@@ -241,25 +221,22 @@ const actions = {
   },
 
   // открывает related_levels для текущего, а текущему ставит finished,
-  // возвращает полный список уровней ДАННОГО СЕЗОНА
-  async open_new_levels({ dispatch, getters, commit }, data) {
-    let header = getters["getHeader"]
-    let url = `${patch_levels}${data.finished_user_level_id}/`
-
+  // возвращает полный список всех сезонов
+  async openRelatedLevels({ dispatch, getters, commit }, userLevelId) {
+    const userId = getters["getUser"].user_id
     try {
-      const response = await axios.patch(
-        url,
-        {
-          finished_level: data.finished_level,
-          related_levels: data.related_levels,
-          season_id: data.season_id,
-        },
-        header
-      )
-      commit("set_updated_season", {
-        levels: response.data.levels,
-        index: data.seasonIndex,
+      const response = await callApi({
+        method: PATCH,
+        url: OPEN_RELATED_LEVELS.replace("{userId}", userId).replace(
+          "{userLevelId}",
+          userLevelId
+        ),
+        data: {},
       })
+      const seasons = response.data.seasons
+      commit("set_seasons", seasons)
+      commit("set_season", seasons[0])
+      dispatch("set_level_in_play", seasons[0].levels[0])
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при открытии уровней")

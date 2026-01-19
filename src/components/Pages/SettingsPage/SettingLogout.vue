@@ -13,7 +13,7 @@
 
 <script>
 import ConfirmModal from "@/components/ModalWindows/ConfirmModal"
-import BaseButton from "@/components/UI/BaseButton"
+import BaseButton from "@/components/UI/Buttons/BaseButton"
 
 export default {
   components: {
@@ -30,8 +30,8 @@ export default {
       this.show_dialog = !this.show_dialog
     },
     logoutProcess() {
-      this.$store.dispatch("logout")
-      this.$router.push("/")
+      this.$store.dispatch("logOut")
+      this.$router.push("/main")
     },
   },
 }
@@ -41,7 +41,7 @@ export default {
 .title-modal {
   font-weight: 700;
   font-size: 1.5rem;
-  color: #667080;
+  color: gold;
   margin-bottom: 20px;
 }
 </style>

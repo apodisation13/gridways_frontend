@@ -1,112 +1,36 @@
 import store from "@/store"
+import { hand_passives } from "@/logic/player_move/passive_abilities/passives_hand"
+import { deck_passives } from "@/logic/player_move/passive_abilities/passives_deck"
+import { grave_passives } from "@/logic/player_move/passive_abilities/passives_graves"
 
-import { add_charges_to_leader_if_play_special } from "@/logic/player_move/passive_abilities/add-charges-to-leader-if-play-special"
-import { passive_end_turn_damage_random_enemy } from "@/logic/player_move/passive_abilities/damage_random_enemy"
-import { passive_end_turn_increase_damage_in_hand } from "@/logic/player_move/passive_abilities/increase_damage_to-card_in_hand"
-import {
-  passive_end_turn_heal_leader_by_2,
-  passive_end_turn_heal_leader_by_3,
-} from "@/logic/player_move/passive_abilities/heal_leader"
-import { passive_end_turn_increase_self_damage } from "@/logic/player_move/passive_abilities/increase_self_damage"
-import { if_in_deck_increase_self_damage } from "@/logic/player_move/passive_abilities/if_in_deck_increase_self_damage"
-import { if_in_grave_increase_self_damage } from "@/logic/player_move/passive_abilities/if_in_grave_increase_self_damage"
-import { passive_end_turn_destroy_2_enemies_after_3_turns } from "@/logic/player_move/passive_abilities/destroy_2_enemies_after_3_turns"
+function player_passive_abilities_end_turn(gameObj, timeOut = 1000) {
+  store.commit("set_ppa_end_turn", true) // установили флаг начала пассивок
 
-function player_passive_abilities_upon_playing_a_card(player_card, leader) {
-  // диспетчер вызова пассивных абилок
+  const { hand, deck, grave, leader } = gameObj
 
-  // здесь карты из руки проверяем
-
-  if (!leader.has_passive) return
-  if (leader.passive_ability.name === "add-charges-to-leader-if-play-special") {
-    add_charges_to_leader_if_play_special(player_card, leader)
-  }
-}
-
-function player_passive_abilities_end_turn(
-  hand,
-  leader,
-  deck,
-  grave,
-  field,
-  enemy_leader,
-  enemies
-) {
-  store.commit("set_ppa_end_turn", true)
-
-  let passive_hand = hand.filter(c => c.has_passive_in_hand)
-  passive_hand.reverse() // не забываем про float right :) FIXME
-  if (leader.has_passive) passive_hand.push(leader)
+  // здесь мы создаем пул карт, для которых нужны пассивки!
+  let pool = hand.filter(c => c.has_passive_in_hand) // собрали пассивные карты из руки
+  if (leader.has_passive) pool.push(leader) // добавили туда ещё и лидера если у него есть пассивка
+  pool = pool.concat(deck.filter(c => c.has_passive_in_deck)) // собрали пассивные карты из колоды
+  pool = pool.concat(grave.filter(c => c.has_passive_in_grave)) // собрали пассивные карты из сброса
 
   let i = 0
+  // вот именно в такой последовательности они и будут работать: рука, лидер, колода, сброс
   let passive_time = setInterval(() => {
-    if (i === passive_hand.length) {
-      deck
-        .filter(c => c.has_passive)
-        .forEach(card => {
-          if (
-            card.passive_ability.name === "if-in-deck-increase-self-damage-by-1"
-          ) {
-            if_in_deck_increase_self_damage(card)
-          }
-        })
-
-      grave
-        .filter(c => c.has_passive)
-        .forEach(card => {
-          if (
-            card.passive_ability.name ===
-            "if-in-grave-increase-self-damage-by-1"
-          ) {
-            if_in_grave_increase_self_damage(card)
-          }
-        })
-
+    if (i === pool.length) {
+      // если мы дошли до конца, сбрасываем интервал и выходим
       clearInterval(passive_time)
       store.commit("set_ppa_end_turn", false)
     } else {
-      // ДИСПЕТЧЕР пассивных абилок
-      if (passive_hand[i].passive_ability.name === "damage-random-enemy-by-1") {
-        passive_end_turn_damage_random_enemy(
-          field,
-          passive_hand[i],
-          undefined,
-          enemy_leader,
-          enemies
-        )
-      } else if (
-        passive_hand[i].passive_ability.name ===
-        "increase-damage-to-card-in-hand-by-1"
-      ) {
-        passive_end_turn_increase_damage_in_hand(hand)
-      } else if (passive_hand[i].passive_ability.name === "heal-leader-by-2") {
-        passive_end_turn_heal_leader_by_2()
-      } else if (passive_hand[i].passive_ability.name === "heal-leader-by-3") {
-        passive_end_turn_heal_leader_by_3()
-      } else if (
-        passive_hand[i].passive_ability.name === "increase-self-damage-by-1"
-      ) {
-        passive_end_turn_increase_self_damage(passive_hand[i])
-      } else if (
-        passive_hand[i].passive_ability.name ===
-        "destroy-2-enemies-after-3-turns"
-      ) {
-        passive_end_turn_destroy_2_enemies_after_3_turns(
-          passive_hand[i],
-          field,
-          enemy_leader,
-          enemies,
-          grave,
-          hand
-        )
-      }
-
+      // МЕНЕДЖЕР пассивных абилок карт: рука, лидер, колода, сброс
+      console.log("Выполняем пассивку номер", i)
+      if (pool[i].has_passive_in_hand || !pool[i].color)
+        hand_passives(pool[i], gameObj)
+      else if (pool[i].has_passive_in_deck) deck_passives(pool[i], gameObj)
+      else if (pool[i].has_passive_in_grave) grave_passives(pool[i], gameObj)
       i += 1
     }
-  }, 1000)
+  }, timeOut)
 }
 
-export {
-  player_passive_abilities_upon_playing_a_card,
-  player_passive_abilities_end_turn,
-}
+export { player_passive_abilities_end_turn }

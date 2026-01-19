@@ -1,23 +1,38 @@
 <template>
   <div class="filter_factions">
-    <div class="factions" v-for="faction in factions" :key="faction">
-      <button
-        class="faction"
+    <base-title-text>{{ title }}</base-title-text>
+    <div class="factions">
+      <faction-item
+        v-for="faction in factions"
+        :key="faction"
+        :faction="faction"
         @click="filtering(faction)"
-        :style="{ backgroundColor: faction.color }"
-      >
-        {{ faction.name[0] }}
-      </button>
+      />
     </div>
   </div>
 </template>
 
 <script>
+import FactionItem from "@/components/Pages/DeckbuildPage/FactionItem"
+import BaseTitleText from "@/components/UI/BaseTitleText"
+
 export default {
+  components: {
+    FactionItem,
+    BaseTitleText,
+  },
   name: "filter-factions",
+  props: {
+    // покажем или Фракции, или "Выберите фракцию" для новой колоды
+    title: {
+      required: false,
+      type: String,
+      default: "Фракции",
+    },
+  },
   computed: {
     factions() {
-      return this.$store.state.database.factions
+      return this.$store.getters["all_factions"]
     },
   },
   methods: {
@@ -33,16 +48,12 @@ export default {
 
 <style scoped>
 .filter_factions {
-  margin-bottom: 12%;
+  margin-bottom: 20px;
 }
+
 .factions {
-  margin: 0.05%;
-  display: inline;
-}
-.faction {
-  height: 4vh;
-  width: 45%;
-  margin: 1%;
-  font-size: 8pt;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 }
 </style>

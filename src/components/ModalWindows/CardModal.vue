@@ -1,123 +1,53 @@
 <template>
-  <modal-window
-    :style="{ backgroundColor: 'floralwhite' }"
-    v-touch:swipe="close_self"
-  >
+  <modal-window v-touch:swipe="close_self">
     <button-close @close_self="close_self" />
 
-    <div>{{ card.name }}</div>
+    <!--Имя у карты есть всегда-->
+    <h2>{{ card.name }}</h2>
 
-    <div class="enemy_border" :style="border(card)">
-      <img class="img" :src="card.image" v-if="card.image" alt="" />
+    <!--Карта игрока, или карта лидера врагов!-->
+    <div
+      class="card-ui"
+      :style="[border(card)]"
+      v-if="!forEnemy || forEnemyLeader"
+    >
+      <card-ui v-bind="$props" />
+    </div>
+    <!--А это соответственно карта врага, у неё есть card.move-->
+    <div class="card-ui" :style="[border(card)]" v-if="forEnemy">
+      <enemy-ui :enemy="card" />
     </div>
 
-    <div class="damage_and_hp">
-      <div class="diamond" :style="background_color(card)"></div>
-      <h3>
-        Урон <br />
-        &dagger;{{ card.damage }}
-      </h3>
+    <card-descriptions :card="card" :forEnemy="forEnemy" />
 
-      <div
-        class="circle"
-        :style="{ backgroundColor: 'orange' }"
-        v-if="card.ability.name === 'damage-all'"
-      >
-        <span>&#9850;</span>
-      </div>
-      <div
-        class="circle"
-        :style="{ backgroundColor: 'orange' }"
-        v-if="card.ability.name === 'spread-damage'"
-      >
-        <span :style="{ 'font-size': '18pt' }">&#9798;</span>
-      </div>
-      <div
-        class="circle"
-        :style="{ backgroundColor: 'green' }"
-        v-else-if="card.ability.name === 'heal'"
-      >
-        <span :style="{ 'font-size': '12pt' }">+&hearts;{{ card.heal }}</span>
-      </div>
-      <div
-        class="circle"
-        :style="{ backgroundColor: 'purple' }"
-        v-else-if="card.ability.name === 'resurrect'"
-      >
-        <span>&#10014;&#8680;</span>
-      </div>
-      <div
-        class="circle"
-        :style="{ backgroundColor: 'purple' }"
-        v-else-if="
-          card.ability.name === 'draw-one-card' ||
-          card.ability.name === 'play-from-deck' ||
-          card.ability.name === 'play-from-grave'
-        "
-      >
-        <span>&#127136;</span>
-      </div>
-      <div
-        class="circle"
-        :style="{ backgroundColor: 'purple' }"
-        v-else-if="card.ability.name === 'give-charges-to-card-in-hand-1'"
-      >
-        <span>+1&#8607;</span>
-      </div>
-
-      <div
-        class="triangle"
-        :style="background_color(card)"
-        v-if="card.has_passive"
-      ></div>
-      <div
-        class="text"
-        :style="{ 'font-size': '20pt' }"
-        v-if="card.has_passive"
-      >
-        <b>&#8987;</b>
-      </div>
-
-      <div class="charges"></div>
-      <h3>
-        Заряды <br />
-        {{ card.charges }}&#8607;
-      </h3>
-
-      <div class="hp" v-if="hp_needed"></div>
-      <h3 v-if="hp_needed">
-        Жизни <br />
-        &hearts;{{ card.hp }}
-      </h3>
-    </div>
-
-    <div class="text"><b>СПОСОБНОСТЬ</b> - {{ card.ability.description }}</div>
-
-    <div class="text" v-if="card.has_passive">
-      <b>ПАССИВНАЯ СПОСОБНОСТЬ</b>
-    </div>
-    <div class="text" v-if="card.has_passive">
-      {{ card.passive_ability.description }}
-    </div>
+    <!--Блок кнопок милл, крафт (ТОЛЬКО ДЛЯ ДЕКБИЛДЕРА!!!-->
     <div class="mill_craft_block" v-if="deckbuilder">
       <div class="divb" v-if="!bonus">
-        <button class="b" @click="mill">Уничтожить</button>
-        <button class="count">{{ count }}</button>
-        <button class="b" @click="craft">Создать</button>
+        <button class="global_text btn btn-mill" @click="mill">
+          Уничтожить
+        </button>
+        <card-count-triangle
+          :count="count"
+          :card-color="background_color_triangle(card.color)"
+        />
+        <button class="global_text btn btn-craft" @click="craft">
+          Создать
+        </button>
       </div>
       <div class="divb" v-if="bonus">
         <button class="bonus_count">У вас {{ count }}</button>
       </div>
     </div>
     <yesno-modal
-      :visible="show_yesno_mill"
-      :resource_value="resource_value"
+      v-if="show_yesno_mill"
+      :item_price="resource_value"
       @confirm="confirm_mill"
       @cancel="cancel"
     />
     <yesno-modal
-      :visible="show_yesno_craft"
-      :resource_value="resource_value"
+      v-if="show_yesno_craft"
+      is_craft
+      :item_price="resource_value"
       @confirm="confirm_craft"
       @cancel="cancel"
     />
@@ -125,14 +55,37 @@
 </template>
 
 <script>
-import { border_for_card, background_color } from "@/logic/border_styles"
-import ButtonClose from "@/components/UI/ButtonClose"
-import ModalWindow from "@/components/UI/ModalWindow"
+import {
+  border_for_card,
+  border_leader,
+  background_color_leader,
+  background_color_hp,
+} from "@/logic/border_styles"
+import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle"
+import ButtonClose from "@/components/UI/Buttons/ButtonClose"
+import ModalWindow from "@/components/ModalWindows/ModalWindow"
 import YesnoModal from "@/components/ModalWindows/YesnoModal"
+import CardUi from "@/components/Cards/CardUi"
+import EnemyUi from "@/components/Cards/EnemyUi"
+import CardDescriptions from "@/components/Cards/CardDescriptions"
+import { CraftMillCardActionSubtype } from "@/store/const/const"
 export default {
   name: "card-modal",
-  components: { ModalWindow, ButtonClose, YesnoModal },
+  components: {
+    CardCountTriangle,
+    CardDescriptions,
+    EnemyUi,
+    CardUi,
+    ModalWindow,
+    ButtonClose,
+    YesnoModal,
+  },
   props: {
+    // брать границу карты как для лидеров
+    is_leader: {
+      type: Boolean,
+      default: false,
+    },
     user_card: {
       // объект противника по индексу поля
       type: Object,
@@ -162,9 +115,22 @@ export default {
       type: Boolean,
       default: false,
     },
+    // отображать описание для врага или нет
+    forEnemy: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    // отображать описание для лидера врагов или нет
+    forEnemyLeader: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
+      show_passive: false,
       show_yesno_mill: false,
       show_yesno_craft: false,
       resource_value: 0,
@@ -174,18 +140,20 @@ export default {
     close_self() {
       this.$emit("close_card_modal")
     },
-    border(e) {
-      return border_for_card(e)
+    border(card) {
+      return this.is_leader ? border_leader(card) : border_for_card(card)
     },
-    background_color(e) {
-      return background_color(e)
+    background_color_triangle(color) {
+      return this.is_leader
+        ? background_color_leader(this.card.faction)
+        : background_color_hp(color)
     },
     cancel() {
       this.show_yesno_mill = false
       this.show_yesno_craft = false
     },
     async mill() {
-      let can_mill = await this.$store.dispatch("calculate_value", {
+      let can_mill = await this.$store.dispatch("calculateCraftMillCardValue", {
         card: this.card,
         process: "mill",
         count: this.count,
@@ -195,29 +163,41 @@ export default {
       this.show_yesno_mill = true
     },
     async craft() {
-      let can_craft = await this.$store.dispatch("calculate_value", {
-        card: this.card,
-        process: "craft",
-        count: this.count,
-      })
+      let can_craft = await this.$store.dispatch(
+        "calculateCraftMillCardValue",
+        {
+          card: this.card,
+          process: "craft",
+          count: this.count,
+        }
+      )
       if (!can_craft) return
       this.resource_value = can_craft
       this.show_yesno_craft = true
     },
     async confirm_mill() {
       this.show_yesno_mill = false
-      let result = await this.$store.dispatch("pay_resource", {
-        scraps: this.$store.getters["resource"].scraps + this.resource_value,
-      })
-      if (result) await this.$store.dispatch("mill_card_action", this.user_card)
+      const subtypeCardAction =
+        this.user_card?.card?.color !== undefined
+          ? CraftMillCardActionSubtype.millCard
+          : CraftMillCardActionSubtype.millLeader
+      const data = {
+        cardId: this.user_card.card.id,
+        subtype: subtypeCardAction,
+      }
+      await this.$store.dispatch("processCraftMillCard", data)
     },
     async confirm_craft() {
       this.show_yesno_craft = false
-      let result = await this.$store.dispatch("pay_resource", {
-        scraps: this.$store.getters["resource"].scraps + this.resource_value,
-      })
-      if (result)
-        await this.$store.dispatch("craft_card_action", this.user_card)
+      const subtypeCardAction =
+        this.user_card?.card?.color !== undefined
+          ? CraftMillCardActionSubtype.craftCard
+          : CraftMillCardActionSubtype.craftLeader
+      const data = {
+        cardId: this.user_card.card.id,
+        subtype: subtypeCardAction,
+      }
+      await this.$store.dispatch("processCraftMillCard", data)
     },
   },
   emits: ["close_card_modal"],
@@ -225,108 +205,49 @@ export default {
 </script>
 
 <style scoped>
-.enemy_border {
-  width: 65%;
-  height: 60%;
-  display: inline;
-  float: left;
-  margin-left: 1%;
-  border-radius: 1%;
-  margin-bottom: 1%;
-}
-
-.img {
-  width: 99%;
-  height: 99%;
-  margin: auto;
-}
-
-.damage_and_hp {
-  width: 30%;
-  height: 60%;
-  display: inline;
-  float: right;
-  margin-bottom: 3%;
-  /*border: solid 2px red;*/
-}
-
-h3 {
-  font-size: 14pt;
-  display: block;
-}
-
-.hp {
-  width: 40%;
-  height: 10%;
-  background-color: green;
-  border-radius: 20%;
-  margin: 3% auto auto;
-}
-
-.charges {
-  width: 20%;
-  height: 10%;
-  background-color: hotpink;
-  border-radius: 20%;
-  margin: 3% auto auto;
-}
-
-.triangle {
-  width: 5vh;
-  height: 5vh;
-  border-radius: 20%;
-  font-size: 10pt;
-  margin: 3% auto auto;
-}
-
-.diamond {
-  /*height: 12%;*/
-  /*width: 36%;*/
-  height: 5vh;
-  width: 5vh;
-  transform: rotateX(45deg) rotateZ(45deg);
-  margin: 3% auto auto;
-  /* background-color: purple; */
-  /* border: solid 1px yellow; */
-}
-
-.circle {
-  display: inline-grid;
-  width: 25%;
-  height: 15%;
-  background: orangered;
-  border-radius: 50%;
-  margin: 3% auto;
-}
-
-span {
-  position: relative;
-  font-size: 22pt;
+div {
   color: white;
-  margin: auto;
 }
-
-.text {
-  margin-bottom: 1%;
-  font-size: 14pt;
+.card-ui {
+  position: relative;
+  margin: 0 auto;
+  width: 85%;
+  box-shadow: -4px 0 4px rgb(0 0 0 / 50%);
+}
+.card-ui::before {
+  content: "";
+  display: block;
+  padding-top: 143%;
 }
 .divb {
-  width: 98%;
-  height: 3vh;
-  margin-left: 0.5%;
-  margin-top: 0.2%;
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 }
-
-.b {
-  width: 42%;
-  height: 100%;
+.btn {
+  width: 48%;
+  height: 3rem;
+  background: linear-gradient(
+    180deg,
+    #1d252d -21.82%,
+    rgba(0, 0, 0, 0.13) 44.55%,
+    #282d33 109.53%
+  );
+  font-size: 16px;
+  border-style: solid;
+  border-color: hsl(44, 94%, 67%);
+  border-radius: 6px;
 }
-
-.count {
-  width: 13%;
-  height: 100%;
+.btn-mill {
+  border-width: 1px 1px 0 0;
+  color: hsl(0, 76%, 47%);
 }
-
+.btn-craft {
+  border-width: 1px 0 0 1px;
+  color: hsl(112, 81%, 53%);
+}
 .bonus_count {
   width: 90%;
   height: 100%;

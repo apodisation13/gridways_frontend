@@ -1,6 +1,6 @@
-import axios from "axios"
 import { useToast } from "vue-toastification"
-import { user_database, user_resource } from "@/store/const/api_urls"
+import { USER_DATABASE } from "@/store/const/api_urls"
+import { callApi, GET } from "@/lib/api/api"
 
 const toast = useToast()
 
@@ -17,9 +17,6 @@ const state = {
   levels: [], // все уровни, из запроса
   seasons: [],
   resource: {},
-
-  databaseLoaded: false,
-  errorLoading: "",
 
   enemies: [],
   enemy_leaders: [],
@@ -106,13 +103,6 @@ const mutations = {
     state.resource = result
   },
 
-  set_databaseLoaded(state, payload) {
-    state.databaseLoaded = payload
-  },
-  set_errorLoading(state, payload) {
-    state.errorLoading = payload
-  },
-
   set_enemies(state, payload) {
     state.enemies = payload
   },
@@ -124,12 +114,14 @@ const mutations = {
 const actions = {
   // в ответе user_database: cards,leaders,u_d(колоды),levels, resources: тут ресурсы
   async get_user_database({ commit, getters, dispatch }) {
-    let user_id = getters["getUser"].user_id
-    let header = getters["getHeader"]
-    const url = `${user_database}${user_id}`
+    let userId = getters["getUser"].user_id
 
     try {
-      let response = await axios.get(url, header)
+      let response = await callApi({
+        method: GET,
+        url: USER_DATABASE.replace("{userId}", userId),
+      })
+
       const {
         user_database,
         seasons,
@@ -142,8 +134,8 @@ const actions = {
       commit("set_leaders", user_database.leaders)
       commit("set_cards", user_database.cards)
 
-      commit("set_decks", user_database.u_d)
-      dispatch("set_deck_in_play", user_database.u_d[0]) // устанавливаем для игры первую колоду
+      commit("set_decks", user_database.decks)
+      dispatch("set_deck_in_play", user_database.decks[0]) // устанавливаем для игры первую колоду
 
       commit("set_seasons", seasons)
       commit("set_season", seasons[0])
@@ -157,46 +149,16 @@ const actions = {
       commit("set_game_const", game_const) // рука, карт в колоде
       commit("set_game_prices", game_const) // всякие игровые цены
 
-      commit("set_databaseLoaded", true)
       toast.success("Успешно загрузили всю вашу базу данных")
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Ошибка загрузки базы данных!")
     }
   },
-
-  async get_resource({ commit, getters, dispatch }) {
-    let header = getters["getHeader"]
-    let user_id = getters["getUser"].user_id
-    const url = `${user_resource}${user_id}/`
-    try {
-      let response = await axios.get(url, header)
-      commit("set_resource", response.data)
-      toast.success("Успешно загрузили ресурсы")
-      return true
-    } catch (err) {
-      dispatch("error_action", err)
-      throw new Error("Ошибка при загрузке ресурсов")
-    }
-  },
-
-  async get_cards() {
-    // let header = getters["getHeader"]
-  },
-  async get_leaders() {
-    // let header = getters["getHeader"]
-  },
-  async get_decks() {
-    // let header = getters["getHeader"]
-  },
-  async get_levels() {
-    // let header = getters["getHeader"]
-  },
-
-  error_action({ commit }, err) {
-    commit("set_errorLoading", err.message)
-    commit("set_databaseLoaded", false)
-    toast.error("Произошла какая-то ошибка при загрузке вашей базы данных")
+  error_action(_, err) {
+    toast.error(
+      `Произошла какая-то ошибка при загрузке вашей базы данных ${err}`
+    )
   },
 
   async render_all_images({ getters, commit }) {

@@ -1,5 +1,5 @@
 <template>
-  <div class="deckbuilder-filters">
+  <div>
     <div class="button-filters">
       <button-icon
         class="filter_btn"
@@ -9,12 +9,12 @@
       />
       <button-toggle-card-list
         @click="showList('leaders')"
-        :isActive="!!(showingList === 'leaders')"
+        :isActive="showingList === 'leaders'"
         >Лидеры</button-toggle-card-list
       >
       <button-toggle-card-list
         @click="showList('pool')"
-        :isActive="!!(showingList === 'pool')"
+        :isActive="showingList === 'pool'"
         >Основные</button-toggle-card-list
       >
       <button-icon
@@ -28,8 +28,7 @@
       v-if="showNewDeckFactionSelect"
       @close-modal="showNewDeckFactionSelect = false"
     >
-      <div>Выберете фракцию!</div>
-      <filter-factions @set-filter="setFilter" />
+      <filter-factions title="Выберите фракцию" @set-filter="setFilter" />
     </base-modal>
   </div>
 </template>
@@ -37,7 +36,7 @@
 <script>
 import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions"
 import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon"
-import BaseModal from "@/components/UI/BaseModal"
+import BaseModal from "@/components/ModalWindows/BaseModal"
 import ButtonToggleCardList from "@/components/Pages/DeckbuildPage/Buttons/ButtonToggleCardList"
 
 export default {
@@ -61,6 +60,7 @@ export default {
   },
   data() {
     return {
+      disable_start_animation: true, // флаг выключения первичной анимации
       showNewDeckFactionSelect: false,
       showFilters: false,
     }
@@ -102,6 +102,7 @@ export default {
 .filter_btn {
   position: relative;
   margin: 10px;
+  transition: transform 0.2s;
 }
 
 .set-filter::before {
@@ -118,11 +119,5 @@ export default {
 
 .is-cancel {
   transform: rotate(45deg);
-}
-
-.btn_save_deck {
-  display: block;
-  height: 3vh;
-  width: 23%;
 }
 </style>

@@ -1,15 +1,9 @@
 import { sound_hit_shield } from "@/logic/play_sounds"
-import { check_win } from "@/logic/player_move/service/check_win"
+import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
+import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 
-function hit_one_enemy(
-  enemy,
-  card,
-  field,
-  enemy_leader,
-  enemies,
-  timeout = 1000
-) {
-  card.damages_enemy = true
+function hit_one_enemy(enemy, card, gameObj, timeout = 1000) {
+  timeoutAnimationFlag(card, "damages_enemy")
 
   if (enemy.shield) {
     enemy.shield = false
@@ -18,27 +12,7 @@ function hit_one_enemy(
     return
   }
 
-  let temp = enemy.hp // сложили жизни в темп
-  enemy.hp = `${enemy.hp}-${card.damage}` // отрисовали 5-3 (жизни-урон)
-
-  // через timeout, default=1сек
-  setTimeout(() => {
-    enemy.hp = temp // вернули ему жизни
-    enemy.hp -= card.damage // вот теперь отняли урон
-
-    if (enemy.hp <= 0) {
-      if (field.indexOf(enemy) === -1) {
-        enemy_leader.hp = 0
-        console.log("умер лидер врагов")
-      } else {
-        field[field.indexOf(enemy)] = ""
-        console.log("враг умер")
-      }
-    }
-
-    card.damages_enemy = false
-    check_win(field, enemies, enemy_leader)
-  }, timeout)
+  enemy_takes_damage(enemy, card, gameObj, timeout)
 }
 
 export { hit_one_enemy }

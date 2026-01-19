@@ -1,69 +1,52 @@
 <template>
-  <div class="wrapper__bg">
-    <div class="app" v-touch:swipe.right="show">
-      <!--картинка страницы по параметрам из роутера-->
-      <page-image />
-      <!--верхняя часть меню, хэдер-->
-      <menu-header />
+  <!-- обертка включение полноэкранного режима -->
+  <app-wrapper-fullscreen>
+    <div class="wrapper__bg">
+      <div class="app">
+        <!--картинка страницы по параметрам из роутера-->
+        <page-image />
+        <!--верхняя часть меню, хэдер-->
+        <menu-header />
 
-      <!--боковое меню слева, TODO: убрать это на страницу GAME-->
-      <menu-bar v-if="showMenu" />
+        <!--собственно рендер самого приложения через роутер, формат {путь(роут): компонент}-->
+        <router-view />
 
-      <!--собственно рендер самого приложения через роутер, формат {путь(роут): компонент}-->
-      <router-view />
-
-      <!--нижняя часть меню, в футере-->
-      <menu-footer />
+        <!--нижняя часть меню, в футере, показываем только авторизованному-->
+        <menu-footer v-if="isLoggedIn" />
+      </div>
     </div>
-  </div>
+  </app-wrapper-fullscreen>
 </template>
 
 <script>
-import MenuBar from "@/components/UI/Menu/MenuBar"
 import MenuFooter from "@/components/UI/Menu/MenuFooter"
 import MenuHeader from "@/components/UI/Menu/MenuHeader"
 import PageImage from "@/components/PageImage"
+import AppWrapperFullscreen from "@/components/Pages/AppWrapperFullscreen/AppWrapperFullscreen"
+
 export default {
   components: {
     PageImage,
     MenuHeader,
     MenuFooter,
-    MenuBar,
+    AppWrapperFullscreen,
   },
+
   async created() {
-    //устанавливаем корректное значение вьюпорта переменную css для работы c var(--vh)
-    let vh = window.innerHeight * 0.01
-    document.documentElement.style.setProperty("--vh", `${vh}px`)
-    // СРАБАТЫВАЕТ ПО ОТКРЫТИЮ САЙТА: вначале прыгаем на загрузку,
-    // Далее проверяем логин из локалсторадж, если успешно, грузим базу данных и рендерим ВСЕ картинки
-    // в любом случае идем на главную потом
-    await this.$router.push("/loading")
+    // вот здесь мы просто добавим setTimeOut и переход дальше через 2сек
+    this.$store.dispatch("fetchNews")
+    await this.$router.push("/")
     try {
-      await this.$store.dispatch("fetchNews")
-      await this.$store.dispatch("check_auth") // пытаемся послать запрос на логин с данными из локалсторадж
-      await this.$store.dispatch("get_user_database")
-      await this.$store.dispatch("render_all_images") // принудительный рендер всех картинок
+      await this.$store.dispatch("checkAuth") // пытаемся послать запрос на логин с данными из локалсторадж
     } catch (err) {
       console.log(err)
       throw err
-    } finally {
-      await this.$router.push("/")
     }
   },
+
   computed: {
-    showMenu() {
-      return (
-        this.$store.state.show_menu &&
-        this.$router.currentRoute.value.meta.sideMenu
-      )
-    },
-  },
-  methods: {
-    show() {
-      this.$store.commit("set_show_menu", true)
-    },
-    close_menu() {
-      this.show_menu = false
+    isLoggedIn() {
+      return this.$store.getters["isLoggedIn"]
     },
   },
 }
@@ -80,6 +63,12 @@ export default {
   user-select: none;
   font-family: "Roboto", "Inter", "Philosopher", sans-serif;
   /* font-family: Arial, Helvetica, sans-serif; единый на всё */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
 }
 
 .app {
@@ -92,16 +81,12 @@ body {
   overscroll-behavior-y: contain;
 }
 
-.body {
-  height: 100%;
-}
-
 .app {
   position: relative;
   z-index: -2;
   background: #fff;
   width: 100%;
-  height: 100%;
+  height: 100vh;
 }
 
 .wrapper__bg {

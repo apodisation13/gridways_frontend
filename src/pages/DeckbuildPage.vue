@@ -16,7 +16,13 @@
         <div class="database_of_cards-wrapper">
           <div
             class="database_of_cards"
-            :class="deckBuilding ? 'pool_deckbuild' : 'pool_full'"
+            :class="
+              disable_start_animation
+                ? 'pool_full__start'
+                : deckBuilding
+                  ? 'pool_deckbuild'
+                  : 'pool_full'
+            "
           >
             <!-- база карт -->
             <card-list-component
@@ -47,11 +53,9 @@
           @save_deck="save_deck"
           @patch_deck="patch_deck"
           @change_name_deck="change_name_deck"
+          @change_order_deck="change_order_deck"
         />
       </div>
-      <!-- <div class="deckbuilder-bottom-buttons-block">
-        <div class="decks_btn" @click="trigger_decks_list_modal(true)">КОЛОДЫ!</div>
-      </div> -->
       <button-decks @click="trigger_decks_list_modal(true)" />
       <decks-list-modal
         v-if="show_decks_list_modal"
@@ -75,8 +79,9 @@ import DecksListModal from "@/components/ModalWindows/DecksListModal"
 import DeckbuilderTopButtonsBlock from "@/components/Pages/DeckbuildPage/DeckbuilderTopButtonsBlock"
 import BlockAssemblingTheDeck from "@/components/Pages/DeckbuildPage/BlockAssemblingTheDeck"
 import DeckbuilderFilters from "@/components/Pages/DeckbuildPage/DeckbuilderFilters"
-import CardListComponent from "@/components/CardListComponent"
+import CardListComponent from "@/components/Cards/CardListComponent"
 import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks"
+import { useToast } from "vue-toastification"
 
 export default {
   components: {
@@ -87,8 +92,13 @@ export default {
     CardListComponent,
     ButtonDecks,
   },
+  setup() {
+    const toast = useToast()
+    return { toast }
+  },
   data() {
     return {
+      disable_start_animation: true, // флаг выключение первичной анимации
       showingList: "pool", // показывать список игровых карт ('pool') или список лидеров ('leaders')
       deckBuilding: false, // флаг - собираем мы колоду, или нет
       showFilters: false, // флаг, показать ли окно с фильтрами
@@ -114,9 +124,9 @@ export default {
 
   methods: {
     // триггеры показа дополнительных окон
-    startDeckBuilding() {
-      this.showNewDeckFactionSelect = true
-    },
+    // startDeckBuilding() {
+    //   this.showNewDeckFactionSelect = true
+    // },
 
     trigger_decks_list_modal(value) {
       this.show_decks_list_modal = value
@@ -126,6 +136,14 @@ export default {
       this.deckBuilding = false
       this.patch = false
       this.new_deck()
+    },
+
+    change_order_deck(index) {
+      this.deck.deck_is_progress.push(
+        ...this.deck.deck_is_progress.splice(index, 1)
+      )
+
+      this.deck.deck_body.push(...this.deck.deck_body.splice(index, 1))
     },
 
     // новая дека, обнуляем фильтры и сбрасываем все добавления
@@ -163,11 +181,11 @@ export default {
       }
       if (this.can_add_card(card)) {
         this.deck.deck_is_progress.push(card)
-        this.deck.deck_body.push({ card: card.card.id })
+        this.deck.deck_body.push(card.card.id)
         this.deck.health += card.card.hp
         return
       }
-      alert(
+      this.toast.warning(
         "нельзя карту добавить закрытую карту, или карту ещё раз или карт больше 12"
       )
     },
@@ -180,7 +198,7 @@ export default {
         1
       )
       this.deck.deck_body.splice(
-        this.deck.deck_body.findIndex(c => c.card === card.card.id),
+        this.deck.deck_body.findIndex(card_id => card_id === card.card.id),
         1
       )
     },
@@ -188,11 +206,11 @@ export default {
     // выбираем лидера для деки
     chose_leader(leader) {
       if (!this.deckBuilding) {
-        alert("выберете фракцию!")
+        this.toast.warning("выберете фракцию!")
         return
       }
       if (leader.count === 0) {
-        alert("нельзя выбрать закрытого лидера")
+        this.toast.warning("нельзя выбрать закрытого лидера")
         return
       }
       this.deck.leader = leader.card
@@ -204,19 +222,18 @@ export default {
 
     async save_deck() {
       if (!this.deck.leader) {
-        return alert("Необходимо выбрать лидера")
+        return this.toast.warning("Необходимо выбрать лидера")
       }
       // карт ровно 12 и лидер выбран
       if (this.cant_save_deck) {
-        return alert("Соберите колоду из 12 карт")
+        return this.toast.warning("Соберите колоду из 12 карт")
       }
       if (this.deck.deck_name.trim() === "") {
-        return alert("Введите имя колоды")
+        return this.toast.warning("Введите имя колоды")
       }
-      this.send_data_to_store("post_deck", {
-        name: this.deck.deck_name,
-        health: this.deck.health,
-        d: this.deck.deck_body,
+      await this.send_data_to_store("createUserDeck", {
+        deck_name: this.deck.deck_name,
+        cards: this.deck.deck_body,
         leader_id: this.deck.leader.id,
       })
     },
@@ -234,39 +251,36 @@ export default {
       ) {
         return false
       }
-      if (this.query.faction === "") {
-        return false
-      }
-      return true
+      return this.query.faction !== ""
     },
     // фильтр карт и лидеров по фракции по нажатию на кнопку фракции
     select_faction(prop, value) {
+      this.disable_start_animation = this.disable_start_animation && false
       this.deckBuilding = true
       this.setFilter(prop, value) // для this.query.cards
     },
 
     show_deck(index) {
+      this.disable_start_animation = this.disable_start_animation && false
       this.new_deck()
       this.deckBuilding = true
       const { deck } = _.cloneDeep(this.$store.getters["all_decks"][index])
-
-      ;(this.deck.deck_id = deck.id),
+      ;((this.deck.deck_id = deck.id),
         (this.deck.deck_name = deck.name),
         (this.deck.deck_is_progress = [...deck.cards]), // колода в процессе - целиком объекты, для отображения
-        (this.deck.deck_body = [...deck.d]), // только {card = id} для пост-запроса
+        (this.deck.deck_body = [...deck.cards.map(card => card.card.id)]), // только {card = id} для пост-запроса
         (this.deck.leader = deck.leader), // сам выбранный лидер
         (this.deck.health = deck.health), // жизни текущей деки
-        (this.query.faction = deck.leader.faction)
+        (this.query.faction = deck.leader.faction))
       this.patch = true
     },
 
     async patch_deck() {
-      this.send_data_to_store("patch_deck", {
-        name: this.deck.deck_name,
-        health: this.deck.health,
-        d: this.deck.deck_body,
+      await this.send_data_to_store("patchUserDeck", {
+        deck_name: this.deck.deck_name,
+        cards: this.deck.deck_body,
         leader_id: this.deck.leader.id,
-        id: this.deck.deck_id,
+        deck_id: this.deck.deck_id,
       })
     },
 
@@ -323,6 +337,10 @@ export default {
 </script>
 
 <style scoped>
+:root {
+  --vh: 1vh;
+}
+
 .deck_builder_page-wrapper {
   display: flex;
   flex-direction: column;
@@ -335,17 +353,12 @@ export default {
   overflow: hidden;
 }
 
-.database_of_cards-wrapper {
-  position: relative;
-}
-
 .database_of_cards-wrapper::after {
   content: "";
   display: block;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  margin-top: -28px;
+  position: relative;
+  z-index: 10;
   height: 28px;
   background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
 }
@@ -353,13 +366,17 @@ export default {
 .database_of_cards {
   width: 100%;
   background: #3c4d60;
-  box-shadow: inset 0px 0px 8px rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7);
   padding-top: 5px;
   padding-bottom: 5px;
   overflow-y: scroll;
   overflow-x: hidden;
 }
 /*база карт*/
+
+.pool_full__start {
+  height: calc((var(--vh) * 100) - 318px);
+}
 .pool_full {
   height: calc((var(--vh) * 100) - 318px);
   /* 318 это сумма высот хедера фильтровнижних кнопок */

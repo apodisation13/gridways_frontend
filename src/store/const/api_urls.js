@@ -1,41 +1,32 @@
-// для login.js
-export const check_auth_url = "https://card-game.ru/accounts/api-token-auth/"
-export const register_url = "https://card-game.ru/accounts/register/"
+import { getEnv } from "@/store/const/const"
 
-// user_database for database.js
-export const user_database = "https://card-game.ru/api/v1/user_database/"
-
-// post deck, + carddecks + userdeck, user_actions: post_deck
-export const post_deck = "https://card-game.ru/api/v1/decks/"
-
-// patch user_resource
-export const user_resource = "https://card-game.ru/api/v1/user_resource/"
-
-// craft card, means POST user:id, card:id
-export const craft_card =
-  "https://card-game.ru/api/v1/patchcards/craft_user_cards/"
-export const mill_card =
-  "https://card-game.ru/api/v1/patchcards/mill_user_cards/"
-export const craft_leader =
-  "https://card-game.ru/api/v1/patchleaders/craft_user_leaders/"
-export const mill_leader =
-  "https://card-game.ru/api/v1/patchleaders/mill_user_leaders/"
+function getDomain() {
+  if (getEnv() === "development_local") return "http://127.0.0.1:8001/api/v1"
+  else if (getEnv() === "docker_local") return "http://127.0.0.1:8002/api/v1"
+  return process.env.VUE_APP_DOMAIN
+}
 
 // для получения новостей
-export const all_news = "https://card-game.ru/api/v1/news/"
+export const LIST_NEWS = `${getDomain()}/news/list-news`
+
+// для login.js
+export const USER_LOGIN = `${getDomain()}/users/login-user`
+export const USER_REGISTER = `${getDomain()}/users/register-user`
+
+// user_database for database.js
+export const USER_DATABASE = `${getDomain()}/user-progress/{userId}`
+
+// post deck, + carddecks + userdeck, user_actions: post_deck
+export const CREATE_USER_DECK = `${getDomain()}/user-progress/{userId}/create-deck`
+export const ALTER_USER_DECK = `${getDomain()}/user-progress/{userId}/alter-deck/{deckId}`
+
+// patch user_resource
+export const USER_RESOURCE = `${getDomain()}/user-progress/{userId}/resource`
+
+// craft card, means POST user:id, card:id
+export const CARD_ACTION = `${getDomain()}/user-progress/{userId}/card/{cardId}`
+export const CRAFT_BONUS_CARD = `${getDomain()}/user-progress/{userId}/craft-bonus-cards`
 
 // PATCH запрос - пришло finished_levels - открытие уровней, не пришло - сброс (нужен id записи UserLevel)
-export const patch_levels = "https://card-game.ru/api/v1/unlock_levels/"
-
-// А ВОТ ЭТО ДЛЯ ЛОКАЛЬНОЙ РАЗРАБОТКИ
-// export const check_auth_url = 'http://127.0.0.1:8000/accounts/api-token-auth/'
-// export const register_url = 'http://127.0.0.1:8000/accounts/register/'
-// export const user_database = 'http://127.0.0.1:8000/api/v1/user_database/'
-// export const post_deck = 'http://127.0.0.1:8000/api/v1/decks/'
-// export const pay_resource = 'http://127.0.0.1:8000/api/v1/user_resource/'
-// export const craft_card = 'http://127.0.0.1:8000/api/v1/patchcards/craft_user_cards/'
-// export const mill_card = 'http://127.0.0.1:8000/api/v1/patchcards/mill_user_cards/'
-// export const craft_leader = 'http://127.0.0.1:80002/api/v1/patchleaders/craft_user_leaders/'
-// export const mill_leader = 'http://127.0.0.1:8000/api/v1/patchleaders/mill_user_leaders/'
-// export const all_enemies = 'http://127.0.0.1:8000/api/v1/enemies/'
-// export const all_enemy_leaders = 'http://127.0.0.1:8000/api/v1/enemy_leaders/'
+export const patch_levels = `${getDomain()}/api/v1/unlock_levels`
+export const OPEN_RELATED_LEVELS = `${getDomain()}/user-progress/{userId}/open-related-levels/{userLevelId}`
