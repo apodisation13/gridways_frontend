@@ -64,7 +64,8 @@ export default {
     #282d33 109.53%
   );
   border: 2px solid #facf5d;
-  box-shadow: 5px 9px 20px rgba(0, 0, 0, 0.25),
+  box-shadow:
+    5px 9px 20px rgba(0, 0, 0, 0.25),
     inset -5px -5px 5px rgba(0, 0, 0, 0.25),
     inset 5px 5px 5px rgba(0, 0, 0, 0.25);
 }

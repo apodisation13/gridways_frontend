@@ -82,7 +82,7 @@ export default {
     this.appHeight()
   },
 
-  destroyed() {
+  unmounted() {
     // удаление прослушателей при демонтрировании компонента
     window.removeEventListener("resize", this.appHeight)
     window.removeEventListener("fullscreenchange", this.setOrientation)

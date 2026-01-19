@@ -20,8 +20,8 @@
               disable_start_animation
                 ? 'pool_full__start'
                 : deckBuilding
-                ? 'pool_deckbuild'
-                : 'pool_full'
+                  ? 'pool_deckbuild'
+                  : 'pool_full'
             "
           >
             <!-- база карт -->
@@ -265,13 +265,13 @@ export default {
       this.new_deck()
       this.deckBuilding = true
       const { deck } = _.cloneDeep(this.$store.getters["all_decks"][index])
-      ;(this.deck.deck_id = deck.id),
+      ;((this.deck.deck_id = deck.id),
         (this.deck.deck_name = deck.name),
         (this.deck.deck_is_progress = [...deck.cards]), // колода в процессе - целиком объекты, для отображения
         (this.deck.deck_body = [...deck.cards.map(card => card.card.id)]), // только {card = id} для пост-запроса
         (this.deck.leader = deck.leader), // сам выбранный лидер
         (this.deck.health = deck.health), // жизни текущей деки
-        (this.query.faction = deck.leader.faction)
+        (this.query.faction = deck.leader.faction))
       this.patch = true
     },
 

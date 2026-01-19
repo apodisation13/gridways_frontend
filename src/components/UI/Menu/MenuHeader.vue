@@ -162,7 +162,9 @@ export default {
   align-items: center;
   justify-content: space-between;
   background: var(--dark-gradient);
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25), 0 -4px 10px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 4px 4px rgba(0, 0, 0, 0.25),
+    0 -4px 10px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(2px);
   margin: 0;
   height: 53px;
@@ -202,7 +204,9 @@ export default {
   border-radius: 5px;
   padding: 2px;
   background: var(--primary-gold-gradient);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
 }

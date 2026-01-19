@@ -55,7 +55,8 @@ export default {
     rgba(71, 43, 30, 0.69) 55.4%,
     #4b2210 109.17%
   );
-  box-shadow: 7px 12px 276px rgba(0, 0, 0, 0.25),
+  box-shadow:
+    7px 12px 276px rgba(0, 0, 0, 0.25),
     inset -7px -7px 7px rgba(0, 0, 0, 0.25),
     inset 7px 7px 7px rgba(0, 0, 0, 0.25);
 }
@@ -67,7 +68,8 @@ export default {
     #162d59 55.4%,
     #366ab8 109.17%
   );
-  box-shadow: 7px 12px 27px rgba(0, 0, 0, 0.25),
+  box-shadow:
+    7px 12px 27px rgba(0, 0, 0, 0.25),
     inset -7px -7px 7px rgba(0, 0, 0, 0.25),
     inset 7px 7px 7px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(13px);
@@ -79,7 +81,8 @@ export default {
     rgba(11, 72, 28, 0.78) 50%,
     #047824 98.44%
   );
-  box-shadow: 7px 12px 27px rgba(0, 0, 0, 0.25),
+  box-shadow:
+    7px 12px 27px rgba(0, 0, 0, 0.25),
     inset -7px -7px 7px rgba(0, 0, 0, 0.25),
     inset 7px 7px 7px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(13px);
@@ -91,7 +94,8 @@ export default {
     rgba(170, 30, 30, 0.58) 50%,
     #ea1c1c 98.96%
   );
-  box-shadow: 7px 12px 27px rgba(0, 0, 0, 0.25),
+  box-shadow:
+    7px 12px 27px rgba(0, 0, 0, 0.25),
     inset -7px -7px 7px rgba(0, 0, 0, 0.25),
     inset 7px 7px 7px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(13px);
