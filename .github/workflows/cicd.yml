@@ -99,7 +99,6 @@ jobs:
             export REGISTRY=${{ env.REGISTRY }}
             export FRONTEND_IMAGE_NAME=${{ env.FRONTEND_IMAGE_NAME }}
             export MODE=${{ env.MODE }}
-#            export DOMAIN_NAME=${{ secrets.DOMAIN_NAME }}
 
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} --username ${{ github.actor }} --password-stdin
             docker pull ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.MODE }}
