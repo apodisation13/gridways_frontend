@@ -42,6 +42,7 @@ jobs:
       github.event.action == 'closed' &&
       github.event.pull_request.merged == true
 
+    needs: linters
     runs-on: ubuntu-latest
 
     # Определяем окружение в зависимости от ветки
