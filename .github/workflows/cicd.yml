@@ -83,7 +83,7 @@ jobs:
           host: ${{ secrets.SSH_SERVER }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "deploy/*"
+          source: "docker-compose.yml"
           target: "/srv/cardgame/frontend/${{ env.MODE }}"
           strip_components: 1
 
