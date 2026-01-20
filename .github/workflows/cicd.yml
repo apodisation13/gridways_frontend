@@ -2,59 +2,83 @@ name: ci-cd
 
 on:
   pull_request:
-    branches: [ master, dev ]
-  push:
-    branches: [ master, dev ] 
+    branches: [ main, testing ]
+    types: [ opened, synchronize, closed ]
 
 env:
   REGISTRY: ghcr.io
   FRONTEND_IMAGE_NAME: ${{ github.repository }}
-  MODE: dev
 
 jobs:
-  tests:
+  # ============================================
+  # ЛИНТЕРЫ - запускаются ВСЕГДА на PR
+  # ============================================
+  linters:
     name: Lint Checker
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 18
+          cache: "npm"
+
       - name: Install Packages
-        run: npm install
-      - name: lint check
+        run: npm ci
+
+      - name: Lint check
         run: npm run lint -- --no-fix
-        continue-on-error: false
 
-  build-push:
-    if: github.event_name == 'push'
-    needs: tests
+  # ============================================
+  # BUILD & DEPLOY - только при мердже (push)
+  # ============================================
+  build-push-deploy:
+    if: | 
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true
+
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-        with:
-          version: v0.6.0
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
+    # Определяем окружение в зависимости от ветки
+    environment: ${{ github.ref_name == 'main' && 'production' || 'testing' }}
+
+    env:
+      MODE: ${{ github.ref_name == 'main' && 'production' || 'testing' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ github.token }}
-      
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
+          context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.MODE }}
-          build-args: VUE_APP_API_URL=${{ secrets.VUE_APP_API_URL }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.MODE }}
+            ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+          build-args: |
+            VUE_APP_API_URL=${{ secrets.VUE_APP_API_URL }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Send docker-compose
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_SERVER }}
           username: ${{ secrets.SSH_USER }}
@@ -64,24 +88,84 @@ jobs:
           strip_components: 1
 
       - name: Deploy on server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_SERVER }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /srv/cardgame/frontend/${{ env.MODE }}
-            
+
             export REGISTRY=${{ env.REGISTRY }}
             export FRONTEND_IMAGE_NAME=${{ env.FRONTEND_IMAGE_NAME }}
             export MODE=${{ env.MODE }}
             export DOMAIN_NAME=${{ secrets.DOMAIN_NAME }}
-            
-            echo "${{ github.token }}" | docker login ${{ env.REGISTRY }} --username ${{ github.actor }} --password-stdin
+
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} --username ${{ github.actor }} --password-stdin
             docker pull ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.MODE }}
-            
+
             docker-compose stop frontend
             docker-compose rm -f frontend
             docker-compose up -d
-            
-            for image in $(docker images | grep none | awk '{print $3}' | cat); do docker rmi "$image"; done
+
+            # Очистка старых образов
+            docker image prune -f
+  
+
+#  build-push:
+#    if: github.event_name == 'push'
+#    needs: tests
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v1
+#        with:
+#          version: v0.6.0
+#
+#      - name: Login to DockerHub
+#        uses: docker/login-action@v1
+#        with:
+#          registry: ${{ env.REGISTRY }}
+#          username: ${{ github.actor }}
+#          password: ${{ github.token }}
+#
+#      - name: Build and push
+#        uses: docker/build-push-action@v2
+#        with:
+#          push: true
+#          tags: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.MODE }}
+#          build-args: VUE_APP_API_URL=${{ secrets.VUE_APP_API_URL }}
+#
+#      - name: Send docker-compose
+#        uses: appleboy/scp-action@master
+#        with:
+#          host: ${{ secrets.SSH_SERVER }}
+#          username: ${{ secrets.SSH_USER }}
+#          key: ${{ secrets.SSH_KEY }}
+#          source: "deploy/*"
+#          target: "/srv/cardgame/frontend/${{ env.MODE }}"
+#          strip_components: 1
+#
+#      - name: Deploy on server
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.SSH_SERVER }}
+#          username: ${{ secrets.SSH_USER }}
+#          key: ${{ secrets.SSH_KEY }}
+#          script: |
+#            cd /srv/cardgame/frontend/${{ env.MODE }}
+#
+#            export REGISTRY=${{ env.REGISTRY }}
+#            export FRONTEND_IMAGE_NAME=${{ env.FRONTEND_IMAGE_NAME }}
+#            export MODE=${{ env.MODE }}
+#            export DOMAIN_NAME=${{ secrets.DOMAIN_NAME }}
+#
+#            echo "${{ github.token }}" | docker login ${{ env.REGISTRY }} --username ${{ github.actor }} --password-stdin
+#            docker pull ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.MODE }}
+#
+#            docker-compose stop frontend
+#            docker-compose rm -f frontend
+#            docker-compose up -d
+#
+#            for image in $(docker images | grep none | awk '{print $3}' | cat); do docker rmi "$image"; done
