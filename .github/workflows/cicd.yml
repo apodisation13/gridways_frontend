@@ -1,4 +1,4 @@
-name: ci-cd
+name: ci-cd gridways frontend
 
 on:
   pull_request:
@@ -47,7 +47,6 @@ jobs:
 
     # Определяем окружение в зависимости от ветки
     environment: ${{ github.ref_name == 'main' && 'production' || 'testing' }}
-
     env:
       MODE: ${{ github.ref_name == 'main' && 'production' || 'testing' }}
 
@@ -74,7 +73,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.MODE }}
             ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
           build-args: |
-            VUE_APP_API_URL=${{ secrets.VUE_APP_API_URL }}
+            VUE_APP_DOMAIN=${{ secrets.VUE_APP_DOMAIN }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -100,7 +99,7 @@ jobs:
             export REGISTRY=${{ env.REGISTRY }}
             export FRONTEND_IMAGE_NAME=${{ env.FRONTEND_IMAGE_NAME }}
             export MODE=${{ env.MODE }}
-            export DOMAIN_NAME=${{ secrets.DOMAIN_NAME }}
+#            export DOMAIN_NAME=${{ secrets.DOMAIN_NAME }}
 
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} --username ${{ github.actor }} --password-stdin
             docker pull ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.MODE }}
@@ -111,62 +110,3 @@ jobs:
 
             # Очистка старых образов
             docker image prune -f
-  
-
-#  build-push:
-#    if: github.event_name == 'push'
-#    needs: tests
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Set up Docker Buildx
-#        uses: docker/setup-buildx-action@v1
-#        with:
-#          version: v0.6.0
-#
-#      - name: Login to DockerHub
-#        uses: docker/login-action@v1
-#        with:
-#          registry: ${{ env.REGISTRY }}
-#          username: ${{ github.actor }}
-#          password: ${{ github.token }}
-#
-#      - name: Build and push
-#        uses: docker/build-push-action@v2
-#        with:
-#          push: true
-#          tags: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.MODE }}
-#          build-args: VUE_APP_API_URL=${{ secrets.VUE_APP_API_URL }}
-#
-#      - name: Send docker-compose
-#        uses: appleboy/scp-action@master
-#        with:
-#          host: ${{ secrets.SSH_SERVER }}
-#          username: ${{ secrets.SSH_USER }}
-#          key: ${{ secrets.SSH_KEY }}
-#          source: "deploy/*"
-#          target: "/srv/cardgame/frontend/${{ env.MODE }}"
-#          strip_components: 1
-#
-#      - name: Deploy on server
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.SSH_SERVER }}
-#          username: ${{ secrets.SSH_USER }}
-#          key: ${{ secrets.SSH_KEY }}
-#          script: |
-#            cd /srv/cardgame/frontend/${{ env.MODE }}
-#
-#            export REGISTRY=${{ env.REGISTRY }}
-#            export FRONTEND_IMAGE_NAME=${{ env.FRONTEND_IMAGE_NAME }}
-#            export MODE=${{ env.MODE }}
-#            export DOMAIN_NAME=${{ secrets.DOMAIN_NAME }}
-#
-#            echo "${{ github.token }}" | docker login ${{ env.REGISTRY }} --username ${{ github.actor }} --password-stdin
-#            docker pull ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ env.MODE }}
-#
-#            docker-compose stop frontend
-#            docker-compose rm -f frontend
-#            docker-compose up -d
-#
-#            for image in $(docker images | grep none | awk '{print $3}' | cat); do docker rmi "$image"; done

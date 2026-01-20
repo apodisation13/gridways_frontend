@@ -1,5 +1,6 @@
 services:
   frontend:
+    image: ${REGISTRY}/${FRONTEND_IMAGE_NAME}:${MODE}
     container_name: gridways-frontend
     restart: unless-stopped
     build:
