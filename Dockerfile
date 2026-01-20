@@ -1,4 +1,4 @@
-FROM node:16-alpine as build-stage
+FROM node:16-alpine AS build-stage
 
 
 # Принимаем аргументы сборки
@@ -33,7 +33,7 @@ EXPOSE 8080
 
 
 # этап production (production-stage)
-FROM nginx:stable-alpine as production-stage
+FROM nginx:stable-alpine AS production-stage
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build-stage /app/dist /var/www
 CMD ["nginx", "-g", "daemon off;"]
