@@ -20,8 +20,8 @@
           <!--Прямоугольник уровня, пройден\открыт\закрыт, свечение по фракции-->
           <v-rect
             :config="squareConfig(level)"
-            @dblclick="setLevel(index)"
-            @dbltap="setLevel(index)"
+            @dblclick="setLevel(level)"
+            @dbltap="setLevel(level)"
             @pointerup="end(level)"
             @pointerdown="start(level)"
           ></v-rect>
@@ -29,8 +29,8 @@
           <v-text
             v-if="level.unlocked"
             :config="textConfig(level)"
-            @dblclick="setLevel(index)"
-            @dbltap="setLevel(index)"
+            @dblclick="setLevel(level)"
+            @dbltap="setLevel(level)"
             @pointerup="end(level)"
             @pointerdown="start(level)"
           ></v-text>
@@ -238,17 +238,17 @@ export default {
         points: [0, 0, x1, y1],
       })
     },
-    setLevel(index) {
-      if (!this.levels[index].id) {
+    setLevel(level) {
+      if (!level.id) {
+        // этот id - user_levels.id - если уровень закрыт, его нет (null)
         this.toast.error("Уровень закрыт!")
         return
       }
-      this.toast.success(`Выбран уровень ${index + 1}! `, { timeout: 1000 })
-      this.$store.commit("set_level", this.levels[index].level)
-      this.$store.commit(
-        "set_enemy_leader",
-        this.levels[index].level.enemy_leader
-      )
+      this.toast.success(`Выбран уровень ${level.level.id}! `, {
+        timeout: 1000,
+      })
+      this.$store.commit("set_level", level.level)
+      this.$store.commit("set_enemy_leader", level.level.enemy_leader)
     },
     start(level) {
       this.timer = setTimeout(() => {

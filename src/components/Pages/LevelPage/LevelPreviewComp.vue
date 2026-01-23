@@ -5,15 +5,9 @@
     v-touch:longtap="open_level_modal"
     @contextmenu.prevent
   >
-    <div :style="background_color(level.level)">
-      {{ level.level.name }}
-    </div>
-    <div>Врагов - {{ level.level.enemies.length }}</div>
-    <div>
-      {{ level.level.difficulty }}
-    </div>
-    <div v-if="!level.id" style="background-color: red">УРОВЕНЬ ЗАКРЫТ!</div>
-    <div v-else style="background-color: lime">Уровень открыт</div>
+    <div :style="background_color(level.level)">{{ level.level.name }}</div>
+    <div style="font-size: 8pt">Врагов - {{ level.level.enemies.length }}</div>
+    <div style="font-size: 8pt">{{ level.level.difficulty }}</div>
 
     <level-modal
       v-if="show_level_modal"

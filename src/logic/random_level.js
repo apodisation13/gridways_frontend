@@ -18,7 +18,7 @@ const hard = {
   Golds: [3, 4, 5, 6],
   diff: "hard",
 }
-const diff = [easy, normal, hard]
+const diff = [easy, easy, easy, normal, normal, hard]
 
 function random_pick_enemies(dict) {
   let enemies = []
