@@ -52,6 +52,7 @@
           <div
             class="level"
             :class="{ level_selected: index === selectedRandomLevel }"
+            :style="difficultyBorder(level)"
             v-for="(level, index) in random_levels"
             :key="level"
             @dblclick="set_random_level(index)"
@@ -138,6 +139,14 @@ export default {
       this.selectedRandomLevel = index
       this.selectedLevel = undefined
     },
+    difficultyBorder(level) {
+      if (level.level.difficulty === "easy")
+        return { border: "1px solid lightgreen" }
+      else if (level.level.difficulty === "normal")
+        return { border: "1px solid orange" }
+      else if (level.level.difficulty === "hard")
+        return { border: "2px solid black" }
+    },
   },
 }
 </script>
@@ -208,7 +217,6 @@ div {
   width: 8vh;
   height: 10vh;
   font-size: 6pt;
-  border: solid 1px brown;
   display: inline-block;
 }
 .level_selected {
