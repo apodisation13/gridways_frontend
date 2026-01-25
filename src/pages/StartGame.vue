@@ -53,7 +53,7 @@ export default {
         // вот здесь мы присылаем level.id, на бэке всё вычислим тоже, сколько нужно заплатить
         await this.$store.dispatch("processResources", {
           subtype: PayResourcesSubtype.startSeasonLevel,
-          data: { level_id: this.$store.state.game.level.id },
+          data: { difficulty: this.$store.state.game.level.difficulty },
         })
         this.$store.commit("set_start_game_redirect", true)
         setTimeout(() => {

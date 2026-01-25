@@ -1,4 +1,5 @@
 import axios from "axios"
+import { v4 as uuidv4 } from "uuid"
 
 export const GET = "GET"
 export const POST = "POST"
@@ -26,6 +27,7 @@ export const callApi = async ({
   try {
     const user = JSON.parse(localStorage.getItem("user") || "{}")
     const token = user && user.token
+    const requestId = uuidv4()
 
     const config = {
       method: method.toLowerCase(),
@@ -35,6 +37,7 @@ export const callApi = async ({
         ...headers,
         // Автоматически добавляем токен авторизации
         ...{ Authorization: `Bearer ${token}` },
+        ...{ "X-Request-ID": requestId },
       },
       params, // query параметры
       data, // тело запроса
