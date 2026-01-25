@@ -185,9 +185,7 @@ export default {
     return { toast }
   },
   created() {
-    console.log(188, this.isRegistration)
     this.formLogin = this.isRegistration !== "true"
-    console.log(this.formLogin)
   },
   data() {
     return {

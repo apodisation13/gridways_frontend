@@ -50,7 +50,6 @@ const routes = [
     meta: {
       requireAuth: false,
       image: images.login,
-      // notRequireMenu: true,
     },
     props: route => ({
       isRegistration: route.query.registration,
