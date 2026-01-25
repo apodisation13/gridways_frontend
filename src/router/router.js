@@ -50,8 +50,11 @@ const routes = [
     meta: {
       requireAuth: false,
       image: images.login,
-      notRequireMenu: true,
+      // notRequireMenu: true,
     },
+    props: route => ({
+      isRegistration: route.query.registration,
+    }),
   },
   {
     path: "/start_game",

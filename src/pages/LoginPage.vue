@@ -184,6 +184,11 @@ export default {
     const toast = useToast()
     return { toast }
   },
+  created() {
+    console.log(188, this.isRegistration)
+    this.formLogin = this.isRegistration !== "true"
+    console.log(this.formLogin)
+  },
   data() {
     return {
       username: "",
@@ -204,6 +209,9 @@ export default {
     }
   },
   computed: {
+    isRegistration() {
+      return this.$route.query.registration
+    },
     userRegisterDisabled() {
       return (
         !this.is_user_agree ||
@@ -214,6 +222,9 @@ export default {
         !this.confirm_password
       )
     },
+    normalizedEmail() {
+      return this.email.trim().toLowerCase()
+    },
   },
   methods: {
     async login() {
@@ -223,7 +234,7 @@ export default {
 
       try {
         await this.$store.dispatch("userLogin", {
-          email: this.email,
+          email: this.normalizedEmail,
           password: this.password,
         })
         await this.$router.push("/loading")
@@ -245,7 +256,7 @@ export default {
       try {
         await this.$store.dispatch("userRegister", {
           username: this.username,
-          email: this.email,
+          email: this.normalizedEmail,
           password: this.password,
         })
         this.formLogin = true
@@ -360,7 +371,7 @@ export default {
   font-size: 29px;
   background: var(--six-gold-gradient);
   -webkit-text-fill-color: transparent;
-  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 .header__login {
@@ -518,7 +529,7 @@ span {
 }
 
 .form__btn {
-  margin-bottom: 60px;
+  margin-bottom: 160px;
 }
 
 .btn__login {
