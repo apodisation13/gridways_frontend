@@ -2,13 +2,19 @@
   <div>
     <div class="not_logged_in" v-if="!isLoggedIn">
       <div class="global_text not_logged_in__text">
-        Зарегистрироваться можно по
-        <router-link to="/login">ссылке</router-link>
+        Здесь можно зарегистрироваться или войти
+        <router-link :to="{ path: '/login', query: { registration: 'true' } }">
+          Регистрация
+        </router-link>
+        /
+        <router-link :to="{ path: '/login', query: { registration: 'false' } }">
+          Вход
+        </router-link>
       </div>
     </div>
     <div class="not_logged_in" v-if="isLoggedIn">
       <div class="global_text not_logged_in__text">
-        Добро пожаловать, {{ $store.state.login.user.username }}
+        Добро пожаловать, {{ username }}
       </div>
     </div>
     <div class="news">
@@ -25,6 +31,9 @@ export default {
     isLoggedIn() {
       return this.$store.getters["isLoggedIn"]
     },
+    username() {
+      return this.$store.state.login.user.username
+    },
   },
   components: {
     NewsList,
@@ -38,23 +47,25 @@ export default {
   justify-content: center;
   text-align: center;
   margin-top: 40px;
-  margin-bottom: 25px;
+  margin-bottom: 45px;
   width: 100%;
   height: 6.5vh;
 }
 
 .not_logged_in__text {
   width: 70%;
-  height: 60px;
-  font-size: 29px;
+  height: 90px;
+  font-size: 22px;
   background: var(--six-gold-gradient);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .not_logged_in__text a {
   text-decoration: underline;
   text-decoration-color: #b07b15;
+  margin-top: 5px;
+  display: inline-block;
 }
 
 .news {

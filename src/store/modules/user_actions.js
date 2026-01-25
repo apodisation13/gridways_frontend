@@ -112,7 +112,7 @@ const actions = {
 
   async processResources({ commit, getters, dispatch }, body) {
     // в body придет обязательно subtype, data
-    // data: { level_id: level.id } - для оплаты игры на уровне сезона
+    // data: { difficulty: easy/normal/hard } - для оплаты игры на уровне сезона
     // data: { wood: 201, scraps: 185, etc } - для получения ресурсов после прохождения уровня сезона
     // data: { wood: -100 } - для получения и списания ресурсов на странице бонусов
     const userId = getters["getUser"].user_id
