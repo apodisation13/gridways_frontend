@@ -86,7 +86,7 @@ export default {
         width: 100vw;
         height: 100vh;
         pointer-events: none;
-        z-index: 9998;
+        z-index: 50;
         background: transparent;
       `
 
@@ -485,6 +485,11 @@ export default {
 }
 .card_in_hand:hover {
   margin-top: -2%;
-  z-index: 999999;
+  z-index: 999;
+}
+/* Убираем hover эффект когда модалка открыта */
+.hand.modal-open .card_in_hand:hover {
+  margin-top: 0;
+  z-index: var(--custom-z-index);
 }
 </style>

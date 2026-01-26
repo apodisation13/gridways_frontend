@@ -2,7 +2,7 @@
   <div>
     <div class="not_logged_in" v-if="!isLoggedIn">
       <div class="global_text not_logged_in__text">
-        Здесь можно зарегистрироваться или войти
+        Воспользуйтесь ссылками:
         <router-link :to="{ path: '/login', query: { registration: 'true' } }">
           Регистрация
         </router-link>
