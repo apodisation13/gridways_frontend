@@ -32,10 +32,26 @@ export default {
     toggleApi() {
       // окно перехода в полноэкранный режим, запрашивается 1 раз при первичной загрузке приложения,
       // дальнейшая логика взаимодействия с полноэкранным режимом реализована в AppWrapperFullscreen
-      if (getEnv() !== "development_local") this.$fullscreen.toggle()
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+
+      if (getEnv() !== "development_local") {
+        if (!isIOS && this.$fullscreen.isEnabled) {
+          // Fullscreen только для НЕ-iOS устройств
+          this.$fullscreen.toggle()
+        } else if (isIOS) {
+          // Для iOS - скрываем адресную строку через скролл (хак)
+          this.hideIOSAddressBar()
+        }
+      }
       // выставляем триггер в строр для разрешения открытия модального окна с запросом перехода в полноэкранный режим
       this.$store.commit("gameStarting")
       this.goFullScreen()
+    },
+    hideIOSAddressBar() {
+      // Небольшой хак для iOS - скролл вниз скрывает адресную строку
+      setTimeout(() => {
+        window.scrollTo(0, 1)
+      }, 100)
     },
 
     async goFullScreen() {
@@ -68,7 +84,12 @@ export default {
   align-items: center;
   background: black;
   width: 100%;
+  /* Заменяем 100vh на безопасные единицы */
+  height: 100dvh; /* dynamic viewport height - учитывает адресную строку */
+
+  /* Fallback для старых браузеров */
   height: 100vh;
+  height: -webkit-fill-available;
 }
 .logo {
   position: absolute;
