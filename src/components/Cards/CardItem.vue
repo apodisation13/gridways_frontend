@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="card-item-wrapper">
     <div
       class="card-item-component"
       @contextmenu.prevent
@@ -10,11 +10,14 @@
     >
       <card-ui v-bind="$props" />
     </div>
-    <card-modal
-      v-if="show_card_modal"
-      v-bind="$props"
-      @close_card_modal="show_card_modal = false"
-    />
+    <!-- ИЗМЕНЕНО: телепортируем модалку в body -->
+    <teleport to="body">
+      <card-modal
+        v-if="show_card_modal"
+        v-bind="$props"
+        @close_card_modal="show_card_modal = false"
+      />
+    </teleport>
   </div>
 </template>
 
@@ -98,6 +101,11 @@ export default {
 </script>
 
 <style scoped>
+.card-item-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .card-item-component {
   position: relative;
   width: 100%;

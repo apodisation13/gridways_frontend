@@ -15,13 +15,18 @@ export default {
 .modal_window {
   background: linear-gradient(180deg, #1e2834 0%, #0a0b0c 100%);
   text-align: center;
-  position: absolute;
+  position: fixed;
   top: 0;
-  right: 0;
   bottom: 0;
-  left: 0;
-  z-index: 9999;
+  z-index: 10000;
   font-size: 12pt;
   overflow: scroll;
+  isolation: isolate;
+
+  /* Ключевое изменение для центрирования */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 425px; /* Укажи ширину игрового контейнера на десктопе */
 }
 </style>

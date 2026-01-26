@@ -70,6 +70,16 @@ export default {
 *::-webkit-scrollbar {
   display: none;
 }
+/* Современный подход с dvh */
+:root {
+  --app-height: 100vh;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
 
 .app {
   padding: 0;

@@ -11,7 +11,8 @@
         ref="carousel"
         :items-to-show="1.4"
         :wrap-around="true"
-        :touchDrag="false"
+        :touchDrag="true"
+        :mouseDrag="true"
         v-if="news"
       >
         <slide v-for="element in news" :key="element.id">
@@ -52,6 +53,19 @@ import "vue3-carousel/dist/carousel.css"
 import { Carousel, Slide } from "vue3-carousel"
 export default {
   name: "news-list",
+  mounted() {
+    const carouselEl = this.$refs.carousel?.$el
+
+    if (carouselEl) {
+      carouselEl.addEventListener(
+        "touchmove",
+        e => {
+          e.preventDefault() // Важно!
+        },
+        { passive: false }
+      )
+    }
+  },
   computed: {
     news() {
       return this.$store.getters["allNews"]
