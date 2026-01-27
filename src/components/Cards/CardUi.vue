@@ -154,7 +154,7 @@ export default {
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgb(0, 0, 0, 0.85);
+  background-color: rgb(0, 0, 0, 0.7);
   z-index: 1;
 }
 
