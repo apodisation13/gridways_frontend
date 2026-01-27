@@ -6,10 +6,10 @@
       :style="themedStyle"
       v-if="$store.state.game.player_turn"
     >
-      ПАС
+      ХОД 🔄
     </button>
     <button class="pass-btn" :disabled="!$store.state.game.player_turn" v-else>
-      ПАС
+      ХОД 🔄
     </button>
   </div>
 </template>
@@ -29,7 +29,7 @@ export default {
 
 <style scoped>
 .pass {
-  height: 12vh;
+  height: 10vh;
   width: 98%;
   /*border: solid 1px blue;*/
   margin-bottom: 1%;

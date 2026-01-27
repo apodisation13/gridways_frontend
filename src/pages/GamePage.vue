@@ -17,8 +17,14 @@
 
         <!-- колода оставшихся врагов и кладбище врагов -->
         <div class="div-two-buttons">
-          <remaining-enemies :enemies="gameObj.enemies" />
-          <enemies-grave :enemies_grave="gameObj.enemies_grave" />
+          <remaining-enemies
+            :enemies="gameObj.enemies"
+            :enemy_leader="gameObj.enemy_leader"
+          />
+          <enemies-grave
+            :enemies_grave="gameObj.enemies_grave"
+            :enemy_leader="gameObj.enemy_leader"
+          />
         </div>
 
         <!-- возможность вытянуть карту, дро -->
@@ -34,8 +40,8 @@
 
         <!-- кнопки кладбища и колоды -->
         <div class="div-two-buttons">
-          <deck-comp :deck="gameObj.deck" />
-          <grave-comp :grave="gameObj.grave" />
+          <deck-comp :deck="gameObj.deck" :leader="gameObj.leader" />
+          <grave-comp :grave="gameObj.grave" :leader="gameObj.leader" />
         </div>
 
         <!-- лидер игрока -->
@@ -338,7 +344,7 @@ export default {
 }
 
 .draw {
-  height: 4.3vh;
+  height: 6.3vh;
   width: 98%;
   /* border: solid 1px red; */
   margin-bottom: 1%;
