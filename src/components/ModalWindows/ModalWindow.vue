@@ -14,6 +14,7 @@ export default {
 <style scoped>
 .modal_window {
   background: linear-gradient(180deg, #1e2834 0%, #0a0b0c 100%);
+  padding-top: 30px;
   text-align: center;
   position: fixed;
   top: 0;

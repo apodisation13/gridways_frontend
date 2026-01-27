@@ -40,11 +40,20 @@ const mutations = {
 
 const actions = {
   async checkAuth({ getters, dispatch, commit }) {
+    const user = getters["getUser"]
+    if (!user.email || !user.password) {
+      commit("logOut")
+      toast.warning(
+        "По сохранённым ранее данным юзера не получилось авторизоваться, попробуйте вручную!"
+      )
+      throw new Error(
+        "По сохранённым ранее данным юзера не получилось авторизоваться, попробуйте вручную"
+      )
+    }
     try {
-      let user = getters["getUser"]
       await dispatch("userLogin", {
-        email: user.email || "",
-        password: user.password || "",
+        email: user.email,
+        password: user.password,
       })
     } catch (err) {
       commit("logOut")
