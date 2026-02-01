@@ -23,6 +23,7 @@ import { set_lowest_dmg_to_as_highest } from "@/logic/player_move/abilities/abil
 import { spawn_tokens_at_enemy_deck } from "@/logic/player_move/abilities/ability_spawn_tokens_at_enemy_deck"
 import { incr_dmg_to_all_hand } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_hand"
 import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_grave"
+import { CardAbility } from "@/logic/models"
 
 // Сюда заходим если там есть враг
 // card - карта, которую мы играем (или из руки, или лидер).
@@ -31,56 +32,58 @@ import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_inc
 function damage_ai_card(card, enemy, isCard, gameObj) {
   const { field, enemy_leader, hand, deck, grave, enemies, leader } = gameObj
 
-  if (card.ability.name === "heal") {
+  const ability = card.ability.name
+
+  if (ability === CardAbility.Heal) {
     damage_one(enemy, card, gameObj)
     heal(card)
-  } else if (card.ability.name === "damage-all") {
+  } else if (ability === CardAbility.DamageAll) {
     damage_all(field, card, gameObj)
     if (enemy_leader.hp > 0) hit_one_enemy(enemy_leader, card, gameObj)
     setTimeout(() => check_win(field, enemies, enemy_leader), 1200)
-  } else if (card.ability.name === "spread-damage") {
+  } else if (ability === CardAbility.SpreadDamage) {
     spread_damage(card, gameObj)
-  } else if (card.ability.name === "damage-row") {
+  } else if (ability === CardAbility.DamageRow) {
     damage_row(enemy, card, gameObj)
-  } else if (card.ability.name === "damage-column") {
+  } else if (ability === CardAbility.DamageColumn) {
     damage_column(enemy, card, gameObj)
-  } else if (card.ability.name === "destroy-highest-hp") {
+  } else if (ability === CardAbility.DestroyHighestHp) {
     destroy_highest_hp(gameObj)
-  } else if (card.ability.name === "destroy-highest-damage") {
+  } else if (ability === CardAbility.DestroyHighestDamage) {
     destroy_highest_damage(gameObj)
-  } else if (card.ability.name === "destroy-random") {
+  } else if (ability === CardAbility.DestroyRandom) {
     destroy_random(gameObj)
-  } else if (card.ability.name === "destroy-all-same-hp") {
+  } else if (ability === CardAbility.DestroyAllSameHp) {
     destroy_all_same_hp(enemy, gameObj)
-  } else if (card.ability.name === "lock") {
+  } else if (ability === CardAbility.Lock) {
     lock_enemy(enemy)
     damage_one(enemy, card, gameObj)
-  } else if (card.ability.name === "move-enemy") {
+  } else if (ability === CardAbility.MoveEnemy) {
     damage_one(enemy, card, gameObj)
     move_enemy(enemy, gameObj)
-  } else if (card.ability.name === "set-enemy-as-token") {
+  } else if (ability === CardAbility.SetEnemyAsToken) {
     set_enemy_as_token(enemy)
-  } else if (card.ability.name === "spawn-self-at-deck") {
+  } else if (ability === CardAbility.SpawnSelfAtDeck) {
     spawn_self_at_deck(card, gameObj)
     damage_one(enemy, card, gameObj)
-  } else if (card.ability.name === "spawn-self-at-grave") {
+  } else if (ability === CardAbility.SpawnSelfAtGrave) {
     spawn_self_at_grave(card, gameObj)
     damage_one(enemy, card, gameObj)
-  } else if (card.ability.name === "destroy-random-enemy-in-deck") {
+  } else if (ability === CardAbility.DestroyRandomEnemyInDeck) {
     destroy_random_enemy_in_deck(gameObj)
     damage_one(enemy, card, gameObj)
-  } else if (card.ability.name === "place-self-in-field") {
+  } else if (ability === CardAbility.PlaceSelfInField) {
     place_self_in_field(card, enemy, gameObj)
-  } else if (card.ability.name === "set-lowest-dmg-to-as-highest") {
+  } else if (ability === CardAbility.SetLowestDmgToAsHighest) {
     set_lowest_dmg_to_as_highest(gameObj)
     damage_one(enemy, card, gameObj)
-  } else if (card.ability.name === "spawn-tokens-at-enemy-deck") {
+  } else if (ability === CardAbility.SpawnTokensAtEnemyDeck) {
     spawn_tokens_at_enemy_deck(card, enemy, gameObj)
     damage_one(enemy, card, gameObj)
-  } else if (card.ability.name === "incr-dmg-to-all-hand") {
+  } else if (ability === CardAbility.IncrDmgToAllHand) {
     damage_one(enemy, card, gameObj)
     incr_dmg_to_all_hand(card, gameObj)
-  } else if (card.ability.name === "incr-dmg-to-all-grave") {
+  } else if (ability === CardAbility.IncrDmgToAllGrave) {
     damage_one(enemy, card, gameObj)
     incr_dmg_to_all_grave(card, gameObj)
   } else damage_one(enemy, card, gameObj)
