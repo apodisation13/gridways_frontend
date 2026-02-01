@@ -236,7 +236,7 @@ export default {
           password: this.password,
         })
         await this.$router.push("/loading")
-        await this.$store.dispatch("get_user_database")
+        await this.$store.dispatch("getUserDatabase")
         await this.$store.dispatch("render_all_images")
         await this.$router.push("/main")
       } catch (err) {

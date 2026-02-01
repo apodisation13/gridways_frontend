@@ -63,7 +63,7 @@ export default {
       // если же логин прошел, то по кнопке начать идем на загрузку и грузим всю базу данных
       try {
         await this.$router.push("/loading")
-        await this.$store.dispatch("get_user_database")
+        await this.$store.dispatch("getUserDatabase")
         await this.$store.dispatch("render_all_images") // принудительный рендер всех картинок
       } catch (err) {
         console.log(err)
@@ -86,10 +86,6 @@ export default {
   width: 100%;
   /* Заменяем 100vh на безопасные единицы */
   height: 100dvh; /* dynamic viewport height - учитывает адресную строку */
-
-  /* Fallback для старых браузеров */
-  height: 100vh;
-  height: -webkit-fill-available;
 }
 .logo {
   position: absolute;

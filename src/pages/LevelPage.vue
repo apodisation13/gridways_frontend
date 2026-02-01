@@ -19,6 +19,7 @@
             <img
               class="backBtn__img"
               src="@/assets/icons/buttons/back_icon.svg"
+              alt=""
             />
           </div>
           <div class="header__chosen">
@@ -29,23 +30,10 @@
           </div>
         </div>
         <div v-if="gameMod.name === 'seasons'">
-          <div v-if="!seasonSelected">
-            <div
-              class="seasons"
-              v-for="season in seasons"
-              :key="season.id"
-              @click="setSeason(season)"
-            >
-              <div class="global_text seasons__element">
-                <div class="season__name">{{ season.name }}</div>
-                <div class="season__description">{{ season.description }}</div>
-              </div>
-            </div>
-            <div class="scroll-closed"></div>
-          </div>
-          <LevelTree
-            :levels="seasonLevels"
-            v-if="seasonLevels && seasonSelected"
+          <SeasonTree
+            :seasons="seasons"
+            :seasonLevelsTreeOpened="seasonLevelsTreeOpened"
+            @level_selected="configureBackButton"
           />
         </div>
         <div v-if="gameMod.name === 'random'">
@@ -70,11 +58,11 @@
 import { useToast } from "vue-toastification"
 import LevelPreviewComp from "@/components/Pages/LevelPage/LevelPreviewComp"
 import { random_level_generator } from "@/logic/random_level"
-import LevelTree from "@/components/Pages/LevelPage/LevelTree"
+import SeasonTree from "@/components/Pages/LevelPage/SeasonTree.vue"
 export default {
   components: {
-    LevelTree,
     LevelPreviewComp,
+    SeasonTree,
   },
   setup() {
     const toast = useToast()
@@ -103,8 +91,7 @@ export default {
         },
       ],
       gameMod: null,
-      seasonLevels: null,
-      seasonSelected: false,
+      seasonLevelsTreeOpened: false,
     }
   },
   computed: {
@@ -116,17 +103,23 @@ export default {
     selectGameMode(mode) {
       this.gameMod = mode
     },
+    configureBackButton() {
+      this.seasonLevelsTreeOpened = true
+    },
+    /*
+    Тут какая логика:
+    1) Если был открыто дерево сезонов, а потом дерево уровней, то вот тогда
+    по кнопке назад из дерева уровней мы вернемся на дерево сезонов
+    2) А если все остальное - то мы сбросим выбор и будем на экране выбора
+    режима игры
+    */
     cancelGameMod() {
-      if (this.seasonSelected) {
-        this.seasonSelected = null
+      if (!this.seasonLevelsTreeOpened) {
+        this.gameMod = null
         return
       }
-      this.gameMod = null
-    },
-    setSeason(season) {
-      this.seasonLevels = season.levels
-      this.$store.commit("set_season", season)
-      this.seasonSelected = true
+      this.gameMod = this.game_types[0]
+      this.seasonLevelsTreeOpened = false
     },
     set_random_level(index) {
       this.toast.success(`Выбран рандомный уровень!`, { timeout: 1000 })
@@ -195,7 +188,7 @@ div {
   text-transform: uppercase;
   font-size: 25px;
   background: var(--primary-gold-gradient);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 .backBtn {
@@ -237,37 +230,6 @@ div {
 }
 .game_modes:nth-child(1) {
   margin-top: 30px;
-}
-.seasons,
-.scroll-closed {
-  background-image: url(~@/assets/icons/game_modes_scroll.svg);
-  background-repeat: no-repeat;
-  background-size: 100%;
-  height: 110px;
-  color: hsl(40, 83%, 20%);
-}
-.scroll-closed {
-  position: relative;
-  left: -75%;
-}
-.seasons__element {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  text-align: start;
-  width: 80%;
-  padding: 20px;
-}
-.season__name {
-  font-family: "Philosopher", serif;
-  margin-bottom: 5px;
-}
-.season__description {
-  font-family: "Inter", serif;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 110%;
 }
 .mode {
   position: absolute;

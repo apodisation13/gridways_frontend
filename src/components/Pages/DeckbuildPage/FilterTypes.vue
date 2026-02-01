@@ -10,11 +10,13 @@
 </template>
 
 <script>
+import { CardType } from "@/logic/models"
+
 export default {
   name: "filter-types",
   data() {
     return {
-      types: ["Unit", "Special"],
+      types: [CardType.Unit, CardType.Special],
     }
   },
   methods: {
@@ -37,7 +39,7 @@ export default {
   font-size: 25px;
   margin-bottom: 15px;
   background: var(--primary-gold-gradient);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 .types {

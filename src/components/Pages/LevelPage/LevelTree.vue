@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div>СЕЗОН 1</div>
     <v-stage :config="configKonva">
       <v-layer>
         <!--для каждого уровня из списка уровней текущего сезона-->
@@ -27,7 +28,7 @@
           ></v-rect>
           <!--Текст внутри прямоугольника, или id или значок замка (закрыт)-->
           <v-text
-            v-if="level.unlocked"
+            v-if="level.unlocked || !userSeasonUnlocked"
             :config="textConfig(level)"
             @dblclick="setLevel(level)"
             @dbltap="setLevel(level)"
@@ -71,6 +72,10 @@ export default {
   props: {
     levels: {
       type: Array,
+      required: true,
+    },
+    userSeasonUnlocked: {
+      type: Boolean,
       required: true,
     },
   },
@@ -119,15 +124,18 @@ export default {
       }
     },
     levelColor(item) {
+      if (!this.userSeasonUnlocked) return "grey"
       if (item.finished) return "rgba(255, 231, 183, 1)"
       if (item.unlocked) return "rgba(237, 177, 62, 1)"
       return "silver"
     },
     levelBorder(item) {
+      if (!this.userSeasonUnlocked) return "grey"
       if (item.finished) return ""
       return "rgba(0, 0, 0, 0.13)"
     },
     levelFaction(item) {
+      if (!this.userSeasonUnlocked) return "grey"
       if (item.level.enemy_leader.faction === "Soldiers") return "blue"
       if (item.level.enemy_leader.faction === "Monsters") return "red"
       if (item.level.enemy_leader.faction === "Animals") return "green"
@@ -221,6 +229,15 @@ export default {
     },
     push_line(connections, level, x1, y1, x2, y2) {
       for (const l of connections) {
+        if (!this.userSeasonUnlocked) {
+          level.lines.push({
+            x: x2,
+            y: y2,
+            fill: "grey",
+            points: [0, 0, x1, y1],
+          })
+          return
+        }
         if (this.levs[parseInt(l) - 1].finished) {
           level.lines.push({
             x: x2,
@@ -239,9 +256,14 @@ export default {
       })
     },
     setLevel(level) {
+      if (!this.userSeasonUnlocked) {
+        // весь сезон закрыт, нельзя поиграть в него вообще
+        this.toast.warning("Весь этот сезон закрыт!")
+        return
+      }
       if (!level.id) {
         // этот id - user_levels.id - если уровень закрыт, его нет (null)
-        this.toast.error("Уровень закрыт!")
+        this.toast.warning("Уровень закрыт!")
         return
       }
       this.toast.success(`Выбран уровень ${level.level.id}! `, {
