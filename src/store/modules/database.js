@@ -14,7 +14,6 @@ const state = {
   leaders: [],
   cards: [],
   decks: [],
-  levels: [], // все уровни, из запроса
   seasons: [],
   resource: {},
 
@@ -27,7 +26,6 @@ const getters = {
   all_leaders: state => state.leaders,
   all_cards: state => state.cards,
   all_decks: state => state.decks,
-  all_levels: state => state.levels,
   all_seasons: state => state.seasons,
   resource: state => state.resource,
 
@@ -95,9 +93,6 @@ const mutations = {
   set_seasons(state, result) {
     state.seasons = result
   },
-  set_updated_season(state, { index, levels }) {
-    state.seasons[index].levels = levels
-  },
   set_resource(state, result) {
     // {scraps, wood, kegs, big_kegs, chests}
     state.resource = result
@@ -113,7 +108,7 @@ const mutations = {
 
 const actions = {
   // в ответе user_database: cards,leaders,u_d(колоды),levels, resources: тут ресурсы
-  async get_user_database({ commit, getters, dispatch }) {
+  async getUserDatabase({ commit, getters, dispatch }) {
     let userId = getters["getUser"].user_id
 
     try {
@@ -138,8 +133,8 @@ const actions = {
       dispatch("set_deck_in_play", user_database.decks[0]) // устанавливаем для игры первую колоду
 
       commit("set_seasons", seasons)
-      commit("set_season", seasons[0])
-      dispatch("set_level_in_play", seasons[0].levels[0]) // устанавливаем для игры первый уровень
+      commit("set_season", seasons[0].season)
+      dispatch("set_level_in_play", seasons[0].season.levels[0]) // устанавливаем для игры первый уровень
 
       commit("set_resource", resources)
 

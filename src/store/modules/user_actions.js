@@ -235,8 +235,8 @@ const actions = {
       })
       const seasons = response.data.seasons
       commit("set_seasons", seasons)
-      commit("set_season", seasons[0])
-      dispatch("set_level_in_play", seasons[0].levels[0])
+      commit("set_season", seasons[0].season)
+      dispatch("set_level_in_play", seasons[0].season.levels[0]) // устанавливаем для игры первый уровень
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при открытии уровней")
