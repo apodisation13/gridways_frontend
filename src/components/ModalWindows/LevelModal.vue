@@ -2,14 +2,14 @@
   <modal-window>
     <button-close @close_self="close_self" />
 
-    {{ level.name }} - {{ level.difficulty }} <br />
+    <h3 class="text">{{ level.name }} - {{ level.difficulty }} <br /></h3>
 
-    Лидер - {{ level.enemy_leader.name }}
+    <h4 class="text">Лидер - {{ level.enemy_leader.name }}</h4>
     <div class="enemy_leader">
       <enemy-leader :enemy_leader="level.enemy_leader" />
     </div>
 
-    Врагов - {{ level.enemies.length }} <br />
+    <h4 class="text">Врагов - {{ level.enemies.length }} <br /></h4>
     <enemy-list :enemies="level.enemies" />
   </modal-window>
 </template>
@@ -40,5 +40,8 @@ export default {
 .enemy_leader {
   width: 30%;
   margin: auto;
+}
+.text {
+  color: white;
 }
 </style>

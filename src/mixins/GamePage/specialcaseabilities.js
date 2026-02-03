@@ -7,6 +7,7 @@ export default {
   data() {
     return {
       ability: "", // параметр для выхода из эмита
+      selectedCardAbilityDescription: "", // описание абилки той карты, которую мы изначально играли
       cards_pool: [], // список карт, которые будем показывать в окне
       show_pick_a_card_selection: false, // показать ли окно
       show_picked_card: false, // показать ли выбранную карту из абилок play_from_
@@ -137,6 +138,8 @@ export default {
       }
       this.ability = this.selected_card.ability.name
       if (this.cards_pool.length) {
+        this.selectedCardAbilityDescription =
+          this.selected_card.ability.description
         this.sca = true
         this.show_pick_a_card_selection = true
       }
@@ -161,6 +164,7 @@ export default {
         this.ability === CardAbility.PlayBronzeSilverFromDeck ||
         this.ability === CardAbility.PlayEnemyFromGrave ||
         this.ability === CardAbility.PlaySpecialFromDeck ||
+        this.ability === CardAbility.PlaySpecialFromGrave ||
         this.ability === CardAbility.PlayFromGrave ||
         this.ability === CardAbility.CreateSpecial ||
         this.ability === CardAbility.CreateAnyUnit
@@ -205,6 +209,7 @@ export default {
       this.enemyView = false
       this.show_pick_a_card_selection = false
       this.ability = ""
+      this.selectedCardAbilityDescription = ""
       this.cards_pool = []
       this.special_case_value = null
     },

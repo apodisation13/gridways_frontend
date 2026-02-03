@@ -417,7 +417,7 @@ export default {
 
 .season-name {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
+  color: black;
   text-align: center;
   max-width: 90%;
   overflow: hidden;

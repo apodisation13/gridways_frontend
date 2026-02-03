@@ -2,12 +2,13 @@
   <modal-window class="redraw-modal-window" v-if="visible">
     <button-close @close_self="close_self" />
 
+    <h3 class="text">Это ваша рука</h3>
     <card-list-component :cards="hand" @chose_player_card="chose_player_card" />
 
     <div>
-      <h1>Изменить карту можно ещё {{ redraws }} раз</h1>
+      <h1 class="text">Изменить карту можно ещё {{ redraws }} раз</h1>
     </div>
-    <h2>В колоде осталось ещё {{ deck.length }} карт</h2>
+    <h2 class="text">В колоде осталось ещё {{ deck.length }} карт</h2>
     <card-list-component :cards="deck" />
   </modal-window>
 </template>
@@ -72,5 +73,9 @@ export default {
 <style scoped>
 .redraw-modal-window {
   overflow-y: scroll;
+}
+.text {
+  color: white;
+  margin-top: 1vh;
 }
 </style>

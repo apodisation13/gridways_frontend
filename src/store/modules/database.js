@@ -170,8 +170,6 @@ const actions = {
       commit("set_images_rendered", true)
       return
     }
-
-    toast.info("мы вообще тут")
     const images = all_cards.map(imageSrc => {
       return new Promise((resolve, reject) => {
         const img = new Image()

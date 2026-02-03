@@ -74,6 +74,7 @@
       :cards_pool="cards_pool"
       :show_picked_card="show_picked_card"
       :enemyView="enemyView"
+      :card_ability="selectedCardAbilityDescription"
       @confirm_selection="confirm_selection"
     />
 
