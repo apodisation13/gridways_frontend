@@ -27,7 +27,7 @@
             <!-- база карт -->
             <card-list-component
               v-show="showingList === 'pool'"
-              :cards="pool"
+              :cards="cardsPool"
               :hp_needed="true"
               :deckbuilder="true"
               @chose_player_card="append_into_deck_in_progress"
@@ -82,6 +82,7 @@ import DeckbuilderFilters from "@/components/Pages/DeckbuildPage/DeckbuilderFilt
 import CardListComponent from "@/components/Cards/CardListComponent"
 import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks"
 import { useToast } from "vue-toastification"
+import { copyObj } from "@/lib/utils"
 
 export default {
   components: {
@@ -119,14 +120,27 @@ export default {
         has_passive: null,
         count: null,
       },
+      cardsPool: [],
     }
   },
-
+  created() {
+    this.init()
+  },
+  watch: {
+    // при изменении параметра query (фильтры для карт), будем всегда выполнять
+    // а там отсеим из пула те карты, которые уже в колоде (новой или имеющейся)
+    query: {
+      deep: true,
+      handler: "init",
+    },
+  },
   methods: {
-    // триггеры показа дополнительных окон
-    // startDeckBuilding() {
-    //   this.showNewDeckFactionSelect = true
-    // },
+    init() {
+      this.cardsPool = copyObj(this.pool)
+      this.cardsPool = this.cardsPool.filter(
+        card => !this.deck.deck_body.some(c => c === card.card.id)
+      )
+    },
 
     trigger_decks_list_modal(value) {
       this.show_decks_list_modal = value
@@ -183,6 +197,7 @@ export default {
         this.deck.deck_is_progress.push(card)
         this.deck.deck_body.push(card.card.id)
         this.deck.health += card.card.hp
+        this.init() // это нужно, так как при добавлении карты, мы хотим убрать ее из пула (для удобства)
         return
       }
       this.toast.warning(
@@ -201,6 +216,7 @@ export default {
         this.deck.deck_body.findIndex(card_id => card_id === card.card.id),
         1
       )
+      this.init() // а здесь наоборот - из колоды убрали, в пул хотим вернуть карту на ее место
     },
 
     // выбираем лидера для деки
@@ -264,15 +280,18 @@ export default {
       this.disable_start_animation = this.disable_start_animation && false
       this.new_deck()
       this.deckBuilding = true
-      const { deck } = _.cloneDeep(this.$store.getters["all_decks"][index])
-      ;((this.deck.deck_id = deck.id),
-        (this.deck.deck_name = deck.name),
-        (this.deck.deck_is_progress = [...deck.cards]), // колода в процессе - целиком объекты, для отображения
-        (this.deck.deck_body = [...deck.cards.map(card => card.card.id)]), // только {card = id} для пост-запроса
-        (this.deck.leader = deck.leader), // сам выбранный лидер
-        (this.deck.health = deck.health), // жизни текущей деки
-        (this.query.faction = deck.leader.faction))
       this.patch = true
+
+      const { deck } = _.cloneDeep(this.$store.getters["all_decks"][index])
+
+      const { id, name, cards, leader, health } = deck
+      this.deck.deck_id = id
+      this.deck.deck_name = name
+      this.deck.deck_is_progress = [...cards] // колода в процессе - целиком объекты, для отображения
+      this.deck.deck_body = cards.map(card => card.card.id) // только [1,2,3,4] для пост-запроса
+      this.deck.leader = leader
+      this.deck.health = health
+      this.query.faction = leader.faction
     },
 
     async patch_deck() {

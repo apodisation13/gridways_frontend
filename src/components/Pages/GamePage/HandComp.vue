@@ -254,12 +254,12 @@ export default {
         Math.PI * 2
       )
       this.ctx.fill()
-      console.log(this.arrowCurrentX, this.arrowCurrentY)
-      const elems = document.elementsFromPoint(
-        this.arrowCurrentX,
-        this.arrowCurrentY
-      )
-      console.log("Найдено элементов в точке:", elems.length)
+      // console.log(this.arrowCurrentX, this.arrowCurrentY)
+      // const elems = document.elementsFromPoint(
+      //   this.arrowCurrentX,
+      //   this.arrowCurrentY
+      // )
+      // console.log("Найдено элементов в точке:", elems.length)
     },
 
     // Останавливаем рисование стрелки
@@ -281,9 +281,9 @@ export default {
       }
 
       // Определяем цель
-      console.log("Определяем цель по координатам:", clientX, clientY)
+      // console.log("Определяем цель по координатам:", clientX, clientY)
       const elems = document.elementsFromPoint(clientX, clientY)
-      console.log("Найдено элементов в точке:", elems.length)
+      // console.log("Найдено элементов в точке:", elems.length)
 
       this.get_target(elems)
 

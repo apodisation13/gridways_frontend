@@ -142,7 +142,7 @@
       </div>
 
       <!-- Кнопки входа и регистрации -->
-      <div class="form__btn" v-if="!input_enabled">
+      <div class="form__btn">
         <button
           class="btn__login"
           v-if="formLogin"

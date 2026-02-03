@@ -1,6 +1,5 @@
 <template>
   <div class="modal_window">
-    <div>Щёлкните дважды для выбора карты</div>
     <slot></slot>
   </div>
 </template>

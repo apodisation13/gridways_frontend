@@ -2,6 +2,7 @@
   <div>
     <!--отркывается по любой абилке где нужно окно, там отфильтрованные карты cards_pool-->
     <modal-window v-if="show_pick_a_card_selection">
+      <h4 class="special-ability-header">{{ card_ability }}</h4>
       <card-list-component
         v-if="!enemyView"
         :cards="cards_pool"
@@ -49,6 +50,11 @@ export default {
       required: true,
       type: Boolean,
     },
+    // это описание абилки той карты, которую мы изначально играли
+    card_ability: {
+      type: String,
+      required: true,
+    },
   },
 
   data() {
@@ -86,5 +92,8 @@ export default {
   right: 1%;
   z-index: 999999;
   /*border: solid 4px black;*/
+}
+.special-ability-header {
+  color: white;
 }
 </style>

@@ -5,9 +5,11 @@
     v-touch:longtap="open_level_modal"
     @contextmenu.prevent
   >
-    <div :style="background_color(level.level)">{{ level.level.name }}</div>
-    <div style="font-size: 8pt">Врагов - {{ level.level.enemies.length }}</div>
-    <div style="font-size: 8pt">{{ level.level.difficulty }}</div>
+    <div class="text" :style="background_color(level.level)">
+      {{ level.level.name }}
+    </div>
+    <div class="text">Врагов - {{ level.level.enemies.length }}</div>
+    <div class="text">{{ level.level.difficulty }}</div>
 
     <level-modal
       v-if="show_level_modal"
@@ -55,5 +57,9 @@ export default {
 .d {
   width: 8vh;
   height: 10vh;
+}
+.text {
+  color: white;
+  font-size: 8pt;
 }
 </style>

@@ -231,9 +231,9 @@ export default {
       }
 
       // Определяем цель
-      console.log("Определяем цель по координатам:", clientX, clientY)
+      // console.log("Определяем цель по координатам:", clientX, clientY)
       const elems = document.elementsFromPoint(clientX, clientY)
-      console.log("Найдено элементов в точке:", elems.length)
+      // console.log("Найдено элементов в точке:", elems.length)
 
       this.get_target(elems)
 
