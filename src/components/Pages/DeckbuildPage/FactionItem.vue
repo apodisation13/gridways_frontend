@@ -51,9 +51,9 @@ export default {
 .faction-n {
   background: linear-gradient(
     180deg,
-    #4b2210 0.48%,
-    rgba(71, 43, 30, 0.69) 55.4%,
-    #4b2210 109.17%
+    #4a4a4a 0.48%,
+    rgba(90, 90, 90, 0.69) 55.4%,
+    #4a4a4a 109.17%
   );
   box-shadow:
     7px 12px 276px rgba(0, 0, 0, 0.25),
