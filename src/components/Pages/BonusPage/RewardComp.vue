@@ -20,6 +20,7 @@
         :cards="reward"
         :deckbuilder="true"
         :bonus="true"
+        hp_needed
         @chose_player_card="accept_reward"
       />
       <!-- Иначе. для ключа отображается этот компонент -->

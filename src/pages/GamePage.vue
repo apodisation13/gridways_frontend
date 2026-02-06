@@ -4,6 +4,7 @@
       <!-- поле с врагами -->
       <field-comp
         :field="gameObj.field"
+        :in_cross_enemy_index="inCrossEnemyIndex"
         @exec_damage_ai_card="exec_damage_enemy_card"
       />
 
@@ -12,6 +13,7 @@
         <!-- лидер врага -->
         <enemy-leader
           :enemy_leader="gameObj.enemy_leader"
+          :in_cross="inCrossEnemyLeader"
           @exec_enemy_leader="exec_damage_enemy_leader"
         />
 
@@ -67,6 +69,8 @@
       @chose_player_card="chose_player_card"
       @target_enemy="exec_damage_enemy_card"
       @target_enemy_leader="exec_damage_enemy_leader"
+      @enemy_leader_in_cross="switch_enemy_leader_in_cross"
+      @enemy_in_cross="switch_enemy_in_cross"
     />
 
     <special-case-abilities
@@ -156,6 +160,10 @@ export default {
       },
       selected_card: null, // объект выбранной карты путём дважды ЛКМ на карте в руке
       selected_enemy: null, // объект выбранного врага, по которому ткнули дважды ЛКМ, из field-comp
+
+      // если лидер врагов или враг под прицелом, у него будет анимация свечения
+      inCrossEnemyLeader: false,
+      inCrossEnemyIndex: null,
     }
   },
   methods: {
@@ -267,6 +275,16 @@ export default {
       )
       this.afterDamage()
       this.isActive.player_leader = false // лидер снова неактивен, чтобы ходить им снова - надо опять на него тыкать
+    },
+    // переключить анимацию, что лидер врагов под целью мышки
+    switch_enemy_leader_in_cross(in_cross) {
+      this.inCrossEnemyIndex = null
+      this.inCrossEnemyLeader = in_cross
+    },
+    switch_enemy_in_cross(index) {
+      // index - это или null если мы ушли мышкой с клетки поля, или индекс поля врага
+      this.inCrossEnemyLeader = false
+      this.inCrossEnemyIndex = index
     },
   },
   computed: {
