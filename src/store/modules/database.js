@@ -151,9 +151,20 @@ const actions = {
     }
   },
   error_action(_, err) {
-    toast.error(
-      `Произошла какая-то ошибка при загрузке вашей базы данных ${err}`
-    )
+    let message = "Неизвестная ошибка"
+
+    if (typeof err.error === "string") {
+      // Сетевая ошибка или наше кастомное сообщение
+      message = err.error
+    } else if (err.error?.error?.message) {
+      // Структура от бэка: { error: { code, message, details } }
+      message = err.error.error.message
+    } else if (err.error?.detail) {
+      // FastAPI HTTPException стиль
+      message = err.error.detail
+    }
+
+    toast.error(`Ошибка при загрузке базы данных: ${message}`)
   },
 
   async render_all_images({ getters, commit }) {
