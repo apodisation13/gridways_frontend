@@ -37,15 +37,47 @@
           />
         </div>
         <div v-if="gameMod.name === 'random'">
-          <div
-            class="level"
-            :class="{ level_selected: index === selectedRandomLevel }"
-            :style="difficultyBorder(level)"
-            v-for="(level, index) in random_levels"
-            :key="level"
-            @dblclick="set_random_level(index)"
-          >
-            <level-preview-comp :level="level" />
+          <div>
+            <div
+              class="level"
+              :class="{ level_selected: index === selectedRandomLevel }"
+              :style="difficultyBorder(level)"
+              v-for="(level, index) in random_levels.filter(
+                l => l.level.difficulty === 'easy'
+              )"
+              :key="level"
+              @dblclick="set_random_level(index)"
+            >
+              <level-preview-comp :level="level" />
+            </div>
+          </div>
+          <div>
+            <div
+              class="level"
+              :class="{ level_selected: index === selectedRandomLevel }"
+              :style="difficultyBorder(level)"
+              v-for="(level, index) in random_levels.filter(
+                l => l.level.difficulty === 'normal'
+              )"
+              :key="level"
+              @dblclick="set_random_level(index)"
+            >
+              <level-preview-comp :level="level" />
+            </div>
+          </div>
+          <div>
+            <div
+              class="level"
+              :class="{ level_selected: index === selectedRandomLevel }"
+              :style="difficultyBorder(level)"
+              v-for="(level, index) in random_levels.filter(
+                l => l.level.difficulty === 'hard'
+              )"
+              :key="level"
+              @dblclick="set_random_level(index)"
+            >
+              <level-preview-comp :level="level" />
+            </div>
           </div>
         </div>
         <div v-if="gameMod.name === 'arena'">Пока не реализовано!</div>

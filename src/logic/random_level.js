@@ -1,24 +1,27 @@
 import store from "@/store"
 
-const easy = {
-  Bronzes: [5, 6, 7],
-  Silvers: [2, 3],
-  Golds: [1, 2],
-  diff: "easy",
+function getRandomLevelConst() {
+  const stateInfo = store.state.game.random_level_enemies_count
+  const easy = {
+    Bronzes: stateInfo?.easy?.bronzes || [5, 6, 7],
+    Silvers: stateInfo?.easy?.silvers || [2, 3],
+    Golds: stateInfo?.easy?.golds || [1, 2],
+    diff: "easy",
+  }
+  const normal = {
+    Bronzes: stateInfo?.normal?.bronzes || [6, 7, 8, 9],
+    Silvers: stateInfo?.normal?.silvers || [2, 3, 4],
+    Golds: stateInfo?.normal?.golds || [2, 3, 4],
+    diff: "normal",
+  }
+  const hard = {
+    Bronzes: stateInfo?.hard?.bronzes || [9, 10, 11, 12, 13, 14],
+    Silvers: stateInfo?.hard?.silvers || [3, 4, 5, 6],
+    Golds: stateInfo?.hard?.golds || [3, 4, 5, 6],
+    diff: "hard",
+  }
+  return [easy, easy, easy, normal, normal, normal, hard, hard]
 }
-const normal = {
-  Bronzes: [6, 7, 8, 9],
-  Silvers: [2, 3, 4],
-  Golds: [2, 3, 4],
-  diff: "normal",
-}
-const hard = {
-  Bronzes: [9, 10, 11, 12, 13, 14],
-  Silvers: [3, 4, 5, 6],
-  Golds: [3, 4, 5, 6],
-  diff: "hard",
-}
-const diff = [easy, easy, easy, normal, normal, hard]
 
 function random_pick_enemies(dict) {
   let enemies = []
@@ -54,6 +57,7 @@ function random_pick_enemies(dict) {
 function random_level_generator() {
   let random_levels = []
   const e_leaders = store.getters["all_enemy_leaders"]
+  const diff = getRandomLevelConst()
 
   diff.forEach(d => {
     let e = random_pick_enemies(d)
