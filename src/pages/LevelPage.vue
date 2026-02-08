@@ -81,6 +81,9 @@
           </div>
         </div>
         <div v-if="gameMod.name === 'arena'">Пока не реализовано!</div>
+        <div v-if="gameMod.name === 'random_select'">
+          ПОЯВИТСЯ В СЛЕДУЮЩЕЙ ВЕРСИИ
+        </div>
       </div>
     </div>
   </div>
@@ -116,6 +119,10 @@ export default {
         {
           name: "random",
           name_ru: "Рандом",
+        },
+        {
+          name: "random_select",
+          name_ru: "Рандом по количеству",
         },
         {
           name: "arena",
