@@ -77,12 +77,12 @@ function background_color(card) {
       return { backgroundColor: "green", border: "solid 2px gold" }
     } else return { backgroundColor: "green" }
   } else if (card.faction === "Neutral") {
-    if (card.color === "Bronze") return { backgroundColor: "brown" }
+    if (card.color === "Bronze") return { backgroundColor: "grey" }
     else if (card.color === "Silver") {
-      return { backgroundColor: "brown", border: "solid 2px silver" }
+      return { backgroundColor: "grey", border: "solid 2px silver" }
     } else if (card.color === "Gold") {
-      return { backgroundColor: "brown", border: "solid 2px gold" }
-    } else return { backgroundColor: "brown" }
+      return { backgroundColor: "grey", border: "solid 2px gold" }
+    } else return { backgroundColor: "grey" }
   } else return {}
 }
 
@@ -120,8 +120,8 @@ function background_color_leader(factionColor) {
       return "red"
     case "Animals":
       return "green"
-    case "Neutrals":
-      return "brown"
+    case "Neutral":
+      return "grey"
     default:
       return "#fd69b5"
   }

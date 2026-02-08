@@ -83,9 +83,10 @@ export default {
           card => card.type === CardType.Special
         )
       } else if (ability === CardAbility.PlaySpecialFromGrave) {
-        // играем любую специальную карту из сброса
+        // играем бронзовую специальную карту из сброса
         this.cards_pool = this.gameObj.grave.filter(
-          card => card.type === CardType.Special
+          card =>
+            card.type === CardType.Special && card.color === CardColor.Bronze
         )
       } else if (ability === CardAbility.MoveEnemyFromDeckToGrave) {
         // выбираем врага из их колоды и перемещаем его в их сброс (+костыль на врагов)

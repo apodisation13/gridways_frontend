@@ -1,6 +1,6 @@
 <template>
   <div class="shield">
-    <span> &#128737; </span>
+    <span class="shield-icon">&#128737;</span>
   </div>
 </template>
 
@@ -18,10 +18,11 @@ export default {}
   display: flex;
   align-items: center;
   justify-content: center;
+  container-type: size;
 }
 
-span {
-  font-size: 30pt;
+.shield-icon {
+  font-size: 30cqmin; /* % от меньшей стороны контейнера */
   color: white;
 }
 </style>

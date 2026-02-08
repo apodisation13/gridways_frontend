@@ -30,7 +30,13 @@ const mutations = {
     state.header = ""
     state.user = ""
     localStorage.removeItem("user")
-    // FIXME: здесь должен быть запрос на очистку токена?
+  },
+  updateAccessToken(state, newToken) {
+    state.user.token = newToken
+    state.header = { headers: { Authorization: `Bearer ${newToken}` } }
+    const user = JSON.parse(localStorage.getItem("user") || "{}")
+    user.token = newToken
+    localStorage.setItem("user", JSON.stringify(user))
   },
   // устанавливаем флаг процесса проверки загрузки
   set_auth_state(state, payload) {
@@ -78,6 +84,7 @@ const actions = {
         email: userObj.email,
         password: userObj.password,
         token: response.data.token.access_token,
+        refreshToken: response.data.token.refresh_token,
         username: response.data.username,
         user_id: response.data.id,
       })

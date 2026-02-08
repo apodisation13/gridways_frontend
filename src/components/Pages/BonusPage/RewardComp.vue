@@ -20,6 +20,7 @@
         :cards="reward"
         :deckbuilder="true"
         :bonus="true"
+        hp_needed
         @chose_player_card="accept_reward"
       />
       <!-- Иначе. для ключа отображается этот компонент -->
@@ -52,6 +53,7 @@ export default {
   data() {
     return {
       show_key_content: !!this.key_reward, //Если не передается награда за ключ, значит это либо бочки, либо сундук
+      isLoading: false,
     }
   },
   props: {
@@ -80,17 +82,13 @@ export default {
     async accept_reward(card) {
       // Если мы открыли сундук, то в маунтеде мы уже сделали запросы на 3 карты.
       // Если же мы ещё ткнули на карту, то приходим сюда и просто закрываем окно
-      if (this.name === "chests") {
-        this.$emit("clear_reward")
+      if (this.isLoading) {
         return
       }
-      // В противном случае мы выполним эмит только после окончания запроса! (потому что там карты перезагрузятся!)
-      // await this.$store.dispatch("processCraftMillCard", {
-      //   subtype: CraftMillCardActionSubtype.craftBonusCard,
-      //   cardId: card.card.id,
-      // })
+      this.isLoading = true
       await this.$store.dispatch("processCraftBonusCard", [card.card.id])
       this.$emit("clear_reward")
+      this.isLoading = false
     },
     async accept_random_reward(res) {
       this.$emit("accept_key_reward", res)

@@ -21,23 +21,25 @@
     <card-descriptions :card="card" :forEnemy="forEnemy" />
 
     <!--Блок кнопок милл, крафт (ТОЛЬКО ДЛЯ ДЕКБИЛДЕРА!!!-->
-    <div class="mill_craft_block" v-if="deckbuilder">
-      <div class="divb" v-if="!bonus">
-        <button class="global_text btn btn-mill" @click="mill">
-          Уничтожить
-        </button>
-        <card-count-triangle
-          :count="count"
-          :card-color="background_color_triangle(card.color)"
-        />
-        <button class="global_text btn btn-craft" @click="craft">
-          Создать
-        </button>
+    <template #footer>
+      <div class="mill_craft_block" v-if="deckbuilder">
+        <div class="divb" v-if="!bonus">
+          <button class="global_text btn btn-mill" @click="mill">
+            Уничтожить
+          </button>
+          <card-count-triangle
+            :count="count"
+            :card-color="background_color_triangle(card.color)"
+          />
+          <button class="global_text btn btn-craft" @click="craft">
+            Создать
+          </button>
+        </div>
+        <div class="divb" v-if="bonus">
+          <button class="bonus_count">У вас {{ count }}</button>
+        </div>
       </div>
-      <div class="divb" v-if="bonus">
-        <button class="bonus_count">У вас {{ count }}</button>
-      </div>
-    </div>
+    </template>
     <yesno-modal
       v-if="show_yesno_mill"
       :item_price="resource_value"
@@ -222,8 +224,6 @@ div {
 .divb {
   display: flex;
   justify-content: space-between;
-  position: absolute;
-  bottom: 0;
   width: 100%;
 }
 .btn {

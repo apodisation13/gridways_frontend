@@ -18,10 +18,7 @@ export default {
 <style scoped>
 .ability-heal {
   position: absolute;
-  right: 5px;
   top: 30%;
-  width: 20px;
-  height: 20px;
   background-image: url("~@/assets/icons/card/emerald.svg");
   background-position: center;
   background-repeat: no-repeat;
@@ -29,12 +26,16 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  right: 1%;
+  width: 18%;
+  aspect-ratio: 1 / 1;
+  container-type: size;
 }
 
 .ability-heal-value {
-  font-family: "Inter";
+  font-family: "Inter", serif;
   font-weight: 500;
-  font-size: 7px;
   color: #ffffff;
+  font-size: 40cqw;
 }
 </style>

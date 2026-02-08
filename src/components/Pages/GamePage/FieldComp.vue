@@ -12,6 +12,7 @@
             v-if="field[get_index(i, j)]"
             :enemy="field[get_index(i, j)]"
             :index="get_index(i, j)"
+            :in_cross="in_cross_enemy_index === get_index(i, j)"
           />
         </td>
       </tr>
@@ -28,6 +29,11 @@ export default {
     field: {
       required: true,
       type: Array,
+    },
+    in_cross_enemy_index: {
+      required: false,
+      default: null,
+      type: [Number, null],
     },
   },
   methods: {

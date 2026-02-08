@@ -40,23 +40,24 @@ export default {
 <style scoped>
 .heart-wrapper {
   position: absolute;
-  bottom: -1px;
-  left: 1px;
-  width: 18px;
-  height: 18px;
+  bottom: -1%;
+  left: 1%;
+  width: 20%;
+  aspect-ratio: 1 / 1; /* Квадрат для ровного ромба */
   transform: rotate(-45deg);
   background-color: var(--bgColor);
-  border-radius: 2px;
+  border-radius: 10%;
+  container-type: size;
 }
 
 .heart {
   position: absolute;
   transform: rotate(45deg);
-  top: 2px;
-  right: 2px;
+  top: 10%;
+  right: 10%;
   bottom: 0;
   left: 0;
-  background-size: 16px;
+  background-size: 100%;
   background-repeat: no-repeat;
   background-position: center;
 }
@@ -70,9 +71,9 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 2px;
-  font-size: 9px;
-  margin-bottom: 2px;
+  margin-top: 10%;
+  margin-bottom: 10%;
+  font-size: 50cqw; /* Относительно контейнера */
   color: white;
 }
 </style>

@@ -49,4 +49,6 @@ export const CardAbility = {
   CreateAnyUnit: "create-any-unit",
   CreateAndPutToDeck: "create-and-put-to-deck",
   DrawExact: "draw-exact",
+  // пока нету
+  SpawnEffectInRow: "spawn-effect-in-row",
 }

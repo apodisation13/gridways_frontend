@@ -12,6 +12,7 @@ export const LIST_NEWS = `${getDomain()}/news/list-news`
 // для login.js
 export const USER_LOGIN = `${getDomain()}/users/login-user`
 export const USER_REGISTER = `${getDomain()}/users/register-user`
+export const REFRESH_TOKEN = `${getDomain()}/users/refresh-token`
 
 // user_database for database.js
 export const USER_DATABASE = `${getDomain()}/user-progress/{userId}`

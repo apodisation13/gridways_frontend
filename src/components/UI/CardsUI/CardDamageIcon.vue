@@ -22,9 +22,10 @@ export default {
   position: absolute;
   top: 0;
   right: 0;
-  height: 18px;
-  width: 18px;
+  width: 20%;
+  aspect-ratio: 1 / 1; /* Принудительно квадрат! */
   transform: rotate(-45deg);
+  container-type: size;
 }
 
 .damage-count {
@@ -35,16 +36,17 @@ export default {
   bottom: 0;
   left: 0;
   color: whitesmoke;
-  font-size: 8px;
+  font-size: 50cqw;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .damage-count::before {
   content: "";
   display: block;
-  width: 6px;
-  height: 12px;
+  width: 40%;
+  height: 80%;
   background-image: url("~@/assets/icons/card/sword.svg");
   background-repeat: no-repeat;
   background-position: center;

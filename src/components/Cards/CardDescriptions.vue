@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>
+    <div class="inlines-wrapper">
       <!--Описание абилки - для карты игрока и лидера врагов тоже-->
       <div
         v-if="!forEnemy && card.ability"
@@ -23,17 +23,12 @@
       ></div>
 
       <!--Описание пассивной абилки-->
-      <div
-        class="inlines"
-        @click="showPassiveAbility"
+      <card-passive
         v-if="card.has_passive"
-        :style="{
-          'background-image':
-            'url(' + require(`@/assets/icons/card/passive_clock.svg`) + ')',
-        }"
-      >
-        <span v-if="card.timer !== 0" class="ss">{{ card.timer }}</span>
-      </div>
+        :card="card"
+        inline
+        @click="showPassiveAbility"
+      />
 
       <!--Описание абилки deathwish - для карт врагов-->
       <div
@@ -49,21 +44,16 @@
 
     <!--А дальше сами описания!!!-->
     <!--Описание абилки для карты игрока и для лидера врагов у которого она есть вообще-->
-    <div class="text" v-if="show_ability && !forEnemy && card.ability">
-      {{ card.ability.description }} <br />
-      <span v-if="'damage' in card">damage = {{ card.damage }}</span>
-      <span v-else>value = {{ card.value }}</span>
+    <div class="text" v-if="show_ability && !forEnemy && card?.ability?.name">
+      {{ formatCardAbility(card) }} <br />
     </div>
     <!--Описание абилки для карты врага-->
     <div class="text" v-if="show_ability && forEnemy">
-      {{ card.move.description }} <br />
-      damage = {{ card.damage }}
+      {{ formatEnemyMove(card) }} <br />
     </div>
     <!--Описание пассивной абилки, разделение для карты или для лидера врагов-->
-    <div class="text" v-if="show_passive">
-      {{ card.passive_ability?.description }}
-      <br />
-      <span v-if="card.value">value = {{ card.value }}</span>
+    <div class="text" v-if="show_passive && card.passive_ability.name">
+      {{ formatCardPassiveAbility(card) }} <br />
       <br />
       <span v-if="card.has_passive_in_field">
         Срабатывает когда карта <b>НА ПОЛЕ</b>
@@ -87,17 +77,21 @@
       </span>
     </div>
     <!--Описание абилки deathwish, только для врага-->
-    <div class="text" v-if="show_deathwish && forEnemy">
-      {{ card.deathwish.description }} <br />
-      value = {{ card.deathwish_value }}
+    <div
+      class="text"
+      v-if="show_deathwish && forEnemy && card?.deathwish?.name"
+    >
+      {{ formatEnemyDeathwish(card) }} <br />
     </div>
   </div>
 </template>
 
 <script>
 import { ability_icon } from "@/logic/border_styles"
+import CardPassive from "@/components/UI/CardsUI/CardPassive.vue"
 export default {
   name: "CardDescriptions",
+  components: { CardPassive },
   props: {
     card: {
       type: Object,
@@ -131,6 +125,45 @@ export default {
     },
   },
   methods: {
+    formatCardAbility(card) {
+      return card.ability.description
+        .replace(
+          /{damage}/g,
+          card?.damage !== undefined ? `{{ ${card.damage} }}` : "{damage}"
+        )
+        .replace(
+          /{heal}/g,
+          card?.heal !== undefined ? `{{ ${card.heal} }}` : "{heal}"
+        )
+        .replace(
+          /{damage_once}/g,
+          card?.value !== undefined ? `{{ ${card.value} }}` : "{damage_once}"
+        )
+        .replace(
+          /{value}/g,
+          card?.value !== undefined ? `{{ ${card.value} }}` : "{value}"
+        )
+    },
+    formatEnemyMove(enemy) {
+      return enemy.move.description.replace(
+        /{damage}/g,
+        enemy.damage !== undefined ? `{{ ${enemy.damage} }}` : "{damage}"
+      )
+    },
+    formatCardPassiveAbility(card) {
+      return card.passive_ability.description.replace(
+        /{value}/g,
+        card.value !== undefined ? `{{ ${card.value} }}` : "{value}"
+      )
+    },
+    formatEnemyDeathwish(enemy) {
+      return enemy.deathwish.description.replace(
+        /{deathwish_value}/g,
+        enemy.deathwish_value !== undefined
+          ? `{{ ${enemy.deathwish_value} }}`
+          : "{deathwish_value}"
+      )
+    },
     showMainAbility() {
       this.show_ability = true
       this.show_move = true
@@ -154,6 +187,13 @@ export default {
 </script>
 
 <style scoped>
+.inlines-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .inlines {
   display: inline-block;
   margin: 1%;
@@ -169,9 +209,5 @@ export default {
 .text {
   margin-bottom: 1%;
   font-size: 12pt;
-}
-
-.ss {
-  position: absolute;
 }
 </style>

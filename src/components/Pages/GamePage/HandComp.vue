@@ -254,12 +254,11 @@ export default {
         Math.PI * 2
       )
       this.ctx.fill()
-      // console.log(this.arrowCurrentX, this.arrowCurrentY)
-      // const elems = document.elementsFromPoint(
-      //   this.arrowCurrentX,
-      //   this.arrowCurrentY
-      // )
-      // console.log("Найдено элементов в точке:", elems.length)
+      const elems = document.elementsFromPoint(
+        this.arrowCurrentX,
+        this.arrowCurrentY
+      )
+      this.get_target(elems, false)
     },
 
     // Останавливаем рисование стрелки
@@ -281,11 +280,9 @@ export default {
       }
 
       // Определяем цель
-      // console.log("Определяем цель по координатам:", clientX, clientY)
       const elems = document.elementsFromPoint(clientX, clientY)
-      // console.log("Найдено элементов в точке:", elems.length)
 
-      this.get_target(elems)
+      this.get_target(elems, true)
 
       this.selectedCardIndex = -1
       console.log("Рисование стрелки завершено")
@@ -390,63 +387,54 @@ export default {
       this.startArrowDrawing(index, touch.clientX, touch.clientY)
     },
 
-    // Остальные методы остаются без изменений
-    // chose_player_card(card) {
-    //   console.log("chose_player_card вызван, карта:", card)
-    //   this.$emit("chose_player_card", card)
-    // },
-
-    // get_card(divs) {
-    //   console.log("get_card вызван, количество divs:", divs.length)
-    //   for (let i = 0; i < divs.length; i++) {
-    //     console.log("Проверяем div", i, "id:", divs[i].id, "className:", divs[i].className)
-    //     if (divs[i].id) {
-    //       console.log("Нашли карту с id:", divs[i].id)
-    //       return divs[i].id
-    //     }
-    //   }
-    //   console.log("Карта не найдена")
-    //   return null
-    // },
-
-    get_target(elems) {
-      console.log("get_target вызван, количество элементов:", elems.length)
+    get_target(elems, fire) {
       let elem = null
       elems.forEach((el, index) => {
-        console.log("Проверяем элемент", index, "className:", el.className)
         if (
           el.className === "card-enemy-component" ||
           el.className === "enemy-leader"
         ) {
-          console.log("Нашли цель! className:", el.className)
+          console.log("Нашли цель! className:", el.className, index)
           elem = el
         }
       })
-      this.target_emit(elem)
+      this.target_emit(elem, fire)
     },
 
-    target_emit(elem) {
-      console.log("target_emit вызван, элемент:", elem)
+    target_emit(elem, fire) {
       const id = elem?.id
-      console.log("ВРАГ id:", id)
 
       if (!id) {
         console.log("Цель не определена")
+        this.$emit("enemy_leader_in_cross", false)
+        this.$emit("enemy_in_cross", null)
         return
       }
 
       if (id.includes("enemy_leader")) {
         console.log("ЭТО ЛИДЕР ВРАГА")
-        this.$emit("target_enemy_leader")
+        if (fire) {
+          this.$emit("enemy_leader_in_cross", false)
+          this.$emit("target_enemy_leader")
+        } else this.$emit("enemy_leader_in_cross", true)
         return
       }
 
       const index = parseInt(id.slice(id.indexOf("_") + 1))
       console.log("ИНДЕКС КЛЕТКИ ПОЛЯ ВРАГА", index)
-      this.$emit("target_enemy", this.field[index])
+      if (fire) {
+        this.$emit("enemy_in_cross", null)
+        this.$emit("target_enemy", this.field[index])
+      } else this.$emit("enemy_in_cross", index)
     },
   },
-  emits: ["chose_player_card", "target_enemy", "target_enemy_leader"],
+  emits: [
+    "chose_player_card",
+    "target_enemy",
+    "target_enemy_leader",
+    "enemy_leader_in_cross",
+    "enemy_in_cross",
+  ],
 }
 </script>
 

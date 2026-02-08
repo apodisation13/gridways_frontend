@@ -2,6 +2,8 @@ const state = {
   cards_in_deck: undefined, // СКОЛЬКО В ДЕКЕ ДОЛЖНО БЫТЬ КАРТ
   hand_size: undefined, // СКОЛЬКО КАРТ В РУКЕ
 
+  random_level_enemies_count: {}, // разбросы количества врагов на рандомных уровнях
+
   current_deck: [], // дека выбранная для игры, deck.cards
   current_deck_index: undefined, // индекс деки в списке дек
   health: 0, // жизни деки, из деки, deck.health
@@ -28,6 +30,7 @@ const mutations = {
   set_game_const(state, payload) {
     state.hand_size = payload.hand_size
     state.cards_in_deck = payload.number_of_cards_in_deck
+    state.random_level_enemies_count = payload.random_level_enemies_count
   },
 
   set_current_deck(state, deck) {

@@ -25,7 +25,7 @@ const mutations = {
 }
 
 const actions = {
-  async fetchNews({ commit }) {
+  async fetchNews({ dispatch, commit }) {
     try {
       const response = await callApi({
         method: GET,
@@ -33,7 +33,7 @@ const actions = {
       })
       commit("setNews", response.data)
     } catch (err) {
-      console.error("Ошибка при загрузке новостей:", err)
+      dispatch("error_action", err)
       throw new Error("Ошибка при загрузке новостей")
     }
   },
