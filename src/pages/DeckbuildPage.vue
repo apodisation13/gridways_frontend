@@ -133,6 +133,9 @@ export default {
       deep: true,
       handler: "init",
     },
+    pool() {
+      this.init()
+    },
   },
   methods: {
     init() {

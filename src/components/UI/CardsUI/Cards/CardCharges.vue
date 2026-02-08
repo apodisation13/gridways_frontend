@@ -26,13 +26,14 @@ export default {
 <style scoped>
 .charge-wrapper {
   position: absolute;
-  width: 18px;
-  height: 18px;
-  bottom: -1px;
+  width: 20%;
+  aspect-ratio: 1 / 1;
+  bottom: -1%;
   right: 0;
   transform: rotate(-45deg);
   background-color: var(--bgColor);
-  border-radius: 2px;
+  border-radius: 10%;
+  container-type: size;
 }
 
 .charge {
@@ -48,8 +49,8 @@ export default {
 }
 
 .charge-icon {
-  width: 12px;
-  height: 20px;
+  width: 65%;
+  height: 110%;
   background-image: url("~@/assets/icons/card/charge.svg");
   background-repeat: no-repeat;
   background-position: right center;
@@ -61,8 +62,8 @@ export default {
 
 .charge-value {
   display: block;
-  font-size: 7px;
+  font-size: 40cqw;
   color: white;
-  margin-right: 2px;
+  margin-right: 10%;
 }
 </style>

@@ -25,10 +25,13 @@ export default {
 <style scoped>
 .ability-circle-enemy {
   position: absolute;
-  width: 25px;
-  height: 25px;
-  top: -3px;
-  left: -3px;
+  top: -1%;
+  left: -1%;
   background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  width: 22%;
+  aspect-ratio: 1 / 1;
+  container-type: size;
 }
 </style>

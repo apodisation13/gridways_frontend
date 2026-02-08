@@ -7,18 +7,27 @@
     />
 
     <!--Дополнительные способности карт: урон на строку, столбец, всем, распределить, уничтожить, заблочить-->
-    <row-attack-ability v-if="card.ability.name === CardAbility.DamageRow" />
-    <column-attack-ability
+    <ability-icon
+      v-if="card.ability.name === CardAbility.DamageRow"
+      :icon="require('@/assets/icons/card/row_attack.svg')"
+    />
+    <ability-icon
       v-else-if="card.ability.name === CardAbility.DamageColumn"
+      :icon="require('@/assets/icons/card/column_attack.svg')"
     />
-    <all-attack-ability
+    <ability-icon
       v-else-if="card.ability.name === CardAbility.DamageAll"
+      :icon="require('@/assets/icons/card/all_attack.svg')"
     />
-    <spread-attack-ability
+    <ability-icon
       v-else-if="card.ability.name === CardAbility.SpreadDamage"
+      :icon="require('@/assets/icons/card/spread_attack.svg')"
     />
-    <lock-ability v-else-if="card.ability.name === CardAbility.Lock" />
-    <destroy-ability
+    <ability-icon
+      v-else-if="card.ability.name === CardAbility.Lock"
+      :icon="require('@/assets/icons/card/locked.svg')"
+    />
+    <ability-icon
       v-else-if="
         card.ability.name === CardAbility.DestroyHighestHp ||
         card.ability.name === CardAbility.DestroyHighestDamage ||
@@ -26,8 +35,9 @@
         card.ability.name === CardAbility.DestroyAllSameHp ||
         card.ability.name === CardAbility.DestroyRandomEnemyInDeck
       "
+      :icon="require('@/assets/icons/card/destroy.svg')"
     />
-    <card-interaction-ability
+    <ability-icon
       v-else-if="
         card.ability.name === CardAbility.Resurrect ||
         card.ability.name === CardAbility.DrawTwoCards ||
@@ -46,29 +56,24 @@
         card.ability.name === CardAbility.CreateAndPutToDeck ||
         card.ability.name === CardAbility.DrawExact
       "
+      :icon="require('@/assets/icons/card/additional_card.svg')"
     />
-    <field-interaction-ability
+    <ability-icon
       v-else-if="
         card.ability.name === CardAbility.MoveEnemy ||
         card.ability.name === CardAbility.SetEnemyAsToken ||
         card.ability.name === CardAbility.PlaceSelfInField ||
         card.ability.name === CardAbility.SpawnEffectInRow
       "
+      :icon="require('@/assets/icons/card/field_interaction.svg')"
     />
   </div>
 </template>
 
 <script>
 import HealAbility from "@/components/UI/CardsUI/HealAbility"
-import RowAttackAbility from "@/components/UI/CardsUI/Cards/Abilities/RowAttackAbility"
-import ColumnAttackAbility from "@/components/UI/CardsUI/Cards/Abilities/ColumnAttackAbility"
-import AllAttackAbility from "@/components/UI/CardsUI/Cards/Abilities/AllAttackAbility"
-import SpreadAttackAbility from "@/components/UI/CardsUI/Cards/Abilities/SpreadAttackAbility"
-import LockAbility from "@/components/UI/CardsUI/Cards/Abilities/LockAbility"
-import DestroyAbility from "@/components/UI/CardsUI/Cards/Abilities/DestroyAbility"
-import CardInteractionAbility from "@/components/UI/CardsUI/Cards/Abilities/CardInteractionAbility"
-import FieldInteractionAbility from "@/components/UI/CardsUI/Cards/Abilities/FieldInteractionAbility.vue"
 import { CardAbility } from "@/logic/models"
+import AbilityIcon from "@/components/UI/CardsUI/Cards/Abilities/AbilityIcon.vue"
 export default {
   name: "card-ability-circle",
   computed: {
@@ -77,15 +82,8 @@ export default {
     },
   },
   components: {
-    FieldInteractionAbility,
-    CardInteractionAbility,
-    DestroyAbility,
-    LockAbility,
+    AbilityIcon,
     HealAbility,
-    RowAttackAbility,
-    ColumnAttackAbility,
-    AllAttackAbility,
-    SpreadAttackAbility,
   },
   props: {
     card: {

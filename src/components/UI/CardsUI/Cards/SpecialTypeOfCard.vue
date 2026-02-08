@@ -22,16 +22,17 @@ export default {
 <style scoped>
 .special-type {
   position: absolute;
-  top: -5px;
-  left: 2px;
+  top: -5%;
+  left: -4%;
   transform: rotate(-45deg);
+  aspect-ratio: 1 / 1;
+  container-type: size;
 }
 
 .gold-lightning,
 .silver-lightning,
 .bronze-lightning {
-  width: 13px;
-  height: 31px;
+  width: 24%;
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;

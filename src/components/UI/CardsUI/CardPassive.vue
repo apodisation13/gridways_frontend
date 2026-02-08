@@ -1,5 +1,5 @@
 <template>
-  <div class="passive">
+  <div class="passive" :class="{ 'passive-inline': inline }">
     <div class="passive-clock" v-if="!card || card.timer === 0"></div>
     <div class="passive-timer" v-else>
       <span class="passive-timer-value">{{ card.timer }}</span>
@@ -14,6 +14,10 @@ export default {
       required: false,
       default: null,
     },
+    inline: {
+      type: Boolean,
+      default: false,
+    },
   },
 }
 </script>
@@ -21,14 +25,30 @@ export default {
 <style scoped>
 .passive {
   position: absolute;
-  right: -3px;
-  bottom: 25px;
+  right: -2%;
+  bottom: 20%;
+  width: 24%;
+  aspect-ratio: 1 / 1;
+  container-type: size;
+}
+
+/* Режим для строки */
+.passive.passive-inline {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  width: 50px;
+  height: 5vh;
+  display: inline-block;
+  margin: 1%;
+  border: solid 2px white;
+  aspect-ratio: auto;
 }
 
 .passive-clock,
 .passive-timer {
-  width: 25px;
-  height: 25px;
+  width: 100%;
+  height: 100%;
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
@@ -43,11 +63,15 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white;
 }
 
 .passive-timer-value {
   color: white;
+  font-size: 50cqw;
+}
+
+/* Фикс размера шрифта для inline режима */
+.passive-inline .passive-timer-value {
   font-size: 12px;
 }
 </style>
