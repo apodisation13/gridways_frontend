@@ -40,13 +40,11 @@
           <div>
             <div
               class="level"
-              :class="{ level_selected: index === selectedRandomLevel }"
+              :class="{ level_selected: level === selectedRandomLevel }"
               :style="difficultyBorder(level)"
-              v-for="(level, index) in random_levels.filter(
-                l => l.level.difficulty === 'easy'
-              )"
+              v-for="(level, index) in random_levels_easy"
               :key="level"
-              @dblclick="set_random_level(index)"
+              @dblclick="set_random_level(index, 'easy')"
             >
               <level-preview-comp :level="level" />
             </div>
@@ -54,13 +52,11 @@
           <div>
             <div
               class="level"
-              :class="{ level_selected: index === selectedRandomLevel }"
+              :class="{ level_selected: level === selectedRandomLevel }"
               :style="difficultyBorder(level)"
-              v-for="(level, index) in random_levels.filter(
-                l => l.level.difficulty === 'normal'
-              )"
+              v-for="(level, index) in random_levels_normal"
               :key="level"
-              @dblclick="set_random_level(index)"
+              @dblclick="set_random_level(index, 'normal')"
             >
               <level-preview-comp :level="level" />
             </div>
@@ -68,13 +64,11 @@
           <div>
             <div
               class="level"
-              :class="{ level_selected: index === selectedRandomLevel }"
+              :class="{ level_selected: level === selectedRandomLevel }"
               :style="difficultyBorder(level)"
-              v-for="(level, index) in random_levels.filter(
-                l => l.level.difficulty === 'hard'
-              )"
+              v-for="(level, index) in random_levels_hard"
               :key="level"
-              @dblclick="set_random_level(index)"
+              @dblclick="set_random_level(index, 'hard')"
             >
               <level-preview-comp :level="level" />
             </div>
@@ -82,7 +76,40 @@
         </div>
         <div v-if="gameMod.name === 'arena'">Пока не реализовано!</div>
         <div v-if="gameMod.name === 'random_select'">
-          ПОЯВИТСЯ В СЛЕДУЮЩЕЙ ВЕРСИИ
+          <div class="form-wrapper">
+            <!-- Поле ввода числа -->
+            <div class="input-group">
+              <label for="numberInput">Введите число (минимум 5):</label>
+              <input
+                id="numberInput"
+                v-model.number="inputNumberEnemiesRandomLevel"
+                type="number"
+                min="5"
+                placeholder="5"
+                class="number-input"
+                @keyup.enter="generateRandomLevel"
+              />
+              <span v-if="errorMessage" class="error">
+                {{ errorMessage }}
+              </span>
+            </div>
+
+            <!-- Кнопка генерации -->
+            <button
+              class="generate-btn"
+              @click="generateRandomLevel"
+              :disabled="!isValid"
+            >
+              Генерировать
+            </button>
+            <div
+              v-if="randomLevelByNumber"
+              :style="difficultyBorder(randomLevelByNumber)"
+              @dblclick="setRandomLevelByNumber"
+            >
+              <level-preview-comp :level="randomLevelByNumber" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -92,7 +119,10 @@
 <script>
 import { useToast } from "vue-toastification"
 import LevelPreviewComp from "@/components/Pages/LevelPage/LevelPreviewComp"
-import { random_level_generator } from "@/logic/random_level"
+import {
+  random_level_generator,
+  random_level_generator_by_number,
+} from "@/logic/random_level"
 import SeasonTree from "@/components/Pages/LevelPage/SeasonTree.vue"
 export default {
   components: {
@@ -131,11 +161,45 @@ export default {
       ],
       gameMod: null,
       seasonLevelsTreeOpened: false,
+      randomLevelByNumber: null,
+      inputNumberEnemiesRandomLevel: 5,
     }
   },
   computed: {
     seasons() {
       return this.$store.getters["all_seasons"]
+    },
+    random_levels_easy() {
+      return this.random_levels.filter(l => l.level.difficulty === "easy")
+    },
+    random_levels_normal() {
+      return this.random_levels.filter(l => l.level.difficulty === "normal")
+    },
+    random_levels_hard() {
+      return this.random_levels.filter(l => l.level.difficulty === "hard")
+    },
+    isValid() {
+      return (
+        this.inputNumberEnemiesRandomLevel !== null &&
+        this.inputNumberEnemiesRandomLevel !== "" &&
+        this.inputNumberEnemiesRandomLevel >= 5 &&
+        this.inputNumberEnemiesRandomLevel >= 55
+      )
+    },
+    errorMessage() {
+      if (
+        this.inputNumberEnemiesRandomLevel === null ||
+        this.inputNumberEnemiesRandomLevel === ""
+      ) {
+        return "Введите число"
+      }
+      if (this.inputNumberEnemiesRandomLevel < 5) {
+        return "Минимальное значение: 5"
+      }
+      if (this.inputNumberEnemiesRandomLevel > 55) {
+        return "Максимальное значение: 55"
+      }
+      return ""
     },
   },
   methods: {
@@ -160,15 +224,28 @@ export default {
       this.gameMod = this.game_types[0]
       this.seasonLevelsTreeOpened = false
     },
-    set_random_level(index) {
-      this.toast.success(`Выбран рандомный уровень!`, { timeout: 1000 })
-      this.random_levels[index].level.random = true // ставим флаг, что уровень рандомный, чтобы потом не открывать его детей
-      this.$store.commit("set_level", this.random_levels[index].level)
+    set_random_level(index, difficulty) {
+      this.toast.success(
+        `Выбран рандомный уровень: ${index + 1} - ${difficulty}`,
+        {
+          timeout: 1000,
+        }
+      )
+
+      let levelsToChoseFrom = []
+      if (difficulty === "easy") levelsToChoseFrom = this.random_levels_easy
+      else if (difficulty === "normal")
+        levelsToChoseFrom = this.random_levels_normal
+      else if (difficulty === "hard")
+        levelsToChoseFrom = this.random_levels_hard
+
+      levelsToChoseFrom[index].level.random = true // ставим флаг, что уровень рандомный, чтобы потом не открывать его детей
+      this.$store.commit("set_level", levelsToChoseFrom[index].level)
       this.$store.commit(
         "set_enemy_leader",
-        this.random_levels[index].level.enemy_leader
+        levelsToChoseFrom[index].level.enemy_leader
       )
-      this.selectedRandomLevel = index
+      this.selectedRandomLevel = levelsToChoseFrom[index]
       this.selectedLevel = undefined
     },
     difficultyBorder(level) {
@@ -178,6 +255,25 @@ export default {
         return { border: "1px solid orange" }
       else if (level.level.difficulty === "hard")
         return { border: "2px solid black" }
+    },
+    generateRandomLevel() {
+      this.randomLevelByNumber = random_level_generator_by_number(
+        this.inputNumberEnemiesRandomLevel
+      )
+    },
+    setRandomLevelByNumber() {
+      this.toast.warning(
+        "Выбран режим рандомных врагов по количеству на выбор!",
+        {
+          timeout: 1000,
+        }
+      )
+      this.randomLevelByNumber.level.random = true // ставим флаг, что уровень рандомный, чтобы потом не открывать его детей
+      this.$store.commit("set_level", this.randomLevelByNumber.level)
+      this.$store.commit(
+        "set_enemy_leader",
+        this.randomLevelByNumber.level.enemy_leader
+      )
     },
   },
 }
@@ -279,5 +375,82 @@ div {
   margin: 0;
   font-size: 25px;
   color: #5f4209;
+}
+
+.form-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 14px;
+  color: white;
+}
+
+.number-input {
+  width: 200px;
+  padding: 12px 16px;
+  font-size: 18px;
+  text-align: center;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.number-input:focus {
+  border-color: #4a90d9;
+}
+
+.number-input:invalid {
+  border-color: #e74c3c;
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 12px;
+}
+
+.generate-btn {
+  padding: 12px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background-color: #4a90d9;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
+}
+
+.generate-btn:hover:not(:disabled) {
+  background-color: #357abd;
+}
+
+.generate-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.generate-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.preview-wrapper {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 </style>

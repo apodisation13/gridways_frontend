@@ -1,4 +1,5 @@
 import store from "@/store"
+import { CardColor } from "@/logic/models"
 
 function getRandomLevelConst() {
   const stateInfo = store.state.game.random_level_enemies_count
@@ -75,8 +76,78 @@ function random_level_generator() {
     })
   })
 
-  // console.log(random_levels[0])
   return random_levels
 }
 
-export { random_level_generator }
+function calculateCounts(total, distribution) {
+  const colors = Object.keys(distribution)
+
+  const exact = {}
+  const floors = {}
+
+  for (const color of colors) {
+    exact[color] = total * distribution[color]
+    floors[color] = Math.floor(exact[color])
+  }
+
+  let currentSum = Object.values(floors).reduce((a, b) => a + b, 0)
+  let remaining = total - currentSum
+
+  const remainders = colors
+    .map(color => ({ color, remainder: exact[color] - floors[color] }))
+    .sort((a, b) => b.remainder - a.remainder)
+
+  const result = { ...floors }
+  for (let i = 0; i < remaining; i++) {
+    result[remainders[i].color]++
+  }
+
+  return result
+}
+
+function getRandomItems(items, totalCount) {
+  const distribution = { bronze: 0.45, silver: 0.35, gold: 0.2 }
+
+  const counts = calculateCounts(totalCount, distribution)
+
+  const byColor = {
+    bronze: items.filter(item => item.color === CardColor.Bronze),
+    silver: items.filter(item => item.color === CardColor.Silver),
+    gold: items.filter(item => item.color === CardColor.Gold),
+  }
+
+  const result = []
+
+  for (const [color, count] of Object.entries(counts)) {
+    const colorItems = byColor[color]
+
+    for (let i = 0; i < count; i++) {
+      const randomIndex = Math.floor(Math.random() * colorItems.length)
+      result.push({ ...colorItems[randomIndex] })
+    }
+  }
+  console.log(result)
+  return result
+}
+
+function random_level_generator_by_number(total_number) {
+  const all_enemies = store.getters["all_enemies"]
+  const e_leaders = store.getters["all_enemy_leaders"]
+  let enemy_leader = e_leaders[Math.floor(Math.random() * e_leaders.length)]
+  const enemies = getRandomItems(all_enemies, total_number)
+  let difficulty = "easy"
+  if (enemies.length > 12) difficulty = "normal"
+  if (enemies.length > 25) difficulty = "hard"
+  return {
+    id: -1,
+    level: {
+      name: "random_n",
+      difficulty: difficulty,
+      starting_enemies_number: 3,
+      enemies: enemies,
+      enemy_leader: enemy_leader,
+    },
+  }
+}
+
+export { random_level_generator, random_level_generator_by_number }

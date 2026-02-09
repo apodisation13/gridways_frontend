@@ -1,5 +1,5 @@
 <template>
-  <button class="draw-btn" :style="themedStyle">
+  <div class="draw-btn" :style="themedStyle">
     <svg
       class="draw-icon"
       viewBox="0 0 100 100"
@@ -34,7 +34,7 @@
         height="40"
       />
     </svg>
-  </button>
+  </div>
 </template>
 
 <script>
