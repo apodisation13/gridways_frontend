@@ -2,10 +2,10 @@ const path = "page_images"
 
 export const images = {
   main: {
-    day: `${path}/afternoon.png`,
-    night: `${path}/night.png`,
-    evening: `${path}/evening.png`,
-    morning: `${path}/morning.png`,
+    day: `${path}/castle_day.webp`,
+    night: `${path}/castle_night.webp`,
+    evening: `${path}/castle_evening.webp`,
+    morning: `${path}/castle_morning.webp`,
   },
   loading: {
     day: `${path}/loading-day.jpg`,
@@ -23,31 +23,31 @@ export const images = {
     default: `${path}/deckbuild_default.jpg`,
   },
   bonus: {
-    default: `${path}/bonus_default.png`,
+    default: `${path}/bonus_new.webp`,
   },
   levels: {
     default: `${path}/levels_default.jpeg`,
   },
   start_game: {
-    day: `${path}/start_game_day.png`,
-    night: `${path}/start_game_night.png`,
-    evening: `${path}/start_game_evening.png`,
-    morning: `${path}/start_game_morning.png`,
+    day: `${path}/start_game_new_day.webp`,
+    night: `${path}/start_game_new_night.webp`,
+    evening: `${path}/start_game_new_evening.webp`,
+    morning: `${path}/start_game_new_day.webp`,
   },
   win: {
-    day: `${path}/win_day.png`,
-    night: `${path}/win_night.png`,
-    evening: `${path}/win_evening.png`,
-    morning: `${path}/win_morning.png`,
+    day: `${path}/win_new.webp`,
+    night: `${path}/win_new.webp`,
+    evening: `${path}/win_new.webp`,
+    morning: `${path}/win_new.webp`,
   },
   lose: {
-    day: `${path}/lose_day.png`,
-    night: `${path}/lose_night.png`,
-    evening: `${path}/lose_evening.png`,
-    morning: `${path}/lose_morning.png`,
+    day: `${path}/lose_new_day.webp`,
+    night: `${path}/lose_new_night.webp`,
+    evening: `${path}/lose_new_day.webp`,
+    morning: `${path}/lose_new_day.webp`,
   },
   field: {
-    default: `${path}/field2.png`,
+    default: `${path}/field3.webp`,
   },
   work_in_progress: {
     default: `${path}/library.jpg`,
