@@ -183,7 +183,7 @@ export default {
         this.inputNumberEnemiesRandomLevel !== null &&
         this.inputNumberEnemiesRandomLevel !== "" &&
         this.inputNumberEnemiesRandomLevel >= 5 &&
-        this.inputNumberEnemiesRandomLevel >= 55
+        this.inputNumberEnemiesRandomLevel <= 55
       )
     },
     errorMessage() {
