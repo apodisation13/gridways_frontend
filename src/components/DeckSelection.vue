@@ -3,7 +3,7 @@
     class="deck_selection"
     :style="{ height: deckbuilder ? '80vh' : '25vh' }"
   >
-    <div class="global_text text">Выберите деку</div>
+    <div class="global_text text">Выберите колоду</div>
 
     <div
       class="decks"

@@ -6,10 +6,10 @@
           <card-item
             v-if="!!deck.leader"
             class="leader-selected"
-            :card="deck.leader ? deck.leader : leader"
+            :card="deck.leader"
             :user_card="deck.leader ? deck : null"
             :is_leader="true"
-            :is_previev="true"
+            :hp_needed="true"
           />
           <div class="leader-empty" v-else></div>
         </div>
