@@ -46,6 +46,9 @@
         <!--Сюда так же добавим ещё настройки-->
       </settings-list>
     </div>
+    <button class="base-button" @click="updateSettings" :disabled="isLoading">
+      <span class="global_text base-button-text">Запомнить мои настройки!</span>
+    </button>
   </div>
 </template>
 
@@ -75,6 +78,7 @@ export default {
       selectedMainSetting: null,
       selectedAccountSetting: null,
       selectedPersonalSetting: null,
+      isLoading: false,
     }
   },
   methods: {
@@ -95,6 +99,12 @@ export default {
       this.selectedMainSetting = null
       this.selectedPersonalSetting = null
       this.selectedAccountSetting = null
+    },
+    async updateSettings() {
+      if (this.isLoading) return
+      this.isLoading = true
+      await this.$store.dispatch("updateUserPreferences")
+      this.isLoading = false
     },
   },
 }
@@ -127,6 +137,27 @@ export default {
   letter-spacing: -0.02em;
   background: var(--primary-gold-gradient);
   -webkit-text-fill-color: transparent;
-  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.base-button {
+  background: linear-gradient(#1d252d, #000000, #282d33);
+  border: 2px solid #facf5d;
+  border-radius: 6px;
+  position: fixed;
+  bottom: 15vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 42%;
+  padding: 13px;
+  cursor: pointer;
+  outline: none;
+}
+
+.base-button-text {
+  font-size: 16px;
+  background: var(--primary-gold-gradient);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 </style>

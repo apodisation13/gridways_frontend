@@ -11,12 +11,12 @@ export default {
   components: { BaseButton },
   computed: {
     sound() {
-      return this.$store.state.play_sound
+      return this.$store.state.settings.soundOn
     },
   },
   methods: {
     switchSound() {
-      this.$store.commit("set_play_sound")
+      this.$store.commit("switchSound")
     },
   },
 }

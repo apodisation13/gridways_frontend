@@ -6,7 +6,6 @@ import user_actions from "@/store/modules/user_actions"
 import news from "@/store/modules/news"
 import settings from "@/store/modules/settings"
 import fullscreen from "@/store/modules/fullscreen"
-import { getEnv } from "@/store/const/const"
 
 // ИНСТРУКЦИЯ:
 // в шаблонах $store. state, getters['name'], commit('name', чё) для мутаций
@@ -23,15 +22,9 @@ const store = createStore({
     settings,
     fullscreen,
   },
-  state: {
-    play_sound: getEnv() !== "development_local",
-  },
+  state: {},
   getters: {},
-  mutations: {
-    set_play_sound(state) {
-      state.play_sound = !state.play_sound
-    },
-  },
+  mutations: {},
   actions: {},
 })
 
