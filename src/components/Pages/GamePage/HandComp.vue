@@ -416,7 +416,10 @@ export default {
         if (fire) {
           this.$emit("enemy_leader_in_cross", false)
           this.$emit("target_enemy_leader")
-        } else this.$emit("enemy_leader_in_cross", true)
+        } else {
+          if (this.$store.getters["animationOn"])
+            this.$emit("enemy_leader_in_cross", true)
+        }
         return
       }
 
@@ -425,7 +428,10 @@ export default {
       if (fire) {
         this.$emit("enemy_in_cross", null)
         this.$emit("target_enemy", this.field[index])
-      } else this.$emit("enemy_in_cross", index)
+      } else {
+        if (this.$store.getters["animationOn"])
+          this.$emit("enemy_in_cross", index)
+      }
     },
   },
   emits: [

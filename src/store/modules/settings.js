@@ -30,6 +30,9 @@ const mutations = {
   switchSound(state) {
     state.soundOn = !state.soundOn
   },
+  switchAnimation(state) {
+    state.animationOn = !state.animationOn
+  },
   setPreferences(state, payload) {
     state.theme = payload.data.theme
     state.avatar = payload.data.avatar
@@ -57,8 +60,8 @@ const actions = {
     const body = {
       data: {
         sound_on: getters.soundOn,
-        animationOn: getters.animationOn,
-        selectedMoveTimeout: getters.selectedMoveTimeout,
+        animation_on: getters.animationOn,
+        move_timeout: getters.selectedMoveTimeout,
         avatar: getters.selectedAvatar,
         theme: getters.selectedTheme,
       },

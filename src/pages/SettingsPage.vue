@@ -19,6 +19,7 @@
         @select-setting="selectMainSetting"
       >
         <setting-sound v-if="selectedMainSetting === 0" />
+        <setting-animation v-if="selectedMainSetting === 1" />
         <!--Сюда так же добавим ещё настройки-->
       </settings-list>
     </div>
@@ -59,8 +60,10 @@ import SettingSound from "@/components/Pages/SettingsPage/SettingSound"
 import SettingChooseTheme from "@/components/Pages/SettingsPage/SettingChooseTheme.vue"
 import SettingsList from "@/components/Pages/SettingsPage/SettingsList.vue"
 import SettingAvatar from "@/components/Pages/SettingsPage/SettingAvatar.vue"
+import SettingAnimation from "@/components/Pages/SettingsPage/SettingAnimation.vue"
 export default {
   components: {
+    SettingAnimation,
     SettingAvatar,
     SettingsList,
     SettingChooseTheme,
@@ -71,7 +74,7 @@ export default {
   data() {
     return {
       settings: ["Общие настройки", "Аккаунт", "Персонализация"],
-      mainSettings: ["Звук", "Язык", "Яркость"],
+      mainSettings: ["Звук", "Анимации наведения", "Язык", "Яркость"],
       accountSettings: ["Данные", "Пароль", "Сброс уровней", "Выйти"],
       personalSettings: ["Цветовая тема", "Аватар", "Стиль карт"],
       selectedSetting: null,
