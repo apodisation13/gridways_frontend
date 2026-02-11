@@ -15,7 +15,6 @@
 </template>
 
 <script>
-// import draggable from "vuedraggable"
 import CardItem from "@/components/Cards/CardItem.vue"
 import { background_color_leader } from "@/logic/border_styles"
 export default {
@@ -53,16 +52,6 @@ export default {
     console.log("компонент leader-comp beforeUnmount")
     window.removeEventListener("resize", this.handleResize)
     this.removeArrowCanvas()
-  },
-  computed: {
-    // draggableLeader: {
-    //   get() {
-    //     return [this.leader]
-    //   },
-    //   set(val) {
-    //     console.log(val)
-    //   },
-    // },
   },
   methods: {
     handleResize() {
@@ -136,12 +125,7 @@ export default {
       this.isDrawingArrow = true
 
       // Эмитим событие выбора карты
-      // this.$emit("chose_player_card", this.hand[cardIndex])
       this.$emit("exec_leader")
-      // console.log(
-      //   "Эмит chose_player_card отправлен для карты:",
-      //   this.hand[cardIndex]
-      // )
 
       // Добавляем глобальные обработчики для перемещения стрелки
       this.addArrowEventListeners()
@@ -167,8 +151,6 @@ export default {
 
       this.ctx.strokeStyle = background_color_leader(this.leader.faction)
       this.ctx.fillStyle = background_color_leader(this.leader.faction)
-      // this.ctx.strokeStyle = "#4a90e2"
-      // this.ctx.fillStyle = "#4a90e2"
 
       // Рисуем пунктирную линию
       this.ctx.setLineDash([5, 3])
@@ -185,31 +167,99 @@ export default {
       )
       const arrowLength = 18
 
-      // Рисуем стрелку в виде треугольника
-      this.ctx.beginPath()
-      this.ctx.moveTo(this.arrowCurrentX, this.arrowCurrentY)
-      this.ctx.lineTo(
-        this.arrowCurrentX - arrowLength * Math.cos(angle - Math.PI / 6),
-        this.arrowCurrentY - arrowLength * Math.sin(angle - Math.PI / 6)
+      // это нужно исключительно для анимаций!
+      const elems = document.elementsFromPoint(
+        this.arrowCurrentX,
+        this.arrowCurrentY
       )
-      this.ctx.lineTo(
-        this.arrowCurrentX - arrowLength * Math.cos(angle + Math.PI / 6),
-        this.arrowCurrentY - arrowLength * Math.sin(angle + Math.PI / 6)
-      )
-      this.ctx.closePath()
-      this.ctx.fill()
+      const result = this.get_target(elems, false)
 
-      // Белая точка в центре стрелки
-      this.ctx.fillStyle = "#ffffff"
-      this.ctx.beginPath()
-      this.ctx.arc(
-        this.arrowCurrentX - arrowLength * 0.3 * Math.cos(angle),
-        this.arrowCurrentY - arrowLength * 0.3 * Math.sin(angle),
-        3,
-        0,
-        Math.PI * 2
-      )
-      this.ctx.fill()
+      if (result) {
+        const outerRadius = 14
+        const innerRadius = 4
+        const crossLength = 20
+
+        this.ctx.lineWidth = 2
+
+        // Внешний круг (кольцо)
+        this.ctx.beginPath()
+        this.ctx.arc(
+          this.arrowCurrentX,
+          this.arrowCurrentY,
+          outerRadius,
+          0,
+          Math.PI * 2
+        )
+        this.ctx.stroke()
+
+        // Центральная точка
+        this.ctx.beginPath()
+        this.ctx.arc(
+          this.arrowCurrentX,
+          this.arrowCurrentY,
+          innerRadius,
+          0,
+          Math.PI * 2
+        )
+        this.ctx.fill()
+
+        // Перекрестие (4 линии)
+        this.ctx.beginPath()
+        // Верхняя линия
+        this.ctx.moveTo(
+          this.arrowCurrentX,
+          this.arrowCurrentY - outerRadius - 2
+        )
+        this.ctx.lineTo(this.arrowCurrentX, this.arrowCurrentY - crossLength)
+        // Нижняя линия
+        this.ctx.moveTo(
+          this.arrowCurrentX,
+          this.arrowCurrentY + outerRadius + 2
+        )
+        this.ctx.lineTo(this.arrowCurrentX, this.arrowCurrentY + crossLength)
+        // Левая линия
+        this.ctx.moveTo(
+          this.arrowCurrentX - outerRadius - 2,
+          this.arrowCurrentY
+        )
+        this.ctx.lineTo(this.arrowCurrentX - crossLength, this.arrowCurrentY)
+        // Правая линия
+        this.ctx.moveTo(
+          this.arrowCurrentX + outerRadius + 2,
+          this.arrowCurrentY
+        )
+        this.ctx.lineTo(this.arrowCurrentX + crossLength, this.arrowCurrentY)
+        this.ctx.stroke()
+
+        // Восстанавливаем lineWidth для следующей отрисовки
+        this.ctx.lineWidth = 2
+      } else {
+        // Рисуем стрелку в виде треугольника
+        this.ctx.beginPath()
+        this.ctx.moveTo(this.arrowCurrentX, this.arrowCurrentY)
+        this.ctx.lineTo(
+          this.arrowCurrentX - arrowLength * Math.cos(angle - Math.PI / 6),
+          this.arrowCurrentY - arrowLength * Math.sin(angle - Math.PI / 6)
+        )
+        this.ctx.lineTo(
+          this.arrowCurrentX - arrowLength * Math.cos(angle + Math.PI / 6),
+          this.arrowCurrentY - arrowLength * Math.sin(angle + Math.PI / 6)
+        )
+        this.ctx.closePath()
+        this.ctx.fill()
+
+        // Белая точка в центре стрелки
+        this.ctx.fillStyle = "#ffffff"
+        this.ctx.beginPath()
+        this.ctx.arc(
+          this.arrowCurrentX - arrowLength * 0.3 * Math.cos(angle),
+          this.arrowCurrentY - arrowLength * 0.3 * Math.sin(angle),
+          3,
+          0,
+          Math.PI * 2
+        )
+        this.ctx.fill()
+      }
     },
 
     // Останавливаем рисование стрелки
@@ -231,11 +281,9 @@ export default {
       }
 
       // Определяем цель
-      // console.log("Определяем цель по координатам:", clientX, clientY)
       const elems = document.elementsFromPoint(clientX, clientY)
-      // console.log("Найдено элементов в точке:", elems.length)
 
-      this.get_target(elems)
+      this.get_target(elems, true)
 
       this.selectedCardIndex = -1
       console.log("Рисование стрелки завершено")
@@ -340,34 +388,7 @@ export default {
       this.startArrowDrawing(touch.clientX, touch.clientY)
     },
 
-    // exec_leader() {
-    //   this.$emit("exec_leader")
-    // },
-    // onDragStart() {
-    //   console.log("ТЯНЕМ ЗА ЛИДЕРА")
-    //   this.$emit("exec_leader")
-    // },
-    // onDragEnd(event) {
-    //   const event_type = event.originalEvent.type // если мы с компа, то там есть этот параметр
-    //
-    //   if (event_type === "dragend") {
-    //     console.log("РАНЕЕ ПОТАЩИЛИ ЛИДЕРА, С КОМПА!!!!")
-    //     const x = event?.originalEvent?.clientX
-    //     const y = event?.originalEvent?.clientY
-    //     if (!x || !y) return
-    //     const elems = document.elementsFromPoint(x, y)
-    //     this.get_target(elems)
-    //   } else {
-    //     console.log("РАНЕЕ ПОТАЩИЛИ ЛИДЕРА, МЫ С ТЕЛЕФОНА!!!")
-    //     const x = event?.originalEvent?.changedTouches?.[0].clientX
-    //     const y = event?.originalEvent?.changedTouches?.[0].clientY
-    //     if (!x || !y) return
-    //     const elems = document.elementsFromPoint(x, y)
-    //     this.get_target(elems)
-    //   }
-    // },
-
-    get_target(elems) {
+    get_target(elems, fire) {
       let elem = null
       elems.forEach(el => {
         if (
@@ -378,24 +399,55 @@ export default {
           elem = el
         }
       })
-      this.target_emit(elem)
+      return this.target_emit(elem, fire)
     },
-    target_emit(elem) {
+
+    target_emit(elem, fire) {
       const id = elem?.id
-      console.log("ВРАГ", id)
-      if (!id) return
+
+      if (!id) {
+        console.log("Цель не определена")
+        this.$emit("enemy_leader_in_cross", false)
+        this.$emit("enemy_in_cross", null)
+        return false
+      }
+
       if (id.includes("enemy_leader")) {
         console.log("ЭТО ЛИДЕР ВРАГА")
-        this.$emit("target_enemy_leader")
-        return
+        if (fire) {
+          this.$emit("enemy_leader_in_cross", false)
+          this.$emit("target_enemy_leader")
+          return false
+        } else {
+          if (this.$store.getters["animationOn"]) {
+            this.$emit("enemy_leader_in_cross", true)
+            return true
+          }
+        }
       }
+
       const index = parseInt(id.slice(id.indexOf("_") + 1)) // card.name_index - вот поэтому ищем _ +1, чтоб индекс поля
       console.log("ИНДЕКС КЛЕТКИ ПОЛЯ ВРАГА", index)
-      this.$emit("target_enemy", this.field[index])
+      if (fire) {
+        this.$emit("enemy_in_cross", null)
+        this.$emit("target_enemy", this.field[index])
+        return false
+      } else {
+        if (this.$store.getters["animationOn"]) {
+          this.$emit("enemy_in_cross", index)
+          return true
+        }
+      }
     },
   },
 
-  emits: ["exec_leader", "target_enemy", "target_enemy_leader"],
+  emits: [
+    "exec_leader",
+    "target_enemy",
+    "target_enemy_leader",
+    "enemy_leader_in_cross",
+    "enemy_in_cross",
+  ],
 }
 </script>
 
