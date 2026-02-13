@@ -217,7 +217,12 @@ export default {
 
     // чтобы показать фиолетовую рамку для этой карты
     incrDmg(card) {
-      timeoutAnimationFlag(card, "incr_dmg", sound_passive_increase_damage)
+      timeoutAnimationFlag(
+        card,
+        "incr_dmg",
+        sound_passive_increase_damage,
+        this.$store.getters["selectedMoveTimeout"]
+      )
     },
   },
 }

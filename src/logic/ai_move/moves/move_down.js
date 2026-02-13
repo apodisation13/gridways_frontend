@@ -1,10 +1,10 @@
 import { sound_enemy_move_down } from "@/logic/play_sounds"
 import { damage_player } from "@/logic/ai_move/moves/damage"
 
-function down_move(field, i) {
+function down_move(field, i, timeout = 1000) {
   // враги которые уже стоят внизу
   if (i >= 9) {
-    damage_player(field, i)
+    damage_player(field, i, timeout)
     return
   }
 
@@ -12,7 +12,7 @@ function down_move(field, i) {
 
   // ЕСЛИ У ВРАГА ЕСТЬ ВРАГ ПОД НИМ ВНИЗУ
   if (field[i + 3]) {
-    damage_player(field, i)
+    damage_player(field, i, timeout)
     return
   }
 

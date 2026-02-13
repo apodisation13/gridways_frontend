@@ -1,7 +1,7 @@
 import { sound_damage_row } from "@/logic/play_sounds"
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
 
-function damage_row(enemy, card, gameObj) {
+function damage_row(enemy, card, gameObj, timeout = 1000) {
   const { field } = gameObj
   let index = field.indexOf(enemy)
   let min = Math.floor(index / 3) * 3
@@ -9,7 +9,7 @@ function damage_row(enemy, card, gameObj) {
 
   sound_damage_row()
   field.slice(min, max).forEach(enemy => {
-    if (enemy) hit_one_enemy(enemy, card, gameObj)
+    if (enemy) hit_one_enemy(enemy, card, gameObj, timeout)
   })
 }
 

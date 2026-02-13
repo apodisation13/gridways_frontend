@@ -1,7 +1,7 @@
 import { choice } from "@/lib/utils"
 import { sound_destroy_enemy, sound_enemy_move_down } from "@/logic/play_sounds"
 
-export function move_enemy(enemy, gameObj) {
+export function move_enemy(enemy, gameObj, timeout = 1000) {
   // это если мы ткнули на лидера врагов! то здесь ничего не выполним
   const c = enemy.hp.split("-")
   if (!enemy.color || c[0] - c[1] <= 0) return
@@ -26,6 +26,6 @@ export function move_enemy(enemy, gameObj) {
     setTimeout(() => {
       prev_enemy.hp = prev_enemy.base_hp
       enemies_grave.push(prev_enemy)
-    }, 1200)
+    }, timeout * 1.2)
   }
 }

@@ -10,7 +10,7 @@ export function give_shields_to_all(gameObj) {
   sound_enemy_regain_shield()
 }
 
-export function give_shield_to_all_deck(gameObj) {
+export function give_shield_to_all_deck(gameObj, timeout = 1000) {
   const { enemies } = gameObj
   if (!enemies.length) return
 
@@ -18,5 +18,5 @@ export function give_shield_to_all_deck(gameObj) {
     e.shield = true
   })
   sound_enemy_regain_shield()
-  timeoutAnimationFlag(enemies[0], "trigger_deck_passive")
+  timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)
 }

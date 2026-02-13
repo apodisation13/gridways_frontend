@@ -2,7 +2,7 @@ import { copyObj } from "@/lib/utils"
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 
-export function set_lowest_dmg_to_as_highest(gameObj) {
+export function set_lowest_dmg_to_as_highest(gameObj, timeout = 1000) {
   const { hand } = gameObj
   const hand_calc = copyObj(hand)
   const highest_dmg_card = hand_calc.sort((a, b) => b.damage - a.damage)[0]
@@ -12,6 +12,7 @@ export function set_lowest_dmg_to_as_highest(gameObj) {
   timeoutAnimationFlag(
     hand[hand.indexOf(card)],
     "incr_dmg",
-    sound_passive_increase_damage
+    sound_passive_increase_damage,
+    timeout * 0.5
   )
 }

@@ -24,6 +24,7 @@ import { spawn_tokens_at_enemy_deck } from "@/logic/player_move/abilities/abilit
 import { incr_dmg_to_all_hand } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_hand"
 import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_grave"
 import { CardAbility } from "@/logic/models"
+import store from "@/store"
 
 // Сюда заходим если там есть враг
 // card - карта, которую мы играем (или из руки, или лидер).
@@ -33,60 +34,61 @@ function damage_ai_card(card, enemy, isCard, gameObj) {
   const { field, enemy_leader, hand, deck, grave, enemies, leader } = gameObj
 
   const ability = card.ability.name
+  const timeout = store.getters["selectedMoveTimeout"]
 
   if (ability === CardAbility.Heal) {
-    damage_one(enemy, card, gameObj)
-    heal(card)
+    damage_one(enemy, card, gameObj, timeout)
+    heal(card, timeout)
   } else if (ability === CardAbility.DamageAll) {
-    damage_all(field, card, gameObj)
-    if (enemy_leader.hp > 0) hit_one_enemy(enemy_leader, card, gameObj)
-    setTimeout(() => check_win(field, enemies, enemy_leader), 1200)
+    damage_all(field, card, gameObj, timeout)
+    if (enemy_leader.hp > 0) hit_one_enemy(enemy_leader, card, gameObj, timeout)
+    setTimeout(() => check_win(field, enemies, enemy_leader), timeout * 1.2)
   } else if (ability === CardAbility.SpreadDamage) {
-    spread_damage(card, gameObj)
+    spread_damage(card, gameObj, timeout)
   } else if (ability === CardAbility.DamageRow) {
-    damage_row(enemy, card, gameObj)
+    damage_row(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.DamageColumn) {
-    damage_column(enemy, card, gameObj)
+    damage_column(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.DestroyHighestHp) {
-    destroy_highest_hp(gameObj)
+    destroy_highest_hp(gameObj, timeout)
   } else if (ability === CardAbility.DestroyHighestDamage) {
-    destroy_highest_damage(gameObj)
+    destroy_highest_damage(gameObj, timeout)
   } else if (ability === CardAbility.DestroyRandom) {
-    destroy_random(gameObj)
+    destroy_random(gameObj, timeout)
   } else if (ability === CardAbility.DestroyAllSameHp) {
-    destroy_all_same_hp(enemy, gameObj)
+    destroy_all_same_hp(enemy, gameObj, timeout)
   } else if (ability === CardAbility.Lock) {
     lock_enemy(enemy)
-    damage_one(enemy, card, gameObj)
+    damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.MoveEnemy) {
-    damage_one(enemy, card, gameObj)
-    move_enemy(enemy, gameObj)
+    damage_one(enemy, card, gameObj, timeout)
+    move_enemy(enemy, gameObj, timeout)
   } else if (ability === CardAbility.SetEnemyAsToken) {
     set_enemy_as_token(enemy)
   } else if (ability === CardAbility.SpawnSelfAtDeck) {
-    spawn_self_at_deck(card, gameObj)
-    damage_one(enemy, card, gameObj)
+    spawn_self_at_deck(card, gameObj, timeout)
+    damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.SpawnSelfAtGrave) {
-    spawn_self_at_grave(card, gameObj)
-    damage_one(enemy, card, gameObj)
+    spawn_self_at_grave(card, gameObj, timeout)
+    damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.DestroyRandomEnemyInDeck) {
     destroy_random_enemy_in_deck(gameObj)
-    damage_one(enemy, card, gameObj)
+    damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.PlaceSelfInField) {
     place_self_in_field(card, enemy, gameObj)
   } else if (ability === CardAbility.SetLowestDmgToAsHighest) {
-    set_lowest_dmg_to_as_highest(gameObj)
-    damage_one(enemy, card, gameObj)
+    set_lowest_dmg_to_as_highest(gameObj, timeout)
+    damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.SpawnTokensAtEnemyDeck) {
     spawn_tokens_at_enemy_deck(card, enemy, gameObj)
-    damage_one(enemy, card, gameObj)
+    damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.IncrDmgToAllHand) {
-    damage_one(enemy, card, gameObj)
-    incr_dmg_to_all_hand(card, gameObj)
+    damage_one(enemy, card, gameObj, timeout)
+    incr_dmg_to_all_hand(card, gameObj, timeout)
   } else if (ability === CardAbility.IncrDmgToAllGrave) {
-    damage_one(enemy, card, gameObj)
-    incr_dmg_to_all_grave(card, gameObj)
-  } else damage_one(enemy, card, gameObj)
+    damage_one(enemy, card, gameObj, timeout)
+    incr_dmg_to_all_grave(card, gameObj, timeout)
+  } else damage_one(enemy, card, gameObj, timeout)
 
   // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда
   card.charges -= 1

@@ -1,7 +1,7 @@
 import { choice_element } from "@/lib/utils"
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
 
-export function incr_dmg_to_value_cards_by_1(enemy, gameObj) {
+export function incr_dmg_to_value_cards_by_1(enemy, gameObj, timeout = 1000) {
   const { hand } = gameObj
   if (!hand.length) return
 
@@ -17,5 +17,5 @@ export function incr_dmg_to_value_cards_by_1(enemy, gameObj) {
     hand.forEach(c => {
       if (c.incr_dmg) c.incr_dmg = false
     })
-  }, 500)
+  }, timeout * 0.5)
 }

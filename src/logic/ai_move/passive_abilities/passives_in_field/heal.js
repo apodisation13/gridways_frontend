@@ -7,33 +7,33 @@ import {
 import { choice_element } from "@/lib/utils"
 
 // ВРАГ лечит пассивно в конце хода сам себя на VALUE
-function heal_self(enemy) {
+function heal_self(enemy, timeout = 1000) {
   timeoutAnimationValue(
     enemy,
     "hp",
     `${enemy.hp}+${enemy.value}`,
     enemy.value,
     sound_heal,
-    750
+    timeout * 0.5
   )
-  timeoutAnimationFlag(enemy, "healing")
+  timeoutAnimationFlag(enemy, "healing", null, timeout * 0.5)
 }
 
 // враг лечит пассивно в конце хода лидера врагов на VALUE
-function heal_enemy_leader(enemy, enemy_leader) {
+function heal_enemy_leader(enemy, enemy_leader, timeout = 1000) {
   timeoutAnimationValue(
     enemy_leader,
     "hp",
     `${enemy_leader.hp}+${enemy.value}`,
     enemy.value,
     sound_heal,
-    750
+    timeout * 0.5
   )
-  timeoutAnimationFlag(enemy, "healing")
+  timeoutAnimationFlag(enemy, "healing", null, timeout * 0.5)
 }
 
 // враг лечит пассивно в конце хода всех врагов на VALUE
-function heal_all(enemy, field, enemy_leader) {
+function heal_all(enemy, field, enemy_leader, timeout = 1000) {
   let all_enemies = get_all_enemies(field, enemy_leader)
 
   sound_heal()
@@ -43,14 +43,14 @@ function heal_all(enemy, field, enemy_leader) {
       "hp",
       `${e.hp}+${enemy.value}`,
       enemy.value,
-      undefined,
-      750
+      null,
+      timeout * 0.5
     )
   })
-  timeoutAnimationFlag(enemy, "healing")
+  timeoutAnimationFlag(enemy, "healing", null, timeout * 0.5)
 }
 
-function heal_random(enemy, field, enemy_leader) {
+function heal_random(enemy, field, enemy_leader, timeout = 1000) {
   let all_enemies = get_all_enemies(field, enemy_leader)
   const random_enemy = choice_element(all_enemies)
 
@@ -60,12 +60,12 @@ function heal_random(enemy, field, enemy_leader) {
     `${random_enemy.hp}+${enemy.value}`,
     enemy.value,
     sound_heal,
-    750
+    timeout * 0.5
   )
-  timeoutAnimationFlag(enemy, "healing")
+  timeoutAnimationFlag(enemy, "healing", null, timeout * 0.5)
 }
 
-function heal_self_by_highest_hp(enemy, field, enemy_leader) {
+function heal_self_by_highest_hp(enemy, field, enemy_leader, timeout = 1000) {
   let all_enemies = get_all_enemies(field, enemy_leader)
   all_enemies.splice(all_enemies.indexOf(enemy), 1) // EXCLUDE self)
   if (!all_enemies.length) return
@@ -79,17 +79,17 @@ function heal_self_by_highest_hp(enemy, field, enemy_leader) {
     `${enemy.hp}+${target.hp}`,
     target.hp,
     sound_heal,
-    750
+    timeout * 0.5
   )
-  timeoutAnimationFlag(enemy, "healing")
+  timeoutAnimationFlag(enemy, "healing", null, timeout * 0.5)
 }
 
-function heal_row(enemy, field) {
+function heal_row(enemy, field, timeout = 1000) {
   let index = field.indexOf(enemy)
   let min = Math.floor(index / 3) * 3
   let max = min + 3
   sound_heal()
-  timeoutAnimationFlag(enemy, "healing")
+  timeoutAnimationFlag(enemy, "healing", null, timeout * 0.5)
   field.slice(min, max).forEach(e => {
     if (e) {
       timeoutAnimationValue(
@@ -97,18 +97,18 @@ function heal_row(enemy, field) {
         "hp",
         `${e.hp}+${enemy.value}`,
         enemy.value,
-        undefined,
-        750
+        null,
+        timeout * 0.5
       )
     }
   })
 }
 
-function heal_column(enemy, field) {
+function heal_column(enemy, field, timeout = 1000) {
   let index = field.indexOf(enemy) % 3
   let indexes = [index, index + 3, index + 6, index + 9]
   sound_heal()
-  timeoutAnimationFlag(enemy, "healing")
+  timeoutAnimationFlag(enemy, "healing", null, timeout * 0.5)
   indexes.forEach(i => {
     if (field[i]) {
       timeoutAnimationValue(
@@ -116,8 +116,8 @@ function heal_column(enemy, field) {
         "hp",
         `${field[i].hp}+${enemy.value}`,
         enemy.value,
-        undefined,
-        750
+        null,
+        timeout * 0.5
       )
     }
   })

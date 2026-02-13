@@ -2,7 +2,7 @@ import { get_all_enemies } from "@/logic/player_move/service/service_for_player_
 import { sound_destroy_enemy } from "@/logic/play_sounds"
 import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
 
-function destroy_all_same_hp(enemy, gameObj) {
+function destroy_all_same_hp(enemy, gameObj, timeout = 1000) {
   const { field, enemy_leader } = gameObj
 
   let all_enemies = get_all_enemies(field, enemy_leader)
@@ -10,7 +10,7 @@ function destroy_all_same_hp(enemy, gameObj) {
 
   sound_destroy_enemy()
   targets.forEach(e => {
-    enemy_takes_damage(e, { damage: e.hp }, gameObj, 1000)
+    enemy_takes_damage(e, { damage: e.hp }, gameObj, timeout)
   })
 }
 

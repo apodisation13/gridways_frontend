@@ -25,9 +25,11 @@ function player_passive_abilities_end_turn(gameObj, timeOut = 1000) {
       // МЕНЕДЖЕР пассивных абилок карт: рука, лидер, колода, сброс
       console.log("Выполняем пассивку номер", i)
       if (pool[i].has_passive_in_hand || !pool[i].color)
-        hand_passives(pool[i], gameObj)
-      else if (pool[i].has_passive_in_deck) deck_passives(pool[i], gameObj)
-      else if (pool[i].has_passive_in_grave) grave_passives(pool[i], gameObj)
+        hand_passives(pool[i], gameObj, timeOut)
+      else if (pool[i].has_passive_in_deck)
+        deck_passives(pool[i], gameObj, timeOut)
+      else if (pool[i].has_passive_in_grave)
+        grave_passives(pool[i], gameObj, timeOut)
       i += 1
     }
   }, timeOut)

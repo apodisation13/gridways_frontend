@@ -6,7 +6,7 @@ import { sound_destroy_enemy } from "@/logic/play_sounds"
 import { choice_pop } from "@/lib/utils"
 import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
 
-function destroy_2_enemies(card, gameObj) {
+function destroy_2_enemies(card, gameObj, timeout = 1000) {
   const { field, enemy_leader, hand, grave, deck } = gameObj
 
   let all_enemies = get_all_enemies(field, enemy_leader)
@@ -16,7 +16,7 @@ function destroy_2_enemies(card, gameObj) {
   const targets = [target_1, target_2]
 
   targets.forEach(e => {
-    if (e) enemy_takes_damage(e, { damage: e.hp }, gameObj, 500)
+    if (e) enemy_takes_damage(e, { damage: e.hp }, gameObj, timeout * 0.5)
     card.charges = 0
   })
   remove_dead_card(card, grave, hand, deck)

@@ -21,7 +21,7 @@ export function spawn_tokens(enemy, gameObj) {
   })
 }
 
-export function spawn_tokens_at_deck(enemy, gameObj) {
+export function spawn_tokens_at_deck(enemy, gameObj, timeout = 1000) {
   const defaultEnemy = get_default_enemy(enemy)
   if (!defaultEnemy) return
   defaultEnemy.hp = 1
@@ -34,5 +34,5 @@ export function spawn_tokens_at_deck(enemy, gameObj) {
   for (let i = 0; i < enemy.deathwish_value; i++) {
     enemies.push(copyObj(defaultEnemy))
   }
-  timeoutAnimationFlag(enemies[0], "trigger_deck_passive")
+  timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)
 }

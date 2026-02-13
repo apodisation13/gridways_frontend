@@ -3,7 +3,7 @@ import { sound_spread_damage } from "@/logic/play_sounds"
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
 import { choice } from "@/lib/utils"
 
-function spread_damage(card, gameObj) {
+function spread_damage(card, gameObj, timeout = 1000) {
   const { field, enemy_leader } = gameObj
 
   let enemy_list = get_all_enemies(field, enemy_leader) // собрать всех врагов в один список
@@ -21,7 +21,12 @@ function spread_damage(card, gameObj) {
     console.log(`попали во врага ${enemy_list[random_enemy].id}`)
 
     let temp = enemy_list[random_enemy].hp
-    hit_one_enemy(enemy_list[random_enemy], { damage: 1 }, gameObj, 200)
+    hit_one_enemy(
+      enemy_list[random_enemy],
+      { damage: 1 },
+      gameObj,
+      timeout * 0.2
+    )
 
     // убрали врага из списка врагов
     if (temp - 1 === 0) {
@@ -30,7 +35,7 @@ function spread_damage(card, gameObj) {
     }
 
     sound_spread_damage()
-  }, 400)
+  }, timeout * 0.4)
 }
 
 export { spread_damage }

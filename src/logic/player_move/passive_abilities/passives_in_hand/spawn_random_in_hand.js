@@ -2,7 +2,7 @@ import store from "@/store"
 import { choice_element, copyObj } from "@/lib/utils"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 
-export function spawn_random_in_hand(card, gameObj) {
+export function spawn_random_in_hand(card, gameObj, timeout = 1000) {
   const { hand, leader } = gameObj
   if (hand.length >= store.state.game.hand_size) return
 
@@ -11,5 +11,5 @@ export function spawn_random_in_hand(card, gameObj) {
   )
   const random_card = choice_element(pool)
   hand.push(copyObj(random_card.card))
-  timeoutAnimationFlag(card, "spawning")
+  timeoutAnimationFlag(card, "spawning", null, timeout * 0.5)
 }
