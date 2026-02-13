@@ -33,12 +33,15 @@ const mutations = {
   switchAnimation(state) {
     state.animationOn = !state.animationOn
   },
+  setMoveTimeout(state, timeout) {
+    state.moveTimeout = timeout
+  },
   setPreferences(state, payload) {
-    state.theme = payload.data.theme
-    state.avatar = payload.data.avatar
-    state.soundOn = payload.data.sound_on
-    state.animationOn = payload.data.animation_on
-    state.moveTimeout = payload.data.move_timeout
+    state.theme = payload.data?.theme
+    state.avatar = payload.data?.avatar
+    state.soundOn = payload.data?.sound_on
+    state.animationOn = payload.data?.animation_on
+    state.moveTimeout = payload.data?.move_timeout
   },
 }
 

@@ -20,6 +20,7 @@
       >
         <setting-sound v-if="selectedMainSetting === 0" />
         <setting-animation v-if="selectedMainSetting === 1" />
+        <setting-move-timeout v-if="selectedMainSetting === 2" />
         <!--Сюда так же добавим ещё настройки-->
       </settings-list>
     </div>
@@ -61,6 +62,7 @@ import SettingChooseTheme from "@/components/Pages/SettingsPage/SettingChooseThe
 import SettingsList from "@/components/Pages/SettingsPage/SettingsList.vue"
 import SettingAvatar from "@/components/Pages/SettingsPage/SettingAvatar.vue"
 import SettingAnimation from "@/components/Pages/SettingsPage/SettingAnimation.vue"
+import SettingMoveTimeout from "@/components/Pages/SettingsPage/SettingMoveTimeout.vue"
 export default {
   components: {
     SettingAnimation,
@@ -70,11 +72,18 @@ export default {
     SettingSound,
     SettingDeleteAllLevels,
     SettingLogout,
+    SettingMoveTimeout,
   },
   data() {
     return {
       settings: ["Общие настройки", "Аккаунт", "Персонализация"],
-      mainSettings: ["Звук", "Анимации наведения", "Язык", "Яркость"],
+      mainSettings: [
+        "Звук",
+        "Анимации наведения",
+        "Время хода",
+        "Язык",
+        "Яркость",
+      ],
       accountSettings: ["Данные", "Пароль", "Сброс уровней", "Выйти"],
       personalSettings: ["Цветовая тема", "Аватар", "Стиль карт"],
       selectedSetting: null,
@@ -151,7 +160,7 @@ export default {
   bottom: 15vh;
   left: 50%;
   transform: translateX(-50%);
-  width: 42%;
+  width: 26%;
   padding: 13px;
   cursor: pointer;
   outline: none;
