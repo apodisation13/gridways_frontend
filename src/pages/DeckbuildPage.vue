@@ -7,6 +7,7 @@
         :showingList="showingList"
         :empty_filters="empty_filters"
         @reset="cancelDeckBuilding"
+        @reset-filters="resetFilters"
         @select_faction="select_faction"
         @trigger_show_list="trigger_show_list"
         @open-filters="showFilters = true"
