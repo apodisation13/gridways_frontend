@@ -50,7 +50,7 @@ export function field_passives(enemy, gameObj, timeout = 1000) {
     heal_random(enemy, field, enemy_leader, timeout)
   } else if (pea === "incr-random-dmg") {
     incr_random_dmg(enemy, field, timeout)
-  } else if (pea === "decrease-player-damage") {
+  } else if (pea === "decr-player-dmg") {
     decrease_player_damage(enemy, hand, timeout)
   } else if (pea === "set-hp-random-grave") {
     set_hp_random_grave(enemy, gameObj, timeout)

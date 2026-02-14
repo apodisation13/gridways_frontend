@@ -38,7 +38,7 @@ export default {
         this.moveTimeOutValue !== null &&
         this.moveTimeOutValue !== "" &&
         this.moveTimeOutValue >= 200 &&
-        this.moveTimeOutValue <= 2000
+        this.moveTimeOutValue <= 1000
       )
     },
     errorMessage() {
@@ -48,8 +48,8 @@ export default {
       if (this.moveTimeOutValue < 200) {
         return "Минимальное значение: 200 мс"
       }
-      if (this.moveTimeOutValue > 2000) {
-        return "Максимальное значение: 2000 мс"
+      if (this.moveTimeOutValue > 1000) {
+        return "Максимальное значение: 1000 мс"
       }
       return ""
     },

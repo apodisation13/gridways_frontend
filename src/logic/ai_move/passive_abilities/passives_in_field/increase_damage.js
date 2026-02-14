@@ -21,6 +21,7 @@ function incr_self_dmg(enemy, timeout = 1000) {
 function incr_random_dmg(enemy, field, timeout = 1000) {
   let all_enemies = get_all_enemies(field, undefined)
   const random_enemy = choice_element(all_enemies)
+  if (!random_enemy) return
   timeoutAnimationValue(
     random_enemy,
     "damage",

@@ -212,7 +212,7 @@ div {
 }
 .card-ui {
   position: relative;
-  margin: 0 auto;
+  margin: 10px auto;
   width: 85%;
   box-shadow: -4px 0 4px rgb(0 0 0 / 50%);
 }
