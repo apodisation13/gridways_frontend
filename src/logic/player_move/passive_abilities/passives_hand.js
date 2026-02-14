@@ -13,32 +13,32 @@ import { set_dmg_as_random_enemy_grave } from "@/logic/player_move/passive_abili
 import { allowActionTimer } from "@/logic/game_logic/timers"
 import { spawn_random_in_hand } from "@/logic/player_move/passive_abilities/passives_in_hand/spawn_random_in_hand"
 
-export function hand_passives(card, gameObj) {
+export function hand_passives(card, gameObj, timeout = 1000) {
   if (!allowActionTimer(card)) return
 
   // ДИСПЕТЧЕР ПАССИВНЫХ АБИЛОК В РУКЕ!
   const pa = card.passive_ability.name
   if (pa === "damage-random-enemy") {
-    damage_random_enemy(card, gameObj)
+    damage_random_enemy(card, gameObj, timeout)
   } else if (pa === "incr-dmg-to") {
-    incr_dmg_to_random(card, gameObj, "hand")
+    incr_dmg_to_random(card, gameObj, "hand", false, timeout)
   } else if (pa === "heal-leader") {
-    heal_leader(card)
+    heal_leader(card, timeout)
   } else if (pa === "incr-self-dmg") {
-    incr_self_dmg(card)
+    incr_self_dmg(card, false, timeout)
   } else if (pa === "destroy-2-enemies") {
-    destroy_2_enemies(card, gameObj)
+    destroy_2_enemies(card, gameObj, timeout)
   } else if (pa === "add-charges-to-leader-if-play-d-all") {
     add_charges_if_playing_d_all(card, gameObj.leader, false)
   } else if (pa === "set-dmg-as-random-enemy-grave") {
-    set_dmg_as_random_enemy_grave(card, gameObj)
+    set_dmg_as_random_enemy_grave(card, gameObj, timeout)
   } else if (pa === "incr-dmg-by-n-enemies-grave") {
-    incr_dmg_by_n_enemies_grave(card, gameObj)
+    incr_dmg_by_n_enemies_grave(card, gameObj, timeout)
   } else if (pa === "incr-dmg-by-len-deck") {
-    incr_dmg_by_len_deck(card, gameObj)
+    incr_dmg_by_len_deck(card, gameObj, timeout)
   } else if (pa === "spawn-random-in-hand") {
-    spawn_random_in_hand(card, gameObj)
+    spawn_random_in_hand(card, gameObj, timeout)
   } else if (pa === "incr-dmg-by-n-grave") {
-    inc_dmg_by_len_grave(card, gameObj)
+    inc_dmg_by_len_grave(card, gameObj, timeout)
   }
 }

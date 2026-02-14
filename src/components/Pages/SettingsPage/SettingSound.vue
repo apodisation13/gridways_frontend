@@ -1,6 +1,6 @@
 <template>
   <base-button @click="switchSound">
-    {{ sound ? "sound ON" : "sound OFF" }}
+    {{ soundOn ? "sound ON" : "sound OFF" }}
   </base-button>
 </template>
 
@@ -10,13 +10,13 @@ export default {
   name: "SettingSound",
   components: { BaseButton },
   computed: {
-    sound() {
-      return this.$store.state.play_sound
+    soundOn() {
+      return this.$store.getters["soundOn"]
     },
   },
   methods: {
     switchSound() {
-      this.$store.commit("set_play_sound")
+      this.$store.commit("switchSound")
     },
   },
 }

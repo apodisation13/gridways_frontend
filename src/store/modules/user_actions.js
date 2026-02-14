@@ -168,7 +168,12 @@ const actions = {
         ),
         data: { subtype: subtype },
       })
-      toast.success("Успешно создали карту")
+      const msg =
+        subtype === CraftMillCardActionSubtype.craftCard ||
+        subtype === CraftMillCardActionSubtype.craftLeader
+          ? "Успешно создали карту"
+          : "Успешно уничтожили карту"
+      toast.success(msg)
 
       commit("set_resource", response.data.resources)
       if (
@@ -196,7 +201,7 @@ const actions = {
         url: CRAFT_BONUS_CARD.replace("{userId}", userId),
         data: { cards_ids: cardsIds },
       })
-      toast.success("Успешно создали карту")
+      toast.success("Успешно добавили карту")
       commit("set_cards", response.data.cards)
     } catch (err) {
       dispatch("error_action", err)

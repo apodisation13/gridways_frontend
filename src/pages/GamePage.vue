@@ -54,6 +54,8 @@
           @exec_leader="chose_leader"
           @target_enemy="exec_damage_enemy_card"
           @target_enemy_leader="exec_damage_enemy_leader"
+          @enemy_leader_in_cross="switch_enemy_leader_in_cross"
+          @enemy_in_cross="switch_enemy_in_cross"
         />
 
         <!-- Просто полоска с жизнями (пока что) -->

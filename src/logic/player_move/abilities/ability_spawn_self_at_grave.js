@@ -1,7 +1,12 @@
 import { copyObj } from "@/lib/utils"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 
-export function spawn_self_at_grave(card, gameObj) {
+export function spawn_self_at_grave(card, gameObj, timeout = 1000) {
   gameObj.grave.push(copyObj(card))
-  timeoutAnimationFlag(gameObj.grave[0], "trigger_grave_passive")
+  timeoutAnimationFlag(
+    gameObj.grave[0],
+    "trigger_grave_passive",
+    null,
+    timeout * 0.5
+  )
 }

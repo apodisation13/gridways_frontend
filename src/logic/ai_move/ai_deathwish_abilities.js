@@ -25,39 +25,40 @@ import {
 import { sound_deathwish } from "@/logic/play_sounds"
 
 // ДИСПЕТЧЕР абилок deathwish у врага
-export function deathwish(deathwish_enemy, gameObj) {
+export function deathwish(deathwish_enemy, gameObj, timeout = 1000) {
   if (!deathwish_enemy) return
 
   const d = deathwish_enemy.deathwish.name
   if (d === "spawn-self") spawn_self(deathwish_enemy, gameObj)
   else if (d === "spawn-tokens") spawn_tokens(deathwish_enemy, gameObj)
   else if (d === "incr-dmg-to-value-cards-by-1") {
-    incr_dmg_to_value_cards_by_1(deathwish_enemy, gameObj)
-  } else if (d === "heal-all") deathwish_heal_all(deathwish_enemy, gameObj)
+    incr_dmg_to_value_cards_by_1(deathwish_enemy, gameObj, timeout)
+  } else if (d === "heal-all")
+    deathwish_heal_all(deathwish_enemy, gameObj, timeout)
   else if (d === "spawn-self-at-deck") {
-    spawn_self_at_deck(deathwish_enemy, gameObj)
+    spawn_self_at_deck(deathwish_enemy, gameObj, timeout)
   } else if (d === "destroy_random_card_in_player_deck") {
     destroy_player_card_in_deck(gameObj)
   } else if (d === "set_hp") {
-    set_hp(deathwish_enemy)
+    set_hp(deathwish_enemy, timeout)
   } else if (d === "spawn-tokens-at-deck") {
-    spawn_tokens_at_deck(deathwish_enemy, gameObj)
+    spawn_tokens_at_deck(deathwish_enemy, gameObj, timeout)
   } else if (d === "spawn-self-at-grave") {
-    spawn_self_at_grave(deathwish_enemy, gameObj)
+    spawn_self_at_grave(deathwish_enemy, gameObj, timeout)
   } else if (d === "give-shields-to-all") {
     give_shields_to_all(gameObj)
   } else if (d === "give-shields-to-all-deck") {
-    give_shield_to_all_deck(gameObj)
+    give_shield_to_all_deck(gameObj, timeout)
   } else if (d === "set-weakest-hp-as-highest") {
-    set_weakest_hp_as_highest(gameObj)
+    set_weakest_hp_as_highest(gameObj, timeout)
   } else if (d === "spawn-faction-unit") {
     sound_deathwish()
-    spawn_faction_unit(deathwish_enemy, gameObj) // а вот это из пассивок! один в один
+    spawn_faction_unit(deathwish_enemy, gameObj, timeout) // а вот это из пассивок! один в один
   } else if (d === "spawn-faction-unit-at-deck") {
     sound_deathwish()
-    spawn_faction_unit_at_deck(deathwish_enemy, gameObj) // а вот это из пассивок! один в один
+    spawn_faction_unit_at_deck(deathwish_enemy, gameObj, timeout) // а вот это из пассивок! один в один
   } else if (d === "spawn-unit") {
     sound_deathwish()
-    spawn_faction_unit(deathwish_enemy, gameObj, false) // передаем false, чтобы взять вообще любого врага
+    spawn_faction_unit(deathwish_enemy, gameObj, false, timeout) // передаем false, чтобы взять вообще любого врага
   }
 }

@@ -23,6 +23,12 @@
         :image_name="'open_filters.svg'"
         :class="[empty_filters ? '' : 'set-filter']"
       />
+      <button-icon
+        v-if="!empty_filters"
+        class="filter_btn_cancel"
+        @click="cancelFilters"
+        :image_name="'add_icon.svg'"
+      />
     </div>
     <base-modal
       v-if="showNewDeckFactionSelect"
@@ -82,13 +88,22 @@ export default {
       this.showNewDeckFactionSelect = false
       this.$emit("reset")
     },
+    cancelFilters() {
+      this.$emit("reset-filters")
+    },
   },
   computed: {
     isCansel() {
       return this.showNewDeckFactionSelect || this.deckBuilding
     },
   },
-  emits: ["open-filters", "select_faction", "trigger_show_list", "reset"],
+  emits: [
+    "open-filters",
+    "select_faction",
+    "trigger_show_list",
+    "reset",
+    "reset-filters",
+  ],
 }
 </script>
 
@@ -97,6 +112,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 .filter_btn {
@@ -119,5 +135,12 @@ export default {
 
 .is-cancel {
   transform: rotate(45deg);
+}
+
+.filter_btn_cancel {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
 }
 </style>

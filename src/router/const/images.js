@@ -8,16 +8,16 @@ export const images = {
     morning: `${path}/castle_morning.webp`,
   },
   loading: {
-    day: `${path}/loading-day.jpg`,
-    night: `${path}/loading-night.jpg`,
-    evening: `${path}/loading-evening.jpg`,
-    morning: `${path}/loading-morning.jpg`,
+    day: `${path}/loading_day_new.webp`,
+    night: `${path}/loading_night_new.webp`,
+    evening: `${path}/loading_evening_new.webp`,
+    morning: `${path}/loading_morning_new.webp`,
   },
   login: {
-    day: `${path}/loading-day.jpg`,
-    night: `${path}/loading-night.jpg`,
-    evening: `${path}/loading-evening.jpg`,
-    morning: `${path}/loading-morning.jpg`,
+    day: `${path}/loading_day_new.webp`,
+    night: `${path}/loading_night_new.webp`,
+    evening: `${path}/loading_evening_new.webp`,
+    morning: `${path}/loading_morning_new.webp`,
   },
   deckbuild: {
     default: `${path}/deckbuild_default.jpg`,
@@ -51,5 +51,11 @@ export const images = {
   },
   work_in_progress: {
     default: `${path}/library.jpg`,
+  },
+  settings: {
+    day: `${path}/library_day_new.webp`,
+    night: `${path}/library_night_new.webp`,
+    evening: `${path}/library_day_new.webp`,
+    morning: `${path}/library_day_new.webp`,
   },
 }

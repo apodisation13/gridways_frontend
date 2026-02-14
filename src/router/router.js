@@ -102,7 +102,7 @@ const routes = [
     component: SettingsPage,
     meta: {
       requireAuth: true,
-      image: images.work_in_progress,
+      image: images.settings,
     },
   },
   {

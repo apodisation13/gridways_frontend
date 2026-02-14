@@ -1,7 +1,7 @@
 import store from "@/store"
 
 function sound(src) {
-  if (store.state.play_sound) new Audio(src).play()
+  if (store.state.settings.soundOn) new Audio(src).play()
 }
 
 export function sound_hit_shield() {

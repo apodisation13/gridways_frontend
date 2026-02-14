@@ -1,7 +1,11 @@
 import { copyObj } from "@/lib/utils"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 
-export function if_in_grave_spawn_self_in_enemy_grave(card, gameObj) {
+export function if_in_grave_spawn_self_in_enemy_grave(
+  card,
+  gameObj,
+  timeout = 1000
+) {
   const { enemies_grave } = gameObj
 
   const self = copyObj(card)
@@ -13,6 +17,11 @@ export function if_in_grave_spawn_self_in_enemy_grave(card, gameObj) {
       "Каждый свой ход враг перемещается на одну клетку ниже, и если ему некуда ходить (он уже внизу, или под ним есть другой враг), он наносит лидеру игрока {damage} урона",
   }
   enemies_grave.push(self)
-  timeoutAnimationFlag(card, "trigger_grave_passive")
-  timeoutAnimationFlag(enemies_grave[0], "trigger_grave_passive")
+  timeoutAnimationFlag(card, "trigger_grave_passive", null, timeout * 0.5)
+  timeoutAnimationFlag(
+    enemies_grave[0],
+    "trigger_grave_passive",
+    null,
+    timeout * 0.5
+  )
 }

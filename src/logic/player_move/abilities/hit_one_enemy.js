@@ -3,7 +3,7 @@ import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_da
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 
 function hit_one_enemy(enemy, card, gameObj, timeout = 1000) {
-  timeoutAnimationFlag(card, "damages_enemy")
+  timeoutAnimationFlag(card, "damages_enemy", null, timeout * 0.5)
 
   if (enemy.shield) {
     enemy.shield = false

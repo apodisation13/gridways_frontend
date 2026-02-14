@@ -446,11 +446,4 @@ div {
   background-color: #ccc;
   cursor: not-allowed;
 }
-
-.preview-wrapper {
-  margin-top: 20px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
 </style>

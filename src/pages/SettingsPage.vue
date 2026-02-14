@@ -19,6 +19,8 @@
         @select-setting="selectMainSetting"
       >
         <setting-sound v-if="selectedMainSetting === 0" />
+        <setting-animation v-if="selectedMainSetting === 1" />
+        <setting-move-timeout v-if="selectedMainSetting === 2" />
         <!--Сюда так же добавим ещё настройки-->
       </settings-list>
     </div>
@@ -46,6 +48,9 @@
         <!--Сюда так же добавим ещё настройки-->
       </settings-list>
     </div>
+    <button class="base-button" @click="updateSettings" :disabled="isLoading">
+      <span class="global_text base-button-text">Запомнить мои настройки!</span>
+    </button>
   </div>
 </template>
 
@@ -56,25 +61,36 @@ import SettingSound from "@/components/Pages/SettingsPage/SettingSound"
 import SettingChooseTheme from "@/components/Pages/SettingsPage/SettingChooseTheme.vue"
 import SettingsList from "@/components/Pages/SettingsPage/SettingsList.vue"
 import SettingAvatar from "@/components/Pages/SettingsPage/SettingAvatar.vue"
+import SettingAnimation from "@/components/Pages/SettingsPage/SettingAnimation.vue"
+import SettingMoveTimeout from "@/components/Pages/SettingsPage/SettingMoveTimeout.vue"
 export default {
   components: {
+    SettingAnimation,
     SettingAvatar,
     SettingsList,
     SettingChooseTheme,
     SettingSound,
     SettingDeleteAllLevels,
     SettingLogout,
+    SettingMoveTimeout,
   },
   data() {
     return {
       settings: ["Общие настройки", "Аккаунт", "Персонализация"],
-      mainSettings: ["Звук", "Язык", "Яркость"],
+      mainSettings: [
+        "Звук",
+        "Анимации наведения",
+        "Время хода",
+        "Язык",
+        "Яркость",
+      ],
       accountSettings: ["Данные", "Пароль", "Сброс уровней", "Выйти"],
       personalSettings: ["Цветовая тема", "Аватар", "Стиль карт"],
       selectedSetting: null,
       selectedMainSetting: null,
       selectedAccountSetting: null,
       selectedPersonalSetting: null,
+      isLoading: false,
     }
   },
   methods: {
@@ -95,6 +111,12 @@ export default {
       this.selectedMainSetting = null
       this.selectedPersonalSetting = null
       this.selectedAccountSetting = null
+    },
+    async updateSettings() {
+      if (this.isLoading) return
+      this.isLoading = true
+      await this.$store.dispatch("updateUserPreferences")
+      this.isLoading = false
     },
   },
 }
@@ -127,6 +149,27 @@ export default {
   letter-spacing: -0.02em;
   background: var(--primary-gold-gradient);
   -webkit-text-fill-color: transparent;
-  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.base-button {
+  background: linear-gradient(#1d252d, #000000, #282d33);
+  border: 2px solid #facf5d;
+  border-radius: 6px;
+  position: fixed;
+  bottom: 15vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26%;
+  padding: 13px;
+  cursor: pointer;
+  outline: none;
+}
+
+.base-button-text {
+  font-size: 16px;
+  background: var(--primary-gold-gradient);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 </style>

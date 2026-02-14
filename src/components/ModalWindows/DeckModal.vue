@@ -3,10 +3,10 @@
     <button-close @close_self="close_self" />
 
     <div class="leader">
-      <card-item :card="leader" :is_leader="true" />
+      <card-item :card="leader" :is_leader="true" :hp_needed="true" />
     </div>
 
-    <card-list-component :cards="deck" />
+    <card-list-component :cards="deck" :hp_needed="true" />
   </modal-window>
 </template>
 

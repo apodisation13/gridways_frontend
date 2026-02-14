@@ -16,7 +16,6 @@
 </template>
 
 <script>
-// import draggable from "vuedraggable"
 import CardItem from "@/components/Cards/CardItem"
 import { background_color_leader } from "@/logic/border_styles"
 export default {
@@ -135,10 +134,6 @@ export default {
 
       // Эмитим событие выбора карты
       this.$emit("chose_player_card", this.hand[cardIndex])
-      console.log(
-        "Эмит chose_player_card отправлен для карты:",
-        this.hand[cardIndex]
-      )
 
       // Добавляем глобальные обработчики для перемещения стрелки
       this.addArrowEventListeners()
@@ -146,51 +141,6 @@ export default {
       // Рисуем первую стрелку СРАЗУ
       this.drawArrow(this.hand[cardIndex])
     },
-
-    // Рисуем стрелку
-    // drawArrow() {
-    //   if (!this.isDrawingArrow || !this.ctx || !this.canvas) {
-    //     console.log("Не рисуем стрелку")
-    //     return
-    //   }
-    //
-    //   // Очищаем канвас
-    //   this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-    //
-    //   // Настройка стиля стрелки
-    //   this.ctx.lineWidth = 3
-    //   this.ctx.lineCap = "round"
-    //   this.ctx.strokeStyle = "#ff0000"
-    //   this.ctx.fillStyle = "#ff0000"
-    //
-    //   // Рисуем линию
-    //   this.ctx.beginPath()
-    //   this.ctx.moveTo(this.arrowStartX, this.arrowStartY)
-    //   this.ctx.lineTo(this.arrowCurrentX, this.arrowCurrentY)
-    //   this.ctx.stroke()
-    //
-    //   // Рисуем стрелку на конце
-    //   const angle = Math.atan2(
-    //     this.arrowCurrentY - this.arrowStartY,
-    //     this.arrowCurrentX - this.arrowStartX
-    //   )
-    //   const arrowLength = 15
-    //   const arrowAngle = Math.PI / 6
-    //
-    //   // Заливаем стрелку
-    //   this.ctx.beginPath()
-    //   this.ctx.moveTo(this.arrowCurrentX, this.arrowCurrentY)
-    //   this.ctx.lineTo(
-    //     this.arrowCurrentX - arrowLength * Math.cos(angle - arrowAngle),
-    //     this.arrowCurrentY - arrowLength * Math.sin(angle - arrowAngle)
-    //   )
-    //   this.ctx.lineTo(
-    //     this.arrowCurrentX - arrowLength * Math.cos(angle + arrowAngle),
-    //     this.arrowCurrentY - arrowLength * Math.sin(angle + arrowAngle)
-    //   )
-    //   this.ctx.closePath()
-    //   this.ctx.fill()
-    // },
 
     drawArrow(card) {
       if (!this.isDrawingArrow || !this.ctx || !this.canvas) {
@@ -211,8 +161,6 @@ export default {
         this.ctx.strokeStyle = background_color_leader(card.faction)
         this.ctx.fillStyle = background_color_leader(card.faction)
       }
-      // this.ctx.strokeStyle = "#4a90e2"
-      // this.ctx.fillStyle = "#4a90e2"
 
       // Рисуем пунктирную линию
       this.ctx.setLineDash([5, 3])
@@ -229,36 +177,99 @@ export default {
       )
       const arrowLength = 18
 
-      // Рисуем стрелку в виде треугольника
-      this.ctx.beginPath()
-      this.ctx.moveTo(this.arrowCurrentX, this.arrowCurrentY)
-      this.ctx.lineTo(
-        this.arrowCurrentX - arrowLength * Math.cos(angle - Math.PI / 6),
-        this.arrowCurrentY - arrowLength * Math.sin(angle - Math.PI / 6)
-      )
-      this.ctx.lineTo(
-        this.arrowCurrentX - arrowLength * Math.cos(angle + Math.PI / 6),
-        this.arrowCurrentY - arrowLength * Math.sin(angle + Math.PI / 6)
-      )
-      this.ctx.closePath()
-      this.ctx.fill()
-
-      // Белая точка в центре стрелки
-      this.ctx.fillStyle = "#ffffff"
-      this.ctx.beginPath()
-      this.ctx.arc(
-        this.arrowCurrentX - arrowLength * 0.3 * Math.cos(angle),
-        this.arrowCurrentY - arrowLength * 0.3 * Math.sin(angle),
-        3,
-        0,
-        Math.PI * 2
-      )
-      this.ctx.fill()
+      // это нужно исключительно для анимаций!
       const elems = document.elementsFromPoint(
         this.arrowCurrentX,
         this.arrowCurrentY
       )
-      this.get_target(elems, false)
+      const result = this.get_target(elems, false)
+
+      if (result) {
+        const outerRadius = 14
+        const innerRadius = 4
+        const crossLength = 20
+
+        this.ctx.lineWidth = 2
+
+        // Внешний круг (кольцо)
+        this.ctx.beginPath()
+        this.ctx.arc(
+          this.arrowCurrentX,
+          this.arrowCurrentY,
+          outerRadius,
+          0,
+          Math.PI * 2
+        )
+        this.ctx.stroke()
+
+        // Центральная точка
+        this.ctx.beginPath()
+        this.ctx.arc(
+          this.arrowCurrentX,
+          this.arrowCurrentY,
+          innerRadius,
+          0,
+          Math.PI * 2
+        )
+        this.ctx.fill()
+
+        // Перекрестие (4 линии)
+        this.ctx.beginPath()
+        // Верхняя линия
+        this.ctx.moveTo(
+          this.arrowCurrentX,
+          this.arrowCurrentY - outerRadius - 2
+        )
+        this.ctx.lineTo(this.arrowCurrentX, this.arrowCurrentY - crossLength)
+        // Нижняя линия
+        this.ctx.moveTo(
+          this.arrowCurrentX,
+          this.arrowCurrentY + outerRadius + 2
+        )
+        this.ctx.lineTo(this.arrowCurrentX, this.arrowCurrentY + crossLength)
+        // Левая линия
+        this.ctx.moveTo(
+          this.arrowCurrentX - outerRadius - 2,
+          this.arrowCurrentY
+        )
+        this.ctx.lineTo(this.arrowCurrentX - crossLength, this.arrowCurrentY)
+        // Правая линия
+        this.ctx.moveTo(
+          this.arrowCurrentX + outerRadius + 2,
+          this.arrowCurrentY
+        )
+        this.ctx.lineTo(this.arrowCurrentX + crossLength, this.arrowCurrentY)
+        this.ctx.stroke()
+
+        // Восстанавливаем lineWidth для следующей отрисовки
+        this.ctx.lineWidth = 2
+      } else {
+        // Рисуем стрелку в виде треугольника
+        this.ctx.beginPath()
+        this.ctx.moveTo(this.arrowCurrentX, this.arrowCurrentY)
+        this.ctx.lineTo(
+          this.arrowCurrentX - arrowLength * Math.cos(angle - Math.PI / 6),
+          this.arrowCurrentY - arrowLength * Math.sin(angle - Math.PI / 6)
+        )
+        this.ctx.lineTo(
+          this.arrowCurrentX - arrowLength * Math.cos(angle + Math.PI / 6),
+          this.arrowCurrentY - arrowLength * Math.sin(angle + Math.PI / 6)
+        )
+        this.ctx.closePath()
+        this.ctx.fill()
+
+        // Белая точка в центре стрелки
+        this.ctx.fillStyle = "#ffffff"
+        this.ctx.beginPath()
+        this.ctx.arc(
+          this.arrowCurrentX - arrowLength * 0.3 * Math.cos(angle),
+          this.arrowCurrentY - arrowLength * 0.3 * Math.sin(angle),
+          3,
+          0,
+          Math.PI * 2
+        )
+        this.ctx.fill()
+      }
     },
 
     // Останавливаем рисование стрелки
@@ -398,7 +409,7 @@ export default {
           elem = el
         }
       })
-      this.target_emit(elem, fire)
+      return this.target_emit(elem, fire)
     },
 
     target_emit(elem, fire) {
@@ -408,7 +419,7 @@ export default {
         console.log("Цель не определена")
         this.$emit("enemy_leader_in_cross", false)
         this.$emit("enemy_in_cross", null)
-        return
+        return false
       }
 
       if (id.includes("enemy_leader")) {
@@ -416,8 +427,13 @@ export default {
         if (fire) {
           this.$emit("enemy_leader_in_cross", false)
           this.$emit("target_enemy_leader")
-        } else this.$emit("enemy_leader_in_cross", true)
-        return
+          return false
+        } else {
+          if (this.$store.getters["animationOn"]) {
+            this.$emit("enemy_leader_in_cross", true)
+            return true
+          }
+        }
       }
 
       const index = parseInt(id.slice(id.indexOf("_") + 1))
@@ -425,7 +441,13 @@ export default {
       if (fire) {
         this.$emit("enemy_in_cross", null)
         this.$emit("target_enemy", this.field[index])
-      } else this.$emit("enemy_in_cross", index)
+        return false
+      } else {
+        if (this.$store.getters["animationOn"]) {
+          this.$emit("enemy_in_cross", index)
+          return true
+        }
+      }
     },
   },
   emits: [

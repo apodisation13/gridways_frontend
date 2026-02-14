@@ -9,38 +9,38 @@ import {
 import { sound_appear_new_enemy } from "@/logic/play_sounds"
 
 // создает свою копию без пассивной способности в колоде врагов
-export function spawn_self_at_deck(enemy, gameObj) {
+export function spawn_self_at_deck(enemy, gameObj, timeout = 1000) {
   const { enemies } = gameObj
   const self = copyObj(enemy)
   self.passive_ability = null
   self.has_passive = null
   self.has_passive_in_field = null
-  timeoutAnimationFlag(enemies[0], "trigger_deck_passive")
+  timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)
   enemies.push(copyObj(self))
 }
 
 // создает в колоде врагов value количество токенов этого врага, снимает у тех пассивные способности
-export function spawn_tokens_in_deck(enemy, gameObj) {
+export function spawn_tokens_in_deck(enemy, gameObj, timeout = 1000) {
   const { enemies } = gameObj
   const token = create_token(enemy)
   for (let i = 0; i < enemy.value; i++) {
     enemies.push(copyObj(token))
   }
-  timeoutAnimationFlag(enemies[0], "trigger_deck_passive")
+  timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)
 }
 
 // создаёт токен этого врага, снимает у того пассивную способность и помещает его на случайную свободную клетку
-export function spawn_token(enemy, field) {
+export function spawn_token(enemy, field, timeout = 1000) {
   const token = create_token(enemy)
   const emptyField = get_empty_field_indexes(field)
   const randomIndex = choice(emptyField)
   field[emptyField[randomIndex]] = copyObj(token)
   sound_appear_new_enemy()
-  timeoutAnimationFlag(enemy, "spawning")
+  timeoutAnimationFlag(enemy, "spawning", null, timeout * 0.5)
 }
 
 // создает токен РАНДОМНОЙ КАРТЫ ЭТОЙ ФРАКЦИИ и помещает его на случайную свободную клетку
-export function spawn_random_token(enemy, gameObj) {
+export function spawn_random_token(enemy, gameObj, timeout = 1000) {
   const { field, enemy_leader } = gameObj
   const random_enemy = choice_element(
     store.getters.all_enemies.filter(e => e.faction === enemy_leader.faction)
@@ -50,11 +50,16 @@ export function spawn_random_token(enemy, gameObj) {
   const randomIndex = choice(emptyField)
   field[emptyField[randomIndex]] = copyObj(token)
   sound_appear_new_enemy()
-  timeoutAnimationFlag(enemy, "spawning")
+  timeoutAnimationFlag(enemy, "spawning", null, timeout * 0.5)
 }
 
 // создает в случайной свободной клетке на поле случайного врага, если faction тру, то этой фракции, или любого
-export function spawn_faction_unit(enemy, gameObj, faction = true) {
+export function spawn_faction_unit(
+  enemy,
+  gameObj,
+  faction = true,
+  timeout = 1000
+) {
   const { field, enemy_leader } = gameObj
 
   let random_enemy
@@ -70,16 +75,16 @@ export function spawn_faction_unit(enemy, gameObj, faction = true) {
   const randomIndex = choice(emptyField)
   field[emptyField[randomIndex]] = copyObj(random_enemy)
   sound_appear_new_enemy()
-  timeoutAnimationFlag(enemy, "spawning")
+  timeoutAnimationFlag(enemy, "spawning", null, timeout * 0.5)
 }
 
 // добавляет в колоду врагов случайного врага из этой фракции!
-export function spawn_faction_unit_at_deck(enemy, gameObj) {
+export function spawn_faction_unit_at_deck(enemy, gameObj, timeout = 1000) {
   const { enemy_leader, enemies } = gameObj
   const random_enemy = choice_element(
     store.getters.all_enemies.filter(e => e.faction === enemy_leader.faction)
   )
   enemies.push(copyObj(random_enemy))
-  timeoutAnimationFlag(enemies[0], "trigger_deck_passive")
-  timeoutAnimationFlag(enemy, "spawning")
+  timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)
+  timeoutAnimationFlag(enemy, "spawning", null, timeout * 0.5)
 }

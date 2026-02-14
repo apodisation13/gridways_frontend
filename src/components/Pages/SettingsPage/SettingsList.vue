@@ -43,7 +43,7 @@ export default {
 .text {
   font-size: 16px;
   background: var(--primary-gold-gradient);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 </style>

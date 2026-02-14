@@ -7,6 +7,7 @@
         :showingList="showingList"
         :empty_filters="empty_filters"
         @reset="cancelDeckBuilding"
+        @reset-filters="resetFilters"
         @select_faction="select_faction"
         @trigger_show_list="trigger_show_list"
         @open-filters="showFilters = true"
@@ -36,6 +37,7 @@
             <card-list-component
               v-show="showingList === 'leaders'"
               :cards="leaders"
+              :hp_needed="true"
               :is_leader="true"
               :deckbuilder="true"
               @chose_player_card="chose_leader"
@@ -232,7 +234,11 @@ export default {
         this.toast.warning("нельзя выбрать закрытого лидера")
         return
       }
+      if (this.deck.leader) {
+        this.deck.health -= this.deck.leader.hp
+      }
       this.deck.leader = leader.card
+      this.deck.health += leader.card.hp
     },
 
     change_name_deck(value) {

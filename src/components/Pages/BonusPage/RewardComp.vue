@@ -82,9 +82,7 @@ export default {
     async accept_reward(card) {
       // Если мы открыли сундук, то в маунтеде мы уже сделали запросы на 3 карты.
       // Если же мы ещё ткнули на карту, то приходим сюда и просто закрываем окно
-      if (this.isLoading) {
-        return
-      }
+      if (this.isLoading) return
       this.isLoading = true
       await this.$store.dispatch("processCraftBonusCard", [card.card.id])
       this.$emit("clear_reward")

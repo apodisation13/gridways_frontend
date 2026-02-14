@@ -10,12 +10,18 @@
         />
       </div>
     </div>
+    <base-button class="reset-avatar" @click="resetAvatar">
+      Сбросить аватар
+    </base-button>
   </div>
 </template>
 
 <script>
+import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
+
 export default {
   name: "SettingAvatar",
+  components: { BaseButton },
   data() {
     return {
       avatars: [{ link: "wood" }, { link: "kegs" }, { link: "chests" }],
@@ -24,6 +30,9 @@ export default {
   methods: {
     setAvatar(path) {
       this.$store.commit("set_avatar", path)
+    },
+    resetAvatar() {
+      this.$store.commit("set_avatar", "")
     },
   },
 }
@@ -37,5 +46,9 @@ export default {
 
 .wood {
   max-height: 60px;
+}
+
+.reset-avatar {
+  margin-top: 2vh;
 }
 </style>

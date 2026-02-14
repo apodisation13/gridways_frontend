@@ -20,7 +20,7 @@ export function spawn_self(enemy, gameObj) {
 }
 
 // создает в колоде врагов deathwish_value копий убитого врага без deathwish
-export function spawn_self_at_deck(enemy, gameObj) {
+export function spawn_self_at_deck(enemy, gameObj, timeout = 1000) {
   const defaultEnemy = get_default_enemy(enemy)
   if (!defaultEnemy) return
 
@@ -30,11 +30,11 @@ export function spawn_self_at_deck(enemy, gameObj) {
   for (let i = 0; i < enemy.deathwish_value; i++) {
     enemies.push(copyObj(defaultEnemy))
   }
-  timeoutAnimationFlag(enemies[0], "trigger_deck_passive")
+  timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)
 }
 
 // создает в сбросе врагов deathwish_value копий убитого врага без deathwish
-export function spawn_self_at_grave(enemy, gameObj) {
+export function spawn_self_at_grave(enemy, gameObj, timeout = 1000) {
   const defaultEnemy = get_default_enemy(enemy)
   if (!defaultEnemy) return
 
@@ -44,5 +44,10 @@ export function spawn_self_at_grave(enemy, gameObj) {
   for (let i = 0; i < enemy.deathwish_value; i++) {
     enemies_grave.push(copyObj(defaultEnemy))
   }
-  timeoutAnimationFlag(enemies_grave[0], "trigger_grave_passive")
+  timeoutAnimationFlag(
+    enemies_grave[0],
+    "trigger_grave_passive",
+    null,
+    timeout * 0.5
+  )
 }

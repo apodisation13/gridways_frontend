@@ -5,18 +5,25 @@ import {
 } from "@/logic/game_logic/timers"
 import { choice } from "@/lib/utils"
 
-export function incr_self_dmg(card, deck_or_grave = false) {
+export function incr_self_dmg(card, deck_or_grave = false, timeout = 1000) {
   timeoutAnimationValue(
     card,
     "damage",
     `${card.damage}+${card.value}`,
     card.value,
-    deck_or_grave ? null : sound_passive_increase_damage
+    deck_or_grave ? null : sound_passive_increase_damage,
+    timeout * 0.5
   )
-  timeoutAnimationFlag(card, "incr_dmg")
+  timeoutAnimationFlag(card, "incr_dmg", null, timeout * 0.5)
 }
 
-export function incr_dmg_to_random(card, gameObj, to, deck_or_grave = false) {
+export function incr_dmg_to_random(
+  card,
+  gameObj,
+  to,
+  deck_or_grave = false,
+  timeout = 1000
+) {
   const { hand, deck, grave } = gameObj
   let target
   if (to === "hand") {
@@ -38,12 +45,13 @@ export function incr_dmg_to_random(card, gameObj, to, deck_or_grave = false) {
     "damage",
     `${target.damage}+${card.value}`,
     card.value,
-    deck_or_grave ? null : sound_passive_increase_damage
+    deck_or_grave ? null : sound_passive_increase_damage,
+    timeout * 0.5
   )
-  timeoutAnimationFlag(target, "incr_dmg")
+  timeoutAnimationFlag(target, "incr_dmg", null, timeout * 0.5)
 }
 
-export function inc_dmg_by_len_grave(card, gameObj) {
+export function inc_dmg_by_len_grave(card, gameObj, timeout = 1000) {
   const { grave } = gameObj
 
   timeoutAnimationValue(
@@ -51,12 +59,13 @@ export function inc_dmg_by_len_grave(card, gameObj) {
     "damage",
     `${card.damage}+${grave.length}`,
     grave.length,
-    sound_passive_increase_damage
+    sound_passive_increase_damage,
+    timeout * 0.5
   )
-  timeoutAnimationFlag(card, "incr_dmg")
+  timeoutAnimationFlag(card, "incr_dmg", null, timeout * 0.5)
 }
 
-export function incr_dmg_by_len_deck(card, gameObj) {
+export function incr_dmg_by_len_deck(card, gameObj, timeout = 1000) {
   const { deck } = gameObj
 
   timeoutAnimationValue(
@@ -64,12 +73,13 @@ export function incr_dmg_by_len_deck(card, gameObj) {
     "damage",
     `${card.damage}+${deck.length}`,
     deck.length,
-    sound_passive_increase_damage
+    sound_passive_increase_damage,
+    timeout * 0.5
   )
-  timeoutAnimationFlag(card, "incr_dmg")
+  timeoutAnimationFlag(card, "incr_dmg", null, timeout * 0.5)
 }
 
-export function incr_dmg_by_n_enemies_grave(card, gameObj) {
+export function incr_dmg_by_n_enemies_grave(card, gameObj, timeout = 1000) {
   const { enemies_grave } = gameObj
   if (!enemies_grave.length) return
 
@@ -78,7 +88,8 @@ export function incr_dmg_by_n_enemies_grave(card, gameObj) {
     "damage",
     `${card.damage}+${enemies_grave.length}`,
     enemies_grave.length,
-    sound_passive_increase_damage
+    sound_passive_increase_damage,
+    timeout * 0.5
   )
-  timeoutAnimationFlag(card, "incr_dmg")
+  timeoutAnimationFlag(card, "incr_dmg", null, timeout * 0.5)
 }

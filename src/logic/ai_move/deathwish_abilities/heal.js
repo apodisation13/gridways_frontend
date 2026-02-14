@@ -2,7 +2,7 @@ import { get_all_enemies } from "@/logic/player_move/service/service_for_player_
 import { sound_deathwish, sound_heal } from "@/logic/play_sounds"
 import { timeoutAnimationValue } from "@/logic/game_logic/timers"
 
-export function deathwish_heal_all(enemy, gameObj) {
+export function deathwish_heal_all(enemy, gameObj, timeout = 1000) {
   const { field, enemy_leader } = gameObj
   let all_enemies = get_all_enemies(field, enemy_leader)
 
@@ -14,8 +14,8 @@ export function deathwish_heal_all(enemy, gameObj) {
       "hp",
       `${e.hp}+${enemy.deathwish_value}`,
       enemy.deathwish_value,
-      undefined,
-      750
+      null,
+      timeout * 0.5
     )
   })
 }
