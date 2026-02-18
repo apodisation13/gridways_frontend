@@ -1,0 +1,8 @@
+<svg viewBox="0 0 24 24" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="6" cy="6" r="4" fill="#EF4444" opacity="0.9"/> <!-- красный -->
+    <circle cx="18" cy="6" r="4" fill="#3B82F6" opacity="0.9"/> <!-- синий -->
+    <circle cx="6" cy="18" r="4" fill="#10B981" opacity="0.9"/> <!-- зеленый -->
+    <circle cx="18" cy="18" r="4" fill="#F59E0B" opacity="0.9"/> <!-- оранжевый -->
+    <circle cx="12" cy="12" r="4" fill="#8B5CF6" opacity="0.9"/> <!-- фиолетовый -->
+    <circle cx="12" cy="12" r="2" fill="white" opacity="0.5"/>
+</svg>

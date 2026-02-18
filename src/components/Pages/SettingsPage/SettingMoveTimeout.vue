@@ -17,15 +17,18 @@
     </div>
 
     <!-- Кнопка генерации -->
-    <button class="generate-btn" @click="setMoveTimeout" :disabled="!isValid">
+    <base-button @click="setMoveTimeout" :disabled="!isValid">
       Сохранить
-    </button>
+    </base-button>
   </div>
 </template>
 
 <script>
+import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
+
 export default {
   name: "SettingAnimation",
+  components: { BaseButton },
   created() {
     this.moveTimeOutValue = this.moveTimeOut
   },
@@ -108,32 +111,5 @@ export default {
 .error {
   color: #e74c3c;
   font-size: 12px;
-}
-
-.generate-btn {
-  padding: 12px 32px;
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-  background-color: #4a90d9;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition:
-    background-color 0.2s,
-    transform 0.1s;
-}
-
-.generate-btn:hover:not(:disabled) {
-  background-color: #357abd;
-}
-
-.generate-btn:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.generate-btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
 }
 </style>
