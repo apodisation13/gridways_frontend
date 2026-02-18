@@ -1,53 +1,43 @@
 <template>
-  <div class="settings">
-    <h1 class="global_text text">Настройки</h1>
+  <div class="settings-page">
+    <!-- Верхняя панель с иконками -->
     <div
-      @click="goBack"
-      class="back_icon"
-      v-if="selectedSetting !== null"
-    ></div>
-
-    <!--Верхний уровень настроек-->
-    <div v-if="selectedSetting === null">
-      <settings-list :settings="settings" @select-setting="selectSetting" />
-    </div>
-
-    <!--Уровень настроек "общие настройки"-->
-    <div v-if="selectedSetting === 0">
-      <settings-list
-        :settings="mainSettings"
-        @select-setting="selectMainSetting"
+      class="icons-panel"
+      ref="scrollContainer"
+      @wheel="handleWheel"
+      @touchstart="handleTouchStart"
+      @touchmove="handleTouchMove"
+    >
+      <button
+        v-for="item in menuItems"
+        :key="item.id"
+        class="icon-button"
+        :class="{ active: activeTab === item.id }"
+        @click="activeTab = item.id"
       >
-        <setting-sound v-if="selectedMainSetting === 0" />
-        <setting-animation v-if="selectedMainSetting === 1" />
-        <setting-move-timeout v-if="selectedMainSetting === 2" />
-        <!--Сюда так же добавим ещё настройки-->
-      </settings-list>
+        <img class="icon" :src="item.icon" alt="" />
+        <span class="icon-label">{{ item.label }}</span>
+      </button>
     </div>
 
-    <!--Уровень настроек "аккаунт"-->
-    <div v-if="selectedSetting === 1">
-      <settings-list
-        :settings="accountSettings"
-        @select-setting="selectAccountSetting"
-      >
-        <!--Сюда так же добавим ещё настройки-->
-        <setting-delete-all-levels v-if="selectedAccountSetting === 2" />
-        <setting-logout v-if="selectedAccountSetting === 3" />
-      </settings-list>
+    <!-- Контейнер для зон настроек -->
+    <div class="settings-zone">
+      <!-- Звук -->
+      <setting-sound v-if="activeTab === 'sound'" />
+      <!-- Анимации -->
+      <setting-animation v-if="activeTab === 'animation'" />
+      <!-- Таймаут хода -->
+      <setting-move-timeout v-if="activeTab === 'timeout'" />
+      <!-- Язык -->
+      <div v-if="activeTab === 'language'">Пока не реализовано</div>
+      <!-- Цветовая схема -->
+      <setting-choose-theme v-if="activeTab === 'colorscheme'" />
+      <!-- Аватарка -->
+      <setting-avatar v-if="activeTab === 'avatar'" />
+      <!-- Выход из аккаунта -->
+      <setting-logout v-if="activeTab === 'logout'" />
     </div>
 
-    <!--Уровень настроек "персонализация"-->
-    <div v-if="selectedSetting === 2">
-      <settings-list
-        :settings="personalSettings"
-        @select-setting="selectPersonalSetting"
-      >
-        <setting-choose-theme v-if="selectedPersonalSetting === 0" />
-        <setting-avatar v-if="selectedPersonalSetting === 1" />
-        <!--Сюда так же добавим ещё настройки-->
-      </settings-list>
-    </div>
     <button class="base-button" @click="updateSettings" :disabled="isLoading">
       <span class="global_text base-button-text">Запомнить мои настройки!</span>
     </button>
@@ -55,62 +45,87 @@
 </template>
 
 <script>
-import SettingLogout from "@/components/Pages/SettingsPage/SettingLogout"
-import SettingDeleteAllLevels from "@/components/Pages/SettingsPage/SettingDeleteAllLevels"
-import SettingSound from "@/components/Pages/SettingsPage/SettingSound"
-import SettingChooseTheme from "@/components/Pages/SettingsPage/SettingChooseTheme.vue"
-import SettingsList from "@/components/Pages/SettingsPage/SettingsList.vue"
-import SettingAvatar from "@/components/Pages/SettingsPage/SettingAvatar.vue"
+import SettingSound from "@/components/Pages/SettingsPage/SettingSound.vue"
 import SettingAnimation from "@/components/Pages/SettingsPage/SettingAnimation.vue"
+import SettingLogout from "@/components/Pages/SettingsPage/SettingLogout.vue"
+import SettingChooseTheme from "@/components/Pages/SettingsPage/SettingChooseTheme.vue"
+import SettingAvatar from "@/components/Pages/SettingsPage/SettingAvatar.vue"
 import SettingMoveTimeout from "@/components/Pages/SettingsPage/SettingMoveTimeout.vue"
 export default {
+  name: "SettingsPage",
   components: {
-    SettingAnimation,
     SettingAvatar,
-    SettingsList,
     SettingChooseTheme,
-    SettingSound,
-    SettingDeleteAllLevels,
     SettingLogout,
+    SettingAnimation,
+    SettingSound,
     SettingMoveTimeout,
   },
   data() {
     return {
-      settings: ["Общие настройки", "Аккаунт", "Персонализация"],
-      mainSettings: [
-        "Звук",
-        "Анимации наведения",
-        "Время хода",
-        "Язык",
-        "Яркость",
-      ],
-      accountSettings: ["Данные", "Пароль", "Сброс уровней", "Выйти"],
-      personalSettings: ["Цветовая тема", "Аватар", "Стиль карт"],
-      selectedSetting: null,
-      selectedMainSetting: null,
-      selectedAccountSetting: null,
-      selectedPersonalSetting: null,
+      activeTab: "sound",
+      touchStartX: 0,
+      scrollLeft: 0,
       isLoading: false,
+      menuItems: [
+        {
+          id: "sound",
+          label: "Звук",
+          icon: require("@/assets/icons/settings/setting_sound.svg"),
+        },
+        {
+          id: "animation",
+          label: "Анимации",
+          icon: require("@/assets/icons/settings/setting_animation.svg"),
+        },
+        {
+          id: "timeout",
+          label: "Таймаут",
+          icon: require("@/assets/icons/settings/setting_timeout.svg"),
+        },
+        {
+          id: "language",
+          label: "Язык",
+          icon: require("@/assets/icons/settings/setting_language.svg"),
+        },
+        {
+          id: "colorscheme",
+          label: "Цвета",
+          icon: require("@/assets/icons/settings/setting_color_scheme.svg"),
+        },
+        {
+          id: "avatar",
+          label: "Аватарка",
+          icon: require("@/assets/icons/settings/setting_avatar.svg"),
+        },
+        {
+          id: "logout",
+          label: "Выйти",
+          icon: require("@/assets/icons/settings/setting_logout.svg"),
+        },
+      ],
     }
   },
   methods: {
-    selectSetting(index) {
-      this.selectedSetting = index
+    handleWheel(e) {
+      if (this.$refs.scrollContainer) {
+        e.preventDefault()
+        this.$refs.scrollContainer.scrollLeft += e.deltaY
+      }
     },
-    selectMainSetting(index) {
-      this.selectedMainSetting = index
+    handleTouchStart(e) {
+      this.touchStartX = e.touches[0].pageX
+      this.scrollLeft = this.$refs.scrollContainer.scrollLeft
     },
-    selectAccountSetting(index) {
-      this.selectedAccountSetting = index
+    handleTouchMove(e) {
+      if (!this.touchStartX) return
+      e.preventDefault()
+      const touchX = e.touches[0].pageX
+      const delta = this.touchStartX - touchX
+      this.$refs.scrollContainer.scrollLeft = this.scrollLeft + delta
     },
-    selectPersonalSetting(index) {
-      this.selectedPersonalSetting = index
-    },
-    goBack() {
-      this.selectedSetting = null
-      this.selectedMainSetting = null
-      this.selectedPersonalSetting = null
-      this.selectedAccountSetting = null
+    handleTouchEnd() {
+      this.touchStartX = 0
     },
     async updateSettings() {
       if (this.isLoading) return
@@ -119,37 +134,185 @@ export default {
       this.isLoading = false
     },
   },
+  mounted() {
+    const container = this.$refs.scrollContainer
+    if (container) {
+      container.addEventListener("touchend", this.handleTouchEnd)
+    }
+  },
+  beforeUnmount() {
+    const container = this.$refs.scrollContainer
+    if (container) {
+      container.removeEventListener("touchend", this.handleTouchEnd)
+    }
+  },
 }
 </script>
 
 <style scoped>
-.settings {
-  padding: 15px;
-}
-
-.back_icon {
-  position: absolute;
-  left: 22px;
-  top: 115px;
-  width: 35px;
-  height: 35px;
-  background-image: url("~@/assets/icons/buttons/back_icon.svg");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
+.settings-page {
+  max-width: 600px;
+  margin: 0 auto;
+  background: transparent;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  height: 90vh;
+  max-height: 800px;
 }
 
-.text {
-  margin-bottom: 50px;
-  margin-top: 8px;
-  font-size: 29px;
-  letter-spacing: -0.02em;
-  background: var(--primary-gold-gradient);
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.icons-panel {
+  display: flex;
+  padding: 5px 4px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.5) rgba(0, 0, 0, 0.1);
+  -webkit-overflow-scrolling: touch;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+  background: linear-gradient(
+    180deg,
+    #465361 0%,
+    rgba(37, 44, 50, 0.35) 50.52%,
+    #1d252d 99.48%
+  );
+  border: none;
+  border-bottom: 3px solid;
+  border-image-source: var(--secondary-gold-gradient);
+  border-image-slice: 1;
+}
+
+.icons-panel:active {
+  cursor: grabbing;
+}
+
+.icons-panel::-webkit-scrollbar {
+  height: 5px;
+}
+
+.icons-panel::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.icons-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+}
+
+.icons-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.icon-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  padding: 5px 3px;
+  background: transparent;
+  border: none;
+  border-radius: 24px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.icon-button .icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+}
+
+.icon-button .icon svg {
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+}
+
+.icon-button .icon-label {
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: white;
+  font-weight: 500;
+}
+
+.icon-button:hover .icon {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.icon-button.active .icon {
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.icon-button.active .icon-label {
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.settings-zone {
+  margin-top: 2vh;
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px;
+  background: transparent;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.5) rgba(0, 0, 0, 0.1);
+}
+
+.settings-zone::-webkit-scrollbar {
+  width: 5px;
+}
+
+.settings-zone::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.settings-zone::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+}
+
+@media (max-width: 480px) {
+  .icons-panel {
+    padding: 16px 12px;
+    gap: 4px;
+  }
+
+  .icon-button {
+    min-width: 60px;
+  }
+
+  .icon-button .icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .icon-button .icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .settings-zone {
+    padding: 18px 14px;
+  }
 }
 
 .base-button {
@@ -160,7 +323,7 @@ export default {
   bottom: 15vh;
   left: 50%;
   transform: translateX(-50%);
-  width: 26%;
+  width: 40%;
   padding: 13px;
   cursor: pointer;
   outline: none;

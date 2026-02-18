@@ -249,9 +249,10 @@ export default {
 .card-item {
   background-repeat: no-repeat;
   background-position: center;
-  background-size: cover;
+  /*background-size: cover;*/
   border-radius: 2px;
   overflow: hidden;
+  background-size: 100% 100%;
 }
 
 .disable::after {

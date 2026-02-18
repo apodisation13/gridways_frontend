@@ -1,6 +1,8 @@
 <template>
-  <button class="base-btn">
-    <slot></slot>
+  <button class="base-b">
+    <span class="base-b-text">
+      <slot></slot>
+    </span>
   </button>
 </template>
 
@@ -9,25 +11,22 @@ export default {}
 </script>
 
 <style scoped>
-.base-btn {
+.base-b {
+  background: linear-gradient(#1d252d, #000000, #282d33);
+  border: 2px solid #facf5d;
+  border-radius: 6px;
   display: block;
   width: 100%;
-  border: none;
   padding: 13px;
   text-align: center;
-  background: #eef1f4;
-  border-radius: 6px;
-  color: #667080;
-  font-weight: 700;
-  font-size: 1rem;
+  cursor: pointer;
+  outline: none;
 }
 
-.base-btn:hover {
-  color: #eef1f4;
-  background: #667080;
-}
-.base-btn:focus {
-  color: #eef1f4;
-  background: #667080;
+.base-b-text {
+  font-size: 16px;
+  background: var(--primary-gold-gradient);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 </style>

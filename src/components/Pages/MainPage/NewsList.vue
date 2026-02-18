@@ -1,49 +1,59 @@
 <template>
-  <div class="news" v-if="news">
-    <button class="news__prev" @click="prev">
-      <img :src="require('@/assets/icons/' + 'arrow.svg')" />
-    </button>
-    <button class="news__next" @click="next">
-      <img :src="require('@/assets/icons/' + 'arrow.svg')" />
-    </button>
-    <div class="news__content">
-      <carousel
-        ref="carousel"
-        :items-to-show="1.4"
-        :wrap-around="true"
-        :touchDrag="true"
-        :mouseDrag="true"
-        v-if="news"
-      >
-        <slide v-for="element in news" :key="element.id">
-          <div class="news__item">
-            <div class="news__title">
-              <p class="news__title-text">{{ element.title }}</p>
-            </div>
-            <div class="news__text">
-              {{ element.text }}
-            </div>
-            <div class="rombica">
-              <div class="rombica__wrapper">
-                <div class="rombica__date">
-                  <span class="rombica__text">{{
-                    this.setDay(element.updated_at, "day")
-                  }}</span>
-                </div>
-                <div class="rombica__date rombica__bottom-date">
-                  <span class="rombica__text">{{
-                    this.setDay(element.updated_at, "month")
-                  }}</span>
+  <div>
+    <div class="news" v-if="news && showNews">
+      <button class="news__prev" @click="prev">
+        <img :src="require('@/assets/icons/' + 'arrow.svg')" alt="" />
+      </button>
+      <button class="news__next" @click="next">
+        <img :src="require('@/assets/icons/' + 'arrow.svg')" alt="" />
+      </button>
+      <div class="news__content">
+        <carousel
+          ref="carousel"
+          :items-to-show="1.4"
+          :wrap-around="true"
+          :touchDrag="true"
+          :mouseDrag="true"
+          v-if="news"
+        >
+          <slide v-for="element in news" :key="element.id">
+            <div class="news__item">
+              <div class="news__title" @click="hideNews">
+                <p class="news__title-text">{{ element.title }}</p>
+              </div>
+              <div
+                class="news__text"
+                @touchstart="preventCarouselDrag"
+                @touchmove="preventCarouselDrag"
+              >
+                {{ element.text }}
+              </div>
+              <div class="rombica">
+                <div class="rombica__wrapper">
+                  <div class="rombica__date">
+                    <span class="rombica__text">{{
+                      this.setDay(element.updated_at, "day")
+                    }}</span>
+                  </div>
+                  <div class="rombica__date rombica__bottom-date">
+                    <span class="rombica__text">{{
+                      this.setDay(element.updated_at, "month")
+                    }}</span>
+                  </div>
                 </div>
               </div>
+              <img
+                class="rombica__outer-border"
+                :src="require('@/assets/icons/Vector 77.svg')"
+                alt=""
+              />
             </div>
-            <img
-              class="rombica__outer-border"
-              :src="require('@/assets/icons/Vector 77.svg')"
-            />
-          </div>
-        </slide>
-      </carousel>
+          </slide>
+        </carousel>
+      </div>
+    </div>
+    <div class="show-hide-news" v-if="!showNews" @click="hideNews">
+      <img src="@/assets/icons/buttons/hide_news.svg" alt="" />
     </div>
   </div>
 </template>
@@ -74,6 +84,7 @@ export default {
   data() {
     return {
       currentSlide: 0,
+      showNews: true,
     }
   },
   methods: {
@@ -91,7 +102,12 @@ export default {
       } else if (option === "day") {
         return date.toLocaleString("en-GB", { day: "2-digit" })
       }
-      // console.log(result.getMonth())
+    },
+    preventCarouselDrag(event) {
+      event.stopPropagation()
+    },
+    hideNews() {
+      this.showNews = !this.showNews
     },
   },
   components: {
@@ -125,7 +141,7 @@ export default {
   align-items: baseline;
 }
 .news__title-text {
-  font-family: "Inter";
+  font-family: "Inter", serif;
   font-style: normal;
   font-weight: 400;
   font-size: 16px;
@@ -139,7 +155,7 @@ export default {
 .news__text {
   padding: 28px 16px;
   text-align: start;
-  font-family: "Inter";
+  font-family: "Inter", serif;
   font-style: normal;
   font-weight: 300;
   font-size: 12px;
@@ -195,7 +211,7 @@ export default {
   font-weight: 700;
   font-size: 13.0909px;
   line-height: 100%;
-  font-family: "Philosopher";
+  font-family: "Philosopher", serif;
   background: var(--third-gold-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -249,5 +265,11 @@ export default {
 .news__next {
   right: 0;
   margin-right: 30px;
+}
+.show-hide-news {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: -7vh;
 }
 </style>
