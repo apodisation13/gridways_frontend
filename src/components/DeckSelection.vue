@@ -1,33 +1,28 @@
 <template>
-  <div
-    class="deck_selection"
-    :style="{ height: deckbuilder ? '80vh' : '25vh' }"
-  >
+  <div class="deck_selection">
     <div class="global_text text">Выберите колоду</div>
 
-    <div
-      class="decks"
-      v-for="(deck, index) in decks"
-      :key="deck"
-      @dblclick="select_deck(index)"
-    >
-      <deck-preview-comp
-        :deck="deck.deck"
-        class="deck"
-        :style="{ width: deckbuilder ? '80%' : '90%' }"
-      />
-
+    <div class="decks-grid">
       <div
-        v-if="deckbuilder && deck.deck.id !== 1"
-        @click="change_deck(index)"
-        class="icon change"
-      ></div>
-
-      <div
-        v-if="deckbuilder && deck.deck.id !== 1"
-        @click="delete_deck(deck.deck)"
-        class="icon delete"
-      ></div>
+        v-for="(deck, index) in decks"
+        :key="deck.deck.id"
+        @dblclick="select_deck(index)"
+      >
+        <deck-preview-comp :deck="deck" :deckbuilder="deckbuilder">
+          <template #actions>
+            <div
+              v-if="deckbuilder && deck.deck.id !== 1"
+              @click.stop="change_deck(index)"
+              class="icon change"
+            ></div>
+            <div
+              v-if="deckbuilder && deck.deck.id !== 1"
+              @click.stop="delete_deck(deck.deck)"
+              class="icon delete"
+            ></div>
+          </template>
+        </deck-preview-comp>
+      </div>
     </div>
 
     <yesno-modal
@@ -53,16 +48,15 @@ export default {
   },
   data() {
     return {
-      is_selected: false, // хоть какая-то дека выбрана
       show_yesno: false, // показать да\нет по кнопке удалить деку
       deck_id: undefined, // id деки, которую надо удалить
     }
   },
   methods: {
-    // осуществить выбор деки для игры, дважды ЛКМ
+    // осуществить выбор деки для игры, дважды ЛКМ, только на странице игры и не на странице колод
     select_deck(i) {
-      this.is_selected = true
-      this.$store.dispatch("set_deck_in_play", this.decks[i])
+      if (!this.deckbuilder)
+        this.$store.dispatch("set_deck_in_play", this.decks[i])
     },
 
     delete_deck(deck) {
@@ -103,7 +97,7 @@ export default {
 .deck_selection {
   margin: 1%;
   width: 95%;
-  height: 25vh;
+  height: 80vh;
   overflow: scroll;
 }
 
@@ -113,19 +107,15 @@ export default {
   background: var(--primary-gold-gradient);
   -webkit-text-fill-color: transparent;
   -webkit-background-clip: text;
+  background-clip: text;
 }
 
-.decks {
-  margin: 1% 1% 3%;
-  display: flex;
-  flex-direction: row;
-}
-
-.deck {
-  height: 35px;
-  width: 210px;
-  font-size: 14px;
-  border-radius: 8px;
+.decks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 15px;
+  justify-items: center;
 }
 
 .icon {

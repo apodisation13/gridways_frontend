@@ -61,6 +61,7 @@
       <button-decks @click="trigger_decks_list_modal(true)" />
       <decks-list-modal
         v-if="show_decks_list_modal"
+        :deckbuilder="true"
         @close_decks_list_modal="trigger_decks_list_modal(false)"
         @change_deck="show_deck"
       />
@@ -374,6 +375,7 @@ export default {
   flex-direction: column;
   justify-content: flex-end;
   padding-bottom: 57px;
+  height: calc(var(--vh) * 100 - 100px);
 }
 
 .deck-builder-body {

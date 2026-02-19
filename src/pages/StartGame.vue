@@ -1,38 +1,80 @@
 <template>
   <div class="start-game__page">
-    <div class="start">
-      <div class="play_price">
-        Для этой игры надо заплатить <br />
-        <b> {{ play_price * -1 }} </b>
-        <img
-          :src="require(`@/assets/icons/resources/wood.svg`)"
-          alt=""
-          class="wood"
-        />
+    <div class="content-wrapper">
+      <!-- Уровень vs Колода -->
+      <div class="battle-section">
+        <div class="battle-side">
+          <span class="global_text battle-label">Уровень</span>
+          <level-preview-comp :level="selectedLevel" />
+        </div>
+
+        <div class="battle-vs">
+          <span class="vs-icon">⚔</span>
+        </div>
+
+        <div class="battle-side">
+          <span class="global_text battle-label">Колода</span>
+          <deck-preview-comp
+            @dblclick="trigger_decks_list_modal(true)"
+            :deck="selectedDeck"
+            :deckbuilder="true"
+          />
+        </div>
       </div>
-      <button @click="start_game" :disabled="loading" class="btn_start">
-        <themed-button title="НАЧАТЬ" />
-      </button>
+
+      <!-- Цена и кнопка старта -->
+      <div class="start-section">
+        <div class="play-price">
+          <span class="global_text price-label">Стоимость игры</span>
+          <div class="price-row">
+            <b class="price-amount">{{ play_price * -1 }}</b>
+            <img
+              :src="require(`@/assets/icons/resources/wood.svg`)"
+              alt=""
+              class="wood"
+            />
+          </div>
+        </div>
+
+        <button @click="start_game" :disabled="loading" class="btn-start">
+          <themed-button title="НАЧАТЬ" />
+        </button>
+      </div>
     </div>
-    <div class="decks">
-      <div>Выбранный уровень: {{ $store.state.game.level.name }}</div>
-      <selected-deck />
-      <deck-selection />
-    </div>
+
+    <!-- Не трогаем -->
+    <button-decks @click="trigger_decks_list_modal(true)" />
+    <decks-list-modal
+      v-if="show_decks_list_modal"
+      :deckbuilder="false"
+      @close_decks_list_modal="trigger_decks_list_modal(false)"
+    />
   </div>
 </template>
 
 <script>
-import DeckSelection from "@/components/DeckSelection"
-import SelectedDeck from "@/components/Pages/LevelPage/SelectedDeck"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import { PayResourcesSubtype } from "@/store/const/const"
+import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
+import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
+import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
+import DeckPreviewComp from "@/components/DeckPreviewComp.vue"
 export default {
   name: "StartGame",
-  components: { ThemedButton, SelectedDeck, DeckSelection },
+  components: {
+    DeckPreviewComp,
+    LevelPreviewComp,
+    DecksListModal,
+    ThemedButton,
+    ButtonDecks,
+  },
+  created() {
+    this.$store.dispatch("re_set_deck", 100)
+  },
   data() {
     return {
       loading: false,
+      show_decks_list_modal: false,
     }
   },
   computed: {
@@ -44,6 +86,12 @@ export default {
       else if (diff === "normal") return price.play_level_normal
       else if (diff === "hard") return price.play_level_hard
       else return "Уровень не выбран!"
+    },
+    selectedLevel() {
+      return this.$store.state.game.whole_level
+    },
+    selectedDeck() {
+      return this.$store.state.game.whole_deck
     },
   },
   methods: {
@@ -65,46 +113,115 @@ export default {
         this.loading = false
       }
     },
+    trigger_decks_list_modal(value) {
+      this.show_decks_list_modal = value
+    },
   },
 }
 </script>
 
 <style scoped>
 .start-game__page {
-  padding: 10px;
-  height: calc((var(--vh) * 100) - 178px);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 57px;
+  height: calc(var(--vh, 1vh) * 100 - 100px);
   color: white;
+}
+
+.content-wrapper {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
 }
 
-.start {
-  width: 70%;
-  height: 30vh;
+/* --- Секция битвы --- */
+.battle-section {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  gap: 24px;
+}
+
+.battle-side {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 10px;
+  /* Учитываем overflow стопки карт (12px вправо и вниз) */
+  padding: 0 12px 12px 0;
 }
 
-.btn_start {
-  margin-top: 15px;
-  width: 80%;
-  height: 100px;
+.battle-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.play_price {
-  text-align: center;
+.battle-vs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 22px; /* компенсация label сверху */
 }
 
-.decks {
-  width: 99%;
-  bottom: 10%;
+.vs-icon {
+  font-size: 36px;
+  filter: drop-shadow(0 0 8px rgba(255, 200, 50, 0.7));
+  animation: vs-pulse 2s ease-in-out infinite;
+}
+
+@keyframes vs-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px rgba(255, 200, 50, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(255, 200, 50, 1));
+  }
+}
+
+/* --- Секция старта --- */
+.start-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.play-price {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.price-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.price-amount {
+  font-size: 28px;
+  font-weight: bold;
 }
 
 .wood {
-  max-height: 30px;
+  max-height: 28px;
+}
+
+.btn-start {
+  width: 200px;
+  height: 60px;
 }
 </style>

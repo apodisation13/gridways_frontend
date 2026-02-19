@@ -2,7 +2,10 @@
   <base-modal>
     <div class="content">
       <button-close-img @click="close_self" />
-      <deck-selection :deckbuilder="true" @emit_state_deck_index="show_deck" />
+      <deck-selection
+        :deckbuilder="deckbuilder"
+        @emit_state_deck_index="show_deck"
+      />
     </div>
   </base-modal>
 </template>
@@ -14,6 +17,12 @@ import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 export default {
   name: "decks-list-modal",
   components: { ButtonCloseImg, BaseModal, DeckSelection },
+  props: {
+    deckbuilder: {
+      type: Boolean,
+      required: true,
+    },
+  },
   methods: {
     close_self() {
       this.$emit("close_decks_list_modal")

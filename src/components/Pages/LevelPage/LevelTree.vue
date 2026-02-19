@@ -269,7 +269,7 @@ export default {
       this.toast.success(`Выбран уровень ${level.level.id}! `, {
         timeout: 1000,
       })
-      this.$store.commit("set_level", level.level)
+      this.$store.commit("set_level", level)
       this.$store.commit("set_enemy_leader", level.level.enemy_leader)
     },
     start(level) {

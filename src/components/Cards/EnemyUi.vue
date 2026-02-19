@@ -200,9 +200,9 @@ export default {
 .card-enemy {
   background-repeat: no-repeat;
   background-position: center;
-  background-size: cover;
   border-radius: 2px;
   overflow: hidden;
+  background-size: 100% 100%;
 }
 
 .card-enemy-information {
