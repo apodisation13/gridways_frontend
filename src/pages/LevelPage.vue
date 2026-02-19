@@ -37,11 +37,10 @@
           />
         </div>
         <div v-if="gameMod.name === 'random'">
-          <div>
+          <div class="levels-row">
             <div
               class="level"
-              :class="{ level_selected: level === selectedRandomLevel }"
-              :style="difficultyBorder(level)"
+              :class="{ 'level-selected': level === selectedRandomLevel }"
               v-for="(level, index) in random_levels_easy"
               :key="level"
               @dblclick="set_random_level(index, 'easy')"
@@ -49,11 +48,10 @@
               <level-preview-comp :level="level" />
             </div>
           </div>
-          <div>
+          <div class="levels-row">
             <div
               class="level"
-              :class="{ level_selected: level === selectedRandomLevel }"
-              :style="difficultyBorder(level)"
+              :class="{ 'level-selected': level === selectedRandomLevel }"
               v-for="(level, index) in random_levels_normal"
               :key="level"
               @dblclick="set_random_level(index, 'normal')"
@@ -61,11 +59,10 @@
               <level-preview-comp :level="level" />
             </div>
           </div>
-          <div>
+          <div class="levels-row">
             <div
               class="level"
-              :class="{ level_selected: level === selectedRandomLevel }"
-              :style="difficultyBorder(level)"
+              :class="{ 'level-selected': level === selectedRandomLevel }"
               v-for="(level, index) in random_levels_hard"
               :key="level"
               @dblclick="set_random_level(index, 'hard')"
@@ -118,7 +115,7 @@
 
 <script>
 import { useToast } from "vue-toastification"
-import LevelPreviewComp from "@/components/Pages/LevelPage/LevelPreviewComp"
+import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
 import {
   random_level_generator,
   random_level_generator_by_number,
@@ -340,19 +337,40 @@ div {
   height: 78vh;
   overflow: scroll;
 }
+.levels-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
 .level {
   margin: 1%;
-  width: 8vh;
-  height: 10vh;
   font-size: 6pt;
   display: inline-block;
+  position: relative;
 }
-.level_selected {
-  width: 8vh;
-  height: 10vh;
-  font-size: 6pt;
-  background-color: green;
+.level-selected :deep(.card-top) {
+  box-shadow:
+    0 0 20px gold,
+    0 0 40px rgba(255, 215, 0, 0.27);
 }
+.level-selected::after {
+  content: "✓";
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  z-index: 20;
+  width: 22px;
+  height: 22px;
+  background: gold;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: bold;
+  color: #1a1a2e;
+  line-height: 22px;
+  text-align: center;
+}
+
 .game_modes {
   position: relative;
   width: 100%;

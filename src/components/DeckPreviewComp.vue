@@ -177,8 +177,11 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-size: cover;
+  background-repeat: no-repeat;
   background-position: center;
+  border-radius: 2px;
+  overflow: hidden;
+  background-size: 100% 100%;
   z-index: 0;
 }
 

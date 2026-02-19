@@ -138,7 +138,7 @@ export default {
 <style scoped>
 .enemy-leader {
   position: relative;
-  margin-top: 15px;
+  margin-top: 21px;
   width: 100%;
   box-shadow: -4px 0 4px rgb(0 0 0 / 50%);
 }
@@ -146,6 +146,6 @@ export default {
 .enemy-leader::before {
   content: "";
   display: block;
-  padding-top: 143%;
+  padding-top: 138%;
 }
 </style>
