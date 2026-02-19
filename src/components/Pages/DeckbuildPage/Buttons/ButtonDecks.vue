@@ -24,7 +24,12 @@ export default {}
   border-left: none;
   border-right: none;
   border-bottom: none;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.13) 0%, #2b6db6 100%);
+  background: linear-gradient(
+    180deg,
+    #465361 0%,
+    rgba(37, 44, 50, 0.35) 50.52%,
+    #1d252d 99.48%
+  );
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -38,7 +43,7 @@ export default {}
 .button-text {
   font-size: 20px;
   background: var(--primary-gold-gradient);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
