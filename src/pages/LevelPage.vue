@@ -237,7 +237,7 @@ export default {
         levelsToChoseFrom = this.random_levels_hard
 
       levelsToChoseFrom[index].level.random = true // ставим флаг, что уровень рандомный, чтобы потом не открывать его детей
-      this.$store.commit("set_level", levelsToChoseFrom[index].level)
+      this.$store.commit("set_level", levelsToChoseFrom[index])
       this.$store.commit(
         "set_enemy_leader",
         levelsToChoseFrom[index].level.enemy_leader
@@ -266,7 +266,7 @@ export default {
         }
       )
       this.randomLevelByNumber.level.random = true // ставим флаг, что уровень рандомный, чтобы потом не открывать его детей
-      this.$store.commit("set_level", this.randomLevelByNumber.level)
+      this.$store.commit("set_level", this.randomLevelByNumber)
       this.$store.commit(
         "set_enemy_leader",
         this.randomLevelByNumber.level.enemy_leader
@@ -349,7 +349,7 @@ div {
   display: inline-block;
   position: relative;
 }
-.level-selected :deep(.card-top) {
+.level-selected {
   box-shadow:
     0 0 20px gold,
     0 0 40px rgba(255, 215, 0, 0.27);

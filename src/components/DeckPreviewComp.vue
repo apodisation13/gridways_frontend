@@ -183,6 +183,7 @@ export default {
   overflow: hidden;
   background-size: 100% 100%;
   z-index: 0;
+  filter: brightness(1.5) contrast(1.2);
 }
 
 .card-inner {

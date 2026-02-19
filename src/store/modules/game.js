@@ -4,12 +4,14 @@ const state = {
 
   random_level_enemies_count: {}, // разбросы количества врагов на рандомных уровнях
 
+  whole_deck: {},
   current_deck: [], // дека выбранная для игры, deck.cards
   current_deck_index: undefined, // индекс деки в списке дек
   current_deck_id: undefined, // id колоды
   health: 0, // жизни деки, из деки, deck.health
   leader: null, // текущий лидер для игры из деки, deck.leader
 
+  whole_level: {},
   level: null, // объект уровня из БД, выбирается на странице LevelPage
   season: null, // объект сезона
   enemy_leader: null, // объект лидера врагов из уровней
@@ -33,7 +35,9 @@ const mutations = {
     state.cards_in_deck = payload.number_of_cards_in_deck
     state.random_level_enemies_count = payload.random_level_enemies_count
   },
-
+  set_whole_deck(state, deck) {
+    state.whole_deck = deck
+  },
   set_current_deck(state, deck) {
     // записать деку для игры
     state.current_deck = deck
@@ -61,7 +65,8 @@ const mutations = {
   },
   set_level(state, level) {
     // установить уровень, объект
-    state.level = level
+    state.level = level.level
+    state.whole_level = level
   },
   set_enemy_leader(state, enemy_leader) {
     // установить лидера врагов
@@ -108,19 +113,20 @@ const actions = {
     commit("set_current_deck_id", deck.id)
     commit("set_health", deck.deck.health)
     commit("set_leader", deck.deck.leader)
+    commit("set_whole_deck", deck)
   },
   set_level_in_play({ commit }, level) {
-    commit("set_level", level.level)
+    commit("set_level", level)
     commit("set_enemy_leader", level.level.enemy_leader)
   },
   // после выигрыша, проигрыша или ухода со страницы игры, вызываем этот экшен и повторяем выбор деки
-  re_set_deck({ state, getters, dispatch }) {
+  re_set_deck({ state, getters, dispatch }, timeout = 3000) {
     const deck = getters["all_decks"][state.current_deck_index]
     if (!deck) return
     setTimeout(() => {
       dispatch("set_deck_in_play", deck)
       console.log("переустановка колоды!")
-    }, 3000)
+    }, timeout)
   },
 }
 

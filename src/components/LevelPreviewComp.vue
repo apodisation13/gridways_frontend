@@ -37,6 +37,7 @@
 
 <script>
 import LevelModal from "@/components/ModalWindows/LevelModal.vue"
+import { background_color_leader } from "@/logic/border_styles"
 
 export default {
   name: "level-preview-comp",
@@ -53,15 +54,9 @@ export default {
     }
   },
   computed: {
-    factionColor() {
-      const faction = this.level.level.enemy_leader?.faction
-      if (faction === "Soldiers") return "#4488ff"
-      if (faction === "Monsters") return "#cc3333"
-      if (faction === "Animals") return "#33aa55"
-      return "#888888"
-    },
     cardBorder() {
-      const color = this.factionColor
+      const bg = background_color_leader(this.level.level.enemy_leader?.faction)
+      const color = bg || "#888"
       return {
         borderColor: color,
         boxShadow: `0 0 10px ${color}44`,
@@ -145,6 +140,7 @@ export default {
   border-radius: 2px;
   overflow: hidden;
   background-size: 100% 100%;
+  filter: brightness(1.5) contrast(1.2);
 }
 
 .card-inner {
