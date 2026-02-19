@@ -6,6 +6,7 @@ const state = {
 
   current_deck: [], // дека выбранная для игры, deck.cards
   current_deck_index: undefined, // индекс деки в списке дек
+  current_deck_id: undefined, // id колоды
   health: 0, // жизни деки, из деки, deck.health
   leader: null, // текущий лидер для игры из деки, deck.leader
 
@@ -40,6 +41,10 @@ const mutations = {
   // запомнить индекс деки из общего списка колод
   set_current_deck_index(state, index) {
     state.current_deck_index = index
+  },
+  // запомнить id колоды
+  set_current_deck_id(state, id) {
+    state.current_deck_id = id
   },
   set_health(state, param) {
     // установить здоровье из deck.health
@@ -100,6 +105,7 @@ const actions = {
     }
     commit("set_current_deck", deck.deck.cards)
     commit("set_current_deck_index", index)
+    commit("set_current_deck_id", deck.id)
     commit("set_health", deck.deck.health)
     commit("set_leader", deck.deck.leader)
   },
