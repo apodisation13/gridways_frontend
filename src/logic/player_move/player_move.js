@@ -33,7 +33,7 @@ import store from "@/store"
 function damage_ai_card(card, enemy, isCard, gameObj) {
   const { field, enemy_leader, hand, deck, grave, enemies, leader } = gameObj
 
-  const ability = card.ability.name
+  const ability = card?.ability?.name
   const timeout = store.getters["selectedMoveTimeout"]
 
   if (ability === CardAbility.Heal) {

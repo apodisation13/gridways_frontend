@@ -105,10 +105,16 @@ export default {
   },
   computed: {
     cardRarityClass() {
-      if (!this.card.color) return ""
-      const color = this.card.color.toLowerCase()
-      if (["gold", "silver", "bronze"].includes(color)) {
-        return color
+      if (!this.is_leader) {
+        const color = this.card.color.toLowerCase()
+        if (["gold", "silver", "bronze"].includes(color)) {
+          return color
+        }
+        return ""
+      }
+      const faction = this.card.faction.toLowerCase()
+      if (["soldiers", "monsters", "animals"].includes(faction)) {
+        return faction
       }
       return ""
     },
@@ -229,6 +235,36 @@ export default {
   --glow-intensity: 3px;
 }
 
+/* Карта лидеров по фракциям */
+.card-outer.soldiers {
+  --border-dark: #0b3669;
+  --border-mid: #1e4f8a;
+  --border-light: #5a9cff;
+  --border-width: 1.5%;
+  --glow-color: rgba(90, 156, 255, 0.5);
+  --glow-intensity: 15px;
+}
+
+/* Красная карта */
+.card-outer.monsters {
+  --border-dark: #b22222;
+  --border-mid: #dc143c;
+  --border-light: #ff4500;
+  --border-width: 1.5%;
+  --glow-color: rgba(255, 69, 0, 0.5);
+  --glow-intensity: 15px;
+}
+
+/* Зеленая карта */
+.card-outer.animals {
+  --border-dark: #1e4d1e;
+  --border-mid: #2e7d32;
+  --border-light: #81c784;
+  --border-width: 1.5%;
+  --glow-color: rgba(76, 175, 80, 0.5);
+  --glow-intensity: 15px;
+}
+
 /* КОНТЕНТ — без изменений, полный размер! */
 .card-body {
   position: relative;
@@ -263,7 +299,7 @@ export default {
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgb(0, 0, 0, 0.7);
+  background-color: rgb(0, 0, 0, 0.8);
   z-index: 1;
 }
 
