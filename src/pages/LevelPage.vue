@@ -348,6 +348,7 @@ div {
   font-size: 6pt;
   display: inline-block;
   position: relative;
+  width: 28%;
 }
 .level-selected {
   box-shadow:
