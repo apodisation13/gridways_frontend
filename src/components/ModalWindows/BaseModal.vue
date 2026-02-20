@@ -46,10 +46,14 @@ export default {
   max-width: 340px;
   width: 100%;
   margin: 10px;
+  height: fit-content; /* или height: auto, но важно: */
+  display: flex; /* добавляем flex для растягивания дочернего элемента */
 }
 
 .modal {
   background: linear-gradient(180deg, #1e2834 0%, #0a0b0c 100%);
   border-radius: 20px;
+  width: 100%;
+  height: 100%; /* теперь будет работать */
 }
 </style>
