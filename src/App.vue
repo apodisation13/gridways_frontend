@@ -33,6 +33,10 @@ export default {
   },
 
   async created() {
+    const tg = window.Telegram.WebApp
+    tg.ready()
+    tg.expand()
+
     // вот здесь мы просто добавим setTimeOut и переход дальше через 2сек
     this.$store.dispatch("fetchNews")
     await this.$router.push("/")
