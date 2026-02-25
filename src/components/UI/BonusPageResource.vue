@@ -1,154 +1,179 @@
 <template>
-  <div>
-    <div class="element">
-      <!--Значок дерева и цены, сколько он стоит, кроме ключа у которого цены нет, так как нельзя купить-->
-      <div class="price" v-if="resource_name !== 'keys'">
-        <img
-          :src="require(`@/assets/icons/resources/wood.svg`)"
-          alt=""
-          class="wood"
-        />
-        <span class="price-value">{{ resource_price }}</span>
-      </div>
-
-      <!--Сам значок соответственного ресурса с ромбом сколько его-->
-      <div class="line">
-        <bonus-page-resource-item
-          :name="resource_name"
-          :count="resource_count"
-          @open_item="open_item"
-        />
-      </div>
-
-      <!--Кнопка + для покупки, для всех кроме ключа, который опять же нельзя купить-->
-      <div
-        class="item-add"
-        v-if="resource_name !== 'keys'"
-        @dblclick="purchase_item"
-      >
-        <div class="item-add_border"></div>
-        <span>+</span>
-      </div>
+  <div class="resource-card">
+    <!-- Иконка + ромб с количеством -->
+    <div class="resource-icon-wrap">
+      <img
+        :src="require(`@/assets/icons/resources/${resource_name}.svg`)"
+        :alt="resource_name"
+        class="resource-icon"
+      />
+      <span class="resource-count">{{ resource_count }}</span>
     </div>
 
-    <!--Модальное окно с подтверждением покупки и кнопками +- для покупки-->
-    <yesno-modal
-      v-if="modal_visible"
-      bonus
-      is_purchase
-      :item_price="resource_price"
-      :name="resource_name"
-      @confirm="add_item"
-      @cancel="cancel"
+    <!-- 4 кнопки действий сеткой 2x2 -->
+    <div class="action-grid">
+      <button
+        v-if="actions.buy"
+        @click="openModal('buy')"
+        class="action-btn btn--buy"
+        title="Купить"
+      >
+        +
+      </button>
+      <button
+        v-if="actions.sell"
+        @click="openModal('sell')"
+        class="action-btn btn--sell"
+        title="Продать"
+      >
+        ↩
+      </button>
+      <button
+        v-if="actions.craft"
+        @click="openModal('craft')"
+        class="action-btn btn--craft"
+        title="Создать"
+      >
+        ⚒
+      </button>
+      <button
+        v-if="actions.mill"
+        @click="openModal('mill')"
+        class="action-btn btn--mill"
+        title="Переработать"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Модальное окно действия -->
+    <resources-action-modal
+      v-if="active_action"
+      :resource_name="resource_name"
+      :action="active_action"
+      :options="actions[active_action]"
+      :current_resources="current_resources"
+      :step="step"
+      @confirm="handleConfirm"
+      @cancel="active_action = null"
     />
   </div>
 </template>
+
 <script>
-import BonusPageResourceItem from "@/components/UI/BonusPageResourceItem"
-import YesnoModal from "../ModalWindows/YesnoModal"
+import ResourcesActionModal from "@/components/Pages/BonusPage/ResourcesActionModal.vue"
 export default {
-  components: { BonusPageResourceItem, YesnoModal },
+  name: "bonus-page-resource",
+  components: { ResourcesActionModal },
   props: {
-    resource_name: {
-      type: String,
-    },
-    resource_count: {
-      type: Number,
-      required: true,
-    },
-    resource_price: {
-      type: [Number, Object], // По умолчанию в геттере пустой объект, вот чтобы не ругалось
-    },
+    resource_name: { type: String, required: true },
+    resource_count: { type: Number, default: 0 },
+    actions: { type: Object, default: () => ({}) },
+    step: { type: Number, default: 1 },
   },
   data() {
     return {
-      modal_visible: false,
+      active_action: null,
     }
   },
-  methods: {
-    open_item() {
-      this.$emit("open_item")
-    },
-    add_item(quantity) {
-      this.modal_visible = false
-      this.$emit("add_item", quantity)
-    },
-    purchase_item() {
-      this.modal_visible = true
-    },
-    cancel() {
-      this.modal_visible = false
+  computed: {
+    current_resources() {
+      return this.$store.getters["resource"]
     },
   },
-  emits: ["open_item", "add_item"],
+  methods: {
+    openModal(action) {
+      this.active_action = action
+    },
+    handleConfirm(payload) {
+      const action = this.active_action
+      this.active_action = null
+      this.$emit("action", {
+        resource_name: this.resource_name,
+        action,
+        ...payload,
+      })
+    },
+  },
+  emits: ["action"],
 }
 </script>
-<style>
-.price {
+
+<style scoped>
+.resource-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(255, 215, 0, 0.04);
+  border: 1px solid rgba(139, 105, 20, 0.35);
+  border-radius: 10px;
+}
+
+.resource-icon-wrap {
   display: flex;
   flex-direction: column;
-  align-items: center;
-}
-
-.price-value {
-  font-size: 1.5rem;
-  background: var(--primary-gold-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.wood {
-  width: 50px;
-}
-
-.item-add {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: hsl(43, 100%, 93%);
-  display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.item-add:active {
-  top: 1px;
-  left: 1px;
+.resource-icon {
+  width: 60px;
+  height: 60px;
 }
 
-.item-add_border {
-  position: absolute;
-  top: -4px;
-  left: -4px;
-  bottom: -4px;
-  right: -4px;
-  border-radius: 50%;
-  background: var(--four-gold-gradient);
-  z-index: -2;
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
 }
 
-.item-add span {
-  font-family: "Philosopher", serif;
-  font-size: 3rem;
-  background: var(--four-gold-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.element {
-  /*border: solid 2px red;*/
-  margin-top: 20px;
-
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
   display: flex;
-  justify-content: space-around;
   align-items: center;
+  justify-content: center;
+  font-family: "Philosopher", serif;
+  transition:
+    opacity 0.15s,
+    transform 0.1s;
 }
 
-.line {
-  display: inline-block;
-  margin-right: 30px;
+.action-btn:active {
+  transform: translate(1px, 1px);
+  opacity: 0.8;
+}
+
+.resource-count {
+  font-family: "Philosopher", serif;
+  font-size: 1.1rem;
+  color: #ffd700;
+  text-align: center;
+  margin-top: 2px;
+}
+
+.btn--buy {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: white;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+.btn--sell {
+  background: linear-gradient(135deg, #2196f3, #1565c0);
+  color: white;
+}
+.btn--craft {
+  background: linear-gradient(135deg, #ff9800, #e65100);
+  color: white;
+}
+.btn--mill {
+  background: linear-gradient(135deg, #f44336, #b71c1c);
+  color: white;
+  font-size: 0.85rem;
 }
 </style>

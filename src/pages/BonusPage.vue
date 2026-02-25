@@ -2,48 +2,20 @@
   <div>
     <div class="bonus-page" v-if="!show_reward_page">
       <div class="title">
-        <div class="title__text">
-          <h1>Страница бонусов</h1>
-        </div>
+        <h1>Страница бонусов</h1>
       </div>
-      <div class="resources">
-        <!--Строка открытия и приобретения kegs-->
+      <div class="resources-grid">
         <bonus-page-resource
-          resource_name="kegs"
-          :resource_count="resource.kegs"
-          :resource_price="kegs_price"
-          @open_item="open_keg"
-          @add_item="add_kegs"
-        />
-
-        <!--Строка открытия и приобретения big_kegs-->
-        <bonus-page-resource
-          resource_name="big_kegs"
-          :resource_count="resource.big_kegs"
-          :resource_price="big_kegs_price"
-          @open_item="open_big_keg"
-          @add_item="add_big_kegs"
-        />
-
-        <!--Строка открытия и приобретения chests-->
-        <bonus-page-resource
-          resource_name="chests"
-          :resource_count="resource.chests"
-          :resource_price="chests_price"
-          @open_item="open_chest"
-          @add_item="add_chests"
-        />
-
-        <!--Строка открытия keys-->
-        <bonus-page-resource
-          resource_name="keys"
-          :resource_count="resource.keys"
-          @open_item="open_key"
+          v-for="(config, name) in resources_config"
+          :key="name"
+          :resource_name="name"
+          :resource_count="resource[name] || 0"
+          :actions="config"
+          :step="config.step"
+          @action="handleAction"
         />
       </div>
     </div>
-
-    <!-- Страница обработки наград -->
     <reward-comp
       v-else
       :visible="show_reward_page"
@@ -57,68 +29,115 @@
 </template>
 
 <script>
-import { getRandomReward } from "@/logic/random_rewards"
-import { choice } from "@/lib/utils"
 import BonusPageResource from "@/components/UI/BonusPageResource"
 import RewardComp from "@/components/Pages/BonusPage/RewardComp.vue"
 import { PayResourcesSubtype } from "@/store/const/const"
+
 export default {
   components: { BonusPageResource, RewardComp },
-  created() {
-    this.init()
-  },
-  watch: {
-    cards() {
-      this.init()
-    },
-  },
-  computed: {
-    cards() {
-      return this.$store.getters["all_cards"]
-    },
-    resource() {
-      return this.$store.getters["resource"]
-    },
-    kegs_price() {
-      return this.$store.getters["get_kegs_price"]
-    },
-    big_kegs_price() {
-      return this.$store.getters["get_big_kegs_price"]
-    },
-    chests_price() {
-      return this.$store.getters["get_chests_price"]
-    },
-  },
   data() {
     return {
-      pool: [], // список всех карт, из которых мы будем брать рандомные для награды
-      random_cards: [], // список рандомных карт для награды
-      keg_len: 3, // в бочке по дефолту 3 карты, а в большой бочке 5 карт
-      random_reward_choice: null, // выбор рандомной награды из ключа
-      reward_name: "",
       show_reward_page: false,
+      reward_name: "",
+      random_cards: [],
+      random_reward_choice: null,
       subtype: PayResourcesSubtype.bonusReward,
     }
   },
+  computed: {
+    resource() {
+      return this.$store.getters["resource"]
+    },
+    resources_config() {
+      // Подставь свой геттер из стора
+      // Структура: { wood: { buy: { money: 1000, scraps: 10000 }, sell: {...}, ... }, ... }
+      // return this.$store.getters['resources_config']
+      return {
+        scraps: {
+          buy: [{ money: 10000 }],
+          sell: [{ money: 1000 }],
+          step: 100,
+        },
+        bronze_ingots: {
+          buy: [{ money: 10000 }],
+          sell: [{ money: 1000 }],
+          craft: [{ raw_bronze: 50, money: 1000 }],
+          mill: [{ raw_bronze: 25, money: -1000 }],
+          step: 1,
+        },
+        silver_ingots: {
+          buy: [{ money: 10000 }],
+          sell: [{ money: 1000 }],
+          craft: [{ raw_silver: 50, money: 1000 }],
+          mill: [{ raw_silver: 25, money: -1000 }],
+          step: 1,
+        },
+        gold_ingots: {
+          buy: [{ money: 10000 }],
+          sell: [{ money: 1000 }],
+          craft: [{ raw_gold: 50, money: 1000 }],
+          mill: [{ raw_gold: 1, money: -1000 }],
+          step: 1,
+        },
+        crops: {
+          buy: [{ money: 10000 }],
+          sell: [{ money: 1000 }],
+          step: 100,
+        },
+        wood: {
+          buy: [{ money: 10000 }],
+          sell: [{ money: 1000 }],
+          step: 100,
+        },
+        kegs: {
+          buy: [{ money: 10000 }],
+          sell: [{ money: 1000 }],
+          craft: [
+            { wood: 100, crops: 100, money: 1000 },
+            { bronze_ingots: 10, crops: 100, money: 1000 },
+            { raw_bronze: 60, crops: 100, money: 1000 },
+          ],
+          mill: [{ big_kegs: 1, money: -1000 }],
+          step: 1,
+        },
+        big_kegs: {
+          buy: [{ money: 20000 }],
+          sell: [{ money: 2000 }],
+          craft: [
+            { wood: 200, crops: 200, money: 2000 },
+            { silver_ingots: 10, crops: 200, money: 2000 },
+            { raw_silver: 160, crops: 200, money: 2000 },
+          ],
+          step: 1,
+          // mill: [{ big_kegs: 1 }],
+        },
+      }
+    },
+  },
   methods: {
-    init() {
-      this.pool = []
-      this.cards.forEach(card => {
-        if (card.card.color === "Bronze") {
-          for (let i = 0; i < 20; i++) {
-            this.pool.push(card)
-          }
-        } else if (card.card.color === "Silver") {
-          this.pool.push(card)
-          this.pool.push(card)
-        } else if (card.card.color === "Gold") {
-          this.pool.push(card)
-        }
+    async pay_resource(data) {
+      await this.$store.dispatch("processResources", {
+        subtype: this.subtype,
+        data,
       })
     },
 
-    is_enough_wood(value) {
-      return this.resource.wood > value
+    async handleAction({ resource_name, action, recipe, quantity, step }) {
+      const actual = quantity * step // сколько реально получаем/тратим единиц ресурса
+      let payload = {}
+      if (action === "buy" || action === "craft") {
+        for (const [res, amount] of Object.entries(recipe)) {
+          payload[res] = -(amount * quantity) // цена уже за 1 шаг
+        }
+        payload[resource_name] = actual
+      } else {
+        payload[resource_name] = -actual
+        for (const [res, amount] of Object.entries(recipe)) {
+          payload[res] = amount * quantity
+        }
+      }
+      console.log(139, resource_name, action, quantity, recipe)
+      // await this.pay_resource(payload)
     },
 
     clear_reward() {
@@ -127,107 +146,19 @@ export default {
       this.show_reward_page = false
     },
 
-    async pay_resource(data) {
-      await this.$store.dispatch("processResources", {
-        subtype: this.subtype,
-        data: data,
-      })
-    },
-
-    async add_kegs(quantity) {
-      const final_price = quantity * this.kegs_price
-      if (!this.is_enough_wood(final_price)) return
-      await this.pay_resource({
-        wood: -final_price,
-        kegs: quantity,
-      })
-    },
-
-    async open_keg() {
-      if (this.resource.kegs <= 0) return
-      this.keg_len = 3
-      this.random_cards = []
-      this.reward_name = "kegs"
-      this.show_reward_page = true
-      for (let i = 0; i < this.keg_len; i++) {
-        this.random_cards.push(this.pool[choice(this.pool)])
-      }
-      await this.pay_resource({ kegs: -1 })
-    },
-
-    async add_big_kegs(quantity) {
-      const final_price = quantity * this.big_kegs_price
-      if (!this.is_enough_wood(final_price)) return
-      await this.pay_resource({
-        wood: -final_price,
-        big_kegs: quantity,
-      })
-    },
-
-    async open_big_keg() {
-      if (this.resource.big_kegs <= 0) return
-      this.keg_len = 5
-      this.random_cards = []
-      this.reward_name = "big_kegs"
-      this.show_reward_page = true
-      for (let i = 0; i < this.keg_len; i++) {
-        this.random_cards.push(this.pool[choice(this.pool)])
-      }
-      await this.pay_resource({ big_kegs: -1 })
-    },
-
-    async add_chests(quantity) {
-      const final_price = quantity * this.chests_price
-      if (!this.is_enough_wood(final_price)) return
-      await this.pay_resource({
-        wood: -final_price,
-        chests: quantity,
-      })
-    },
-    async open_chest() {
-      if (this.resource.chests <= 0) return
-      this.keg_len = 3
-      this.random_cards = []
-      this.reward_name = "chests"
-      this.show_reward_page = true
-      for (let i = 0; i < this.keg_len; i++) {
-        this.random_cards.push(this.pool[choice(this.pool)])
-      }
-      await this.pay_resource({ chests: -1 })
-    },
-
-    async open_key() {
-      if (this.resource.keys <= 0) return
-      await this.pay_resource({ keys: -1 })
-      const key_reward = []
-      for (let i = 0; i < 3; i++) {
-        key_reward.push(getRandomReward())
-      }
-      this.reward_name = "keys"
-      this.random_reward_choice = key_reward
-      this.show_reward_page = true
-    },
-
-    // функция принятия награды с ключа
     async accept_random_reward(res) {
       const { resource, value } = res
-      let reward = {}
-      reward[resource] = value
-      await this.pay_resource(reward)
+      await this.pay_resource({ [resource]: value })
       this.clear_reward()
     },
   },
-  emits: ["add_item"],
 }
 </script>
 
 <style scoped>
 .bonus-page {
   width: 98%;
-  height: 80vh;
-  /* border: solid 1px blueviolet; */
   margin: 1%;
-  /*background-image: url('~@/assets/brick.jpg');*/
 }
 
 div {
@@ -239,20 +170,20 @@ div {
 .title {
   text-align: center;
   margin-top: 10px;
+  margin-bottom: 16px;
 }
 
-.title__text h1 {
+.title h1 {
   font-family: "Philosopher", serif;
   font-size: 2rem;
   line-height: 2rem;
   color: hsl(39, 82%, 62%);
 }
 
-.resources {
-  min-height: 90%;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: space-around;
+.resources-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 8px;
 }
 </style>
