@@ -1,0 +1,54 @@
+<svg width="29" height="31" viewBox="0 0 29 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g filter="url(#filter0_coins)">
+        <!-- Стопка медных монет (сзади слева) -->
+        <ellipse cx="8" cy="22" rx="5" ry="2" fill="#5D3A1A"/>
+        <ellipse cx="8" cy="20.5" rx="5" ry="2" fill="#8B5A2B"/>
+        <ellipse cx="8" cy="19" rx="5" ry="2" fill="#A0693C"/>
+        <ellipse cx="8" cy="17.5" rx="5" ry="2" fill="#B87333"/>
+        <ellipse cx="8" cy="17" rx="2.5" ry="0.8" fill="#D4A574" fill-opacity="0.5"/>
+
+        <!-- Стопка серебряных (сзади справа) -->
+        <ellipse cx="21" cy="21" rx="5" ry="2" fill="#4A4A4A"/>
+        <ellipse cx="21" cy="19.5" rx="5" ry="2" fill="#808080"/>
+        <ellipse cx="21" cy="18" rx="5" ry="2" fill="#A8A8A8"/>
+        <ellipse cx="21" cy="16.5" rx="5" ry="2" fill="#C0C0C0"/>
+        <ellipse cx="21" cy="15" rx="5" ry="2" fill="#D8D8D8"/>
+        <ellipse cx="21" cy="14.5" rx="2.5" ry="0.8" fill="#FFFFFF" fill-opacity="0.6"/>
+
+        <!-- Большая стопка золотых (спереди по центру) -->
+        <ellipse cx="14" cy="24" rx="6" ry="2.5" fill="#8B6914"/>
+        <ellipse cx="14" cy="22" rx="6" ry="2.5" fill="#CDA000"/>
+        <ellipse cx="14" cy="20" rx="6" ry="2.5" fill="#E5B328"/>
+        <ellipse cx="14" cy="18" rx="6" ry="2.5" fill="#F4C430"/>
+        <ellipse cx="14" cy="16" rx="6" ry="2.5" fill="#FFD700"/>
+        <ellipse cx="14" cy="14" rx="6" ry="2.5" fill="#FFE135"/>
+        <ellipse cx="14" cy="12" rx="6" ry="2.5" fill="#FFEC8B"/>
+        <!-- Символ $ -->
+        <text x="14" y="13.5" font-family="Arial" font-size="4" font-weight="bold" fill="#CDA000" text-anchor="middle">$</text>
+        <!-- Блик -->
+        <ellipse cx="14" cy="11.5" rx="3" ry="1" fill="#FFFFFF" fill-opacity="0.5"/>
+
+        <!-- Рассыпанные монеты -->
+        <ellipse cx="5" cy="12" rx="3.5" ry="1.5" fill="#FFD700" transform="rotate(-25 5 12)"/>
+        <ellipse cx="5" cy="11.8" rx="1.5" ry="0.6" fill="#FFFFA0" fill-opacity="0.5" transform="rotate(-25 5 12)"/>
+
+        <ellipse cx="24" cy="9" rx="3" ry="1.3" fill="#B87333" transform="rotate(20 24 9)"/>
+
+        <ellipse cx="10" cy="7" rx="3.5" ry="1.5" fill="#C0C0C0" transform="rotate(-10 10 7)"/>
+        <ellipse cx="10" cy="6.8" rx="1.5" ry="0.6" fill="#FFFFFF" fill-opacity="0.5" transform="rotate(-10 10 7)"/>
+
+        <ellipse cx="19" cy="5" rx="3" ry="1.3" fill="#FFE135" transform="rotate(15 19 5)"/>
+    </g>
+    <defs>
+        <filter id="filter0_coins" x="0" y="0" width="29" height="31" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feOffset dx="1" dy="2"/>
+            <feGaussianBlur stdDeviation="2"/>
+            <feComposite in2="hardAlpha" operator="out"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+        </filter>
+    </defs>
+</svg>

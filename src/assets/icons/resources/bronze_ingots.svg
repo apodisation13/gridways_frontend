@@ -1,0 +1,27 @@
+<svg width="29" height="31" viewBox="0 0 29 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g filter="url(#filter0_bronze)">
+        <!-- Нижний слиток -->
+        <path d="M4 20L8 23L24 23L21 20H4Z" fill="#5D4022"/>
+        <path d="M4 14V20L8 23V17L4 14Z" fill="#8B5E34"/>
+        <path d="M8 17V23H24V17H8Z" fill="#9E6B3A"/>
+        <path d="M4 14L8 17H24L21 14H4Z" fill="#B07840"/>
+
+        <!-- Верхний слиток -->
+        <path d="M6 12L10 15L22 15L19 12H6Z" fill="#4D3318"/>
+        <path d="M6 7V12L10 15V10L6 7Z" fill="#7A5028"/>
+        <path d="M10 10V15H22V10H10Z" fill="#8C5C30"/>
+        <path d="M6 7L10 10H22L19 7H6Z" fill="#A06835"/>
+    </g>
+    <defs>
+        <filter id="filter0_bronze" x="0" y="3" width="28" height="24" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feOffset dx="1" dy="2"/>
+            <feGaussianBlur stdDeviation="2"/>
+            <feComposite in2="hardAlpha" operator="out"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+        </filter>
+    </defs>
+</svg>

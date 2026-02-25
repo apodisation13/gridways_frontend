@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50.71 61">
+    <defs>
+        <linearGradient id="crystal1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#9B30FF"/>
+            <stop offset="30%" stop-color="#DA70D6"/>
+            <stop offset="60%" stop-color="#8A2BE2"/>
+            <stop offset="100%" stop-color="#4B0082"/>
+        </linearGradient>
+        <linearGradient id="crystal2" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#E066FF"/>
+            <stop offset="100%" stop-color="#551A8B"/>
+        </linearGradient>
+        <linearGradient id="crystalGlow" x1="50%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stop-color="#FF00FF" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#8B008B" stop-opacity="0"/>
+        </linearGradient>
+        <filter id="glow">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    <g id="magic_crystal">
+        <!-- Свечение под камнем -->
+        <ellipse cx="25" cy="52" rx="15" ry="5" fill="url(#crystalGlow)" filter="url(#glow)"/>
+
+        <!-- Основание/постамент -->
+        <path d="M15,50 L20,55 L30,55 L35,50 L30,48 L20,48 Z" fill="#3D3D3D" stroke="#2D2D2D" stroke-width="0.5"/>
+
+        <!-- Главный кристалл -->
+        <path d="M25,12 L18,30 L20,48 L30,48 L32,30 Z" fill="url(#crystal1)" stroke="#4B0082" stroke-width="0.5"/>
+
+        <!-- Грани кристалла -->
+        <path d="M25,12 L32,30 L25,35 Z" fill="url(#crystal2)" opacity="0.8"/>
+        <path d="M25,12 L18,30 L25,35 Z" fill="#9932CC" opacity="0.6"/>
+        <path d="M25,35 L32,30 L30,48 Z" fill="#7B68EE" opacity="0.7"/>
+        <path d="M25,35 L18,30 L20,48 Z" fill="#6A5ACD" opacity="0.5"/>
+
+        <!-- Малые кристаллы -->
+        <path d="M12,35 L8,42 L10,50 L15,50 L17,42 Z" fill="url(#crystal1)" stroke="#4B0082" stroke-width="0.3" opacity="0.9"/>
+        <path d="M38,32 L35,40 L37,50 L42,50 L44,40 Z" fill="url(#crystal2)" stroke="#4B0082" stroke-width="0.3" opacity="0.9"/>
+
+        <!-- Внутренние блики -->
+        <path d="M23,18 L21,28 L25,32 L27,25 Z" fill="#FFFFFF" opacity="0.3"/>
+        <path d="M26,15 L28,22 L26,25 Z" fill="#FFFFFF" opacity="0.4"/>
+
+        <!-- Магические частицы -->
+        <circle cx="20" cy="20" r="1" fill="#FF69B4" opacity="0.8" filter="url(#glow)"/>
+        <circle cx="32" cy="25" r="0.8" fill="#FF69B4" opacity="0.7" filter="url(#glow)"/>
+        <circle cx="15" cy="38" r="0.6" fill="#DA70D6" opacity="0.8" filter="url(#glow)"/>
+        <circle cx="38" cy="36" r="0.7" fill="#DA70D6" opacity="0.7" filter="url(#glow)"/>
+        <circle cx="25" cy="8" r="1.2" fill="#FFFFFF" opacity="0.9" filter="url(#glow)"/>
+
+        <!-- Руны на постаменте -->
+        <text x="22" y="53" font-size="4" fill="#9B30FF" opacity="0.8">ᚱ</text>
+        <text x="27" y="53" font-size="4" fill="#9B30FF" opacity="0.8">ᛗ</text>
+    </g>
+</svg>
