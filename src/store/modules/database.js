@@ -6,10 +6,10 @@ const toast = useToast()
 
 const state = {
   factions: [
-    { name: "Neutral" },
     { name: "Soldiers" },
-    { name: "Animals" },
     { name: "Monsters" },
+    { name: "Animals" },
+    { name: "Neutral" },
   ],
   leaders: [],
   cards: [],
@@ -143,6 +143,7 @@ const actions = {
 
       commit("set_game_const", game_const) // рука, карт в колоде
       commit("set_game_prices", game_const) // всякие игровые цены
+      commit("set_resources_transitions", game_const) // всякие игровые цены
 
       toast.success("Успешно загрузили всю вашу базу данных")
     } catch (err) {
