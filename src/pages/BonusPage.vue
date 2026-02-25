@@ -49,69 +49,14 @@ export default {
       return this.$store.getters["resource"]
     },
     resources_config() {
-      // Подставь свой геттер из стора
-      // Структура: { wood: { buy: { money: 1000, scraps: 10000 }, sell: {...}, ... }, ... }
-      // return this.$store.getters['resources_config']
-      return {
-        scraps: {
-          buy: [{ money: 10000 }],
-          sell: [{ money: 1000 }],
-          step: 100,
-        },
-        bronze_ingots: {
-          buy: [{ money: 10000 }],
-          sell: [{ money: 1000 }],
-          craft: [{ raw_bronze: 50, money: 1000 }],
-          mill: [{ raw_bronze: 25, money: -1000 }],
-          step: 1,
-        },
-        silver_ingots: {
-          buy: [{ money: 10000 }],
-          sell: [{ money: 1000 }],
-          craft: [{ raw_silver: 50, money: 1000 }],
-          mill: [{ raw_silver: 25, money: -1000 }],
-          step: 1,
-        },
-        gold_ingots: {
-          buy: [{ money: 10000 }],
-          sell: [{ money: 1000 }],
-          craft: [{ raw_gold: 50, money: 1000 }],
-          mill: [{ raw_gold: 1, money: -1000 }],
-          step: 1,
-        },
-        crops: {
-          buy: [{ money: 10000 }],
-          sell: [{ money: 1000 }],
-          step: 100,
-        },
-        wood: {
-          buy: [{ money: 10000 }],
-          sell: [{ money: 1000 }],
-          step: 100,
-        },
-        kegs: {
-          buy: [{ money: 10000 }],
-          sell: [{ money: 1000 }],
-          craft: [
-            { wood: 100, crops: 100, money: 1000 },
-            { bronze_ingots: 10, crops: 100, money: 1000 },
-            { raw_bronze: 60, crops: 100, money: 1000 },
-          ],
-          mill: [{ big_kegs: 1, money: -1000 }],
-          step: 1,
-        },
-        big_kegs: {
-          buy: [{ money: 20000 }],
-          sell: [{ money: 2000 }],
-          craft: [
-            { wood: 200, crops: 200, money: 2000 },
-            { silver_ingots: 10, crops: 200, money: 2000 },
-            { raw_silver: 160, crops: 200, money: 2000 },
-          ],
-          step: 1,
-          // mill: [{ big_kegs: 1 }],
-        },
-      }
+      const transitions = this.$store.getters["resources_transitions"]
+
+      return Object.keys(transitions)
+        .sort((a, b) => transitions[a].index - transitions[b].index)
+        .reduce((acc, key) => {
+          acc[key] = transitions[key]
+          return acc
+        }, {})
     },
   },
   methods: {

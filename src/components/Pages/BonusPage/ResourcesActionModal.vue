@@ -46,21 +46,44 @@
           :class="{ 'option-card--active': selected === idx }"
           @click="selected = idx"
         >
-          <div v-for="(amount, res) in recipe" :key="res" class="recipe-row">
-            <img :src="getIcon(res)" class="option-icon" alt="" />
-            <span
-              class="option-total"
-              :class="{ insufficient: is_short(recipe, res) }"
+          <template v-if="action === 'mill'">
+            <div class="mill-label">Получить:</div>
+            <template v-for="(amount, res) in recipe" :key="'g-' + res">
+              <div v-if="amount > 0" class="recipe-row">
+                <img :src="getIcon(res)" class="option-icon" alt="" />
+                <span class="option-total">{{ amount * quantity }}</span>
+              </div>
+            </template>
+
+            <div class="mill-label">Заплатить:</div>
+            <template v-for="(amount, res) in recipe" :key="'p-' + res">
+              <div v-if="amount < 0" class="recipe-row">
+                <img :src="getIcon(res)" class="option-icon" alt="" />
+                <span
+                  class="option-total"
+                  :class="{ insufficient: is_short(recipe, res) }"
+                >
+                  {{ Math.abs(amount) * quantity }}
+                </span>
+              </div>
+            </template>
+          </template>
+
+          <template v-else>
+            <div
+              v-for="[res, amount] in sortedRecipe(recipe)"
+              :key="res"
+              class="recipe-row"
             >
-              {{ amount * quantity }}
-            </span>
-<!--            <span-->
-<!--              class="option-name"-->
-<!--              :class="{ insufficient: is_short(recipe, res) }"-->
-<!--            >-->
-<!--              {{ res }}-->
-<!--            </span>-->
-          </div>
+              <img :src="getIcon(res)" class="option-icon" alt="" />
+              <span
+                class="option-total"
+                :class="{ insufficient: is_short(recipe, res) }"
+              >
+                {{ amount * quantity }}
+              </span>
+            </div>
+          </template>
         </div>
       </div>
       <div class="modal-btns">
@@ -151,18 +174,48 @@ export default {
           ([res, amount]) =>
             (this.current_resources[res] || 0) >= amount * this.quantity
         )
-      } else {
-        // sell / mill: проверяем есть ли достаточно самого ресурса
+      } else if (this.action === "sell") {
         return (
           (this.current_resources[this.resource_name] || 0) >=
           this.quantity * this.step
         )
+      } else {
+        // mill: хватает ли самого ресурса + хватает ли отрицательных (costs)
+        const hasMain =
+          (this.current_resources[this.resource_name] || 0) >=
+          this.quantity * this.step
+        const hasCosts = Object.entries(recipe)
+          // eslint-disable-next-line no-unused-vars
+          .filter(([_, amt]) => amt < 0)
+          .every(
+            ([res, amt]) =>
+              (this.current_resources[res] || 0) >=
+              Math.abs(amt) * this.quantity
+          )
+        return hasMain && hasCosts
       }
     },
 
     is_short(recipe, res) {
-      if (this.action !== "buy" && this.action !== "craft") return false
-      return (this.current_resources[res] || 0) < recipe[res] * this.quantity
+      if (this.action === "buy" || this.action === "craft") {
+        return (this.current_resources[res] || 0) < recipe[res] * this.quantity
+      }
+      if (this.action === "mill" && recipe[res] < 0) {
+        return (
+          (this.current_resources[res] || 0) <
+          Math.abs(recipe[res]) * this.quantity
+        )
+      }
+      return false
+    },
+
+    sortedRecipe(recipe) {
+      const order = { crops: 0, wood: 1, money: Infinity }
+      return Object.entries(recipe).sort(([a], [b]) => {
+        const aOrder = order[a] ?? 2
+        const bOrder = order[b] ?? 2
+        return aOrder - bOrder
+      })
     },
   },
   emits: ["confirm", "cancel"],
@@ -289,14 +342,6 @@ export default {
   text-align: center;
 }
 
-.option-name {
-  font-family: "Philosopher", serif;
-  font-size: 0.65rem;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
 .recipe-row {
   display: flex;
   align-items: center;
@@ -308,6 +353,14 @@ export default {
   display: flex;
   gap: 10px;
   justify-content: center;
+}
+
+.mill-label {
+  font-family: "Philosopher", serif;
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-top: 6px;
+  margin-bottom: 2px;
 }
 
 .btn-ok,

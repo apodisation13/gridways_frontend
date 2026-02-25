@@ -24,7 +24,12 @@
           v-else
         />
       </button>
-      <resource-list @click="$router.push('/bonus')" v-if="isLoggedIn" />
+      <!-- ДОБАВЬ ЭТОТ БЛОК -->
+      <div @click="showRightMenu" class="resources-clickable">
+        <resource-item name="keys" :count="resources.keys" />
+        <resource-item name="money" :count="resources.money" />
+      </div>
+      <!-- КОНЕЦ БЛОКА -->
     </div>
     <img
       class="header__border"
@@ -67,27 +72,83 @@
         </div>
       </div>
     </div>
+    <!-- ПРАВОЕ МЕНЮ - замени старые классы на эти -->
+    <div
+      class="expand-menu-right"
+      v-if="expandedRight"
+      v-touch:swipe.top="showRightMenu"
+      @click.self="showRightMenu"
+    >
+      <div class="expand-menu-right__wrapper">
+        <div class="expand-menu-right__content">
+          <div @click="goToBonus">
+            <div class="expand-menu-right__resources-row">
+              <resource-item name="raw_bronze" :count="resources.raw_bronze" />
+              <resource-item name="raw_silver" :count="resources.raw_silver" />
+              <resource-item name="raw_gold" :count="resources.raw_gold" />
+            </div>
+            <div class="expand-menu-right__resources-row">
+              <resource-item name="scraps" :count="resources.scraps" />
+              <resource-item
+                name="bronze_ingots"
+                :count="resources.bronze_ingots"
+              />
+              <resource-item
+                name="silver_ingots"
+                :count="resources.silver_ingots"
+              />
+              <resource-item
+                name="gold_ingots"
+                :count="resources.gold_ingots"
+              />
+            </div>
+            <div class="expand-menu-right__resources-row">
+              <resource-item name="crops" :count="resources.crops" />
+              <resource-item name="wood" :count="resources.wood" />
+              <resource-item name="silk" :count="resources.silk" />
+            </div>
+            <div class="expand-menu-right__resources-row">
+              <resource-item name="kegs" :count="resources.kegs" />
+              <resource-item name="big_kegs" :count="resources.big_kegs" />
+              <resource-item name="chests" :count="resources.chests" />
+            </div>
+            <div class="expand-menu-right__resources-row">
+              <resource-item name="rare_gem" :count="resources.rare_gem" />
+              <resource-item name="keys" :count="resources.keys" />
+              <resource-item name="money" :count="resources.money" />
+            </div>
+          </div>
+          <div class="expand-menu-right__footer" @click="showRightMenu">
+            <button class="menu-btn">
+              <span class="global_text menu-btn__text">Закрыть</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import ResourceList from "@/components/ResourceList"
+import ResourceItem from "@/components/UI/ResourceItem.vue"
 export default {
   name: "MenuHeader",
-  components: { ResourceList },
+  components: {
+    ResourceItem,
+  },
   computed: {
     // меню не нужны, если в роутере есть notRequireMenu (страницы загрузки, игры)
     menuNeeded() {
       return !this.$router.currentRoute.value.meta.notRequireMenu
-    },
-    username() {
-      return this.$store.getters["getUser"].username
     },
     isLoggedIn() {
       return this.$store.getters["isLoggedIn"]
     },
     path_to_icon() {
       return this.$store.getters["selectedAvatar"]
+    },
+    resources() {
+      return this.$store.getters["resource"]
     },
   },
   data() {
@@ -99,9 +160,14 @@ export default {
         { title: "Настройки", path: "/settings", requireAuth: true },
       ],
       expanded: false,
+      expandedRight: false, // для правого меню
     }
   },
   methods: {
+    showRightMenu() {
+      this.expandedRight = !this.expandedRight
+      if (this.expandedRight) this.expanded = false // закрываем левое, если открыто правое
+    },
     showExpandedMenu() {
       this.expanded = !this.expanded
     },
@@ -109,6 +175,11 @@ export default {
       if (!path) return
       this.expanded = false
       this.$router.push(path)
+    },
+    goToBonus() {
+      this.expandedRight = false
+      this.expanded = false
+      this.$router.push("/bonus")
     },
   },
 }
@@ -255,5 +326,114 @@ export default {
   background: var(--primary-gold-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.resources-clickable {
+  cursor: pointer;
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.expand-menu-right {
+  content: "";
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.3);
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.expand-menu-right__wrapper {
+  background-image: url("~@/assets/header-menu-background.png");
+  width: 207px;
+  height: 331px;
+  border-radius: 8px;
+  margin-right: 10px;
+  z-index: 8;
+  position: relative;
+  margin-top: 18px;
+}
+
+.expand-menu-right__content {
+  background-image: linear-gradient(
+    180deg,
+    rgba(102, 112, 128, 0.95) 0%,
+    rgba(21, 45, 81, 0.95) 100%
+  );
+  mix-blend-mode: multiply;
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  /* margin-top: 18px;  ← УДАЛИ ЭТУ СТРОКУ ПОЛНОСТЬЮ */
+  flex-direction: column;
+  justify-content: space-around;
+  border-radius: 5px;
+  height: 100%;
+}
+
+.expand-menu-right__content::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  border-radius: 5px;
+  padding: 2px;
+  background: var(--primary-gold-gradient);
+  -webkit-mask:
+    linear-gradient(0deg, #fff 0 0) content-box,
+    linear-gradient(0deg, #fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.expand-menu-right__footer button {
+  margin: 15px 0 21px 22px;
+}
+
+.expand-menu-right__content {
+  background-image: linear-gradient(
+    180deg,
+    rgba(102, 112, 128, 0.95) 0%,
+    rgba(21, 45, 81, 0.95) 100%
+  );
+  mix-blend-mode: multiply;
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  /* margin-top: 18px;  ← УДАЛИ ЭТУ СТРОКУ ПОЛНОСТЬЮ */
+  flex-direction: column;
+  justify-content: space-around;
+  border-radius: 5px;
+  height: 100%;
+}
+
+.expand-menu-right__resources-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 5px 5px 5px 0;
+  gap: 8px;
+}
+
+.expand-menu-right__resources-row resource-item {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.expand-menu-right__footer {
+  margin-top: auto; /* прижимает кнопку вниз */
+  border-top: 1px solid;
+  border-image-source: linear-gradient(
+    266.83deg,
+    rgba(192, 150, 69, 0) 0%,
+    #facf5d 46.39%,
+    rgba(192, 150, 70, 0) 93.76%
+  );
+  border-image-slice: 1;
 }
 </style>
