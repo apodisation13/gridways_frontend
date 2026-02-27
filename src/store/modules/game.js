@@ -16,6 +16,8 @@ const state = {
   season: null, // объект сезона
   enemy_leader: null, // объект лидера врагов из уровней
 
+  enemies_grave: [], // нужно только для WinPage, чтобы посчитать награды!
+
   ppa_end_turn: false, // true - значит они сейчас в процессе
   ai_move: false, // true - значит они сейчас ходят
   epa_end_turn: false,
@@ -27,6 +29,7 @@ const state = {
 const getters = {
   get_season: state => state.season,
   currentLevel: state => state.level,
+  enemies_grave: state => state.enemies_grave,
 }
 
 const mutations = {
@@ -93,6 +96,9 @@ const mutations = {
 
   set_start_game_redirect(state, payload) {
     state.start_game_redirect = payload
+  },
+  set_enemies_grave(state, enemies_grave) {
+    state.enemies_grave = enemies_grave
   },
 }
 
