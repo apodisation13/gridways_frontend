@@ -1,72 +1,81 @@
 <template>
-  <div class="start">
-    <div class="win_price">
-      ВАШ ВЫИГРЫШ <br /><br />
-      scraps: <b>{{ pay_data.scraps }}</b>
-      <img
-        :src="require(`@/assets/icons/resources/scraps.svg`)"
-        alt=""
-        class="wood"
+  <div class="win-section">
+    <span class="global_text price-label">ВАШ ВЫИГРЫШ</span>
+    <div class="play-price">
+      <resource-item
+        v-if="pay_data.raw_bronze"
+        name="raw_bronze"
+        :count="pay_data.raw_bronze"
+        style="transform: scale(2)"
       />
-      <br /><br />
-      wood: <b>{{ pay_data.wood }}</b>
-      <img
-        :src="require(`@/assets/icons/resources/wood.svg`)"
-        alt=""
-        class="wood"
+      <resource-item
+        v-if="pay_data.raw_silver"
+        name="raw_silver"
+        :count="pay_data.raw_silver"
+        style="transform: scale(2)"
       />
-      <br /><br />
-      kegs: <b>{{ pay_data.kegs }}</b>
-      <img
-        :src="require(`@/assets/icons/resources/kegs.svg`)"
-        alt=""
-        class="wood"
+      <resource-item
+        v-if="pay_data.raw_gold"
+        name="raw_gold"
+        :count="pay_data.raw_gold"
+        style="transform: scale(2)"
       />
-      <br /><br />
-      big kegs: <b>{{ pay_data.big_kegs }}</b>
-      <img
-        :src="require(`@/assets/icons/resources/big_kegs.svg`)"
-        alt=""
-        class="wood"
+    </div>
+    <div class="play-price">
+      <resource-item
+        v-if="pay_data.scraps"
+        name="scraps"
+        :count="pay_data.scraps"
+        style="transform: scale(2)"
       />
-      <br /><br />
-      keys: <b>{{ pay_data.keys }}</b>
-      <img
-        :src="require(`@/assets/icons/resources/keys.svg`)"
-        alt=""
-        class="wood"
+      <resource-item
+        v-if="pay_data.crops"
+        name="crops"
+        :count="pay_data.crops"
+        style="transform: scale(2)"
       />
-      <br /><br />
-      <div v-if="related_levels.length">
-        Вы открыли уровни: <br />
-        {{ related_levels }}
-      </div>
+      <resource-item
+        v-if="pay_data.wood"
+        name="wood"
+        :count="pay_data.wood"
+        style="transform: scale(2)"
+      />
+    </div>
+    <div class="play-price">
+      <resource-item
+        v-if="pay_data.kegs"
+        name="kegs"
+        :count="pay_data.kegs"
+        style="transform: scale(2)"
+      />
+      <resource-item
+        v-if="pay_data.big_kegs"
+        name="big_kegs"
+        :count="pay_data.big_kegs"
+        style="transform: scale(2)"
+      />
+    </div>
+    <div class="play-price">
+      <resource-item
+        v-if="pay_data.money"
+        name="money"
+        :count="pay_data.money"
+        style="transform: scale(2)"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import { getRewardForLevel } from "@/logic/random_rewards"
+import ResourceItem from "@/components/UI/ResourceItem.vue"
 import { PayResourcesSubtype } from "@/store/const/const"
 export default {
   name: "win-page",
-  computed: {
-    win_price() {
-      const diff = this.$store.state.game.level.difficulty
-      const game_prices = this.$store.getters["game_prices"]
-      if (diff === "easy") return game_prices.win_level_easy
-      else if (diff === "normal") return game_prices.win_level_normal
-      else if (diff === "hard") return game_prices.win_level_hard
-      else return 0
-    },
-    all_seasons() {
-      return this.$store.getters["all_seasons"]
-    },
-  },
+  components: { ResourceItem },
   data() {
     return {
       pay_data: {},
-      related_levels: [],
     }
   },
   async created() {
@@ -77,26 +86,14 @@ export default {
     this.$store.commit("set_win_redirect", false)
   },
   methods: {
-    // оплата ресурсов за прохождение уровня
+    // награда ресурсов за прохождение уровня
     async pay_resources() {
-      this.pay_data = getRewardForLevel(this.win_price)
-      console.log(82, "-------------", this.pay_data)
-
-      let data = {
-        wood: this.pay_data.wood,
-        scraps: this.pay_data.scraps,
-        keys: this.pay_data.keys,
-      }
-      if (this.pay_data.kegs) {
-        data.kegs = this.pay_data.kegs
-      }
-      if (this.pay_data.big_kegs) {
-        data.big_kegs = this.pay_data.big_kegs
-      }
-
+      const difficulty = this.$store.state.game.level.difficulty
+      const win_level_rewards = this.$store.getters["win_level_rewards"]
+      this.pay_data = getRewardForLevel(win_level_rewards[difficulty])
       await this.$store.dispatch("processResources", {
         subtype: PayResourcesSubtype.winSeasonLevel,
-        data: data,
+        data: this.pay_data,
       })
     },
     // открытие всех связанных уровней при прохождении уровня
@@ -124,30 +121,34 @@ export default {
 </script>
 
 <style scoped>
-div {
-  color: white;
+.win-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 55px;
 }
 
-.start {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 75%;
-  height: 70vh;
-  border: solid 2px black;
+.play-price {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 4vw, 30px);
+  flex-wrap: wrap;
 }
 
-.win_price {
-  width: 100%;
-  text-align: center;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  position: absolute;
-}
-
-.wood {
-  max-height: 30px;
+.price-label {
+  font-family: "Philosopher", serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 23px;
+  line-height: 120%;
+  background: var(--primary-gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 2px;
+  padding: 2px;
 }
 </style>
