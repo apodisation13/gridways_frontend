@@ -5,7 +5,9 @@ export function getEnv() {
 export const PayResourcesSubtype = {
   startSeasonLevel: "start_season_level",
   winSeasonLevel: "win_season_level",
-  bonusReward: "bonus_reward",
+  resourceTransition: "resource_transition",
+  openBonusResource: "open_bonus_resource",
+  acceptKeyReward: "accept_key_reward",
 }
 
 export const CraftMillCardActionSubtype = {

@@ -16,6 +16,7 @@ const toast = useToast()
 
 const state = {
   game_prices: {},
+  resources_transitions: {},
 
   win_redirect: false,
 }
@@ -37,6 +38,7 @@ const getters = {
       : 0
   },
   game_prices: state => state.game_prices,
+  resources_transitions: state => state.resources_transitions,
 }
 
 const mutations = {
@@ -47,6 +49,10 @@ const mutations = {
 
   set_win_redirect(state, payload) {
     state.win_redirect = payload
+  },
+
+  set_resources_transitions(state, payload) {
+    state.resources_transitions = payload.resources_transitions
   },
 }
 
@@ -114,7 +120,8 @@ const actions = {
     // в body придет обязательно subtype, data
     // data: { difficulty: easy/normal/hard } - для оплаты игры на уровне сезона
     // data: { wood: 201, scraps: 185, etc } - для получения ресурсов после прохождения уровня сезона
-    // data: { wood: -100 } - для получения и списания ресурсов на странице бонусов
+    // data: { action:buy/sell/crart/mill, resource: kegs, quantity: int, recipe: {money: -1000, etc} }
+    // - для получения и списания ресурсов на странице бонусов
     const userId = getters["getUser"].user_id
 
     try {

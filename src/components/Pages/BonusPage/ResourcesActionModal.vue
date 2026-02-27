@@ -80,7 +80,7 @@
                 class="option-total"
                 :class="{ insufficient: is_short(recipe, res) }"
               >
-                {{ amount * quantity }}
+                {{ Math.abs(amount) * quantity }}
               </span>
             </div>
           </template>
@@ -172,7 +172,8 @@ export default {
       if (this.action === "buy" || this.action === "craft") {
         return Object.entries(recipe).every(
           ([res, amount]) =>
-            (this.current_resources[res] || 0) >= amount * this.quantity
+            (this.current_resources[res] || 0) >=
+            Math.abs(amount) * this.quantity
         )
       } else if (this.action === "sell") {
         return (
@@ -198,7 +199,10 @@ export default {
 
     is_short(recipe, res) {
       if (this.action === "buy" || this.action === "craft") {
-        return (this.current_resources[res] || 0) < recipe[res] * this.quantity
+        return (
+          (this.current_resources[res] || 0) <
+          Math.abs(recipe[res]) * this.quantity
+        )
       }
       if (this.action === "mill" && recipe[res] < 0) {
         return (
