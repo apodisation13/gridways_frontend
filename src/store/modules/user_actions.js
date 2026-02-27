@@ -18,29 +18,16 @@ const state = {
   game_prices: {},
   resources_transitions: {},
   keys_rewards: {},
+  win_level_rewards: {},
 
   win_redirect: false,
 }
 
 const getters = {
-  get_kegs_price: () => {
-    return state.game_prices.pay_for_kegs
-      ? state.game_prices.pay_for_kegs * -1
-      : 0
-  },
-  get_big_kegs_price: () => {
-    return state.game_prices.pay_for_big_kegs
-      ? state.game_prices.pay_for_big_kegs * -1
-      : 0
-  },
-  get_chests_price: () => {
-    return state.game_prices.pay_for_chests
-      ? state.game_prices.pay_for_chests * -1
-      : 0
-  },
   game_prices: state => state.game_prices,
   resources_transitions: state => state.resources_transitions,
   keys_rewards: state => state.keys_rewards,
+  win_level_rewards: state => state.win_level_rewards,
 }
 
 const mutations = {
@@ -58,6 +45,9 @@ const mutations = {
   },
   set_keys_rewards(state, payload) {
     state.keys_rewards = payload.keys_rewards
+  },
+  set_win_level_rewards(state, payload) {
+    state.win_level_rewards = payload.win_level_rewards
   },
 }
 
