@@ -333,6 +333,7 @@ export default {
   flex: 1;
   display: flex;
   justify-content: flex-end;
+  margin-right: 15px;
 }
 
 .expand-menu-right {
