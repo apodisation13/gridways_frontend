@@ -1,33 +1,25 @@
 import { choice, randInt } from "@/lib/utils"
 
-function getValue(resource) {
-  if (resource === "kegs" || resource === "big_kegs" || resource === "chests")
-    return 1
-  else if (resource === "scraps") return randInt(100, 200)
-  else if (resource === "wood") return randInt(150, 250)
+function getValue(cfg) {
+  if (cfg.type === "simple") return cfg.value
+  if (cfg.type === "diapason") return randInt(cfg.min, cfg.max)
 }
 
-export function getRandomReward() {
-  const random_reward = [
-    "scraps",
-    "scraps",
-    "scraps",
-    "wood",
-    "wood",
-    "wood",
-    "wood",
-    "wood",
-    "kegs",
-    "kegs",
-    "kegs",
-    "big_kegs",
-    "big_kegs",
-    "chests",
-  ]
-  const random_choice = choice(random_reward)
-  const resource = random_reward[random_choice]
-  const value = getValue(resource)
-  return { resource: resource, value: value }
+export function getRandomReward(rewards_config) {
+  const entries = Object.entries(rewards_config)
+  const totalWeight = entries.reduce((sum, [, cfg]) => sum + cfg.probability, 0)
+
+  let rand = Math.random() * totalWeight
+  for (const [resource, cfg] of entries) {
+    rand -= cfg.probability
+    if (rand <= 0) {
+      return { resource, value: getValue(cfg) }
+    }
+  }
+
+  // fallback на последний элемент (на случай float погрешности)
+  const [resource, cfg] = entries[entries.length - 1]
+  return { resource, value: getValue(cfg) }
 }
 
 export function getRewardForLevel(win_price) {

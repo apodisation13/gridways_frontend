@@ -159,6 +159,7 @@ export default {
       }
       this.show_reward_page = true
     },
+
     async open_key() {
       await this.pay_resource(
         { keys: -1 },
@@ -166,7 +167,7 @@ export default {
       )
       const key_reward = []
       for (let i = 0; i < 3; i++) {
-        key_reward.push(getRandomReward())
+        key_reward.push(getRandomReward(this.$store.getters["keys_rewards"]))
       }
       this.reward_name = "keys"
       this.random_reward_choice = key_reward

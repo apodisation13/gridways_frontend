@@ -17,6 +17,7 @@ const toast = useToast()
 const state = {
   game_prices: {},
   resources_transitions: {},
+  keys_rewards: {},
 
   win_redirect: false,
 }
@@ -39,6 +40,7 @@ const getters = {
   },
   game_prices: state => state.game_prices,
   resources_transitions: state => state.resources_transitions,
+  keys_rewards: state => state.keys_rewards,
 }
 
 const mutations = {
@@ -53,6 +55,9 @@ const mutations = {
 
   set_resources_transitions(state, payload) {
     state.resources_transitions = payload.resources_transitions
+  },
+  set_keys_rewards(state, payload) {
+    state.keys_rewards = payload.keys_rewards
   },
 }
 

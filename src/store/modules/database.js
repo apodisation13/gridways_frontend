@@ -143,7 +143,8 @@ const actions = {
 
       commit("set_game_const", game_const) // рука, карт в колоде
       commit("set_game_prices", game_const) // всякие игровые цены
-      commit("set_resources_transitions", game_const) // всякие игровые цены
+      commit("set_resources_transitions", game_const) // покупка/продажа ресурсов
+      commit("set_keys_rewards", game_const) // всякие игровые цены
 
       toast.success("Успешно загрузили всю вашу базу данных")
     } catch (err) {
