@@ -4,9 +4,23 @@
       <div class="title">
         <h1>Страница бонусов</h1>
       </div>
+      <!-- Переключатель вкладок -->
+      <div class="tabs">
+        <div class="tabs__slider" :style="sliderStyle"></div>
+        <button
+          v-for="(tab, idx) in tabs"
+          :key="idx"
+          class="tabs__btn"
+          :class="{ 'tabs__btn--active': active_tab === idx }"
+          @click="active_tab = idx"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
+
       <div class="resources-grid">
         <bonus-page-resource
-          v-for="(config, name) in resources_config"
+          v-for="(config, name) in filtered_resources"
           :key="name"
           :resource_name="name"
           :resource_count="resource[name] || 0"
@@ -53,6 +67,15 @@ export default {
       reward_name: "",
       random_cards: [],
       random_reward_choice: null,
+      active_tab: 0,
+      tabs: [
+        { label: "Награды", keys: ["kegs", "big_kegs", "chests", "keys"] },
+        {
+          label: "Для карт",
+          keys: ["scraps", "bronze_ingots", "silver_ingots", "gold_ingots"],
+        },
+        { label: "Для уровней", keys: ["crops", "wood", "silk"] },
+      ],
     }
   },
   computed: {
@@ -61,6 +84,20 @@ export default {
     },
     resource() {
       return this.$store.getters["resource"]
+    },
+    filtered_resources() {
+      const keys = this.tabs[this.active_tab].keys
+      return Object.fromEntries(
+        Object.entries(this.resources_config).filter(([name]) =>
+          keys.includes(name)
+        )
+      )
+    },
+    sliderStyle() {
+      return {
+        transform: `translateX(${this.active_tab * 100}%)`,
+        width: `${100 / this.tabs.length}%`,
+      }
     },
     resources_config() {
       const transitions = this.$store.getters["resources_transitions"]
@@ -204,6 +241,44 @@ div {
   font-family: "Brush Script MT", cursive;
   font-size: 14pt;
   color: white;
+}
+
+.tabs {
+  position: relative;
+  display: flex;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  margin: 0 8px 12px;
+  padding: 3px;
+}
+
+.tabs__slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: calc(100% - 6px);
+  border-radius: 8px;
+  background: var(--primary-gold-gradient, #c49000);
+  transition: transform 0.25s ease;
+  pointer-events: none;
+}
+
+.tabs__btn {
+  flex: 1;
+  z-index: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 4px;
+  font-family: "Philosopher", serif;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.2s;
+}
+
+.tabs__btn--active {
+  color: #1a1208;
+  font-weight: bold;
 }
 
 .title {

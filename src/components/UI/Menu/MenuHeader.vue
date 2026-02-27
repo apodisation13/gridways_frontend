@@ -24,12 +24,11 @@
           v-else
         />
       </button>
-      <!-- ДОБАВЬ ЭТОТ БЛОК -->
       <div @click="showRightMenu" class="resources-clickable">
+        <resource-item name="scraps" :count="resources.scraps" />
         <resource-item name="keys" :count="resources.keys" />
         <resource-item name="money" :count="resources.money" />
       </div>
-      <!-- КОНЕЦ БЛОКА -->
     </div>
     <img
       class="header__border"
