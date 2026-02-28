@@ -146,6 +146,7 @@ const actions = {
       commit("set_resources_transitions", game_const) // покупка/продажа ресурсов
       commit("set_keys_rewards", game_const) // награды за открытие ключей
       commit("set_win_level_rewards", game_const) // награды за прохождение уровня
+      commit("set_start_level_prices", game_const) // стоимость игры в уровни
 
       toast.success("Успешно загрузили всю вашу базу данных")
     } catch (err) {

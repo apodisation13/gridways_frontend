@@ -19,6 +19,7 @@ const state = {
   resources_transitions: {},
   keys_rewards: {},
   win_level_rewards: {},
+  start_level_prices: {},
 
   win_redirect: false,
 }
@@ -28,6 +29,7 @@ const getters = {
   resources_transitions: state => state.resources_transitions,
   keys_rewards: state => state.keys_rewards,
   win_level_rewards: state => state.win_level_rewards,
+  start_level_prices: state => state.start_level_prices,
 }
 
 const mutations = {
@@ -48,6 +50,9 @@ const mutations = {
   },
   set_win_level_rewards(state, payload) {
     state.win_level_rewards = payload.win_level_rewards
+  },
+  set_start_level_prices(state, payload) {
+    state.start_level_prices = payload.start_level_prices
   },
 }
 
@@ -113,7 +118,7 @@ const actions = {
 
   async processResources({ commit, getters, dispatch }, body) {
     // в body придет обязательно subtype, data
-    // data: { difficulty: easy/normal/hard } - для оплаты игры на уровне сезона
+    // data: { wood: 201, crops: 210 } - для оплаты игры на уровне сезона
     // data: { wood: 201, scraps: 185, etc } - для получения ресурсов после прохождения уровня сезона
     // data: { action:buy/sell/crart/mill, resource: kegs, quantity: int, recipe: {money: -1000, etc} }
     // - для получения и списания ресурсов на странице бонусов
