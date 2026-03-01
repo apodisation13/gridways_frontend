@@ -23,7 +23,10 @@ export const images = {
     default: `${path}/deckbuild_default.jpg`,
   },
   bonus: {
-    default: `${path}/bonus_new.webp`,
+    day: `${path}/bonus_new.webp`,
+    night: `${path}/bonus_new_night.webp`,
+    evening: `${path}/bonus_new.webp`,
+    morning: `${path}/bonus_new.webp`,
   },
   levels: {
     default: `${path}/levels_default.jpeg`,
@@ -35,10 +38,10 @@ export const images = {
     morning: `${path}/start_game_new_day.webp`,
   },
   win: {
-    day: `${path}/win_new.webp`,
-    night: `${path}/win_new.webp`,
-    evening: `${path}/win_new.webp`,
-    morning: `${path}/win_new.webp`,
+    day: `${path}/win_day.webp`,
+    night: `${path}/win_night.webp`,
+    evening: `${path}/win_day.webp`,
+    morning: `${path}/win_day.webp`,
   },
   lose: {
     day: `${path}/lose_new_day.webp`,

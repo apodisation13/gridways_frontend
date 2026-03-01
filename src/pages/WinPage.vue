@@ -56,6 +56,9 @@
       />
     </div>
     <div class="play-price">
+      <resource-item name="keys" :count="1" style="transform: scale(2)" />
+    </div>
+    <div class="play-price">
       <resource-item
         v-if="pay_data.money"
         name="money"

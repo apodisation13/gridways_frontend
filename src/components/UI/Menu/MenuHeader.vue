@@ -24,10 +24,13 @@
           v-else
         />
       </button>
-      <div @click="showRightMenu" class="resources-clickable">
-        <resource-item name="scraps" :count="resources.scraps" />
-        <resource-item name="keys" :count="resources.keys" />
-        <resource-item name="money" :count="resources.money" />
+      <div @click="showRightMenu" class="resources-clickable" v-if="isLoggedIn">
+        <resource-item
+          v-for="(count, name) in resources_list"
+          :key="name"
+          :name="name"
+          :count="count"
+        />
       </div>
     </div>
     <img
@@ -148,6 +151,50 @@ export default {
     },
     resources() {
       return this.$store.getters["resource"]
+    },
+    currentPath() {
+      return this.$route.path
+    },
+    resources_list() {
+      if (this.currentPath === "/start_game") {
+        return {
+          crops: this.resources.crops,
+          wood: this.resources.wood,
+          silk: this.resources.silk,
+          keys: this.resources.keys,
+          money: this.resources.money,
+        }
+      } else if (this.currentPath === "/deckbuild") {
+        return {
+          scraps: this.resources.scraps,
+          bronze_ingots: this.resources.bronze_ingots,
+          silver_ingots: this.resources.silver_ingots,
+          gold_ingots: this.resources.gold_ingots,
+          rare_gem: this.resources.rare_gem,
+          money: this.resources.money,
+        }
+      } else if (this.currentPath === "/bonus") {
+        return {
+          raw_bronze: this.resources.raw_bronze,
+          raw_silver: this.resources.raw_silver,
+          raw_gold: this.resources.raw_gold,
+          rare_gem: this.resources.rare_gem,
+          money: this.resources.money,
+        }
+      } else if (this.currentPath === "/win") {
+        return {
+          scraps: this.resources.scraps,
+          raw_bronze: this.resources.raw_bronze,
+          raw_silver: this.resources.raw_silver,
+          raw_gold: this.resources.raw_gold,
+          crops: this.resources.crops,
+          wood: this.resources.wood,
+          silk: this.resources.silk,
+          keys: this.resources.keys,
+          money: this.resources.money,
+        }
+      }
+      return { keys: this.resources.keys, money: this.resources.money }
     },
   },
   data() {
