@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import BonusPageResource from "@/components/UI/BonusPageResource"
+import BonusPageResource from "@/components/Pages/BonusPage/BonusPageResource.vue"
 import RewardComp from "@/components/Pages/BonusPage/RewardComp.vue"
 import { PayResourcesSubtype } from "@/store/const/const"
 import { choice } from "@/lib/utils"
