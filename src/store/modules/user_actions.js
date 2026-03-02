@@ -15,7 +15,7 @@ import { CraftMillCardActionSubtype } from "@/store/const/const"
 const toast = useToast()
 
 const state = {
-  game_prices: {},
+  cards_resources_prices: {},
   resources_transitions: {},
   keys_rewards: {},
   win_level_rewards: {},
@@ -25,7 +25,7 @@ const state = {
 }
 
 const getters = {
-  game_prices: state => state.game_prices,
+  cards_resources_prices: state => state.cards_resources_prices,
   resources_transitions: state => state.resources_transitions,
   keys_rewards: state => state.keys_rewards,
   win_level_rewards: state => state.win_level_rewards,
@@ -33,26 +33,24 @@ const getters = {
 }
 
 const mutations = {
-  // устанавливаем все игровые цены на крафт, милл итп
-  set_game_prices(state, payload) {
-    state.game_prices = payload
-  },
-
   set_win_redirect(state, payload) {
     state.win_redirect = payload
   },
 
-  set_resources_transitions(state, payload) {
-    state.resources_transitions = payload.resources_transitions
+  set_cards_resources_prices(state, cards_resources_prices) {
+    state.cards_resources_prices = cards_resources_prices
   },
-  set_keys_rewards(state, payload) {
-    state.keys_rewards = payload.keys_rewards
+  set_resources_transitions(state, resources_transitions) {
+    state.resources_transitions = resources_transitions
   },
-  set_win_level_rewards(state, payload) {
-    state.win_level_rewards = payload.win_level_rewards
+  set_keys_rewards(state, keys_rewards) {
+    state.keys_rewards = keys_rewards
   },
-  set_start_level_prices(state, payload) {
-    state.start_level_prices = payload.start_level_prices
+  set_win_level_rewards(state, win_level_rewards) {
+    state.win_level_rewards = win_level_rewards
+  },
+  set_start_level_prices(state, start_level_prices) {
+    state.start_level_prices = start_level_prices
   },
 }
 
@@ -138,31 +136,6 @@ const actions = {
     }
   },
 
-  calculateCraftMillCardValue({ state }, obj) {
-    // процесс крафта: по цвету, или если цвета нет, то крафтим лидера значит
-    if (obj.process === "craft") {
-      if (obj.card.color === "Bronze") return state.game_prices.craft_bronze
-      else if (obj.card.color === "Silver")
-        return state.game_prices.craft_silver
-      else if (obj.card.color === "Gold") return state.game_prices.craft_gold
-      else return state.game_prices.craft_leader
-    }
-    // процесс милла: по цвету, или лидера, но нельзя если count = 0, или стартовый набор
-    if (obj.process === "mill") {
-      // нельзя: если карт 0, или если карт 1 и при этом она в стартовом наборе (unlocked, то есть)
-      if (obj.count === 0 || (obj.count === 1 && obj.card.unlocked)) {
-        toast.warning(
-          "Нельзя размиллить карту из стартового набора (или карту которой у вас и так нет, ха-ха)"
-        )
-        return
-      }
-      if (obj.card.color === "Bronze") return state.game_prices.mill_bronze
-      else if (obj.card.color === "Silver") return state.game_prices.mill_silver
-      else if (obj.card.color === "Gold") return state.game_prices.mill_gold
-      else return state.game_prices.mill_leader
-    }
-  },
-
   async processCraftMillCard({ getters, commit, dispatch }, body) {
     let userId = getters["getUser"].user_id
     const subtype = body.subtype
@@ -173,7 +146,7 @@ const actions = {
           "{cardId}",
           body.cardId
         ),
-        data: { subtype: subtype },
+        data: { subtype: subtype, recipe: body.recipe },
       })
       const msg =
         subtype === CraftMillCardActionSubtype.craftCard ||
