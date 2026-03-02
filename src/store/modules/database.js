@@ -142,7 +142,6 @@ const actions = {
       commit("set_enemy_leaders", enemy_leaders)
 
       commit("set_game_const", game_const) // рука, карт в колоде, распределение рандомных врагов
-      commit("set_game_prices", game_const) // всякие игровые цены
 
       commit("set_resources_transitions", game_const.resources_transitions) // покупка/продажа ресурсов
       commit("set_keys_rewards", game_const.keys_rewards) // награды за открытие ключей
