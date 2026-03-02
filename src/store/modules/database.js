@@ -141,12 +141,14 @@ const actions = {
       commit("set_enemies", enemies)
       commit("set_enemy_leaders", enemy_leaders)
 
-      commit("set_game_const", game_const) // рука, карт в колоде
+      commit("set_game_const", game_const) // рука, карт в колоде, распределение рандомных врагов
       commit("set_game_prices", game_const) // всякие игровые цены
-      commit("set_resources_transitions", game_const) // покупка/продажа ресурсов
-      commit("set_keys_rewards", game_const) // награды за открытие ключей
-      commit("set_win_level_rewards", game_const) // награды за прохождение уровня
-      commit("set_start_level_prices", game_const) // стоимость игры в уровни
+
+      commit("set_resources_transitions", game_const.resources_transitions) // покупка/продажа ресурсов
+      commit("set_keys_rewards", game_const.keys_rewards) // награды за открытие ключей
+      commit("set_win_level_rewards", game_const.win_level_rewards) // награды за прохождение уровня
+      commit("set_start_level_prices", game_const.start_level_prices) // стоимость игры в уровни
+      commit("set_cards_resources_prices", game_const.cards_resources_prices) // крафт/милл карт и лидеров
 
       toast.success("Успешно загрузили всю вашу базу данных")
     } catch (err) {
