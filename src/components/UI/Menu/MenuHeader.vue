@@ -187,9 +187,6 @@ export default {
           raw_bronze: this.resources.raw_bronze,
           raw_silver: this.resources.raw_silver,
           raw_gold: this.resources.raw_gold,
-          crops: this.resources.crops,
-          wood: this.resources.wood,
-          silk: this.resources.silk,
           keys: this.resources.keys,
           money: this.resources.money,
         }
