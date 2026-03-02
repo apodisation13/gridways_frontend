@@ -57,13 +57,10 @@ export function getRewardForLevel(rewards_config) {
     }
 
     result[resource] = getValue(cfg)
+    console.log(result)
   }
 
   // добавляем туда награду за убитых врагов
   result = getRewardsForEnemiesGrave(result)
-
-  // и добавляем туда один ключ
-  result["keys"] = 1
-
   return result
 }

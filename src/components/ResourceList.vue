@@ -1,7 +1,7 @@
 <template>
   <div class="resource-list">
     <resource-item
-      v-for="(count, name) in resource"
+      v-for="(count, name) in resources"
       :key="name"
       :name="name"
       :count="count"
@@ -15,11 +15,17 @@ import ResourceItem from "@/components/UI/ResourceItem"
 export default {
   components: { ResourceItem },
   name: "resource-comp",
-  computed: {
-    resource() {
-      return this.$store.getters["resource"]
+  props: {
+    resources: {
+      type: Object,
+      required: true,
     },
   },
+  // computed: {
+  //   resource() {
+  //     return this.$store.getters["resource"]
+  //   },
+  // },
 }
 </script>
 
@@ -30,8 +36,6 @@ div {
 }
 
 .resource-list {
-  max-width: 270px;
-  width: 100%;
   display: flex;
   align-items: flex-end;
   justify-content: space-around;

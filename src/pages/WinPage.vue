@@ -56,7 +56,11 @@
       />
     </div>
     <div class="play-price">
-      <resource-item name="keys" :count="1" style="transform: scale(2)" />
+      <resource-item
+        name="keys"
+        :count="pay_data.keys"
+        style="transform: scale(2)"
+      />
     </div>
     <div class="play-price">
       <resource-item
