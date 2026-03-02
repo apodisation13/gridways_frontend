@@ -44,17 +44,14 @@
       v-if="show_modal_craft"
       action="craft"
       :options="craft_options"
-      :current_resources="$store.getters['resource']"
       :card="card"
       @confirm="confirm_craft"
       @cancel="show_modal_craft = false"
     />
-
     <card-action-modal
       v-if="show_modal_mill"
       action="mill"
       :options="mill_options"
-      :current_resources="$store.getters['resource']"
       :card="card"
       @confirm="confirm_mill"
       @cancel="show_modal_mill = false"
@@ -149,7 +146,7 @@ export default {
   },
   computed: {
     card_color_key() {
-      return this.card.color ? this.card.color.toLowerCase() : "leader"
+      return this.card.color ? this.card.color : "leader"
     },
     craft_options() {
       const config = this.$store.getters["cards_resources_prices"]

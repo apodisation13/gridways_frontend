@@ -95,7 +95,6 @@ export default {
     action: { type: String, required: true }, // 'craft' | 'mill'
     options: { type: Array, required: true },
     card: { type: Object, required: true },
-    current_resources: { type: Object, default: () => ({}) },
   },
   data() {
     return {
@@ -170,28 +169,26 @@ export default {
     is_affordable(recipe) {
       if (this.action === "craft") {
         return Object.entries(recipe).every(
-          ([res, amt]) => (this.current_resources[res] || 0) >= Math.abs(amt)
+          ([res, amt]) => (this.resources[res] || 0) >= Math.abs(amt)
         )
       }
       // mill: проверяем только отрицательные (затраты)
       return Object.entries(recipe)
         .filter(([, amt]) => amt < 0)
-        .every(
-          ([res, amt]) => (this.current_resources[res] || 0) >= Math.abs(amt)
-        )
+        .every(([res, amt]) => (this.resources[res] || 0) >= Math.abs(amt))
     },
     is_short(recipe, res) {
       if (this.action === "craft") {
-        return (this.current_resources[res] || 0) < Math.abs(recipe[res])
+        return (this.resources[res] || 0) < Math.abs(recipe[res])
       }
       if (this.action === "mill" && recipe[res] < 0) {
-        return (this.current_resources[res] || 0) < Math.abs(recipe[res])
+        return (this.resources[res] || 0) < Math.abs(recipe[res])
       }
       return false
     },
     confirm() {
       if (this.selected === null) return
-      this.$emit("confirm", { recipe: this.options[this.selected] })
+      this.$emit("confirm", this.options[this.selected])
     },
   },
   emits: ["confirm", "cancel"],
