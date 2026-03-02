@@ -11,7 +11,6 @@
 
 <script>
 import ResourceItem from "@/components/UI/ResourceItem"
-
 export default {
   components: { ResourceItem },
   name: "resource-comp",
@@ -21,11 +20,6 @@ export default {
       required: true,
     },
   },
-  // computed: {
-  //   resource() {
-  //     return this.$store.getters["resource"]
-  //   },
-  // },
 }
 </script>
 
@@ -34,11 +28,11 @@ div {
   font-family: "Brush Script MT", cursive;
   font-size: 14pt;
 }
-
 .resource-list {
   display: flex;
   align-items: flex-end;
-  justify-content: space-around;
-  margin-left: auto;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
 }
 </style>
