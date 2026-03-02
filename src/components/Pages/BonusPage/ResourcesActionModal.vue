@@ -5,6 +5,9 @@
         <span class="action-label">{{ actionLabel }}</span>
         <img :src="getIcon(resource_name)" class="header-icon" alt="" />
       </div>
+
+      <resource-list :resources="res" />
+
       <!-- Количество -->
       <div class="qty-row">
         <button
@@ -101,6 +104,8 @@
 </template>
 
 <script>
+import ResourceList from "@/components/ResourceList.vue"
+
 const ACTION_LABELS = {
   buy: "Купить",
   sell: "Продать",
@@ -110,11 +115,11 @@ const ACTION_LABELS = {
 
 export default {
   name: "resource-action-modal",
+  components: { ResourceList },
   props: {
     resource_name: { type: String, required: true },
     action: { type: String, required: true },
     options: { type: Array, required: true },
-    current_resources: { type: Object, default: () => ({}) },
     step: { type: Number, default: 1 },
   },
   data() {
@@ -132,6 +137,33 @@ export default {
     },
     optionsLabel() {
       return this.isSpending ? "Получить" : "Заплатить"
+    },
+    resources() {
+      return this.$store.getters["resource"]
+    },
+    res() {
+      const RESOURCE_ORDER = {
+        scraps: 0,
+        raw_bronze: 1,
+        bronze_ingots: 1,
+        raw_silver: 2,
+        silver_ingots: 2,
+        raw_gold: 3,
+        gold_ingots: 3,
+        crops: 4,
+        wood: 5,
+        silk: 6,
+        money: Infinity,
+      }
+      const keys = [
+        ...new Set(Object.values(this.options).flatMap(Object.keys)),
+      ]
+      const sorted = keys.sort(
+        (a, b) => (RESOURCE_ORDER[a] ?? 99) - (RESOURCE_ORDER[b] ?? 99)
+      )
+      return Object.fromEntries(
+        sorted.map(key => [key, this.resources[key] || 0])
+      )
     },
   },
   methods: {
@@ -172,26 +204,22 @@ export default {
       if (this.action === "buy" || this.action === "craft") {
         return Object.entries(recipe).every(
           ([res, amount]) =>
-            (this.current_resources[res] || 0) >=
-            Math.abs(amount) * this.quantity
+            (this.resources[res] || 0) >= Math.abs(amount) * this.quantity
         )
       } else if (this.action === "sell") {
         return (
-          (this.current_resources[this.resource_name] || 0) >=
-          this.quantity * this.step
+          (this.resources[this.resource_name] || 0) >= this.quantity * this.step
         )
       } else {
         // mill: хватает ли самого ресурса + хватает ли отрицательных (costs)
         const hasMain =
-          (this.current_resources[this.resource_name] || 0) >=
-          this.quantity * this.step
+          (this.resources[this.resource_name] || 0) >= this.quantity * this.step
         const hasCosts = Object.entries(recipe)
           // eslint-disable-next-line no-unused-vars
           .filter(([_, amt]) => amt < 0)
           .every(
             ([res, amt]) =>
-              (this.current_resources[res] || 0) >=
-              Math.abs(amt) * this.quantity
+              (this.resources[res] || 0) >= Math.abs(amt) * this.quantity
           )
         return hasMain && hasCosts
       }
@@ -200,14 +228,12 @@ export default {
     is_short(recipe, res) {
       if (this.action === "buy" || this.action === "craft") {
         return (
-          (this.current_resources[res] || 0) <
-          Math.abs(recipe[res]) * this.quantity
+          (this.resources[res] || 0) < Math.abs(recipe[res]) * this.quantity
         )
       }
       if (this.action === "mill" && recipe[res] < 0) {
         return (
-          (this.current_resources[res] || 0) <
-          Math.abs(recipe[res]) * this.quantity
+          (this.resources[res] || 0) < Math.abs(recipe[res]) * this.quantity
         )
       }
       return false
@@ -274,6 +300,7 @@ export default {
   justify-content: center;
   gap: 18px;
   margin-bottom: 16px;
+  margin-top: 16px;
 }
 
 .qty-btn {

@@ -59,7 +59,6 @@
       :resource_name="resource_name"
       :action="active_action"
       :options="actions[active_action]"
-      :current_resources="current_resources"
       :step="step"
       @confirm="handleConfirm"
       @cancel="active_action = null"
@@ -93,11 +92,6 @@ export default {
       active_action: null,
       open_item_visible: false,
     }
-  },
-  computed: {
-    current_resources() {
-      return this.$store.getters["resource"]
-    },
   },
   methods: {
     openModal(action) {
