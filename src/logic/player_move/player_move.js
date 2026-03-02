@@ -31,7 +31,16 @@ import store from "@/store"
 // enemy - тот враг, в которого мы стреляем (или карта на поле, или лидер врагов).
 // isCard - флаг, картой или лидером мы ходим, нужен для сброса в кладбище
 function damage_ai_card(card, enemy, isCard, gameObj) {
-  const { field, enemy_leader, hand, deck, grave, enemies, leader } = gameObj
+  const {
+    field,
+    enemy_leader,
+    hand,
+    deck,
+    grave,
+    enemies,
+    leader,
+    enemies_grave,
+  } = gameObj
 
   const ability = card?.ability?.name
   const timeout = store.getters["selectedMoveTimeout"]
@@ -42,7 +51,10 @@ function damage_ai_card(card, enemy, isCard, gameObj) {
   } else if (ability === CardAbility.DamageAll) {
     damage_all(field, card, gameObj, timeout)
     if (enemy_leader.hp > 0) hit_one_enemy(enemy_leader, card, gameObj, timeout)
-    setTimeout(() => check_win(field, enemies, enemy_leader), timeout * 1.2)
+    setTimeout(
+      () => check_win(field, enemies, enemy_leader, enemies_grave),
+      timeout * 1.2
+    )
   } else if (ability === CardAbility.SpreadDamage) {
     spread_damage(card, gameObj, timeout)
   } else if (ability === CardAbility.DamageRow) {

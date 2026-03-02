@@ -15,38 +15,42 @@ import { CraftMillCardActionSubtype } from "@/store/const/const"
 const toast = useToast()
 
 const state = {
-  game_prices: {},
+  cards_resources_prices: {},
+  resources_transitions: {},
+  keys_rewards: {},
+  win_level_rewards: {},
+  start_level_prices: {},
 
   win_redirect: false,
 }
 
 const getters = {
-  get_kegs_price: () => {
-    return state.game_prices.pay_for_kegs
-      ? state.game_prices.pay_for_kegs * -1
-      : 0
-  },
-  get_big_kegs_price: () => {
-    return state.game_prices.pay_for_big_kegs
-      ? state.game_prices.pay_for_big_kegs * -1
-      : 0
-  },
-  get_chests_price: () => {
-    return state.game_prices.pay_for_chests
-      ? state.game_prices.pay_for_chests * -1
-      : 0
-  },
-  game_prices: state => state.game_prices,
+  cards_resources_prices: state => state.cards_resources_prices,
+  resources_transitions: state => state.resources_transitions,
+  keys_rewards: state => state.keys_rewards,
+  win_level_rewards: state => state.win_level_rewards,
+  start_level_prices: state => state.start_level_prices,
 }
 
 const mutations = {
-  // устанавливаем все игровые цены на крафт, милл итп
-  set_game_prices(state, payload) {
-    state.game_prices = payload
-  },
-
   set_win_redirect(state, payload) {
     state.win_redirect = payload
+  },
+
+  set_cards_resources_prices(state, cards_resources_prices) {
+    state.cards_resources_prices = cards_resources_prices
+  },
+  set_resources_transitions(state, resources_transitions) {
+    state.resources_transitions = resources_transitions
+  },
+  set_keys_rewards(state, keys_rewards) {
+    state.keys_rewards = keys_rewards
+  },
+  set_win_level_rewards(state, win_level_rewards) {
+    state.win_level_rewards = win_level_rewards
+  },
+  set_start_level_prices(state, start_level_prices) {
+    state.start_level_prices = start_level_prices
   },
 }
 
@@ -112,9 +116,10 @@ const actions = {
 
   async processResources({ commit, getters, dispatch }, body) {
     // в body придет обязательно subtype, data
-    // data: { difficulty: easy/normal/hard } - для оплаты игры на уровне сезона
+    // data: { wood: 201, crops: 210 } - для оплаты игры на уровне сезона
     // data: { wood: 201, scraps: 185, etc } - для получения ресурсов после прохождения уровня сезона
-    // data: { wood: -100 } - для получения и списания ресурсов на странице бонусов
+    // data: { action:buy/sell/crart/mill, resource: kegs, quantity: int, recipe: {money: -1000, etc} }
+    // - для получения и списания ресурсов на странице бонусов
     const userId = getters["getUser"].user_id
 
     try {
@@ -131,31 +136,6 @@ const actions = {
     }
   },
 
-  calculateCraftMillCardValue({ state }, obj) {
-    // процесс крафта: по цвету, или если цвета нет, то крафтим лидера значит
-    if (obj.process === "craft") {
-      if (obj.card.color === "Bronze") return state.game_prices.craft_bronze
-      else if (obj.card.color === "Silver")
-        return state.game_prices.craft_silver
-      else if (obj.card.color === "Gold") return state.game_prices.craft_gold
-      else return state.game_prices.craft_leader
-    }
-    // процесс милла: по цвету, или лидера, но нельзя если count = 0, или стартовый набор
-    if (obj.process === "mill") {
-      // нельзя: если карт 0, или если карт 1 и при этом она в стартовом наборе (unlocked, то есть)
-      if (obj.count === 0 || (obj.count === 1 && obj.card.unlocked)) {
-        toast.warning(
-          "Нельзя размиллить карту из стартового набора (или карту которой у вас и так нет, ха-ха)"
-        )
-        return
-      }
-      if (obj.card.color === "Bronze") return state.game_prices.mill_bronze
-      else if (obj.card.color === "Silver") return state.game_prices.mill_silver
-      else if (obj.card.color === "Gold") return state.game_prices.mill_gold
-      else return state.game_prices.mill_leader
-    }
-  },
-
   async processCraftMillCard({ getters, commit, dispatch }, body) {
     let userId = getters["getUser"].user_id
     const subtype = body.subtype
@@ -166,7 +146,7 @@ const actions = {
           "{cardId}",
           body.cardId
         ),
-        data: { subtype: subtype },
+        data: { subtype: subtype, recipe: body.recipe },
       })
       const msg =
         subtype === CraftMillCardActionSubtype.craftCard ||

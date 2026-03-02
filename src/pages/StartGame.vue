@@ -24,16 +24,29 @@
 
       <!-- Цена и кнопка старта -->
       <div class="start-section">
+        <span class="global_text price-label">Стоимость игры</span>
         <div class="play-price">
-          <span class="global_text price-label">Стоимость игры</span>
-          <div class="price-row">
-            <b class="price-amount">{{ play_price * -1 }}</b>
-            <img
-              :src="require(`@/assets/icons/resources/wood.svg`)"
-              alt=""
-              class="wood"
-            />
-          </div>
+          <resource-item
+            name="crops"
+            :count="play_price.crops"
+            style="transform: scale(1.5)"
+          />
+          <resource-item
+            name="wood"
+            :count="play_price.wood"
+            style="transform: scale(1.5)"
+          />
+          <resource-item
+            v-if="play_price.silk"
+            name="silk"
+            :count="play_price.silk"
+            style="transform: scale(1.5)"
+          />
+          <resource-item
+            name="money"
+            :count="play_price.money"
+            style="transform: scale(1.5)"
+          />
         </div>
 
         <button @click="start_game" :disabled="loading" class="btn-start">
@@ -59,9 +72,11 @@ import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vu
 import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
 import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
 import DeckPreviewComp from "@/components/DeckPreviewComp.vue"
+import ResourceItem from "@/components/UI/ResourceItem.vue"
 export default {
   name: "StartGame",
   components: {
+    ResourceItem,
     DeckPreviewComp,
     LevelPreviewComp,
     DecksListModal,
@@ -80,12 +95,29 @@ export default {
   computed: {
     // теперь это используется только для отображения, и всё равно мы на бэке всё валидируем
     play_price() {
+      const config = this.$store.getters["start_level_prices"]
       const diff = this.$store.state.game.level.difficulty
-      const price = this.$store.state.user_actions.game_prices
-      if (diff === "easy") return price.play_level_easy
-      else if (diff === "normal") return price.play_level_normal
-      else if (diff === "hard") return price.play_level_hard
-      else return "Уровень не выбран!"
+      const cards = this.selectedDeck.deck.cards
+
+      const result = {}
+
+      // 1. Стоимость по сложности уровня
+      const diff_costs = config.levels_difficulty_values[diff] || {}
+      for (const [resource, cfg] of Object.entries(diff_costs)) {
+        result[resource] = (result[resource] || 0) + Math.abs(cfg.value)
+      }
+
+      // 2. Стоимость каждой карты в колоде
+      const card_costs = config.player_cards_values
+      for (const card of cards) {
+        const color = card.card.color.toLowerCase() // "Bronze" → "bronze"
+        const color_costs = card_costs[color] || {}
+        for (const [resource, value] of Object.entries(color_costs)) {
+          result[resource] = (result[resource] || 0) + Math.abs(value)
+        }
+      }
+
+      return result
     },
     selectedLevel() {
       return this.$store.state.game.whole_level
@@ -97,11 +129,16 @@ export default {
   methods: {
     async start_game() {
       this.loading = true
+
+      // здесь мы все значения поставили с минусом, мы же списываем ресурс
+      const payload = Object.fromEntries(
+        Object.entries(this.play_price).map(([k, v]) => [k, -v])
+      )
+
       try {
-        // вот здесь мы присылаем level.id, на бэке всё вычислим тоже, сколько нужно заплатить
         await this.$store.dispatch("processResources", {
           subtype: PayResourcesSubtype.startSeasonLevel,
-          data: { difficulty: this.$store.state.game.level.difficulty },
+          data: payload,
         })
         this.$store.commit("set_start_game_redirect", true)
         setTimeout(() => {
@@ -183,7 +220,6 @@ export default {
   }
 }
 
-/* --- Секция старта --- */
 .start-section {
   display: flex;
   flex-direction: column;
@@ -193,35 +229,22 @@ export default {
 
 .play-price {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: 32px;
 }
 
 .price-label {
-  font-size: 13px;
+  font-size: 23px;
   color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
   letter-spacing: 1px;
-}
-
-.price-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.price-amount {
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.wood {
-  max-height: 28px;
+  margin: 18px;
 }
 
 .btn-start {
   width: 200px;
   height: 60px;
+  margin: 18px;
 }
 </style>

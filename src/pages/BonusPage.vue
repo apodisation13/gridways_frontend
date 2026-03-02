@@ -2,48 +2,35 @@
   <div>
     <div class="bonus-page" v-if="!show_reward_page">
       <div class="title">
-        <div class="title__text">
-          <h1>Страница бонусов</h1>
-        </div>
+        <h1>Страница бонусов</h1>
       </div>
-      <div class="resources">
-        <!--Строка открытия и приобретения kegs-->
-        <bonus-page-resource
-          resource_name="kegs"
-          :resource_count="resource.kegs"
-          :resource_price="kegs_price"
-          @open_item="open_keg"
-          @add_item="add_kegs"
-        />
+      <!-- Переключатель вкладок -->
+      <div class="tabs">
+        <div class="tabs__slider" :style="sliderStyle"></div>
+        <button
+          v-for="(tab, idx) in tabs"
+          :key="idx"
+          class="tabs__btn"
+          :class="{ 'tabs__btn--active': active_tab === idx }"
+          @click="active_tab = idx"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
 
-        <!--Строка открытия и приобретения big_kegs-->
+      <div class="resources-grid">
         <bonus-page-resource
-          resource_name="big_kegs"
-          :resource_count="resource.big_kegs"
-          :resource_price="big_kegs_price"
-          @open_item="open_big_keg"
-          @add_item="add_big_kegs"
-        />
-
-        <!--Строка открытия и приобретения chests-->
-        <bonus-page-resource
-          resource_name="chests"
-          :resource_count="resource.chests"
-          :resource_price="chests_price"
-          @open_item="open_chest"
-          @add_item="add_chests"
-        />
-
-        <!--Строка открытия keys-->
-        <bonus-page-resource
-          resource_name="keys"
-          :resource_count="resource.keys"
-          @open_item="open_key"
+          v-for="(config, name) in filtered_resources"
+          :key="name"
+          :resource_name="name"
+          :resource_count="resource[name] || 0"
+          :actions="config"
+          :step="config.step"
+          @action="handleAction"
+          @open-resource-confirm="openResource"
         />
       </div>
     </div>
-
-    <!-- Страница обработки наград -->
     <reward-comp
       v-else
       :visible="show_reward_page"
@@ -57,11 +44,12 @@
 </template>
 
 <script>
-import { getRandomReward } from "@/logic/random_rewards"
-import { choice } from "@/lib/utils"
-import BonusPageResource from "@/components/UI/BonusPageResource"
+import BonusPageResource from "@/components/Pages/BonusPage/BonusPageResource.vue"
 import RewardComp from "@/components/Pages/BonusPage/RewardComp.vue"
 import { PayResourcesSubtype } from "@/store/const/const"
+import { choice } from "@/lib/utils"
+import { getRandomReward } from "@/logic/random_rewards"
+
 export default {
   components: { BonusPageResource, RewardComp },
   created() {
@@ -72,6 +60,24 @@ export default {
       this.init()
     },
   },
+  data() {
+    return {
+      pool: [],
+      show_reward_page: false,
+      reward_name: "",
+      random_cards: [],
+      random_reward_choice: null,
+      active_tab: 0,
+      tabs: [
+        { label: "Награды", keys: ["kegs", "big_kegs", "chests", "keys"] },
+        {
+          label: "Для карт",
+          keys: ["scraps", "bronze_ingots", "silver_ingots", "gold_ingots"],
+        },
+        { label: "Для уровней", keys: ["crops", "wood", "silk"] },
+      ],
+    }
+  },
   computed: {
     cards() {
       return this.$store.getters["all_cards"]
@@ -79,33 +85,37 @@ export default {
     resource() {
       return this.$store.getters["resource"]
     },
-    kegs_price() {
-      return this.$store.getters["get_kegs_price"]
+    filtered_resources() {
+      const keys = this.tabs[this.active_tab].keys
+      return Object.fromEntries(
+        Object.entries(this.resources_config).filter(([name]) =>
+          keys.includes(name)
+        )
+      )
     },
-    big_kegs_price() {
-      return this.$store.getters["get_big_kegs_price"]
+    sliderStyle() {
+      return {
+        transform: `translateX(${this.active_tab * 100}%)`,
+        width: `${100 / this.tabs.length}%`,
+      }
     },
-    chests_price() {
-      return this.$store.getters["get_chests_price"]
+    resources_config() {
+      const transitions = this.$store.getters["resources_transitions"]
+
+      return Object.keys(transitions)
+        .sort((a, b) => transitions[a].index - transitions[b].index)
+        .reduce((acc, key) => {
+          acc[key] = transitions[key]
+          return acc
+        }, {})
     },
-  },
-  data() {
-    return {
-      pool: [], // список всех карт, из которых мы будем брать рандомные для награды
-      random_cards: [], // список рандомных карт для награды
-      keg_len: 3, // в бочке по дефолту 3 карты, а в большой бочке 5 карт
-      random_reward_choice: null, // выбор рандомной награды из ключа
-      reward_name: "",
-      show_reward_page: false,
-      subtype: PayResourcesSubtype.bonusReward,
-    }
   },
   methods: {
     init() {
       this.pool = []
       this.cards.forEach(card => {
         if (card.card.color === "Bronze") {
-          for (let i = 0; i < 20; i++) {
+          for (let i = 0; i < 30; i++) {
             this.pool.push(card)
           }
         } else if (card.card.color === "Silver") {
@@ -117,8 +127,97 @@ export default {
       })
     },
 
-    is_enough_wood(value) {
-      return this.resource.wood > value
+    async pay_resource(data, subtype) {
+      await this.$store.dispatch("processResources", {
+        subtype: subtype,
+        data,
+      })
+    },
+
+    async handleAction({ resource_name, action, recipe, quantity }) {
+      await this.pay_resource(
+        {
+          resource: resource_name,
+          action,
+          quantity,
+          recipe,
+        },
+        PayResourcesSubtype.resourceTransition
+      )
+    },
+
+    async openResource(resource_name) {
+      console.log(resource_name)
+      if (resource_name === "kegs") await this.open_keg()
+      else if (resource_name === "big_kegs") await this.open_big_keg()
+      else if (resource_name === "chests") await this.open_chest()
+      else if (resource_name === "keys") await this.open_key()
+    },
+
+    async open_keg() {
+      if (this.resource.kegs <= 0) return
+      await this.pay_resource(
+        { kegs: -1 },
+        PayResourcesSubtype.openBonusResource
+      )
+      this.keg_len = 3
+      this.random_cards = []
+      this.reward_name = "kegs"
+      for (let i = 0; i < this.keg_len; i++) {
+        this.random_cards.push(this.pool[choice(this.pool)])
+      }
+      this.show_reward_page = true
+    },
+    async open_big_keg() {
+      if (this.resource.big_kegs <= 0) return
+      await this.pay_resource(
+        { big_kegs: -1 },
+        PayResourcesSubtype.openBonusResource
+      )
+      this.keg_len = 5
+      this.random_cards = []
+      this.reward_name = "big_kegs"
+      for (let i = 0; i < this.keg_len; i++) {
+        this.random_cards.push(this.pool[choice(this.pool)])
+      }
+      this.show_reward_page = true
+    },
+    async open_chest() {
+      if (this.resource.chests <= 0) return
+      await this.pay_resource(
+        { chests: -1 },
+        PayResourcesSubtype.openBonusResource
+      )
+      this.keg_len = 3
+      this.random_cards = []
+      this.reward_name = "chests"
+      for (let i = 0; i < this.keg_len; i++) {
+        this.random_cards.push(this.pool[choice(this.pool)])
+      }
+      this.show_reward_page = true
+    },
+
+    async open_key() {
+      await this.pay_resource(
+        { keys: -1 },
+        PayResourcesSubtype.openBonusResource
+      )
+      const key_reward = []
+      for (let i = 0; i < 3; i++) {
+        key_reward.push(getRandomReward(this.$store.getters["keys_rewards"]))
+      }
+      this.reward_name = "keys"
+      this.random_reward_choice = key_reward
+      this.show_reward_page = true
+    },
+
+    async accept_random_reward(res) {
+      const { resource, value } = res
+      await this.pay_resource(
+        { [resource]: value },
+        PayResourcesSubtype.acceptKeyReward
+      )
+      this.clear_reward()
     },
 
     clear_reward() {
@@ -126,108 +225,16 @@ export default {
       this.random_reward_choice = null
       this.show_reward_page = false
     },
-
-    async pay_resource(data) {
-      await this.$store.dispatch("processResources", {
-        subtype: this.subtype,
-        data: data,
-      })
-    },
-
-    async add_kegs(quantity) {
-      const final_price = quantity * this.kegs_price
-      if (!this.is_enough_wood(final_price)) return
-      await this.pay_resource({
-        wood: -final_price,
-        kegs: quantity,
-      })
-    },
-
-    async open_keg() {
-      if (this.resource.kegs <= 0) return
-      this.keg_len = 3
-      this.random_cards = []
-      this.reward_name = "kegs"
-      this.show_reward_page = true
-      for (let i = 0; i < this.keg_len; i++) {
-        this.random_cards.push(this.pool[choice(this.pool)])
-      }
-      await this.pay_resource({ kegs: -1 })
-    },
-
-    async add_big_kegs(quantity) {
-      const final_price = quantity * this.big_kegs_price
-      if (!this.is_enough_wood(final_price)) return
-      await this.pay_resource({
-        wood: -final_price,
-        big_kegs: quantity,
-      })
-    },
-
-    async open_big_keg() {
-      if (this.resource.big_kegs <= 0) return
-      this.keg_len = 5
-      this.random_cards = []
-      this.reward_name = "big_kegs"
-      this.show_reward_page = true
-      for (let i = 0; i < this.keg_len; i++) {
-        this.random_cards.push(this.pool[choice(this.pool)])
-      }
-      await this.pay_resource({ big_kegs: -1 })
-    },
-
-    async add_chests(quantity) {
-      const final_price = quantity * this.chests_price
-      if (!this.is_enough_wood(final_price)) return
-      await this.pay_resource({
-        wood: -final_price,
-        chests: quantity,
-      })
-    },
-    async open_chest() {
-      if (this.resource.chests <= 0) return
-      this.keg_len = 3
-      this.random_cards = []
-      this.reward_name = "chests"
-      this.show_reward_page = true
-      for (let i = 0; i < this.keg_len; i++) {
-        this.random_cards.push(this.pool[choice(this.pool)])
-      }
-      await this.pay_resource({ chests: -1 })
-    },
-
-    async open_key() {
-      if (this.resource.keys <= 0) return
-      await this.pay_resource({ keys: -1 })
-      const key_reward = []
-      for (let i = 0; i < 3; i++) {
-        key_reward.push(getRandomReward())
-      }
-      this.reward_name = "keys"
-      this.random_reward_choice = key_reward
-      this.show_reward_page = true
-    },
-
-    // функция принятия награды с ключа
-    async accept_random_reward(res) {
-      const { resource, value } = res
-      let reward = {}
-      reward[resource] = value
-      await this.pay_resource(reward)
-      this.clear_reward()
-    },
   },
-  emits: ["add_item"],
 }
 </script>
 
 <style scoped>
 .bonus-page {
   width: 98%;
-  height: 80vh;
-  /* border: solid 1px blueviolet; */
   margin: 1%;
-  /*background-image: url('~@/assets/brick.jpg');*/
+  height: 75vh;
+  overflow-y: auto;
 }
 
 div {
@@ -236,23 +243,61 @@ div {
   color: white;
 }
 
+.tabs {
+  position: relative;
+  display: flex;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  margin: 0 8px 12px;
+  padding: 3px;
+}
+
+.tabs__slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: calc(100% - 6px);
+  border-radius: 8px;
+  background: var(--primary-gold-gradient, #c49000);
+  transition: transform 0.25s ease;
+  pointer-events: none;
+}
+
+.tabs__btn {
+  flex: 1;
+  z-index: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 4px;
+  font-family: "Philosopher", serif;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.2s;
+}
+
+.tabs__btn--active {
+  color: #1a1208;
+  font-weight: bold;
+}
+
 .title {
   text-align: center;
   margin-top: 10px;
+  margin-bottom: 16px;
 }
 
-.title__text h1 {
+.title h1 {
   font-family: "Philosopher", serif;
   font-size: 2rem;
   line-height: 2rem;
   color: hsl(39, 82%, 62%);
 }
 
-.resources {
-  min-height: 90%;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: space-around;
+.resources-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 8px;
 }
 </style>

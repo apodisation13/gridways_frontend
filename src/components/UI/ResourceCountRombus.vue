@@ -42,10 +42,10 @@ export default {
 }
 
 .resource-count__value {
-  font-family: "Philosopher";
+  font-family: "Philosopher", serif;
   font-style: normal;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 14px;
   line-height: 120%;
   background: linear-gradient(
     183.6deg,

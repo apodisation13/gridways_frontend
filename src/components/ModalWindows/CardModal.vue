@@ -25,14 +25,14 @@
       <div class="mill_craft_block" v-if="deckbuilder">
         <div class="divb" v-if="!bonus">
           <button class="global_text btn btn-mill" @click="mill">
-            Уничтожить
+            Уничтожить ✕
           </button>
           <card-count-triangle
             :count="count"
             :card-color="background_color_triangle(card.color)"
           />
           <button class="global_text btn btn-craft" @click="craft">
-            Создать
+            Создать ⚒
           </button>
         </div>
         <div class="divb" v-if="bonus">
@@ -40,18 +40,21 @@
         </div>
       </div>
     </template>
-    <yesno-modal
-      v-if="show_yesno_mill"
-      :item_price="resource_value"
-      @confirm="confirm_mill"
-      @cancel="cancel"
-    />
-    <yesno-modal
-      v-if="show_yesno_craft"
-      is_craft
-      :item_price="resource_value"
+    <card-action-modal
+      v-if="show_modal_craft"
+      action="craft"
+      :options="craft_options"
+      :card="card"
       @confirm="confirm_craft"
-      @cancel="cancel"
+      @cancel="show_modal_craft = false"
+    />
+    <card-action-modal
+      v-if="show_modal_mill"
+      action="mill"
+      :options="mill_options"
+      :card="card"
+      @confirm="confirm_mill"
+      @cancel="show_modal_mill = false"
     />
   </modal-window>
 </template>
@@ -66,21 +69,26 @@ import {
 import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose"
 import ModalWindow from "@/components/ModalWindows/ModalWindow"
-import YesnoModal from "@/components/ModalWindows/YesnoModal"
 import CardUi from "@/components/Cards/CardUi"
 import EnemyUi from "@/components/Cards/EnemyUi"
 import CardDescriptions from "@/components/Cards/CardDescriptions"
 import { CraftMillCardActionSubtype } from "@/store/const/const"
+import CardActionModal from "@/components/ModalWindows/CardActionModal.vue"
+import { useToast } from "vue-toastification"
 export default {
   name: "card-modal",
   components: {
+    CardActionModal,
     CardCountTriangle,
     CardDescriptions,
     EnemyUi,
     CardUi,
     ModalWindow,
     ButtonClose,
-    YesnoModal,
+  },
+  setup() {
+    const toast = useToast()
+    return { toast }
   },
   props: {
     // брать границу карты как для лидеров
@@ -132,11 +140,24 @@ export default {
   },
   data() {
     return {
-      show_passive: false,
-      show_yesno_mill: false,
-      show_yesno_craft: false,
-      resource_value: 0,
+      show_modal_mill: false,
+      show_modal_craft: false,
     }
+  },
+  computed: {
+    card_color_key() {
+      return this.card.color ? this.card.color : "leader"
+    },
+    craft_options() {
+      const config = this.$store.getters["cards_resources_prices"]
+      const cfg = config[this.card_color_key]
+      return cfg["craft_card"] || cfg["craft_leader"] || []
+    },
+    mill_options() {
+      const config = this.$store.getters["cards_resources_prices"]
+      const cfg = config[this.card_color_key]
+      return cfg["mill_card"] || cfg["mill_leader"]
+    },
   },
   methods: {
     close_self() {
@@ -150,35 +171,21 @@ export default {
         ? background_color_leader(this.card.faction)
         : background_color_hp(color)
     },
-    cancel() {
-      this.show_yesno_mill = false
-      this.show_yesno_craft = false
+    mill() {
+      if (this.count === 0 || (this.count === 1 && this.card.unlocked)) {
+        this.toast.warning(
+          "Нельзя размиллить карту из стартового набора или ту, которой и так 0"
+        )
+        return
+      }
+      this.show_modal_mill = true
     },
-    async mill() {
-      let can_mill = await this.$store.dispatch("calculateCraftMillCardValue", {
-        card: this.card,
-        process: "mill",
-        count: this.count,
-      })
-      if (!can_mill) return
-      this.resource_value = can_mill
-      this.show_yesno_mill = true
+    craft() {
+      this.show_modal_craft = true
     },
-    async craft() {
-      let can_craft = await this.$store.dispatch(
-        "calculateCraftMillCardValue",
-        {
-          card: this.card,
-          process: "craft",
-          count: this.count,
-        }
-      )
-      if (!can_craft) return
-      this.resource_value = can_craft
-      this.show_yesno_craft = true
-    },
+
     async confirm_mill() {
-      this.show_yesno_mill = false
+      this.show_modal_mill = false
       const subtypeCardAction =
         this.user_card?.card?.color !== undefined
           ? CraftMillCardActionSubtype.millCard
@@ -189,8 +196,8 @@ export default {
       }
       await this.$store.dispatch("processCraftMillCard", data)
     },
-    async confirm_craft() {
-      this.show_yesno_craft = false
+    async confirm_craft(recipe) {
+      this.show_modal_craft = false
       const subtypeCardAction =
         this.user_card?.card?.color !== undefined
           ? CraftMillCardActionSubtype.craftCard
@@ -198,6 +205,7 @@ export default {
       const data = {
         cardId: this.user_card.card.id,
         subtype: subtypeCardAction,
+        recipe: recipe,
       }
       await this.$store.dispatch("processCraftMillCard", data)
     },

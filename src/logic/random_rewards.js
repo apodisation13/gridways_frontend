@@ -1,51 +1,65 @@
-import { choice, randInt } from "@/lib/utils"
+import { randInt } from "@/lib/utils"
+import store from "@/store"
+import { CardColor } from "@/logic/models"
 
-function getValue(resource) {
-  if (resource === "kegs" || resource === "big_kegs" || resource === "chests")
-    return 1
-  else if (resource === "scraps") return randInt(100, 200)
-  else if (resource === "wood") return randInt(150, 250)
+function getValue(cfg) {
+  if (cfg.type === "simple") return cfg.value
+  if (cfg.type === "diapason") return randInt(cfg.min, cfg.max)
 }
 
-export function getRandomReward() {
-  const random_reward = [
-    "scraps",
-    "scraps",
-    "scraps",
-    "wood",
-    "wood",
-    "wood",
-    "wood",
-    "wood",
-    "kegs",
-    "kegs",
-    "kegs",
-    "big_kegs",
-    "big_kegs",
-    "chests",
-  ]
-  const random_choice = choice(random_reward)
-  const resource = random_reward[random_choice]
-  const value = getValue(resource)
-  return { resource: resource, value: value }
+export function getRandomReward(rewards_config) {
+  // расчет награды за открытый ключ
+  const entries = Object.entries(rewards_config)
+  const totalWeight = entries.reduce((sum, [, cfg]) => sum + cfg.probability, 0)
+
+  let rand = Math.random() * totalWeight
+  for (const [resource, cfg] of entries) {
+    rand -= cfg.probability
+    if (rand <= 0) {
+      return { resource, value: getValue(cfg) }
+    }
+  }
+
+  // fallback на последний элемент (на случай float погрешности)
+  const [resource, cfg] = entries[entries.length - 1]
+  return { resource, value: getValue(cfg) }
 }
 
-export function getRewardForLevel(win_price) {
-  let pay_data = {}
+function getRewardsForEnemiesGrave(rewards) {
+  const enemies_grave = store.getters["enemies_grave"]
 
-  pay_data.wood = randInt(win_price - 25, win_price + 25)
-  pay_data.scraps = randInt(win_price - 25, win_price + 25)
+  const bronze_enemies = enemies_grave.filter(
+    e => e.color === CardColor.Bronze && !e.token
+  )
+  const silver_enemies = enemies_grave.filter(
+    e => e.color === CardColor.Silver && !e.token
+  )
+  const gold_enemies = enemies_grave.filter(
+    e => e.color === CardColor.Gold && !e.token
+  )
 
-  let kegs = [0, 0, 0, 1] // 25%!!!
-  let chance = kegs[choice(kegs)]
-  pay_data.kegs = chance === 1 ? 1 : 0
+  if (bronze_enemies.length > 0) rewards["raw_bronze"] = bronze_enemies.length
+  if (silver_enemies.length > 0) rewards["raw_silver"] = silver_enemies.length
+  if (gold_enemies.length > 0) rewards["raw_gold"] = gold_enemies.length
 
-  let big_kegs = [0, 0, 0, 0, 0, 0, 0, 1] // 18%!!!
-  let chance2 = big_kegs[choice(big_kegs)]
-  if (chance2 === 1) pay_data.big_kegs = 1
-  else pay_data.big_kegs = 0
+  return rewards
+}
 
-  pay_data.keys = 1
+export function getRewardForLevel(rewards_config) {
+  // награда за прохождение уровня, с учетом конфига и убитых врагов
+  let result = {}
 
-  return pay_data
+  for (const [resource, cfg] of Object.entries(rewards_config)) {
+    // если probability не указано — выпадает всегда
+    if (cfg.probability !== undefined) {
+      const roll = Math.random() * 100
+      if (roll > cfg.probability) continue // не повезло, пропускаем
+    }
+
+    result[resource] = getValue(cfg)
+  }
+
+  // добавляем туда награду за убитых врагов
+  result = getRewardsForEnemiesGrave(result)
+  return result
 }

@@ -28,6 +28,6 @@ export function enemy_takes_damage(enemy, card, gameObj, timeout = 1000) {
       }
     }
 
-    check_win(field, enemies, enemy_leader)
+    check_win(field, enemies, enemy_leader, enemies_grave)
   }, timeout)
 }

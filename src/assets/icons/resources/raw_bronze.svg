@@ -1,0 +1,61 @@
+<svg width="29" height="31" viewBox="0 0 29 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g filter="url(#filter0_bronze)">
+        <!-- Тень под куском -->
+        <ellipse cx="14" cy="26" rx="8" ry="2.5" fill="#8B4513" fill-opacity="0.3"/>
+
+        <!-- Основная масса куска - неровная форма -->
+        <path d="M6 18L4 12L8 7L14 5L20 6L24 10L26 16L24 22L20 25L10 26L6 22V18Z" fill="#CD7F32"/>
+
+        <!-- Тёмные грани (тени) -->
+        <path d="M6 18L4 12L8 9L10 14L6 18Z" fill="#8B5A2B"/>
+        <path d="M10 26L6 22L6 18L10 21L10 26Z" fill="#7A4A1A"/>
+        <path d="M20 25L24 22L24 18L20 21V25Z" fill="#6B4513"/>
+        <path d="M24 22L26 16L24 12L22 17L24 22Z" fill="#8B5A2B"/>
+
+        <!-- Средние тона - основные плоскости -->
+        <path d="M8 9L14 7L18 8L14 13L10 14L8 9Z" fill="#B87333"/>
+        <path d="M18 8L22 10L24 12L20 14L14 13L18 8Z" fill="#A66B2B"/>
+        <path d="M10 14L14 13L14 19L10 21L10 14Z" fill="#CD7F32"/>
+        <path d="M14 13L20 14L20 21L14 19V13Z" fill="#B87333"/>
+        <path d="M10 21L14 19L20 21L20 25L10 26L10 21Z" fill="#996633"/>
+
+        <!-- Светлые грани (блики) -->
+        <path d="M14 5L20 6L18 8L14 7L14 5Z" fill="#DFA878"/>
+        <path d="M8 7L14 5L14 7L8 9L8 7Z" fill="#E8B888"/>
+        <path d="M20 6L24 10L22 10L18 8L20 6Z" fill="#D49058"/>
+
+        <!-- Текстура - неровности поверхности -->
+        <ellipse cx="12" cy="11" rx="1.5" ry="1" fill="#A66B2B"/>
+        <ellipse cx="17" cy="16" rx="2" ry="1.2" fill="#996633"/>
+        <ellipse cx="11" cy="19" rx="1.2" ry="0.8" fill="#8B5A2B"/>
+        <ellipse cx="18" cy="22" rx="1.5" ry="0.9" fill="#7A4A1A"/>
+        <circle cx="15" cy="10" r="0.8" fill="#8B5A2B"/>
+        <circle cx="21" cy="17" r="1" fill="#6B4513"/>
+
+        <!-- Яркие блики - металлический блеск -->
+        <path d="M10 7.5L13 6L14 7L11 8.5L10 7.5Z" fill="#F0C090" fill-opacity="0.9"/>
+        <path d="M15 6L18 7L17 8L15 7.5V6Z" fill="#FFDAB0" fill-opacity="0.8"/>
+
+        <!-- Искры/точечные блики -->
+        <circle cx="12" cy="7" r="0.8" fill="#FFE4C4"/>
+        <circle cx="19" cy="8" r="0.6" fill="#FFDAB0" fill-opacity="0.9"/>
+        <circle cx="9" cy="10" r="0.5" fill="#FFFFFF" fill-opacity="0.7"/>
+
+        <!-- Патина/окисление (зеленоватые пятна) -->
+        <ellipse cx="8" cy="15" rx="1" ry="0.7" fill="#698B69" fill-opacity="0.4"/>
+        <ellipse cx="22" cy="20" rx="0.8" ry="0.6" fill="#5F8A5F" fill-opacity="0.3"/>
+        <circle cx="13" cy="23" r="0.6" fill="#6B8E6B" fill-opacity="0.35"/>
+    </g>
+    <defs>
+        <filter id="filter0_bronze" x="0" y="0" width="29" height="31" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+            <feOffset dx="1" dy="2"/>
+            <feGaussianBlur stdDeviation="2"/>
+            <feComposite in2="hardAlpha" operator="out"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+        </filter>
+    </defs>
+</svg>
