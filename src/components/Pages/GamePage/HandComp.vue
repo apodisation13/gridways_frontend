@@ -1,17 +1,17 @@
 <template>
   <div class="hand">
-    <div class="hand-list">
-      <card-item
-        v-for="(card, index) in hand"
+    <transition-group name="card-hand" tag="div" class="hand-list">
+      <div
+        v-for="(card, index) in displayedHand"
         :key="card.id || index"
-        :card="card"
-        :index="index"
-        class="card_in_hand"
-        :style="{ '--custom-z-index': 10 - index }"
+        class="card_wrap"
+        :style="cardStyle(index)"
         @mousedown="handleCardMouseDown($event, index)"
         @touchstart="handleCardTouchStart($event, index)"
-      />
-    </div>
+      >
+        <card-item :card="card" :index="index" class="card_in_hand" />
+      </div>
+    </transition-group>
   </div>
 </template>
 
@@ -38,6 +38,15 @@ export default {
       required: true,
       type: Boolean,
     },
+    // 2 параметра для анимации карт в руке - появление и исчезновение
+    drawing: {
+      type: Boolean,
+      default: false,
+    },
+    initialHandSize: {
+      type: Number,
+      default: Infinity,
+    },
   },
   data() {
     return {
@@ -49,7 +58,16 @@ export default {
       selectedCardIndex: -1,
       canvas: null,
       ctx: null,
+      effectiveInitialSize: 0,
     }
+  },
+  computed: {
+    displayedHand() {
+      if (this.drawing) {
+        return this.hand.slice(0, this.initialHandSize)
+      }
+      return this.hand
+    },
   },
   mounted() {
     console.log("компонент hand-comp mounted")
@@ -62,6 +80,16 @@ export default {
     this.removeArrowCanvas()
   },
   methods: {
+    cardStyle(index) {
+      const mid = (this.displayedHand.length - 1) / 2
+      const offset = index - mid
+      return {
+        "--z": 10 - index,
+        "--rot": `${offset}deg`,
+        "--arc": `${-Math.abs(offset) * 3}px`,
+      }
+    },
+
     handleResize() {
       if (this.canvas) {
         this.canvas.width = window.innerWidth
@@ -469,37 +497,93 @@ export default {
 .hand-list {
   display: flex;
   justify-content: space-around;
+  align-items: flex-end;
   flex-shrink: 1;
   margin: 0 10px;
+  position: relative;
 }
 
-.card_in_hand {
-  z-index: var(--custom-z-index);
+.card_wrap {
+  z-index: var(--z);
   width: 26%;
   margin-left: -10%;
   margin-right: -10%;
-  border-radius: 2px;
+  transform: rotate(var(--rot)) translateY(var(--arc));
+  transform-origin: bottom center;
+  transition: transform 0.2s ease;
+  cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
-  -ms-user-select: none;
   -webkit-user-drag: none;
-  cursor: pointer;
 }
 
-.card_in_hand:first-child {
+.card_wrap:first-child {
   margin-left: -5%;
 }
-
-.card_in_hand:last-child {
+.card_wrap:last-child {
   margin-right: -5%;
 }
-.card_in_hand:hover {
-  margin-top: -2%;
+
+.card_wrap:hover {
+  transform: rotate(var(--rot)) translateY(calc(var(--arc) - 18px)) scale(1.12);
   z-index: 999;
 }
-/* Убираем hover эффект когда модалка открыта */
-.hand.modal-open .card_in_hand:hover {
-  margin-top: 0;
-  z-index: var(--custom-z-index);
+
+.card_in_hand {
+  width: 100%;
+  border-radius: 2px;
+}
+
+.hand.modal-open .card_wrap:hover {
+  transform: rotate(var(--rot)) translateY(var(--arc));
+  z-index: var(--z);
+}
+
+/* Анимации */
+.card-hand-enter-active {
+  animation: card-deal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transition: none;
+}
+.card-hand-leave-active {
+  animation: card-play 0.45s ease-in both;
+  position: absolute;
+  pointer-events: none;
+  z-index: 999;
+  transition: none;
+}
+.card-hand-move {
+  transition: transform 0.4s ease;
+}
+
+@keyframes card-deal {
+  0% {
+    opacity: 0;
+    transform: translateY(90px) scale(0.55);
+  }
+  65% {
+    opacity: 1;
+    transform: rotate(var(--rot)) translateY(calc(var(--arc) - 18px))
+      scale(1.07);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(var(--rot)) translateY(var(--arc)) scale(1);
+  }
+}
+
+@keyframes card-play {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--rot)) translateY(var(--arc)) scale(1);
+  }
+  30% {
+    opacity: 1;
+    transform: rotate(calc(var(--rot) * 0.3))
+      translateY(calc(var(--arc) - 60px)) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-5deg) translateY(-220px) scale(0.6);
+  }
 }
 </style>

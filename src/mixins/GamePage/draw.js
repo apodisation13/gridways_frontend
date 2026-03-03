@@ -6,6 +6,7 @@ export default {
       redraws: 3, // ИЗНАЧАЛЬНОЕ ЗНАЧЕНИЕ 3, А ДАЛЬШЕ БУДЕТ 1!!!
       can_draw: false, // возможность вытянуть карту
       draw: false, // показать ли модальное окно с редро
+      initialHandSize: 0, // штука для анимации руки, появление и исчезновение
     }
   },
   methods: {
@@ -20,6 +21,7 @@ export default {
 
     // тянем одну карту из деки, блокируем карты игрока чтобы ходить было нельзя
     draw_one_card() {
+      this.initialHandSize = this.gameObj.hand.length // штука для анимации руки
       if (this.calc_can_draw()) {
         let card1 = choice_pop(this.gameObj.deck)
         this.gameObj.hand.push(card1)
