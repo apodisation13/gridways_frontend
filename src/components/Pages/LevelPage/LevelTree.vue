@@ -112,15 +112,19 @@ export default {
       })
     },
     squareConfig(item) {
+      const unlocked = this.userSeasonUnlocked
       return {
         x: item.level.x,
         y: item.level.y,
         width: this.w,
         height: this.w,
+        cornerRadius: 8,
         fill: this.levelColor(item),
         stroke: this.levelBorder(item),
+        strokeWidth: item.finished ? 0 : 1.5,
         shadowColor: this.levelFaction(item),
-        shadowBlur: 7,
+        shadowBlur: !unlocked ? 0 : item.finished ? 14 : 9,
+        shadowOpacity: unlocked ? 0.6 : 0,
       }
     },
     levelColor(item) {
