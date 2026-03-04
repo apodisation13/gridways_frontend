@@ -356,15 +356,13 @@ export default {
   width: 24.5%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center; /* или flex-start */
+  gap: 8px; /* фиксированный отступ между элементами */
 }
 
 .div-two-buttons {
   height: 7.5vh;
   width: 98%;
-  /* border: solid 1px red; */
-  margin-bottom: 1%;
-  margin-top: 1%;
   display: flex;
   flex-direction: row;
   gap: 1px;
@@ -373,8 +371,5 @@ export default {
 .draw {
   height: 6.3vh;
   width: 98%;
-  /* border: solid 1px red; */
-  margin-bottom: 1%;
-  margin-top: 1%;
 }
 </style>
