@@ -151,10 +151,12 @@
         </text>
       </svg>
     </button>
-    <modal-window v-if="flag" v-touch:swipe="close_self">
-      <button-close @close_self="close_self" />
-      <card-list-component :cards="grave" />
-    </modal-window>
+    <transition name="modal">
+      <modal-window v-if="flag" v-touch:swipe="close_self">
+        <button-close @close_self="close_self" />
+        <card-list-component :cards="grave" />
+      </modal-window>
+    </transition>
   </div>
 </template>
 
@@ -265,6 +267,31 @@ export default {
   50% {
     transform: scale(1.05);
     filter: drop-shadow(0 0 15px rgba(255, 204, 0, 0.8));
+  }
+}
+
+.modal-enter-active {
+  animation: modal-fade-in 0.25s ease-out;
+}
+.modal-leave-active {
+  animation: modal-fade-out 0.25s ease-in;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }
 </style>
