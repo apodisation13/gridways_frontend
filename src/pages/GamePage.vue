@@ -68,7 +68,7 @@
       :field="gameObj.field"
       :enemy_leader="gameObj.enemy_leader"
       :player_cards_active="isActive.player_cards"
-      :drawing="draw || show_pick_a_card_selection"
+      :drawing="draw"
       :initial-hand-size="initialHandSize"
       @chose_player_card="chose_player_card"
       @target_enemy="exec_damage_enemy_card"
@@ -115,6 +115,7 @@ import HealthComp from "@/components/Pages/GamePage/HealthComp"
 import HandComp from "@/components/Pages/GamePage/HandComp"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities"
 import RedrawComp from "@/components/Pages/GamePage/RedrawComp"
+import { remove_dead_card } from "@/logic/player_move/service/service_for_player_move"
 export default {
   components: {
     RedrawComp,
@@ -203,6 +204,16 @@ export default {
     afterDamage() {
       // особие абилки, которые требуют открытия окон
       this.special_case_abilities()
+      // если не надо играть особые абилки, сбрасываем карту в сброс СРАЗУ тут же
+      // а если надо, то сбросим ПОСЛЕ того как закроем окно с выбором карты, чтобы анимации увидеть тут
+      if (!this.show_pick_a_card_selection) {
+        remove_dead_card(
+          this.selected_card,
+          this.gameObj.grave,
+          this.gameObj.hand,
+          this.gameObj.deck
+        )
+      }
       this.selected_card = null // обнуляем карту, за которую изначально тянули
       this.show_picked_card = false // из specialcaseabilities.js!!!
       this.setNotActive()
@@ -221,12 +232,8 @@ export default {
     damageEnemyByCard() {
       if (!this.targetEnemyByCard) return
 
-      damage_ai_card(
-        this.selected_card,
-        this.selected_enemy,
-        true,
-        this.gameObj
-      )
+      damage_ai_card(this.selected_card, this.selected_enemy, this.gameObj)
+
       // снимаем флаг активности карт игрока, ОДНА КАРТА ЗА ХОД! станет ТРУ только после окончания хода компа!
       // если мы играли первый раз картой из руки, то всё равно заблокируем руку, так как sca ЕЩЁ не было на тот момент
       // если мы играем доп картой из лидера, то sca будет ТРУ на момент игры доп карты, и рука не будет заблокирована
@@ -237,12 +244,7 @@ export default {
     damageEnemyByLeader() {
       if (!this.targetEnemyByLeader) return
 
-      damage_ai_card(
-        this.gameObj.leader,
-        this.selected_enemy,
-        false,
-        this.gameObj
-      )
+      damage_ai_card(this.gameObj.leader, this.selected_enemy, this.gameObj)
       this.afterDamage()
       this.isActive.player_leader = false // лидер снова неактивен, чтобы ходить им снова - надо опять на него тыкать
     },
@@ -261,7 +263,6 @@ export default {
       damage_ai_card(
         this.selected_card,
         this.gameObj.enemy_leader,
-        true,
         this.gameObj
       )
       if (!this.sca) this.isActive.player_cards = false
@@ -274,7 +275,6 @@ export default {
       damage_ai_card(
         this.gameObj.leader,
         this.gameObj.enemy_leader,
-        false,
         this.gameObj
       )
       this.afterDamage()

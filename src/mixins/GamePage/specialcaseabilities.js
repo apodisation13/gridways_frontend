@@ -2,6 +2,7 @@ import { choice_element, copyObj } from "@/lib/utils"
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { CardAbility, CardColor, CardType } from "@/logic/models"
+import { remove_dead_card } from "@/logic/player_move/service/service_for_player_move"
 
 export default {
   data() {
@@ -15,6 +16,8 @@ export default {
       enemyView: false, // показать окно с картами или с картами, или с врагами
 
       sca: false, // КОСТЫЛЬ: играем ли мы доп карту! (чтобы не заблокировать руку когда доп карта играется из лидера!)
+
+      dead_card: null, // КОСТЫЛЬ: тут мы запоминаем исходную карту, которой играли 1й раз, чтобы сбросить ее ПОСЛЕ закрытия окна
     }
   },
   methods: {
@@ -143,6 +146,7 @@ export default {
           this.selected_card.ability.description
         this.sca = true
         this.show_pick_a_card_selection = true
+        this.dead_card = this.selected_card // раз мы пришли сюда, нужно открыть окно, запоминаем ИСХОДНУЮ карту
       }
     },
 
@@ -206,6 +210,15 @@ export default {
         this.gameObj.deck.splice(card, 1)
         this.gameObj.hand.push(card)
       }
+
+      // сбрасываем ИСХОДНУЮ карту, которой 1й раз играли
+      remove_dead_card(
+        this.dead_card,
+        this.gameObj.grave,
+        this.gameObj.hand,
+        this.gameObj.deck
+      )
+      this.dead_card = null // обнуляем ту запомненную ИСХОДНУЮ карту
 
       this.enemyView = false
       this.show_pick_a_card_selection = false
