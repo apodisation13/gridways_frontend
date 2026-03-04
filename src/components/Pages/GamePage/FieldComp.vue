@@ -108,12 +108,9 @@ export default {
 
 table tr,
 td {
-  /* width: 50%; */
   height: 20vh;
-  /*border: dashed 0.5px black;*/
   overflow: hidden;
   padding: 3px;
-  /*position: relative;*/
 }
 
 .enemy-enter-active {
