@@ -83,7 +83,12 @@
       :show_picked_card="show_picked_card"
       :enemyView="enemyView"
       :card_ability="selectedCardAbilityDescription"
+      :field="gameObj.field"
       @confirm_selection="confirm_selection"
+      @target_enemy="exec_damage_enemy_card"
+      @target_enemy_leader="exec_damage_enemy_leader"
+      @enemy_leader_in_cross="switch_enemy_leader_in_cross"
+      @enemy_in_cross="switch_enemy_in_cross"
     />
 
     <redraw-comp

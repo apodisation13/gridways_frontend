@@ -251,5 +251,57 @@ export const arrowMixin = {
       this._handleTouchMove = null
       this._handleTouchEnd = null
     },
+
+    get_target(elems, fire) {
+      let elem = null
+      elems.forEach((el, index) => {
+        if (
+          el.className === "card-enemy-component" ||
+          el.className === "enemy-leader"
+        ) {
+          console.log("Нашли цель! className:", el.className, index)
+          elem = el
+        }
+      })
+      return this.target_emit(elem, fire)
+    },
+
+    target_emit(elem, fire) {
+      const id = elem?.id
+
+      if (!id) {
+        console.log("Цель не определена")
+        this.$emit("enemy_leader_in_cross", false)
+        this.$emit("enemy_in_cross", null)
+        return false
+      }
+
+      if (id.includes("enemy_leader")) {
+        console.log("ЭТО ЛИДЕР ВРАГА")
+        if (fire) {
+          this.$emit("enemy_leader_in_cross", false)
+          this.$emit("target_enemy_leader")
+          return false
+        } else {
+          if (this.$store.getters["animationOn"]) {
+            this.$emit("enemy_leader_in_cross", true)
+            return true
+          }
+        }
+      }
+
+      const index = parseInt(id.slice(id.indexOf("_") + 1))
+      console.log("ИНДЕКС КЛЕТКИ ПОЛЯ ВРАГА", index)
+      if (fire) {
+        this.$emit("enemy_in_cross", null)
+        this.$emit("target_enemy", this.field[index])
+        return false
+      } else {
+        if (this.$store.getters["animationOn"]) {
+          this.$emit("enemy_in_cross", index)
+          return true
+        }
+      }
+    },
   },
 }

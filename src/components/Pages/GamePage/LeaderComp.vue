@@ -32,18 +32,6 @@ export default {
       type: Array,
     },
   },
-  data() {
-    return {
-      isDrawingArrow: false,
-      arrowStartX: 0,
-      arrowStartY: 0,
-      arrowCurrentX: 0,
-      arrowCurrentY: 0,
-      selectedCardIndex: -1,
-      canvas: null,
-      ctx: null,
-    }
-  },
   mounted() {
     this.initArrowCanvas(9998)
     window.addEventListener("resize", this.handleResize)
@@ -76,58 +64,6 @@ export default {
         touch.clientY,
         this.leader.faction
       )
-    },
-
-    get_target(elems, fire) {
-      let elem = null
-      elems.forEach(el => {
-        if (
-          el.className === "card-enemy-component" ||
-          el.className === "enemy-leader"
-        ) {
-          console.log(el.className)
-          elem = el
-        }
-      })
-      return this.target_emit(elem, fire)
-    },
-
-    target_emit(elem, fire) {
-      const id = elem?.id
-
-      if (!id) {
-        console.log("Цель не определена")
-        this.$emit("enemy_leader_in_cross", false)
-        this.$emit("enemy_in_cross", null)
-        return false
-      }
-
-      if (id.includes("enemy_leader")) {
-        console.log("ЭТО ЛИДЕР ВРАГА")
-        if (fire) {
-          this.$emit("enemy_leader_in_cross", false)
-          this.$emit("target_enemy_leader")
-          return false
-        } else {
-          if (this.$store.getters["animationOn"]) {
-            this.$emit("enemy_leader_in_cross", true)
-            return true
-          }
-        }
-      }
-
-      const index = parseInt(id.slice(id.indexOf("_") + 1)) // card.name_index - вот поэтому ищем _ +1, чтоб индекс поля
-      console.log("ИНДЕКС КЛЕТКИ ПОЛЯ ВРАГА", index)
-      if (fire) {
-        this.$emit("enemy_in_cross", null)
-        this.$emit("target_enemy", this.field[index])
-        return false
-      } else {
-        if (this.$store.getters["animationOn"]) {
-          this.$emit("enemy_in_cross", index)
-          return true
-        }
-      }
     },
   },
 
