@@ -53,32 +53,36 @@ export default {
     this._prevField = [...this.field] // не реактивно, просто снимок
   },
 
-  updated() {
-    const old = this._prevField
-    const now = this.field
-    this._prevField = [...now] // обновляем снимок сразу
+  watch: {
+    field: {
+      handler(newVal) {
+        const old = this._prevField
+        const now = newVal
 
-    const disappeared = []
-    const appeared = []
+        const disappeared = []
+        const appeared = []
+        for (let i = 0; i < now.length; i++) {
+          if (old[i] && !now[i]) disappeared.push({ enemy: old[i], i })
+          else if (!old[i] && now[i]) appeared.push({ enemy: now[i], i })
+        }
 
-    for (let i = 0; i < now.length; i++) {
-      if (old[i] && !now[i]) disappeared.push({ enemy: old[i], i })
-      else if (!old[i] && now[i]) appeared.push({ enemy: now[i], i })
-    }
+        const moved = []
+        for (const d of disappeared) {
+          const match = appeared.find(a => a.enemy === d.enemy)
+          if (match) moved.push(d.i, match.i)
+        }
 
-    // Ищем пары: тот же объект исчез тут и появился там → ход
-    const moved = []
-    for (const d of disappeared) {
-      const match = appeared.find(a => a.enemy === d.enemy)
-      if (match) moved.push(d.i, match.i)
-    }
+        this._prevField = [...now]
 
-    if (moved.length > 0) {
-      this.movingIndices = moved
-      setTimeout(() => {
-        this.movingIndices = []
-      }, 350)
-    }
+        if (moved.length > 0) {
+          this.movingIndices = moved
+          setTimeout(() => {
+            this.movingIndices = []
+          }, 350)
+        }
+      },
+      deep: true,
+    },
   },
 
   methods: {
@@ -114,11 +118,19 @@ td {
 }
 
 .enemy-enter-active {
-  animation: enemy-spawn 0.95s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: enemy-spawn 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .enemy-leave-active {
-  animation: enemy-die 0.45s ease-in forwards;
+  animation: enemy-die 0.5s ease-in forwards;
+}
+
+.enemy-move-enter-active {
+  animation: enemy-step-in 0.25s ease-out forwards;
+}
+
+.enemy-move-leave-active {
+  animation: enemy-step-out 0.25s ease-in forwards;
 }
 
 @keyframes enemy-spawn {
