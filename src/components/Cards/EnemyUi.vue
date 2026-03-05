@@ -37,6 +37,7 @@
         <deathwish-ability v-if="enemy.has_deathwish" />
         <heart-icon
           :health="enemy.hp"
+          :hp_delta="enemy.hp_delta"
           :bgColor="background_color_hp(enemy.color)"
         />
       </div>

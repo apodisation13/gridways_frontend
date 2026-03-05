@@ -8,15 +8,9 @@ function damage_player(field, i, timeout = 1000) {
 
   sound_enemy_damage_player()
 
-  let temp = store.state.game.health // сохраняем сколько было жизней
-  store.commit("set_health", `${store.state.game.health}-${field[i].damage}`) // 45-12
-
+  store.commit("change_health", -field[i].damage)
   timeoutAnimationFlag(field[i], "damages_player", null, timeout * 0.5)
-  setTimeout(() => {
-    store.commit("set_health", temp)
-    store.commit("change_health", -field[i].damage)
-    check_lose()
-  }, timeout * 0.5)
+  check_lose()
 }
 
 export { damage_player }

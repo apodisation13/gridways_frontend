@@ -36,7 +36,7 @@ function damage_ai_card(card, enemy, gameObj) {
 
   if (ability === CardAbility.Heal) {
     damage_one(enemy, card, gameObj, timeout)
-    heal(card, timeout)
+    heal(card)
   } else if (ability === CardAbility.DamageAll) {
     damage_all(field, card, gameObj, timeout)
     if (enemy_leader.hp > 0) hit_one_enemy(enemy_leader, card, gameObj, timeout)

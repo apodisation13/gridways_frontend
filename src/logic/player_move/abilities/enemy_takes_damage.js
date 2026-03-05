@@ -4,14 +4,15 @@ import { deathwish } from "@/logic/ai_move/ai_deathwish_abilities"
 export function enemy_takes_damage(enemy, card, gameObj, timeout = 1000) {
   const { field, enemy_leader, enemies, enemies_grave } = gameObj
 
-  let temp = enemy.hp // сложили жизни в темп
-  enemy.hp = `${enemy.hp}-${card.damage}` // отрисовали 5-3 (жизни-урон)
-
-  // через timeout, default=1сек
+  // поставили на 0.5 врагу это поле, чтобы проиграть анимацию урона
+  enemy.hp_delta = -card.damage
   setTimeout(() => {
-    enemy.hp = temp // вернули ему жизни
-    enemy.hp -= card.damage // вот теперь отняли урон
+    enemy.hp_delta = null
+  }, timeout)
 
+  enemy.hp -= card.damage
+
+  setTimeout(() => {
     if (enemy.hp <= 0) {
       // у лидера врагов нет поля color!
       if (!enemy.color) {
