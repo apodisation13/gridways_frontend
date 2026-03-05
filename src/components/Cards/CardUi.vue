@@ -5,8 +5,20 @@
         class="card-item"
         :style="[{ backgroundImage: `url(${card.image})` }, card_margin(card)]"
         :class="{ disable: count === 0 }"
-      ></div>
-
+      >
+        <transition name="heal">
+          <div
+            v-if="card.healing"
+            class="heal-overlay"
+            :style="{ '--flash-duration': flashDuration + 'ms' }"
+          >
+            <div class="heal-icon-wrap">
+              <span class="heal-icon">💚</span>
+              <span class="heal-icon-text">+{{ card.value }}</span>
+            </div>
+          </div>
+        </transition>
+      </div>
       <div class="card-item-information" v-if="!is_previev">
         <special-type-of-card
           :color="card.color"
@@ -117,6 +129,9 @@ export default {
         return faction
       }
       return ""
+    },
+    flashDuration() {
+      return this.$store.getters["selectedMoveTimeout"]
     },
   },
   methods: {
@@ -282,10 +297,76 @@ export default {
   left: 0;
 }
 
+.heal-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(46, 204, 64, 0.25);
+  border-radius: inherit;
+  --flash-duration: 500ms;
+  animation: heal-pulse var(--flash-duration, 500ms) ease-out forwards;
+}
+
+.heal-icon-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.heal-icon {
+  font-size: 3.5rem;
+  display: block;
+  line-height: 1;
+  animation: heal-icon-pop var(--flash-duration, 500ms) ease-out forwards;
+  filter: drop-shadow(0 0 8px rgba(46, 204, 64, 1));
+}
+
+.heal-icon-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+}
+
+@keyframes heal-pulse {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes heal-icon-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+  70% {
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
 .card-item {
   background-repeat: no-repeat;
   background-position: center;
-  /*background-size: cover;*/
   border-radius: 2px;
   overflow: hidden;
   background-size: 100% 100%;
@@ -307,7 +388,6 @@ export default {
   z-index: 2;
 }
 
-/* Hover */
 .card-outer:hover {
   box-shadow:
     0 0 calc(var(--glow-intensity, 0px) * 2) var(--glow-color, transparent),
