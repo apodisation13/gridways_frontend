@@ -36,6 +36,7 @@
             alt=""
             class="reward-resources__item"
           />
+          <span class="resource-count">{{ resources[resource.resource] }}</span>
           <resource-count-rombus>
             {{ resource.value }}
           </resource-count-rombus>
@@ -50,12 +51,6 @@ import ResourceCountRombus from "@/components/UI/ResourceCountRombus"
 export default {
   components: { CardListComponent, ResourceCountRombus },
   name: "reward-comp",
-  data() {
-    return {
-      show_key_content: !!this.key_reward, //Если не передается награда за ключ, значит это либо бочки, либо сундук
-      isLoading: false,
-    }
-  },
   props: {
     name: {
       type: String,
@@ -69,6 +64,43 @@ export default {
       type: Array,
       required: false,
       default: null,
+    },
+  },
+  created() {
+    this.accept_chest_reward()
+  },
+  data() {
+    return {
+      show_key_content: !!this.key_reward, //Если не передается награда за ключ, значит это либо бочки, либо сундук
+      isLoading: false,
+    }
+  },
+  computed: {
+    resources() {
+      return this.$store.getters["resource"]
+    },
+    res() {
+      const RESOURCE_ORDER = {
+        scraps: 0,
+        raw_bronze: 1,
+        bronze_ingots: 1,
+        raw_silver: 2,
+        silver_ingots: 2,
+        raw_gold: 3,
+        gold_ingots: 3,
+        crops: 4,
+        wood: 5,
+        silk: 6,
+        money: Infinity,
+      }
+      const sorted = [...this.key_reward].sort(
+        (a, b) =>
+          (RESOURCE_ORDER[a.resource] ?? 99) -
+          (RESOURCE_ORDER[b.resource] ?? 99)
+      )
+      return Object.fromEntries(
+        sorted.map(item => [item.resource, this.resources[item.resource] || 0])
+      )
     },
   },
   methods: {
@@ -100,9 +132,6 @@ export default {
     clear_reward() {
       if (this.name === "chests") this.$emit("clear_reward")
     },
-  },
-  created() {
-    this.accept_chest_reward()
   },
 }
 </script>
@@ -140,6 +169,17 @@ export default {
 
 .reward-resources__wrapper {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.resource-count {
+  font-family: "Philosopher", serif;
+  font-size: 1.1rem;
+  color: #ffd700;
+  text-align: center;
+  margin-top: 2px;
 }
 
 .reward-resources {
@@ -152,5 +192,7 @@ export default {
 
 .reward-resources__item {
   width: 100px;
+  height: 80px;
+  object-fit: contain;
 }
 </style>

@@ -3,7 +3,10 @@
     <div class="modal-window">
       <div class="modal-header">
         <span class="action-label">{{ actionLabel }}</span>
-        <img :src="getIcon(resource_name)" class="header-icon" alt="" />
+        <resource-item
+          :name="resource_name"
+          :count="resources[resource_name]"
+        />
       </div>
 
       <resource-list :resources="res" />
@@ -105,6 +108,7 @@
 
 <script>
 import ResourceList from "@/components/ResourceList.vue"
+import ResourceItem from "@/components/UI/ResourceItem.vue"
 
 const ACTION_LABELS = {
   buy: "Купить",
@@ -115,7 +119,7 @@ const ACTION_LABELS = {
 
 export default {
   name: "resource-action-modal",
-  components: { ResourceList },
+  components: { ResourceItem, ResourceList },
   props: {
     resource_name: { type: String, required: true },
     action: { type: String, required: true },
