@@ -228,7 +228,7 @@ export default {
       this.special_case_value = null
     },
 
-    // чтобы показать фиолетовую рамку для этой карты
+    // чтобы показать фиолетовую рамку для этой карты и проиграть анимацию
     incrDmg(card) {
       timeoutAnimationFlag(
         card,
@@ -236,6 +236,10 @@ export default {
         sound_passive_increase_damage,
         this.$store.getters["selectedMoveTimeout"]
       )
+      card.dmg_delta = card.value
+      setTimeout(() => {
+        card.dmg_delta = null
+      }, this.$store.getters["selectedMoveTimeout"] * 0.5)
     },
   },
 }
