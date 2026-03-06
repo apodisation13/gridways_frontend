@@ -189,7 +189,7 @@ export default {
         this.setActive() // поле и лидер врагов теперь активны
       } else if (this.ability === CardAbility.IncrDmgToHandBySelfDmg) {
         card.damage += this.special_case_value
-        this.incrDmg(card)
+        this.incrDmg(card, this.special_case_value)
       } else if (this.ability === CardAbility.MoveEnemyFromDeckToGrave) {
         const cd = this.gameObj.enemies.findIndex(c => c.id === card.id)
         this.gameObj.enemies.splice(cd, 1)
@@ -200,10 +200,10 @@ export default {
         if (card.damage < 0) card.damage = 0
         const random_card = choice_element(this.gameObj.hand)
         random_card.damage += this.special_case_value
-        this.incrDmg(random_card)
+        this.incrDmg(random_card, this.special_case_value)
       } else if (this.ability === CardAbility.IncrDmgByNCharges) {
         card.damage += card.charges
-        this.incrDmg(card)
+        this.incrDmg(card, card.charges)
       } else if (this.ability === CardAbility.CreateAndPutToDeck) {
         this.gameObj.deck.push(card)
       } else if (this.ability === CardAbility.DrawExact) {
@@ -229,14 +229,14 @@ export default {
     },
 
     // чтобы показать фиолетовую рамку для этой карты и проиграть анимацию
-    incrDmg(card) {
+    incrDmg(card, value) {
       timeoutAnimationFlag(
         card,
         "incr_dmg",
         sound_passive_increase_damage,
         this.$store.getters["selectedMoveTimeout"]
       )
-      card.dmg_delta = card.value
+      card.dmg_delta = value
       setTimeout(() => {
         card.dmg_delta = null
       }, this.$store.getters["selectedMoveTimeout"] * 0.5)

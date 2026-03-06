@@ -63,7 +63,7 @@ function damage_ai_card(card, enemy, gameObj) {
     damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.MoveEnemy) {
     damage_one(enemy, card, gameObj, timeout)
-    move_enemy(enemy, gameObj, timeout)
+    move_enemy(enemy, gameObj)
   } else if (ability === CardAbility.SetEnemyAsToken) {
     set_enemy_as_token(enemy)
   } else if (ability === CardAbility.SpawnSelfAtDeck) {
