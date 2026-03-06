@@ -24,6 +24,7 @@ import { incr_dmg_to_all_hand } from "@/logic/player_move/abilities/ability_incr
 import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_grave"
 import { CardAbility } from "@/logic/models"
 import store from "@/store"
+import { change_card_charges } from "@/logic/player_move/service/service_for_player_move"
 
 // Сюда заходим если там есть враг
 // card - карта, которую мы играем (или из руки, или лидер).
@@ -94,7 +95,7 @@ function damage_ai_card(card, enemy, gameObj) {
   // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда
   // чтобы анимация сброса корректно игралась, сброс карты происходит теперь не здесь,
   // а в special-case-abilities там где закрываем окно и в afterDamage (если не вызывалась sca)
-  card.charges -= 1
+  change_card_charges(card, -1, timeout)
 
   // пассивные абилки от хода
   player_passive_abilities_upon_playing_a_card(card, leader, enemy)

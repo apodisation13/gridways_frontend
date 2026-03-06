@@ -44,9 +44,19 @@ function get_empty_field_indexes(field) {
   return emptyIndexesArray
 }
 
+function change_card_charges(card, value, timeout = 1000) {
+  card.charges += value
+  // а это для анимации изменения зарядов
+  card.charges_delta = value
+  setTimeout(() => {
+    card.charges_delta = null
+  }, timeout * 0.5)
+}
+
 export {
   remove_dead_card,
   get_all_enemies,
   get_random_enemy,
   get_empty_field_indexes,
+  change_card_charges,
 }

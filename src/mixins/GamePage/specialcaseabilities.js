@@ -2,7 +2,10 @@ import { choice_element, copyObj } from "@/lib/utils"
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { CardAbility, CardColor, CardType } from "@/logic/models"
-import { remove_dead_card } from "@/logic/player_move/service/service_for_player_move"
+import {
+  change_card_charges,
+  remove_dead_card,
+} from "@/logic/player_move/service/service_for_player_move"
 
 export default {
   data() {
@@ -158,7 +161,7 @@ export default {
         this.gameObj.hand.push(card)
         this.gameObj.grave.splice(this.gameObj.grave.indexOf(card), 1)
       } else if (this.ability === CardAbility.GiveChargesToCardInHand1) {
-        card.charges += 1
+        change_card_charges(card, 1)
       } else if (this.ability === CardAbility.DiscardDraw2) {
         this.gameObj.grave.push(card)
         this.gameObj.hand.splice(this.gameObj.hand.indexOf(card), 1)

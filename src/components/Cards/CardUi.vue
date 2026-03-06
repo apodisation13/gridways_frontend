@@ -66,6 +66,16 @@
           {{ card.p_dmg_delta > 0 ? "+" : "" }}{{ card.p_dmg_delta }}
         </span>
       </div>
+      <!-- увеличение зарядов -->
+      <div
+        v-if="card.charges_delta"
+        class="charges-anim"
+        :style="{ '--flash-duration': flashDuration + 'ms' }"
+      >
+        <span class="charges-anim-text">
+          {{ card.charges_delta > 0 ? "+" : "" }}{{ card.charges_delta }}
+        </span>
+      </div>
       <div class="card-item-information" v-if="!is_previev">
         <special-type-of-card
           :color="card.color"
@@ -510,6 +520,31 @@ export default {
 }
 
 .dmg-anim-text {
+  transform: rotate(45deg);
+  font-weight: 900;
+  color: white;
+  font-size: 1rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.charges-anim {
+  position: absolute;
+  bottom: -5%;
+  right: -5%;
+  width: 25%;
+  aspect-ratio: 1 / 1;
+  transform: rotate(-45deg);
+  background: rgba(169, 169, 169, 0.95);
+  border-radius: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 50;
+  animation: dmg-delta-pop var(--flash-duration, 500ms) ease-out forwards;
+}
+
+.charges-anim-text {
   transform: rotate(45deg);
   font-weight: 900;
   color: white;
