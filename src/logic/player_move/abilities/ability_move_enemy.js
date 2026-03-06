@@ -1,10 +1,9 @@
 import { choice } from "@/lib/utils"
 import { sound_destroy_enemy, sound_enemy_move_down } from "@/logic/play_sounds"
 
-export function move_enemy(enemy, gameObj, timeout = 1000) {
+export function move_enemy(enemy, gameObj) {
   // это если мы ткнули на лидера врагов! то здесь ничего не выполним
-  const c = enemy.hp.split("-")
-  if (!enemy.color || c[0] - c[1] <= 0) return
+  if (!enemy.color) return
 
   const { field, enemies_grave } = gameObj
 
@@ -19,13 +18,15 @@ export function move_enemy(enemy, gameObj, timeout = 1000) {
   } else {
     // если же там кто-то есть, мы убираем того в кладбище, а этого врага ставим сюда
     sound_destroy_enemy()
+    // предыдущий враг на той клетке
     const prev_enemy = field[target_index]
+    // убиваем его
+    field[target_index] = ""
+    // кладем в сброс и восстанавливаем его здорове
+    enemies_grave.push(prev_enemy)
+    prev_enemy.hp = prev_enemy.base_hp
+    // новый враг прыгаем туда со своей старой клетки
     field[target_index] = enemy
     field[prev_index] = ""
-    // таймаут тут потому, что у врага ещё 3-1 жизней, и только через 1сек станет 2, тогда мы и положим его в сброс
-    setTimeout(() => {
-      prev_enemy.hp = prev_enemy.base_hp
-      enemies_grave.push(prev_enemy)
-    }, timeout * 1.2)
   }
 }

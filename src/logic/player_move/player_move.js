@@ -11,7 +11,6 @@ import { destroy_random } from "@/logic/player_move/abilities/ability_destroy_ra
 import { destroy_all_same_hp } from "@/logic/player_move/abilities/ability_destroy_all_same_hp"
 import { lock_enemy } from "@/logic/player_move/abilities/ability_lock"
 import { move_enemy } from "@/logic/player_move/abilities/ability_move_enemy"
-import { remove_dead_card } from "@/logic/player_move/service/service_for_player_move"
 import { check_win } from "@/logic/player_move/service/check_win"
 import { player_passive_abilities_upon_playing_a_card } from "@/logic/player_move/player_passive_abilities_upon_playing_a_card"
 import { set_enemy_as_token } from "@/logic/player_move/abilities/ability_set_enemy_as_token"
@@ -25,29 +24,20 @@ import { incr_dmg_to_all_hand } from "@/logic/player_move/abilities/ability_incr
 import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_grave"
 import { CardAbility } from "@/logic/models"
 import store from "@/store"
+import { change_card_charges } from "@/logic/player_move/service/service_for_player_move"
 
 // Сюда заходим если там есть враг
 // card - карта, которую мы играем (или из руки, или лидер).
 // enemy - тот враг, в которого мы стреляем (или карта на поле, или лидер врагов).
-// isCard - флаг, картой или лидером мы ходим, нужен для сброса в кладбище
-function damage_ai_card(card, enemy, isCard, gameObj) {
-  const {
-    field,
-    enemy_leader,
-    hand,
-    deck,
-    grave,
-    enemies,
-    leader,
-    enemies_grave,
-  } = gameObj
+function damage_ai_card(card, enemy, gameObj) {
+  const { field, enemy_leader, enemies, leader, enemies_grave } = gameObj
 
   const ability = card?.ability?.name
   const timeout = store.getters["selectedMoveTimeout"]
 
   if (ability === CardAbility.Heal) {
     damage_one(enemy, card, gameObj, timeout)
-    heal(card, timeout)
+    heal(card)
   } else if (ability === CardAbility.DamageAll) {
     damage_all(field, card, gameObj, timeout)
     if (enemy_leader.hp > 0) hit_one_enemy(enemy_leader, card, gameObj, timeout)
@@ -74,7 +64,7 @@ function damage_ai_card(card, enemy, isCard, gameObj) {
     damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.MoveEnemy) {
     damage_one(enemy, card, gameObj, timeout)
-    move_enemy(enemy, gameObj, timeout)
+    move_enemy(enemy, gameObj)
   } else if (ability === CardAbility.SetEnemyAsToken) {
     set_enemy_as_token(enemy)
   } else if (ability === CardAbility.SpawnSelfAtDeck) {
@@ -103,8 +93,9 @@ function damage_ai_card(card, enemy, isCard, gameObj) {
   } else damage_one(enemy, card, gameObj, timeout)
 
   // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда
-  card.charges -= 1
-  if (isCard) remove_dead_card(card, grave, hand, deck)
+  // чтобы анимация сброса корректно игралась, сброс карты происходит теперь не здесь,
+  // а в special-case-abilities там где закрываем окно и в afterDamage (если не вызывалась sca)
+  change_card_charges(card, -1, timeout)
 
   // пассивные абилки от хода
   player_passive_abilities_upon_playing_a_card(card, leader, enemy)

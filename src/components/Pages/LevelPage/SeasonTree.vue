@@ -29,24 +29,51 @@
         v-for="season in seasonTree"
         :key="'label-' + season.season.id"
         class="season-label"
+        :class="{
+          'is-locked': isLocked(season),
+          'is-finished': season.finished,
+          'is-open': !isLocked(season) && !season.finished,
+        }"
         :style="labelStyle(season)"
         @dblclick="setSeason(season)"
         @touchend="handleDoubleTap($event, season)"
       >
         <div class="season-content">
-          <!-- Иконка замка в правом верхнем углу -->
           <div class="lock-icon" v-if="isLocked(season)">🔒</div>
-          <span class="season-name" v-if="season.season.name">
-            {{ season.season.name }}
-          </span>
-          <!-- Кнопка описания -->
-          <button class="description-btn" @click="openDescription(season)">
-            <span class="info-icon">ℹ️</span>
-          </button>
-          <!-- Кнопка статистики -->
-          <button class="description-btn" @click="openStats(season)">
-            <span class="info-icon">📊️</span>
-          </button>
+          <span class="season-name">{{ season.season.name }}</span>
+
+          <div
+            class="season-progress"
+            v-if="!isLocked(season) && season.stats?.total_levels"
+          >
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                :style="{ width: progressPercent(season) + '%' }"
+              />
+            </div>
+            <span class="progress-text">
+              {{ season.stats.finished_levels }} /
+              {{ season.stats.total_levels }}
+            </span>
+          </div>
+
+          <div class="season-actions">
+            <button
+              class="action-btn"
+              @click.stop="openDescription(season)"
+              title="Описание"
+            >
+              ℹ️
+            </button>
+            <button
+              class="action-btn"
+              @click.stop="openStats(season)"
+              title="Статистика"
+            >
+              📊
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -204,7 +231,7 @@ export default {
   },
   data() {
     return {
-      w: 120,
+      w: 100,
       configKonva: { width: 1000, height: 1000 },
       seasonTree: [],
       seasonLevels: [],
@@ -246,41 +273,51 @@ export default {
     // Стиль для HTML блока поверх прямоугольника
     labelStyle(item) {
       return {
-        position: "absolute",
         left: item.season.x + "px",
         top: item.season.y + "px",
         width: this.w + "px",
         height: this.w + "px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
       }
     },
     isLocked(season) {
       return season.id === null
     },
+    progressPercent(season) {
+      const { finished_levels, total_levels } = season.stats ?? {}
+      if (!total_levels) return 0
+      return Math.round((finished_levels / total_levels) * 100)
+    },
     squareConfig(item) {
+      const isLocked = !item.id
+      const isFinished = item.finished
+
+      const gradients = {
+        locked: [0, "#9e9e9e", 1, "#616161"],
+        finished: [0, "#e53935", 1, "#7c0205"],
+        open: [0, "#ffe082", 1, "#ffb300"],
+      }
+      const key = isLocked ? "locked" : isFinished ? "finished" : "open"
+
       return {
         x: item.season.x,
         y: item.season.y,
         width: this.w,
         height: this.w,
-        fill: this.seasonColor(item),
-        stroke: this.seasonBorder(item),
-        shadowBlur: 7,
+        fillLinearGradientStartPoint: { x: 0, y: 0 },
+        fillLinearGradientEndPoint: { x: this.w, y: this.w },
+        fillLinearGradientColorStops: gradients[key],
+        cornerRadius: 20,
+        shadowColor: isLocked
+          ? "rgba(0,0,0,0.3)"
+          : isFinished
+            ? "rgba(180,0,0,0.5)"
+            : "rgba(255,160,0,0.5)",
+        shadowBlur: 20,
+        shadowOffsetX: 0,
+        shadowOffsetY: 5,
+        stroke: isLocked ? "transparent" : "rgba(255,220,100,0.7)",
+        strokeWidth: isLocked ? 0 : 2,
       }
-    },
-    seasonColor(item) {
-      // здесь item - это весь объект списка user_seasons: {id, finished, season}
-      // если id есть - значит он есть в user_seasons (и он открыт!)
-      if (!item.id) return "grey"
-      if (item.finished) return "rgba(124, 2, 5, 1)"
-      return "rgba(255, 231, 183, 1)"
-    },
-    seasonBorder(item) {
-      if (!item.id) return "grey"
-      if (item.finished) return ""
-      return "rgba(0, 0, 0, 0.13)"
     },
     lineConfig(arrow) {
       return {
@@ -388,75 +425,66 @@ export default {
 }
 
 .season-label {
-  pointer-events: auto;
+  position: absolute;
+  border-radius: 20px;
+  pointer-events: all;
   cursor: pointer;
-  user-select: none; /* запрет выделения текста */
-  -webkit-user-select: none;
-  -webkit-touch-callout: none; /* запрет меню на iOS */
+  transition: transform 0.18s ease;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.season-label:hover:not(.is-locked) {
+  transform: scale(1.06);
+}
+
+.season-label.is-locked {
+  cursor: default;
 }
 
 .season-content {
-  position: relative;
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 8px 6px;
   gap: 4px;
+  position: relative;
+  box-sizing: border-box;
 }
 
 /* Иконка замка в правом верхнем углу */
 .lock-icon {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  font-size: 14px;
+  top: 6px;
+  right: 7px;
+  font-size: 13px;
   line-height: 1;
 }
 
 .season-name {
-  font-size: 14px;
-  color: black;
+  font-size: 11px;
+  font-weight: 700;
   text-align: center;
-  max-width: 90%;
+  line-height: 1.25;
+  color: rgba(30, 20, 0, 0.85);
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
-/* Кнопка описания */
-.description-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  margin-top: 4px;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 12px;
-  color: white;
-  font-size: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(4px);
+.is-finished .season-name {
+  color: rgba(255, 240, 210, 0.95);
 }
 
-.description-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
-}
-
-.description-btn:active {
-  transform: scale(0.95);
-}
-
-.info-icon {
-  font-size: 12px;
-}
-
-.btn-text {
-  font-weight: 500;
+.is-locked .season-name {
+  color: rgba(255, 255, 255, 0.65);
 }
 
 /* Попап оверлей */
@@ -629,5 +657,65 @@ export default {
   height: 1px;
   background: linear-gradient(90deg, transparent, #ddd, transparent);
   margin: 4px 0;
+}
+
+.season-progress {
+  width: 88%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.progress-bar {
+  height: 5px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 10px;
+  transition: width 0.6s ease;
+}
+
+.is-finished .progress-fill {
+  background: rgba(255, 210, 130, 0.85);
+}
+
+.progress-text {
+  font-size: 9px;
+  text-align: center;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.is-finished .progress-text {
+  color: rgba(255, 230, 180, 0.85);
+}
+
+.season-actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.action-btn {
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  border-radius: 8px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.4;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.55);
+  transform: scale(1.12);
 }
 </style>

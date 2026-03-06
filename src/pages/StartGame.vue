@@ -141,10 +141,8 @@ export default {
           data: payload,
         })
         this.$store.commit("set_start_game_redirect", true)
-        setTimeout(() => {
-          this.$router.push("/game") // ВОТ ТУТ мы переходим на игру и ТОЛЬКО тут (с флагом, что запрос успешно)
-          this.loading = false
-        }, 1000)
+        this.$router.push("/game") // ВОТ ТУТ мы переходим на игру и ТОЛЬКО тут (с флагом, что запрос успешно)
+        this.loading = false
       } catch (err) {
         alert("Что-то пошло не так, сыграть невозможно")
         this.loading = false

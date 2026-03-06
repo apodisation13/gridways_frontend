@@ -40,7 +40,7 @@ export function deathwish(deathwish_enemy, gameObj, timeout = 1000) {
   } else if (d === "destroy_random_card_in_player_deck") {
     destroy_player_card_in_deck(gameObj)
   } else if (d === "set_hp") {
-    set_hp(deathwish_enemy, timeout)
+    set_hp(deathwish_enemy)
   } else if (d === "spawn-tokens-at-deck") {
     spawn_tokens_at_deck(deathwish_enemy, gameObj, timeout)
   } else if (d === "spawn-self-at-grave") {

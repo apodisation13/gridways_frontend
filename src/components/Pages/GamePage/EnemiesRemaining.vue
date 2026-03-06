@@ -117,10 +117,12 @@
         </text>
       </svg>
     </button>
-    <modal-window v-if="visible" v-touch:swipe.left="close_self">
-      <button-close @close_self="close_self" />
-      <enemy-list :enemies="enemies" />
-    </modal-window>
+    <transition name="modal">
+      <modal-window v-if="visible" v-touch:swipe.left="close_self">
+        <button-close @close_self="close_self" />
+        <enemy-list :enemies="enemies" />
+      </modal-window>
+    </transition>
   </div>
 </template>
 
@@ -246,6 +248,31 @@ export default {
   }
   50% {
     box-shadow: 0 4px 15px rgba(255, 204, 0, 0.6);
+  }
+}
+
+.modal-enter-active {
+  animation: modal-fade-in 0.25s ease-out;
+}
+.modal-leave-active {
+  animation: modal-fade-out 0.25s ease-in;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }
 </style>

@@ -68,6 +68,8 @@
       :field="gameObj.field"
       :enemy_leader="gameObj.enemy_leader"
       :player_cards_active="isActive.player_cards"
+      :drawing="draw"
+      :initial-hand-size="initialHandSize"
       @chose_player_card="chose_player_card"
       @target_enemy="exec_damage_enemy_card"
       @target_enemy_leader="exec_damage_enemy_leader"
@@ -81,15 +83,22 @@
       :show_picked_card="show_picked_card"
       :enemyView="enemyView"
       :card_ability="selectedCardAbilityDescription"
+      :field="gameObj.field"
       @confirm_selection="confirm_selection"
+      @target_enemy="exec_damage_enemy_card"
+      @target_enemy_leader="exec_damage_enemy_leader"
+      @enemy_leader_in_cross="switch_enemy_leader_in_cross"
+      @enemy_in_cross="switch_enemy_in_cross"
     />
 
-    <redraw-comp
-      v-if="draw"
-      :game-obj="gameObj"
-      :redraw-number="redraws"
-      @redraw_finished="redraw_finished"
-    />
+    <transition name="modal" appear>
+      <redraw-comp
+        v-if="draw"
+        :game-obj="gameObj"
+        :redraw-number="redraws"
+        @redraw_finished="redraw_finished"
+      />
+    </transition>
   </div>
 </template>
 
@@ -99,7 +108,6 @@ import draw from "@/mixins/GamePage/draw"
 import specialcaseabilities from "@/mixins/GamePage/specialcaseabilities"
 import execaimove from "@/mixins/GamePage/execaimove"
 import startgame from "@/mixins/GamePage/startgame"
-
 import FieldComp from "@/components/Pages/GamePage/FieldComp"
 import EnemyLeader from "@/components/Cards/EnemyLeader"
 import RemainingEnemies from "@/components/Pages/GamePage/EnemiesRemaining"
@@ -113,6 +121,7 @@ import HealthComp from "@/components/Pages/GamePage/HealthComp"
 import HandComp from "@/components/Pages/GamePage/HandComp"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities"
 import RedrawComp from "@/components/Pages/GamePage/RedrawComp"
+import { remove_dead_card } from "@/logic/player_move/service/service_for_player_move"
 export default {
   components: {
     RedrawComp,
@@ -201,6 +210,16 @@ export default {
     afterDamage() {
       // особие абилки, которые требуют открытия окон
       this.special_case_abilities()
+      // если не надо играть особые абилки, сбрасываем карту в сброс СРАЗУ тут же
+      // а если надо, то сбросим ПОСЛЕ того как закроем окно с выбором карты, чтобы анимации увидеть тут
+      if (!this.show_pick_a_card_selection) {
+        remove_dead_card(
+          this.selected_card,
+          this.gameObj.grave,
+          this.gameObj.hand,
+          this.gameObj.deck
+        )
+      }
       this.selected_card = null // обнуляем карту, за которую изначально тянули
       this.show_picked_card = false // из specialcaseabilities.js!!!
       this.setNotActive()
@@ -219,12 +238,8 @@ export default {
     damageEnemyByCard() {
       if (!this.targetEnemyByCard) return
 
-      damage_ai_card(
-        this.selected_card,
-        this.selected_enemy,
-        true,
-        this.gameObj
-      )
+      damage_ai_card(this.selected_card, this.selected_enemy, this.gameObj)
+
       // снимаем флаг активности карт игрока, ОДНА КАРТА ЗА ХОД! станет ТРУ только после окончания хода компа!
       // если мы играли первый раз картой из руки, то всё равно заблокируем руку, так как sca ЕЩЁ не было на тот момент
       // если мы играем доп картой из лидера, то sca будет ТРУ на момент игры доп карты, и рука не будет заблокирована
@@ -235,12 +250,7 @@ export default {
     damageEnemyByLeader() {
       if (!this.targetEnemyByLeader) return
 
-      damage_ai_card(
-        this.gameObj.leader,
-        this.selected_enemy,
-        false,
-        this.gameObj
-      )
+      damage_ai_card(this.gameObj.leader, this.selected_enemy, this.gameObj)
       this.afterDamage()
       this.isActive.player_leader = false // лидер снова неактивен, чтобы ходить им снова - надо опять на него тыкать
     },
@@ -259,7 +269,6 @@ export default {
       damage_ai_card(
         this.selected_card,
         this.gameObj.enemy_leader,
-        true,
         this.gameObj
       )
       if (!this.sca) this.isActive.player_cards = false
@@ -272,7 +281,6 @@ export default {
       damage_ai_card(
         this.gameObj.leader,
         this.gameObj.enemy_leader,
-        false,
         this.gameObj
       )
       this.afterDamage()
@@ -350,15 +358,13 @@ export default {
   width: 24.5%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center; /* или flex-start */
+  gap: 8px; /* фиксированный отступ между элементами */
 }
 
 .div-two-buttons {
   height: 7.5vh;
   width: 98%;
-  /* border: solid 1px red; */
-  margin-bottom: 1%;
-  margin-top: 1%;
   display: flex;
   flex-direction: row;
   gap: 1px;
@@ -367,8 +373,30 @@ export default {
 .draw {
   height: 6.3vh;
   width: 98%;
-  /* border: solid 1px red; */
-  margin-bottom: 1%;
-  margin-top: 1%;
+}
+
+.modal-enter-active {
+  animation: modal-fade-in 0.5s ease-out;
+}
+.modal-leave-active {
+  animation: modal-fade-out 0.25s ease-in;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 </style>

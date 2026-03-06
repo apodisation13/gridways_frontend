@@ -8,7 +8,20 @@
           { backgroundImage: `url(${enemy.image})` },
           card_margin(enemy),
         ]"
-      ></div>
+      >
+        <transition name="damage">
+          <div
+            v-if="enemy.damages_player"
+            class="damage-overlay"
+            :style="{ '--flash-duration': flashDuration + 'ms' }"
+          >
+            <div class="damage-icon-wrap">
+              <div class="damage-icon"></div>
+              <span class="damage-icon-text">{{ -enemy.damage }}</span>
+            </div>
+          </div>
+        </transition>
+      </div>
       <div class="card-enemy-information">
         <!--Иконка хода для всех врагов, а лидеру врагов не надо, отсюда и условие-->
         <ability-circle-enemy :enemy="enemy" v-if="enemy.move" />
@@ -18,12 +31,24 @@
           :style="background_color(enemy)"
           :damage="enemy.damage"
         />
+        <!-- отдельный анимированный ромб, damage-comp не трогаем -->
+        <div
+          v-if="enemy.dmg_delta"
+          class="dmg-anim"
+          :style="{ '--flash-duration': flashDuration + 'ms' }"
+        >
+          <span class="dmg-anim-text">
+            {{ enemy.dmg_delta > 0 ? "+" : "" }}{{ enemy.dmg_delta }}
+          </span>
+        </div>
+
         <card-passive v-if="enemy.has_passive" :card="enemy" />
         <enemy-shield v-if="enemy.shield" />
         <enemy-locked v-if="enemy.locked" />
         <deathwish-ability v-if="enemy.has_deathwish" />
         <heart-icon
           :health="enemy.hp"
+          :hp_delta="enemy.hp_delta"
           :bgColor="background_color_hp(enemy.color)"
         />
       </div>
@@ -76,6 +101,9 @@ export default {
         return faction
       }
       return ""
+    },
+    flashDuration() {
+      return this.$store.getters["selectedMoveTimeout"]
     },
   },
   methods: {
@@ -268,5 +296,130 @@ export default {
     0 5px 12px rgba(0, 0, 0, 0.5),
     inset 1px 1px 3px rgba(255, 255, 255, 0.3),
     inset -1px -1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.damage-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 59, 48, 0.25);
+  border-radius: inherit;
+  animation: damage-pulse var(--flash-duration, 500ms) ease-out forwards;
+  z-index: 1;
+}
+
+.damage-icon-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.damage-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  background-image: url("~@/assets/icons/card/sword.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: invert(1) sepia(1) saturate(10) hue-rotate(300deg); /* красный цвет */
+  animation: damage-icon-pop var(--flash-duration, 500ms) ease-out forwards;
+}
+
+.damage-icon-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+}
+
+@keyframes damage-pulse {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes damage-icon-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+  70% {
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.dmg-anim {
+  position: absolute;
+  top: -10%;
+  right: -10%;
+  width: 35%; /* больше оригинала (был 20%) */
+  aspect-ratio: 1 / 1;
+  transform: rotate(-45deg);
+  background: rgba(220, 80, 0, 0.95);
+  border-radius: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+  animation: dmg-delta-pop var(--flash-duration, 500ms) ease-out forwards;
+}
+
+.dmg-anim-text {
+  transform: rotate(45deg);
+  font-weight: 900;
+  color: white;
+  font-size: 1rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+@keyframes dmg-delta-pop {
+  0% {
+    opacity: 0;
+    transform: rotate(-45deg) scale(0.3);
+    box-shadow: none;
+  }
+  25% {
+    opacity: 1;
+    transform: rotate(-45deg) scale(1.4);
+    box-shadow:
+      0 0 16px 6px rgba(255, 100, 0, 0.9),
+      0 0 32px 10px rgba(255, 100, 0, 0.5);
+  }
+  40% {
+    transform: rotate(-48deg) scale(1.2); /* лёгкий наклон — эффект тряски */
+  }
+  55% {
+    transform: rotate(-42deg) scale(1.25);
+    box-shadow: 0 0 12px 4px rgba(255, 100, 0, 0.8);
+  }
+  70% {
+    transform: rotate(-45deg) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-45deg) scale(0.9);
+    box-shadow: none;
+  }
 }
 </style>

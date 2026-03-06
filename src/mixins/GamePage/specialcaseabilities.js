@@ -2,6 +2,10 @@ import { choice_element, copyObj } from "@/lib/utils"
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { CardAbility, CardColor, CardType } from "@/logic/models"
+import {
+  change_card_charges,
+  remove_dead_card,
+} from "@/logic/player_move/service/service_for_player_move"
 
 export default {
   data() {
@@ -15,6 +19,8 @@ export default {
       enemyView: false, // показать окно с картами или с картами, или с врагами
 
       sca: false, // КОСТЫЛЬ: играем ли мы доп карту! (чтобы не заблокировать руку когда доп карта играется из лидера!)
+
+      dead_card: null, // КОСТЫЛЬ: тут мы запоминаем исходную карту, которой играли 1й раз, чтобы сбросить ее ПОСЛЕ закрытия окна
     }
   },
   methods: {
@@ -143,6 +149,7 @@ export default {
           this.selected_card.ability.description
         this.sca = true
         this.show_pick_a_card_selection = true
+        this.dead_card = this.selected_card // раз мы пришли сюда, нужно открыть окно, запоминаем ИСХОДНУЮ карту
       }
     },
 
@@ -154,7 +161,7 @@ export default {
         this.gameObj.hand.push(card)
         this.gameObj.grave.splice(this.gameObj.grave.indexOf(card), 1)
       } else if (this.ability === CardAbility.GiveChargesToCardInHand1) {
-        card.charges += 1
+        change_card_charges(card, 1)
       } else if (this.ability === CardAbility.DiscardDraw2) {
         this.gameObj.grave.push(card)
         this.gameObj.hand.splice(this.gameObj.hand.indexOf(card), 1)
@@ -185,7 +192,7 @@ export default {
         this.setActive() // поле и лидер врагов теперь активны
       } else if (this.ability === CardAbility.IncrDmgToHandBySelfDmg) {
         card.damage += this.special_case_value
-        this.incrDmg(card)
+        this.incrDmg(card, this.special_case_value)
       } else if (this.ability === CardAbility.MoveEnemyFromDeckToGrave) {
         const cd = this.gameObj.enemies.findIndex(c => c.id === card.id)
         this.gameObj.enemies.splice(cd, 1)
@@ -196,16 +203,25 @@ export default {
         if (card.damage < 0) card.damage = 0
         const random_card = choice_element(this.gameObj.hand)
         random_card.damage += this.special_case_value
-        this.incrDmg(random_card)
+        this.incrDmg(random_card, this.special_case_value)
       } else if (this.ability === CardAbility.IncrDmgByNCharges) {
         card.damage += card.charges
-        this.incrDmg(card)
+        this.incrDmg(card, card.charges)
       } else if (this.ability === CardAbility.CreateAndPutToDeck) {
         this.gameObj.deck.push(card)
       } else if (this.ability === CardAbility.DrawExact) {
         this.gameObj.deck.splice(card, 1)
         this.gameObj.hand.push(card)
       }
+
+      // сбрасываем ИСХОДНУЮ карту, которой 1й раз играли
+      remove_dead_card(
+        this.dead_card,
+        this.gameObj.grave,
+        this.gameObj.hand,
+        this.gameObj.deck
+      )
+      this.dead_card = null // обнуляем ту запомненную ИСХОДНУЮ карту
 
       this.enemyView = false
       this.show_pick_a_card_selection = false
@@ -215,14 +231,18 @@ export default {
       this.special_case_value = null
     },
 
-    // чтобы показать фиолетовую рамку для этой карты
-    incrDmg(card) {
+    // чтобы показать фиолетовую рамку для этой карты и проиграть анимацию
+    incrDmg(card, value) {
       timeoutAnimationFlag(
         card,
         "incr_dmg",
         sound_passive_increase_damage,
         this.$store.getters["selectedMoveTimeout"]
       )
+      card.dmg_delta = value
+      setTimeout(() => {
+        card.dmg_delta = null
+      }, this.$store.getters["selectedMoveTimeout"] * 0.5)
     },
   },
 }

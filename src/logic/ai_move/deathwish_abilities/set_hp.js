@@ -8,13 +8,9 @@ import { get_all_enemies } from "@/logic/player_move/service/service_for_player_
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 
 // устанавливает жизни игрока равными enemy.deathwish_value!
-export function set_hp(enemy, timeout = 1000) {
+export function set_hp(enemy) {
   sound_deathwish()
-  let temp = store.state.game.health // сохраняем сколько было жизней
-  store.commit("set_health", `${temp}-${temp - enemy.deathwish_value}`) // 43 - (42)
-  setTimeout(() => {
-    store.commit("set_health", enemy.deathwish_value)
-  }, timeout * 0.5)
+  store.commit("set_health", enemy.deathwish_value)
   sound_enemy_damage_player()
 }
 

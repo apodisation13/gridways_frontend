@@ -15,4 +15,8 @@ export function set_lowest_dmg_to_as_highest(gameObj, timeout = 1000) {
     sound_passive_increase_damage,
     timeout * 0.5
   )
+  card.dmg_delta = highest_dmg_card.damage
+  setTimeout(() => {
+    card.dmg_delta = null
+  }, timeout * 0.5)
 }

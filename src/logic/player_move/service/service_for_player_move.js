@@ -1,15 +1,18 @@
+// сбрасываем карту из руки или из колоды в сброс, если у нее 0 зарядов
+// если лидер - не сбрасываем его никуда (у него нет card.color)
 function remove_dead_card(card, grave, hand, deck) {
-  if (card.charges === 0) {
-    grave.push(card) // поместили карту в кладбище
+  if (card.charges > 0) return // если у карты зарядов не 0, ничего делать не нужно
+  if (card.color === undefined) return // случай лидера, его не надо сбрасывать никуда
 
-    // если такая карта есть в руке, удаляем её из руки, если есть в колоде - удаляем из колоды
-    if (hand.indexOf(card) !== -1) {
-      hand.splice(hand.indexOf(card), 1)
-      // alert('удалили карту из руки')
-    } else if (deck.indexOf(card) !== -1) {
-      deck.splice(deck.indexOf(card), 1)
-      // alert('удалили карту из колоды')
-    }
+  grave.push(card) // поместили карту в кладбище
+
+  // если такая карта есть в руке, удаляем её из руки, если есть в колоде - удаляем из колоды
+  if (hand.indexOf(card) !== -1) {
+    hand.splice(hand.indexOf(card), 1)
+    // alert('удалили карту из руки')
+  } else if (deck.indexOf(card) !== -1) {
+    deck.splice(deck.indexOf(card), 1)
+    // alert('удалили карту из колоды')
   }
 }
 
@@ -41,9 +44,19 @@ function get_empty_field_indexes(field) {
   return emptyIndexesArray
 }
 
+function change_card_charges(card, value, timeout = 1000) {
+  card.charges += value
+  // а это для анимации изменения зарядов
+  card.charges_delta = value
+  setTimeout(() => {
+    card.charges_delta = null
+  }, timeout * 0.5)
+}
+
 export {
   remove_dead_card,
   get_all_enemies,
   get_random_enemy,
   get_empty_field_indexes,
+  change_card_charges,
 }

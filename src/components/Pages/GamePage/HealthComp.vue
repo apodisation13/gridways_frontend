@@ -1,11 +1,19 @@
 <template>
   <div class="health-container">
-    <div class="health-bar" :style="barStyle">
+    <div
+      class="health-bar"
+      :style="[barStyle, { '--flash-duration': flashDuration + 'ms' }]"
+      :class="delta ? `bar-flash--${delta.type}` : ''"
+    >
       <div class="health-content">
         <span class="heart-icon">❤️</span>
         <span class="health-value">{{ health }}</span>
       </div>
       <div class="health-fill" :style="fillStyle"></div>
+    </div>
+    <div v-if="delta" :class="['health-delta', delta.type]">
+      <span class="delta-heart">{{ delta.type === "heal" ? "💚" : "❤️" }}</span>
+      <span class="delta-text">{{ delta.text }}</span>
     </div>
   </div>
 </template>
@@ -13,43 +21,47 @@
 <script>
 export default {
   name: "health-comp",
+  data() {
+    return {
+      delta: null,
+      deltaTimer: null,
+    }
+  },
   computed: {
     health() {
       return this.$store.state.game.health
     },
-
-    barStyle() {
-      // Цвет фона в зависимости от здоровья
-      let bgColor
-      if (isNaN(this.health) && this.health.includes("-")) {
-        bgColor = "rgba(255, 59, 48, 0.2)" // красный для урона
-      } else if (isNaN(this.health) && this.health.includes("+")) {
-        bgColor = "rgba(52, 199, 89, 0.2)" // зеленый для лечения
-      } else if (this.health < 20) {
-        bgColor = "rgba(255, 59, 48, 0.2)" // оранжевый для низкого HP
-      } else if (this.health < 35) {
-        bgColor = "rgba(255, 149, 0, 0.2)" // оранжевый для низкого HP
-      } else if (this.health < 50) {
-        bgColor = "rgba(255, 204, 0, 0.2)" // желтый для среднего HP
-      } else {
-        bgColor = "rgba(52, 199, 89, 0.2)" // зеленый для высокого HP
-      }
-
-      return { backgroundColor: bgColor }
+    flashDuration() {
+      return this.$store.getters["selectedMoveTimeout"]
     },
-
+    barStyle() {
+      if (this.health < 20) return { backgroundColor: "rgba(255, 59, 48, 0.2)" }
+      if (this.health < 35) return { backgroundColor: "rgba(255, 149, 0, 0.2)" }
+      if (this.health < 50) return { backgroundColor: "rgba(255, 204, 0, 0.2)" }
+      return { backgroundColor: "rgba(52, 199, 89, 0.2)" }
+    },
     fillStyle() {
-      // Процент заполнения (если здоровье числовое)
-      if (!isNaN(this.health)) {
-        const percent = Math.min(Math.max(this.health, 0), 100)
-        return { width: `${percent}%` }
+      const percent = Math.min(Math.max(this.health, 0), 100)
+      return { width: `${percent}%` }
+    },
+  },
+  watch: {
+    health(newVal, oldVal) {
+      const diff = newVal - oldVal
+      if (diff === 0) return
+
+      clearTimeout(this.deltaTimer)
+      this.delta = {
+        text: diff > 0 ? `+${diff}` : `${diff}`,
+        type: diff > 0 ? "heal" : "damage",
       }
-      return { width: "100%" }
+      this.deltaTimer = setTimeout(() => {
+        this.delta = null
+      }, this.flashDuration)
     },
   },
 }
 </script>
-
 <style scoped>
 .health-container {
   height: 4vh;
@@ -154,6 +166,94 @@ export default {
   50% {
     transform: scale(1.2);
     opacity: 0.8;
+  }
+}
+
+/* Вспышка полоски при изменении HP */
+.bar-flash--heal {
+  animation: bar-glow-heal var(--flash-duration, 0.75s) ease-out forwards;
+}
+.bar-flash--damage {
+  animation: bar-glow-damage var(--flash-duration, 0.75s) ease-out forwards;
+}
+
+@keyframes bar-glow-heal {
+  0%,
+  40% {
+    box-shadow:
+      0 0 8px 3px rgba(52, 199, 89, 1),
+      0 0 24px 8px rgba(52, 199, 89, 0.7);
+    background-color: rgba(52, 199, 89, 0.45);
+  }
+  100% {
+    box-shadow: none;
+    background-color: transparent;
+  }
+}
+
+@keyframes bar-glow-damage {
+  0%,
+  40% {
+    box-shadow:
+      0 0 8px 3px rgba(255, 59, 48, 1),
+      0 0 24px 8px rgba(255, 59, 48, 0.7);
+    background-color: rgba(255, 59, 48, 0.45);
+  }
+  100% {
+    box-shadow: none;
+    background-color: transparent;
+  }
+}
+
+/* Всплывающее число */
+.health-delta {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  pointer-events: none;
+  animation: delta-float 0.9s ease-out forwards;
+}
+
+.delta-heart {
+  position: relative;
+  font-size: 3.5rem;
+  display: block;
+  line-height: 1;
+}
+
+.delta-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+}
+
+.health-delta.heal {
+  color: #2ecc40;
+}
+.health-delta.damage {
+  color: #ff3b30;
+}
+
+@keyframes delta-float {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0);
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-12px);
   }
 }
 </style>
