@@ -6,6 +6,33 @@
         :style="[{ backgroundImage: `url(${card.image})` }, card_margin(card)]"
         :class="{ disable: count === 0 }"
       >
+        <!-- анимация со значком меча на карте - по сути ход любой картой -->
+        <transition name="damage">
+          <div
+            v-if="card.damages_enemy"
+            class="damage-overlay"
+            :style="{ '--flash-duration': flashDuration + 'ms' }"
+          >
+            <div class="damage-icon-wrap">
+              <div class="damage-icon"></div>
+              <span class="damage-icon-text">{{ -card.damage }}</span>
+            </div>
+          </div>
+        </transition>
+        <!-- анимация со значком меча на карте - пассивный урон от карты в руке -->
+        <transition name="damage">
+          <div
+            v-if="card.p_damages_enemy"
+            class="damage-overlay"
+            :style="{ '--flash-duration': flashDuration + 'ms' }"
+          >
+            <div class="damage-icon-wrap">
+              <div class="damage-icon"></div>
+              <span class="damage-icon-text">{{ -card.value }}</span>
+            </div>
+          </div>
+        </transition>
+        <!-- анимация со значком сердца на карте - пассивное лечение от карты в руке -->
         <transition name="heal">
           <div
             v-if="card.healing"
@@ -18,6 +45,26 @@
             </div>
           </div>
         </transition>
+      </div>
+      <!-- увеличение урона при ХОДЕ картой -->
+      <div
+        v-if="card.dmg_delta"
+        class="dmg-anim"
+        :style="{ '--flash-duration': flashDuration + 'ms' }"
+      >
+        <span class="dmg-anim-text">
+          {{ card.dmg_delta > 0 ? "+" : "" }}{{ card.dmg_delta }}
+        </span>
+      </div>
+      <!-- увеличение урона при ПАССИВНОЙ СПОСОБНОСТИ карты -->
+      <div
+        v-if="card.p_dmg_delta"
+        class="dmg-anim"
+        :style="{ '--flash-duration': flashDuration + 'ms' }"
+      >
+        <span class="dmg-anim-text">
+          {{ card.p_dmg_delta > 0 ? "+" : "" }}{{ card.p_dmg_delta }}
+        </span>
       </div>
       <div class="card-item-information" v-if="!is_previev">
         <special-type-of-card
@@ -364,6 +411,57 @@ export default {
   }
 }
 
+.damage-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 59, 48, 0.25);
+  border-radius: inherit;
+  animation: damage-pulse var(--flash-duration, 500ms) ease-out forwards;
+}
+
+.damage-icon-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.damage-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  background-image: url("~@/assets/icons/card/sword.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: invert(1) sepia(1) saturate(10) hue-rotate(300deg); /* красный цвет */
+  animation: damage-icon-pop var(--flash-duration, 500ms) ease-out forwards;
+}
+
+.damage-icon-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+}
+
+@keyframes damage-pulse {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .card-item {
   background-repeat: no-repeat;
   background-position: center;
@@ -392,5 +490,60 @@ export default {
   box-shadow:
     0 0 calc(var(--glow-intensity, 0px) * 2) var(--glow-color, transparent),
     0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.dmg-anim {
+  position: absolute;
+  top: -10%;
+  right: -10%;
+  width: 35%; /* больше оригинала (был 20%) */
+  aspect-ratio: 1 / 1;
+  transform: rotate(-45deg);
+  background: rgba(220, 80, 0, 0.95);
+  border-radius: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 50;
+  animation: dmg-delta-pop var(--flash-duration, 500ms) ease-out forwards;
+}
+
+.dmg-anim-text {
+  transform: rotate(45deg);
+  font-weight: 900;
+  color: white;
+  font-size: 1rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+@keyframes dmg-delta-pop {
+  0% {
+    opacity: 0;
+    transform: rotate(-45deg) scale(0.3);
+    box-shadow: none;
+  }
+  25% {
+    opacity: 1;
+    transform: rotate(-45deg) scale(1.4);
+    box-shadow:
+      0 0 16px 6px rgba(255, 100, 0, 0.9),
+      0 0 32px 10px rgba(255, 100, 0, 0.5);
+  }
+  40% {
+    transform: rotate(-48deg) scale(1.2); /* лёгкий наклон — эффект тряски */
+  }
+  55% {
+    transform: rotate(-42deg) scale(1.25);
+    box-shadow: 0 0 12px 4px rgba(255, 100, 0, 0.8);
+  }
+  70% {
+    transform: rotate(-45deg) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-45deg) scale(0.9);
+    box-shadow: none;
+  }
 }
 </style>

@@ -31,6 +31,17 @@
           :style="background_color(enemy)"
           :damage="enemy.damage"
         />
+        <!-- отдельный анимированный ромб, damage-comp не трогаем -->
+        <div
+          v-if="enemy.dmg_delta"
+          class="dmg-anim"
+          :style="{ '--flash-duration': flashDuration + 'ms' }"
+        >
+          <span class="dmg-anim-text">
+            {{ enemy.dmg_delta > 0 ? "+" : "" }}{{ enemy.dmg_delta }}
+          </span>
+        </div>
+
         <card-passive v-if="enemy.has_passive" :card="enemy" />
         <enemy-shield v-if="enemy.shield" />
         <enemy-locked v-if="enemy.locked" />
@@ -296,6 +307,7 @@ export default {
   background: rgba(255, 59, 48, 0.25);
   border-radius: inherit;
   animation: damage-pulse var(--flash-duration, 500ms) ease-out forwards;
+  z-index: 1;
 }
 
 .damage-icon-wrap {
@@ -353,6 +365,61 @@ export default {
   100% {
     opacity: 0;
     transform: scale(1);
+  }
+}
+
+.dmg-anim {
+  position: absolute;
+  top: -10%;
+  right: -10%;
+  width: 35%; /* больше оригинала (был 20%) */
+  aspect-ratio: 1 / 1;
+  transform: rotate(-45deg);
+  background: rgba(220, 80, 0, 0.95);
+  border-radius: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+  animation: dmg-delta-pop var(--flash-duration, 500ms) ease-out forwards;
+}
+
+.dmg-anim-text {
+  transform: rotate(45deg);
+  font-weight: 900;
+  color: white;
+  font-size: 1rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+@keyframes dmg-delta-pop {
+  0% {
+    opacity: 0;
+    transform: rotate(-45deg) scale(0.3);
+    box-shadow: none;
+  }
+  25% {
+    opacity: 1;
+    transform: rotate(-45deg) scale(1.4);
+    box-shadow:
+      0 0 16px 6px rgba(255, 100, 0, 0.9),
+      0 0 32px 10px rgba(255, 100, 0, 0.5);
+  }
+  40% {
+    transform: rotate(-48deg) scale(1.2); /* лёгкий наклон — эффект тряски */
+  }
+  55% {
+    transform: rotate(-42deg) scale(1.25);
+    box-shadow: 0 0 12px 4px rgba(255, 100, 0, 0.8);
+  }
+  70% {
+    transform: rotate(-45deg) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-45deg) scale(0.9);
+    box-shadow: none;
   }
 }
 </style>
