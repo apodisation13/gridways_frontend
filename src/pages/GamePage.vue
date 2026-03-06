@@ -91,12 +91,14 @@
       @enemy_in_cross="switch_enemy_in_cross"
     />
 
-    <redraw-comp
-      v-if="draw"
-      :game-obj="gameObj"
-      :redraw-number="redraws"
-      @redraw_finished="redraw_finished"
-    />
+    <transition name="modal" appear>
+      <redraw-comp
+        v-if="draw"
+        :game-obj="gameObj"
+        :redraw-number="redraws"
+        @redraw_finished="redraw_finished"
+      />
+    </transition>
   </div>
 </template>
 
@@ -371,5 +373,30 @@ export default {
 .draw {
   height: 6.3vh;
   width: 98%;
+}
+
+.modal-enter-active {
+  animation: modal-fade-in 0.5s ease-out;
+}
+.modal-leave-active {
+  animation: modal-fade-out 0.25s ease-in;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 </style>

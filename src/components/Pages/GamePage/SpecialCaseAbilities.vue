@@ -1,19 +1,21 @@
 <template>
   <div>
     <!--отркывается по любой абилке где нужно окно, там отфильтрованные карты cards_pool-->
-    <modal-window v-if="show_pick_a_card_selection">
-      <h4 class="special-ability-header">{{ card_ability }}</h4>
-      <card-list-component
-        v-if="!enemyView"
-        :cards="cards_pool"
-        @chose_player_card="confirm_selection"
-      />
-      <enemy-list
-        v-else
-        :enemies="cards_pool"
-        @chose-enemy="confirm_selection"
-      />
-    </modal-window>
+    <transition name="modal" appear>
+      <modal-window v-if="show_pick_a_card_selection">
+        <h4 class="special-ability-header">{{ card_ability }}</h4>
+        <card-list-component
+          v-if="!enemyView"
+          :cards="cards_pool"
+          @chose_player_card="confirm_selection"
+        />
+        <enemy-list
+          v-else
+          :enemies="cards_pool"
+          @chose-enemy="confirm_selection"
+        />
+      </modal-window>
+    </transition>
 
     <!--а тут только 1 выбранная карта, при абилках играть play_from-->
     <div
@@ -140,5 +142,29 @@ export default {
 }
 .special-ability-header {
   color: white;
+}
+.modal-enter-active {
+  animation: modal-fade-in 0.5s ease-out;
+}
+.modal-leave-active {
+  animation: modal-fade-out 0.25s ease-in;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 </style>
