@@ -9,6 +9,8 @@ const state = {
   current_deck_index: undefined, // индекс деки в списке дек
   current_deck_id: undefined, // id колоды
   health: 0, // жизни деки, из деки, deck.health
+  armor: 0, // новая фича: броня лидера, защищает N ходов от урона
+  armor_delta: null,
   leader: null, // текущий лидер для игры из деки, deck.leader
 
   whole_level: {},
@@ -79,6 +81,14 @@ const mutations = {
   change_health(state, param) {
     // в процессе игры, dmg/heal
     state.health += param
+  },
+  // в процессе игры, добавить или отнять броню лидеру
+  change_armor(state, armor_delta) {
+    state.armor += armor_delta
+  },
+  // в процессе игры, для анимации +1/-1 во время работы с броней
+  set_armor_delta(state, armor_delta) {
+    state.armor_delta = armor_delta
   },
 
   set_ppa_end_turn(state, payload) {
