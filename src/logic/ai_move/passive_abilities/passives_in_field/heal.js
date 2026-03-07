@@ -30,11 +30,11 @@ function heal_all(enemy, field, enemy_leader, timeout = 1000) {
 
   sound_heal()
   all_enemies.forEach(e => {
-    e.hp_delta = e.value
+    e.hp_delta = enemy.value
     setTimeout(() => {
       e.hp_delta = null
     }, timeout)
-    e.hp += e.value
+    e.hp += enemy.value
   })
   timeoutAnimationFlag(enemy, "healing", sound_heal, timeout * 0.5)
 }
@@ -47,7 +47,7 @@ function heal_random(enemy, field, enemy_leader, timeout = 1000) {
   setTimeout(() => {
     random_enemy.hp_delta = null
   }, timeout)
-  random_enemy.hp += random_enemy.value
+  random_enemy.hp += enemy.value
   timeoutAnimationFlag(enemy, "healing", sound_heal, timeout * 0.5)
 }
 
