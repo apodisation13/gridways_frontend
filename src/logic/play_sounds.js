@@ -8,6 +8,10 @@ export function sound_hit_shield() {
   sound("./../../audio/sounds/hit_shield.wav")
 }
 
+export function sound_hit_armor() {
+  sound("./../../audio/sounds/hit_armor.mp3")
+}
+
 export function sound_damage_all() {
   sound("./../../audio/sounds/damage_all.wav")
 }
