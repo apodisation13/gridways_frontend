@@ -227,6 +227,7 @@ export default {
 
     // если ткнули ранее на карту игрока или лидера, а потом на поле, ходим // enemy - объект врага (field[i])
     exec_damage_enemy_card(enemy) {
+      if (!enemy) return
       this.selected_enemy = enemy
       this.can_draw = false // если хотя бы раз сюда попали, то дро нельзя
       // далее выполним ИЛИ одну функцию, ИЛИ другую! то есть или картой выстрелим, или лидером
