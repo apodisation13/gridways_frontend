@@ -19,6 +19,7 @@
       </v-layer>
     </v-stage>
     <LevelTree
+      :seasonName="seasonName"
       :levels="seasonLevels"
       :userSeasonUnlocked="userSeasonUnlocked"
       v-if="showSeasonLevelsTree && seasonLevels"
@@ -40,6 +41,7 @@
       >
         <div class="season-content">
           <div class="lock-icon" v-if="isLocked(season)">🔒</div>
+          <div class="lock-icon" v-if="isFinished(season)">✅</div>
           <span class="season-name">{{ season.season.name }}</span>
 
           <div
@@ -234,6 +236,7 @@ export default {
       w: 100,
       configKonva: { width: 1000, height: 1000 },
       seasonTree: [],
+      seasonName: "",
       seasonLevels: [],
       showSeasonLevelsTree: false,
       userSeasonUnlocked: false,
@@ -282,6 +285,9 @@ export default {
     isLocked(season) {
       return season.id === null
     },
+    isFinished(season) {
+      return season.stats.total_levels === season.stats.finished_levels
+    },
     progressPercent(season) {
       const { finished_levels, total_levels } = season.stats ?? {}
       if (!total_levels) return 0
@@ -293,8 +299,8 @@ export default {
 
       const gradients = {
         locked: [0, "#9e9e9e", 1, "#616161"],
-        finished: [0, "#e53935", 1, "#7c0205"],
-        open: [0, "#ffe082", 1, "#ffb300"],
+        finished: [0, "rgba(255, 231, 183, 1)", 1, "rgba(255, 231, 183, 1)"],
+        open: [0, "rgba(237, 177, 62, 1)", 1, "rgba(237, 177, 62, 1)"],
       }
       const key = isLocked ? "locked" : isFinished ? "finished" : "open"
 
@@ -315,7 +321,7 @@ export default {
         shadowBlur: 20,
         shadowOffsetX: 0,
         shadowOffsetY: 5,
-        stroke: isLocked ? "transparent" : "rgba(255,220,100,0.7)",
+        stroke: "transparent",
         strokeWidth: isLocked ? 0 : 2,
       }
     },
@@ -392,6 +398,7 @@ export default {
     setSeason(season) {
       if (season.id) this.$store.commit("set_season", season.season)
       this.seasonLevels = season.season.levels
+      this.seasonName = season.season.name
       this.showSeasonLevelsTree = true
       this.userSeasonUnlocked = season.id !== null
       this.$emit("level_selected", this.showSeasonLevelsTree)
@@ -477,10 +484,6 @@ export default {
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
-}
-
-.is-finished .season-name {
-  color: rgba(255, 240, 210, 0.95);
 }
 
 .is-locked .season-name {
@@ -689,10 +692,6 @@ export default {
   text-align: center;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.55);
-}
-
-.is-finished .progress-text {
-  color: rgba(255, 230, 180, 0.85);
 }
 
 .season-actions {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>СЕЗОН 1</div>
+    <div>{{ seasonName }}</div>
     <v-stage :config="configKonva">
       <v-layer>
         <!--для каждого уровня из списка уровней текущего сезона-->
@@ -70,6 +70,10 @@ export default {
   name: "LevelTree",
   components: { LevelModal },
   props: {
+    seasonName: {
+      type: String,
+      required: true,
+    },
     levels: {
       type: Array,
       required: true,
@@ -242,7 +246,10 @@ export default {
           })
           return
         }
-        if (this.levs[parseInt(l) - 1].finished) {
+        const levIndex = this.levels.findIndex(
+          lev => lev.level.id === parseInt(l)
+        )
+        if (this.levs[levIndex].finished) {
           level.lines.push({
             x: x2,
             y: y2,

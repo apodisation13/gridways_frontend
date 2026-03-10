@@ -106,7 +106,9 @@ export default {
         )
       } else if (ability === CardAbility.IncrDmgByNCharges) {
         // увеличиваем урон карты в руке на количество зарядов у той
-        this.cards_pool = this.gameObj.hand
+        this.cards_pool = this.gameObj.hand.filter(
+          card => card.id !== this.selected_card.id
+        )
       } else if (ability === CardAbility.CreateSpecial) {
         // вот это сложно... выбираем 3 случайные бронзовые спец карты НЕ из фракции
         const pool = this.$store.getters["all_cards"].filter(
