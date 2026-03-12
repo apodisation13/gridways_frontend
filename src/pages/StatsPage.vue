@@ -1,24 +1,39 @@
 <template>
   <div class="user-stats">
-    <!-- Фракции -->
-    <div class="factions-row">
-      <div
-        v-for="(factionStat, factionName) in userStats"
-        :key="factionName"
-        class="faction-block"
-      >
-        <faction-item :faction="{ name: factionName }" />
+    <!-- Шапка: профиль + фракции -->
+    <div class="header-section">
+      <!-- Левая часть: аватарка + никнейм -->
+      <div class="user-profile">
+        <img
+          v-if="selectedAvatar"
+          :src="require(`@/assets/icons/resources/${selectedAvatar}.svg`)"
+          alt=""
+          class="avatar"
+        />
+        <div v-else class="avatar-placeholder" />
+        <span class="username">{{ username }}</span>
+      </div>
 
-        <div class="stat-box">
-          <span class="stat-label">побед / игр</span>
-          <span class="stat-value"
-            >{{ factionStat.win }} / {{ factionStat.play }}</span
-          >
-        </div>
+      <!-- Правая часть: фракции вертикально -->
+      <div class="factions-column">
+        <div
+          v-for="(factionStat, factionName) in userStats"
+          :key="factionName"
+          class="faction-row"
+        >
+          <faction-item :faction="{ name: factionName }" />
 
-        <div class="stat-box">
-          <span class="stat-label">винрейт</span>
-          <span class="stat-value">{{ factionStat.winrate }}%</span>
+          <div class="stat-box">
+            <span class="stat-label">побед / игр</span>
+            <span class="stat-value">
+              {{ factionStat.win }} / {{ factionStat.play }}
+            </span>
+          </div>
+
+          <div class="stat-box">
+            <span class="stat-label">винрейт</span>
+            <span class="stat-value">{{ factionStat.winrate }}%</span>
+          </div>
         </div>
       </div>
     </div>
@@ -29,27 +44,27 @@
     <div class="general-stats">
       <div class="stat-row">
         <span class="stat-row-label">Карты</span>
-        <span class="stat-row-value"
-          >{{ cardsStats.open }} / {{ cardsStats.total }}</span
-        >
+        <span class="stat-row-value">
+          {{ cardsStats.open }} / {{ cardsStats.total }}
+        </span>
       </div>
       <div class="stat-row">
         <span class="stat-row-label">Лидеры</span>
-        <span class="stat-row-value"
-          >{{ leaderStats.open }} / {{ leaderStats.total }}</span
-        >
+        <span class="stat-row-value">
+          {{ leaderStats.open }} / {{ leaderStats.total }}
+        </span>
       </div>
       <div class="stat-row">
         <span class="stat-row-label">Уровни</span>
-        <span class="stat-row-value"
-          >{{ levelsStats.finished }} / {{ levelsStats.total }}</span
-        >
+        <span class="stat-row-value">
+          {{ levelsStats.finished }} / {{ levelsStats.total }}
+        </span>
       </div>
       <div class="stat-row">
         <span class="stat-row-label">Сезоны</span>
-        <span class="stat-row-value"
-          >{{ seasonsStats.finished }} / {{ seasonsStats.total }}</span
-        >
+        <span class="stat-row-value">
+          {{ seasonsStats.finished }} / {{ seasonsStats.total }}
+        </span>
       </div>
     </div>
   </div>
@@ -65,6 +80,15 @@ export default {
   computed: {
     userId() {
       return this.$route.query.userId || this.$store.getters["getUser"].user_id
+    },
+    username() {
+      return this.$route.query.username || this.$store.state.login.user.username
+    },
+    selectedAvatar() {
+      return (
+        this.$route.query.userProfileAvatar ||
+        this.$store.getters["selectedAvatar"]
+      )
     },
     ...mapGetters([
       "userStats",
@@ -87,21 +111,62 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-top: 24px; /* 4) отступ сверху */
+  padding-top: 24px;
 }
 
-.factions-row {
+/* Шапка */
+.header-section {
   display: flex;
   flex-direction: row;
-  gap: 16px;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
-.faction-block {
+.user-profile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  min-width: 100px;
+}
+
+.avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 20%;
+  object-fit: contain;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.avatar-placeholder {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.username {
+  font-size: 14px;
+  color: white;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* Фракции */
+.factions-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: auto;
+  margin-right: 30px;
+}
+
+.faction-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
 }
 
 .stat-box {
@@ -115,18 +180,19 @@ export default {
 }
 
 .stat-label {
-  font-size: 11px; /* 1) покрупнее */
+  font-size: 11px;
   color: white;
 }
 
 .stat-value {
-  font-size: 16px; /* 1) покрупнее */
+  font-size: 16px;
   color: white;
 }
 
+/* Статистика */
 .section-title {
   font-size: 16px;
-  margin-top: 84px; /* 3) отступ до статистики */
+  margin-top: 84px;
   color: white;
 }
 
@@ -146,8 +212,8 @@ export default {
 }
 
 .stat-row-label {
-  font-size: 15px; /* 1) покрупнее */
-  background: var(--primary-gold-gradient); /* 2) золотой */
+  font-size: 15px;
+  background: var(--primary-gold-gradient);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -155,7 +221,7 @@ export default {
 }
 
 .stat-row-value {
-  font-size: 15px; /* 1) покрупнее */
+  font-size: 15px;
   background: var(--primary-gold-gradient);
   -webkit-background-clip: text;
   background-clip: text;

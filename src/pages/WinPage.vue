@@ -76,7 +76,7 @@
 <script>
 import { getRewardForLevel } from "@/logic/random_rewards"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
-import { PayResourcesSubtype } from "@/store/const/const"
+import { GameStatsRecordType, PayResourcesSubtype } from "@/store/const/const"
 export default {
   name: "win-page",
   components: { ResourceItem },
@@ -90,6 +90,10 @@ export default {
     this.$store.dispatch("re_set_deck") // и тут переустанавливаем выбранную деку
     await this.pay_resources() // получаем ресурсы за выигрыш
     await this.open_levels() // открываем связанные уровни в дереве
+    await this.$store.dispatch("postUserStatistic", {
+      user_deck_id: this.$store.state.game.whole_deck.id,
+      type: GameStatsRecordType.win,
+    })
     this.$store.commit("set_win_redirect", false)
   },
   methods: {

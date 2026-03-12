@@ -33,3 +33,6 @@ export const CRAFT_BONUS_CARD = `${getDomain()}/user-progress/{userId}/craft-bon
 // PATCH запрос - пришло finished_levels - открытие уровней, не пришло - сброс (нужен id записи UserLevel)
 export const patch_levels = `${getDomain()}/api/v1/unlock_levels`
 export const OPEN_RELATED_LEVELS = `${getDomain()}/user-progress/{userId}/open-related-levels/{userLevelId}`
+
+// statistics
+export const USER_STATS = `${getDomain()}/statistics/{userId}/stats`
