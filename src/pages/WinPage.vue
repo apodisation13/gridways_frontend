@@ -76,7 +76,11 @@
 <script>
 import { getRewardForLevel } from "@/logic/random_rewards"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
-import { GameStatsRecordType, PayResourcesSubtype } from "@/store/const/const"
+import {
+  GameStatsRecordType,
+  LeaderboardGameMode,
+  PayResourcesSubtype,
+} from "@/store/const/const"
 export default {
   name: "win-page",
   components: { ResourceItem },
@@ -93,6 +97,17 @@ export default {
     await this.$store.dispatch("postUserStatistic", {
       user_deck_id: this.$store.state.game.whole_deck.id,
       type: GameStatsRecordType.win,
+    })
+    const level_name = this.$store.state.game.level.name
+    let gameMode
+    if (level_name === "random") gameMode = LeaderboardGameMode.random
+    else if (level_name === "random_n") gameMode = LeaderboardGameMode.random_n
+    else gameMode = LeaderboardGameMode.season
+    console.log("1066666666666666", this.$store.getters["enemies_grave"].length)
+    await this.$store.dispatch("postUserLeaderboard", {
+      user_deck_id: this.$store.state.game.whole_deck.id,
+      mode: gameMode,
+      max_kills: this.$store.getters["enemies_grave"].length + 1,
     })
     this.$store.commit("set_win_redirect", false)
   },

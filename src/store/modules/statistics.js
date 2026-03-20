@@ -1,5 +1,5 @@
 import { callApi, GET, POST } from "@/lib/api/api"
-import { USER_STATS } from "@/store/const/api_urls"
+import { USER_LEADERBOARD, USER_STATS } from "@/store/const/api_urls"
 // import { useToast } from "vue-toastification"
 //
 // const toast = useToast()
@@ -10,6 +10,8 @@ const state = {
   leaderStats: {},
   levelsStats: {},
   seasonsStats: {},
+
+  userLeaderboard: [],
 }
 
 const getters = {
@@ -18,6 +20,8 @@ const getters = {
   leaderStats: state => state.leaderStats,
   levelsStats: state => state.levelsStats,
   seasonsStats: state => state.seasonsStats,
+
+  userLeaderboard: state => state.userLeaderboard,
 }
 
 const mutations = {
@@ -27,6 +31,9 @@ const mutations = {
     state.leaderStats = payload.leaders
     state.seasonsStats = payload.seasons
     state.levelsStats = payload.levels
+  },
+  setLeaderboard(state, payload) {
+    state.userLeaderboard = payload
   },
 }
 
@@ -51,6 +58,34 @@ const actions = {
         method: POST,
         url: USER_STATS.replace("{userId}", userId),
         data: { user_deck_id: user_deck_id, type: type },
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  },
+  async getUserLeaderboard({ getters, commit }) {
+    const userId = getters["getUser"].user_id
+    try {
+      const response = await callApi({
+        method: GET,
+        url: USER_LEADERBOARD.replace("{userId}", userId),
+      })
+      commit("setLeaderboard", response.data)
+    } catch (err) {
+      console.log(err)
+    }
+  },
+  async postUserLeaderboard({ getters }, { user_deck_id, mode, max_kills }) {
+    const userId = getters["getUser"].user_id
+    try {
+      await callApi({
+        method: POST,
+        url: USER_LEADERBOARD.replace("{userId}", userId),
+        data: {
+          user_deck_id: user_deck_id,
+          max_kills: max_kills,
+          mode: mode,
+        },
       })
     } catch (err) {
       console.log(err)

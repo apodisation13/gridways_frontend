@@ -36,3 +36,4 @@ export const OPEN_RELATED_LEVELS = `${getDomain()}/user-progress/{userId}/open-r
 
 // statistics
 export const USER_STATS = `${getDomain()}/statistics/{userId}/stats`
+export const USER_LEADERBOARD = `${getDomain()}/statistics/{userId}/leaderboard`
