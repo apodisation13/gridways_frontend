@@ -67,7 +67,7 @@
 
 <script>
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
-import { PayResourcesSubtype } from "@/store/const/const"
+import { GameStatsRecordType, PayResourcesSubtype } from "@/store/const/const"
 import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
 import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
 import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
@@ -139,6 +139,10 @@ export default {
         await this.$store.dispatch("processResources", {
           subtype: PayResourcesSubtype.startSeasonLevel,
           data: payload,
+        })
+        await this.$store.dispatch("postUserStatistic", {
+          user_deck_id: this.selectedDeck.id,
+          type: GameStatsRecordType.play,
         })
         this.$store.commit("set_start_game_redirect", true)
         this.$router.push("/game") // ВОТ ТУТ мы переходим на игру и ТОЛЬКО тут (с флагом, что запрос успешно)

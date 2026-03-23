@@ -200,6 +200,8 @@ export default {
         { title: "Главная", path: "/main" },
         { title: "Правила", path: "/rules" },
         { title: "О нас", path: "/about" },
+        { title: "Статистика", path: "/stats", requireAuth: true },
+        { title: "Доска лидеров", path: "/leaderboard", requireAuth: true },
         { title: "Настройки", path: "/settings", requireAuth: true },
       ],
       expanded: false,
@@ -287,7 +289,6 @@ export default {
 .expand-menu__wrapper {
   background-image: url("~@/assets/header-menu-background.png");
   width: 207px;
-  height: 271px;
   border-radius: 8px;
   margin-left: 10px;
   z-index: 8;

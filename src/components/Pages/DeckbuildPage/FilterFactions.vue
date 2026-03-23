@@ -2,12 +2,15 @@
   <div class="filter_factions">
     <base-title-text>{{ title }}</base-title-text>
     <div class="factions">
-      <faction-item
+      <div
         v-for="faction in factions"
-        :key="faction"
-        :faction="faction"
+        :key="faction.name"
+        class="faction-wrap"
+        :class="{ 'faction-wrap--active': selectedFaction === faction.name }"
         @click="filtering(faction)"
-      />
+      >
+        <faction-item :faction="faction" />
+      </div>
     </div>
   </div>
 </template>
@@ -28,6 +31,10 @@ export default {
       required: false,
       type: String,
       default: "Фракции",
+    },
+    selectedFaction: {
+      type: String,
+      default: null,
     },
   },
   computed: {
@@ -55,5 +62,16 @@ export default {
   display: flex;
   justify-content: space-around;
   align-items: center;
+}
+
+.faction-wrap {
+  border-radius: 6px;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+
+.faction-wrap--active {
+  border-color: #facf5d;
 }
 </style>

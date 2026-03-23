@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router"
 import store from "@/store"
 
+import { images } from "@/router/const/images"
 import EmblemPage from "@/pages/EmblemPage.vue"
 import MainPage from "@/pages/MainPage"
 import GamePage from "@/pages/GamePage"
@@ -15,8 +16,8 @@ import WinPage from "@/pages/WinPage"
 import LoadingPage from "@/pages/LoadingPage"
 import StartGame from "@/pages/StartGame"
 import LosePage from "@/pages/LosePage"
-
-import { images } from "@/router/const/images"
+import StatsPage from "@/pages/StatsPage.vue"
+import LeaderboardPage from "@/pages/LeaderboardPage.vue"
 
 const routes = [
   {
@@ -100,6 +101,25 @@ const routes = [
   {
     path: "/settings",
     component: SettingsPage,
+    meta: {
+      requireAuth: true,
+      image: images.settings,
+    },
+  },
+  {
+    path: "/stats",
+    component: StatsPage,
+    meta: {
+      requireAuth: true,
+      image: images.settings,
+    },
+    props: route => ({
+      userId: route.query.userId,
+    }),
+  },
+  {
+    path: "/leaderboard",
+    component: LeaderboardPage,
     meta: {
       requireAuth: true,
       image: images.settings,

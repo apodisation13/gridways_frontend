@@ -6,6 +6,7 @@ import user_actions from "@/store/modules/user_actions"
 import news from "@/store/modules/news"
 import settings from "@/store/modules/settings"
 import fullscreen from "@/store/modules/fullscreen"
+import statistics from "@/store/modules/statistics"
 
 // ИНСТРУКЦИЯ:
 // в шаблонах $store. state, getters['name'], commit('name', чё) для мутаций
@@ -21,6 +22,7 @@ const store = createStore({
     news,
     settings,
     fullscreen,
+    statistics,
   },
   state: {},
   getters: {},

@@ -16,3 +16,15 @@ export const CraftMillCardActionSubtype = {
   millCard: "mill_card",
   millLeader: "mill_leader",
 }
+
+export const GameStatsRecordType = {
+  play: "play",
+  win: "win",
+}
+
+export const LeaderboardGameMode = {
+  arena: "arena",
+  random: "random",
+  random_n: "random_n",
+  season: "season",
+}
