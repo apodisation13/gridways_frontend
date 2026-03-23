@@ -4,7 +4,8 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Фракция</th>
+          <th v-if="is_world">Игрок</th>
+          <th v-if="!is_world">Фракция</th>
           <th>Лидер</th>
           <th>Режим</th>
           <th>Рекорд</th>
@@ -14,9 +15,26 @@
         <tr
           v-for="(entry, index) in filteredLeaderboard"
           :key="entry.leader_id + entry.mode"
+          :class="{
+            'leaderboard__row--mine': is_world && entry.username === username,
+          }"
         >
           <td>{{ index + 1 }}</td>
-          <td>
+          <td v-if="is_world">
+            <div class="leaderboard__user" @click="goToStats(entry)">
+              <img
+                v-if="entry.user_avatar"
+                :src="
+                  require(`@/assets/icons/resources/${entry.user_avatar}.svg`)
+                "
+                alt=""
+                class="avatar"
+              />
+              <div v-else class="avatar avatar--placeholder" />
+              <span>{{ entry.username }}</span>
+            </div>
+          </td>
+          <td v-if="!is_world">
             <faction-item :faction="{ name: entry.faction_name }" />
           </td>
           <td>
@@ -43,19 +61,40 @@
 <script>
 import CardItem from "@/components/Cards/CardItem.vue"
 import FactionItem from "@/components/Pages/DeckbuildPage/FactionItem.vue"
+import { mapActions, mapGetters } from "vuex"
 
 export default {
   name: "LeaderboardTable",
   components: { FactionItem, CardItem },
   props: {
-    isWorld: {
+    is_world: {
       type: Boolean,
       default: false,
     },
+    selectedFaction: {
+      type: [String, null],
+      required: true,
+    },
+    selectedMode: {
+      type: [String, null],
+      required: true,
+    },
+  },
+  async created() {
+    await this.getUserLeaderboard()
+    await this.getWorldLeaderboard()
   },
   computed: {
+    ...mapGetters(["userLeaderboard", "worldLeaderboard"]),
+    username() {
+      return this.$store.state.login.user.username
+    },
+    userLeaderboardData() {
+      if (this.is_world) return this.worldLeaderboard
+      else return this.userLeaderboard
+    },
     filteredLeaderboard() {
-      return this.userLeaderboard.filter(e => {
+      return this.userLeaderboardData.filter(e => {
         if (this.selectedFaction && e.faction_name !== this.selectedFaction)
           return false
         return !(this.selectedMode && e.mode !== this.selectedMode)
@@ -63,10 +102,21 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["getUserLeaderboard", "getWorldLeaderboard"]),
     findLeader(leaderId) {
       return this.$store.getters["all_leaders"].find(
         item => item.card.id === leaderId
       )
+    },
+    goToStats(entry) {
+      this.$router.push({
+        path: "/stats",
+        query: {
+          userId: entry.user_id,
+          username: entry.username,
+          userProfileAvatar: entry.avatar,
+        },
+      })
     },
   },
 }
@@ -76,7 +126,7 @@ export default {
 .leaderboard__table-wrap {
   overflow-y: auto;
   max-height: calc(
-    100vh - 200px
+    100vh - 400px
   ); /* 200px — примерная высота шапки + кнопки + отступы */
 }
 
@@ -134,5 +184,27 @@ export default {
 .leaderboard__card-wrap {
   width: 60px;
   margin: 0 auto;
+}
+
+.leaderboard__row--mine {
+  background-color: rgba(255, 215, 0, 0.15); /* или любой цвет */
+}
+
+.leaderboard__user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+}
+
+.avatar--placeholder {
+  background: #444;
+  border-radius: 50%;
 }
 </style>

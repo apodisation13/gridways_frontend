@@ -1,5 +1,9 @@
 import { callApi, GET, POST } from "@/lib/api/api"
-import { USER_LEADERBOARD, USER_STATS } from "@/store/const/api_urls"
+import {
+  USER_LEADERBOARD,
+  USER_STATS,
+  WORLD_LEADERBOARD,
+} from "@/store/const/api_urls"
 // import { useToast } from "vue-toastification"
 //
 // const toast = useToast()
@@ -12,6 +16,7 @@ const state = {
   seasonsStats: {},
 
   userLeaderboard: [],
+  worldLeaderboard: [],
 }
 
 const getters = {
@@ -22,6 +27,7 @@ const getters = {
   seasonsStats: state => state.seasonsStats,
 
   userLeaderboard: state => state.userLeaderboard,
+  worldLeaderboard: state => state.worldLeaderboard,
 }
 
 const mutations = {
@@ -34,6 +40,9 @@ const mutations = {
   },
   setLeaderboard(state, payload) {
     state.userLeaderboard = payload
+  },
+  setWorldLeaderboard(state, payload) {
+    state.worldLeaderboard = payload
   },
 }
 
@@ -71,6 +80,18 @@ const actions = {
         url: USER_LEADERBOARD.replace("{userId}", userId),
       })
       commit("setLeaderboard", response.data)
+    } catch (err) {
+      console.log(err)
+    }
+  },
+  async getWorldLeaderboard({ getters, commit }) {
+    const userId = getters["getUser"].user_id
+    try {
+      const response = await callApi({
+        method: GET,
+        url: WORLD_LEADERBOARD.replace("{userId}", userId),
+      })
+      commit("setWorldLeaderboard", response.data)
     } catch (err) {
       console.log(err)
     }

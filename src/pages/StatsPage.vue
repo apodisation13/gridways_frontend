@@ -1,5 +1,12 @@
 <template>
   <div class="user-stats">
+    <button
+      v-if="$route.query.userId"
+      class="back-btn"
+      @click="$router.push({ path: '/leaderboard', query: { world: true } })"
+    >
+      ← Назад
+    </button>
     <!-- Шапка: профиль + фракции -->
     <div class="header-section">
       <!-- Левая часть: аватарка + никнейм -->
@@ -112,6 +119,19 @@ export default {
   flex-direction: column;
   gap: 16px;
   padding-top: 24px;
+}
+
+.back-btn {
+  background: linear-gradient(#1d252d, #000000, #282d33);
+  border: 2px solid #facf5d;
+  border-radius: 6px;
+  display: inline-block;
+  padding: 8px 16px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #facf5d;
+  margin-bottom: 16px;
 }
 
 /* Шапка */
