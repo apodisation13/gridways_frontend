@@ -1,0 +1,35 @@
+<svg width="28" height="40" viewBox="0 0 28 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M28 7.41818L14 0V20L28 7.41818Z" fill="#BB2244"/>
+    <path d="M14 20H28V7.41818L14 20Z" fill="#DD4466"/>
+    <path d="M14 0L0 7.41818L14 20V0Z" fill="#FF8AAA"/>
+    <path d="M14 20V40L28 32.5818L14 20Z" fill="#991133"/>
+    <path d="M14 20L28 32.5818V20H14Z" fill="#CC3355"/>
+    <path d="M14 20L0 7.41818V20H14Z" fill="#BB3355"/>
+    <path d="M14 20L0 32.5818L14 40V20Z" fill="#550011"/>
+    <path d="M0 20V32.5818L14 20H0Z" fill="#770022"/>
+    <path d="M21.0884 26.6182V13.4837L14.4711 9.57092L7.99711 13.4837V26.6182L14.4711 30.4146L21.0884 26.6182Z" fill="url(#curse_grad)"/>
+    <!-- Flame (outer) -->
+    <path d="M14 10.5C12.5 13.5 11 15.5 12 17.5H16C17 15.5 15.5 13.5 14 10.5Z" fill="#FF4400"/>
+    <!-- Flame (inner) -->
+    <path d="M14 11.5C13.2 13.2 12.8 14.8 13.5 16.5H14.5C15.2 14.8 14.8 13.2 14 11.5Z" fill="#FFAA00"/>
+    <!-- Skull head -->
+    <path d="M14 17C11.2 17 9 19.2 9 21.5C9 23.3 10 24.6 11.3 25.3V27.5H16.7V25.3C18 24.6 19 23.3 19 21.5C19 19.2 16.8 17 14 17Z" fill="#1A0808"/>
+    <!-- X left eye -->
+    <line x1="10.8" y1="20.2" x2="12.6" y2="22" stroke="#FF2244" stroke-width="1.1" stroke-linecap="round"/>
+    <line x1="12.6" y1="20.2" x2="10.8" y2="22" stroke="#FF2244" stroke-width="1.1" stroke-linecap="round"/>
+    <!-- X right eye -->
+    <line x1="15.4" y1="20.2" x2="17.2" y2="22" stroke="#FF2244" stroke-width="1.1" stroke-linecap="round"/>
+    <line x1="17.2" y1="20.2" x2="15.4" y2="22" stroke="#FF2244" stroke-width="1.1" stroke-linecap="round"/>
+    <!-- Nose -->
+    <ellipse cx="14" cy="23.8" rx="0.8" ry="0.9" fill="#FF2244"/>
+    <!-- Teeth -->
+    <rect x="11.2" y="27.5" width="1.2" height="1.8" rx="0.3" fill="#1A0808"/>
+    <rect x="13.4" y="27.5" width="1.2" height="2.1" rx="0.3" fill="#1A0808"/>
+    <rect x="15.6" y="27.5" width="1.2" height="1.8" rx="0.3" fill="#1A0808"/>
+    <defs>
+        <linearGradient id="curse_grad" x1="10" y1="11" x2="19" y2="29" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#FF99BB"/>
+            <stop offset="1" stop-color="#880022"/>
+        </linearGradient>
+    </defs>
+</svg>

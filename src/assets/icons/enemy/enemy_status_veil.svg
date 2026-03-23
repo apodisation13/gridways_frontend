@@ -1,0 +1,23 @@
+<svg width="28" height="40" viewBox="0 0 28 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M28 7.41818L14 0V20L28 7.41818Z" fill="#4A8FCC"/>
+    <path d="M14 20H28V7.41818L14 20Z" fill="#79B8E8"/>
+    <path d="M14 0L0 7.41818L14 20V0Z" fill="#B5D8F0"/>
+    <path d="M14 20V40L28 32.5818L14 20Z" fill="#3878BB"/>
+    <path d="M14 20L28 32.5818V20H14Z" fill="#699DD8"/>
+    <path d="M14 20L0 7.41818V20H14Z" fill="#87BADD"/>
+    <path d="M14 20L0 32.5818L14 40V20Z" fill="#194A8A"/>
+    <path d="M0 20V32.5818L14 20H0Z" fill="#2D60A8"/>
+    <path d="M21.0884 26.6182V13.4837L14.4711 9.57092L7.99711 13.4837V26.6182L14.4711 30.4146L21.0884 26.6182Z" fill="url(#veil_grad)"/>
+    <!-- Eye -->
+    <path d="M9 20Q14 14.5 19 20Q14 25.5 9 20Z" fill="white"/>
+    <circle cx="14" cy="20" r="2.8" fill="#2A5AAA"/>
+    <circle cx="14" cy="20" r="1.4" fill="#091630"/>
+    <!-- Slash -->
+    <line x1="9.5" y1="16" x2="18.5" y2="24" stroke="#091630" stroke-width="1.8" stroke-linecap="round"/>
+    <defs>
+        <linearGradient id="veil_grad" x1="10" y1="11" x2="19" y2="29" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#C5E5FF"/>
+            <stop offset="1" stop-color="#4A7DC0"/>
+        </linearGradient>
+    </defs>
+</svg>
