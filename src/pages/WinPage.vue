@@ -103,7 +103,6 @@ export default {
     if (level_name === "random") gameMode = LeaderboardGameMode.random
     else if (level_name === "random_n") gameMode = LeaderboardGameMode.random_n
     else gameMode = LeaderboardGameMode.season
-    console.log("1066666666666666", this.$store.getters["enemies_grave"].length)
     await this.$store.dispatch("postUserLeaderboard", {
       user_deck_id: this.$store.state.game.whole_deck.id,
       mode: gameMode,
