@@ -25,6 +25,7 @@ import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_inc
 import { CardAbility } from "@/logic/models"
 import store from "@/store"
 import { change_card_charges } from "@/logic/player_move/service/service_for_player_move"
+import { poison_one_enemy } from "@/logic/player_move/abilities/ability_poison"
 
 // Сюда заходим если там есть враг
 // card - карта, которую мы играем (или из руки, или лидер).
@@ -90,6 +91,9 @@ function damage_ai_card(card, enemy, gameObj) {
   } else if (ability === CardAbility.IncrDmgToAllGrave) {
     damage_one(enemy, card, gameObj, timeout)
     incr_dmg_to_all_grave(card, gameObj, timeout)
+  } else if (ability === CardAbility.Poison) {
+    damage_one(enemy, card, gameObj, timeout)
+    poison_one_enemy(enemy, gameObj, timeout)
   } else damage_one(enemy, card, gameObj, timeout)
 
   // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда
