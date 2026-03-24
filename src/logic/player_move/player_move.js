@@ -1,3 +1,5 @@
+import store from "@/store"
+import { CardAbility } from "@/logic/models"
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
 import { heal } from "@/logic/player_move/abilities/ability_heal"
 import { damage_one } from "@/logic/player_move/abilities/ability_damage_one"
@@ -22,10 +24,13 @@ import { set_lowest_dmg_to_as_highest } from "@/logic/player_move/abilities/abil
 import { spawn_tokens_at_enemy_deck } from "@/logic/player_move/abilities/ability_spawn_tokens_at_enemy_deck"
 import { incr_dmg_to_all_hand } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_hand"
 import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_grave"
-import { CardAbility } from "@/logic/models"
-import store from "@/store"
 import { change_card_charges } from "@/logic/player_move/service/service_for_player_move"
-import { poison_one_enemy } from "@/logic/player_move/abilities/ability_poison"
+import {
+  poison_all_enemies,
+  poison_one_enemy,
+} from "@/logic/player_move/abilities/ability_poison"
+import { add_armor } from "@/logic/player_move/abilities/ability_armor"
+import { purify } from "@/logic/player_move/abilities/ability_purify"
 
 // Сюда заходим если там есть враг
 // card - карта, которую мы играем (или из руки, или лидер).
@@ -94,6 +99,15 @@ function damage_ai_card(card, enemy, gameObj) {
   } else if (ability === CardAbility.Poison) {
     damage_one(enemy, card, gameObj, timeout)
     poison_one_enemy(enemy, gameObj, timeout)
+  } else if (ability === CardAbility.PoisonAll) {
+    damage_one(enemy, card, gameObj, timeout)
+    poison_all_enemies(gameObj, timeout)
+  } else if (ability === CardAbility.AddArmor) {
+    damage_one(enemy, card, gameObj, timeout)
+    add_armor(card.armor, timeout)
+  } else if (ability === CardAbility.Purify) {
+    purify(enemy)
+    damage_one(enemy, card, gameObj, timeout)
   } else damage_one(enemy, card, gameObj, timeout)
 
   // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда

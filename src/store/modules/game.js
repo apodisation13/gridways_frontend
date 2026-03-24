@@ -86,6 +86,10 @@ const mutations = {
   change_armor(state, armor_delta) {
     state.armor += armor_delta
   },
+  // сбросить броню
+  set_armor(state, armor_value) {
+    state.armor = armor_value
+  },
   // в процессе игры, для анимации +1/-1 во время работы с броней
   set_armor_delta(state, armor_delta) {
     state.armor_delta = armor_delta

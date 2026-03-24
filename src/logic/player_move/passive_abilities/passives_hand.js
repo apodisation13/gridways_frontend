@@ -16,6 +16,7 @@ import {
   poison_all_enemies_passive,
   poison_random_enemy_passive,
 } from "@/logic/player_move/passive_abilities/passives_in_hand/poison"
+import { add_armor_passive } from "@/logic/player_move/passive_abilities/passives_in_hand/armor"
 
 export function hand_passives(card, gameObj, timeout = 1000) {
   if (!allowActionTimer(card)) return
@@ -48,5 +49,7 @@ export function hand_passives(card, gameObj, timeout = 1000) {
     poison_random_enemy_passive(card, gameObj, timeout)
   } else if (pa === "poison-all") {
     poison_all_enemies_passive(card, gameObj, timeout)
+  } else if (pa === "add-armor") {
+    add_armor_passive(card, timeout)
   }
 }

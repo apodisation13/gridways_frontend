@@ -37,6 +37,7 @@ export const CardAbility = {
   IncrDmgToAllHand: "incr-dmg-to-all-hand",
   IncrDmgToAllGrave: "incr-dmg-to-all-grave",
   Poison: "poison",
+  PoisonAll: "poison-all",
   Purify: "purify",
   AddArmor: "add-armor",
   // special case abilities
