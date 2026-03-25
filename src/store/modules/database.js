@@ -42,6 +42,12 @@ const getters = {
           if ("has_passive" === prop) {
             return obj.card[prop] === find
           }
+          if ("newly_added" === prop && find === null) {
+            return true
+          }
+          if ("newly_added" === prop) {
+            return obj.card[prop] === find
+          }
           if ("faction" === prop) {
             return obj.card[prop].includes(find) || obj.card[prop] === "Neutral"
           }

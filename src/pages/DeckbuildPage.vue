@@ -122,6 +122,7 @@ export default {
         color: "",
         has_passive: null,
         count: null,
+        newly_added: null,
       },
       cardsPool: [],
     }
@@ -180,6 +181,7 @@ export default {
         color: "",
         has_passive: null,
         count: null,
+        newly_added: null,
       }
     },
 
