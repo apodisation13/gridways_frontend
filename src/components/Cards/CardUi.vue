@@ -45,6 +45,22 @@
             </div>
           </div>
         </transition>
+        <!-- анимация со значком яда на карте - яд от пассивной способности -->
+        <transition name="poison">
+          <div
+            v-if="card.passive_poisoning"
+            class="poison-overlay"
+            :style="{ '--flash-duration': flashDuration + 'ms' }"
+          >
+            <div class="poison-icon-wrap">
+              <img
+                class="poison-icon"
+                :src="require(`@/assets/icons/enemy/enemy_status_poison.svg`)"
+                alt="poison"
+              />
+            </div>
+          </div>
+        </transition>
       </div>
       <!-- увеличение урона при ХОДЕ картой -->
       <div
@@ -404,6 +420,61 @@ export default {
 }
 
 @keyframes heal-icon-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+  70% {
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.poison-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(128, 0, 200, 0.25);
+  border-radius: inherit;
+  --flash-duration: 500ms;
+  animation: poison-pulse var(--flash-duration, 500ms) ease-out forwards;
+}
+
+.poison-icon-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.poison-icon {
+  width: 3.5rem;
+  height: auto;
+  display: block;
+  animation: poison-icon-pop var(--flash-duration, 500ms) ease-out forwards;
+  filter: drop-shadow(0 0 8px rgba(80, 200, 50, 0.9));
+}
+
+@keyframes poison-pulse {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes poison-icon-pop {
   0% {
     opacity: 0;
     transform: scale(0.3);

@@ -12,6 +12,11 @@ import { add_charges_if_playing_d_all } from "@/logic/player_move/passive_abilit
 import { set_dmg_as_random_enemy_grave } from "@/logic/player_move/passive_abilities/passives_in_hand/set_dmg_as_random_enemy_grave"
 import { allowActionTimer } from "@/logic/game_logic/timers"
 import { spawn_random_in_hand } from "@/logic/player_move/passive_abilities/passives_in_hand/spawn_random_in_hand"
+import {
+  poison_all_enemies_passive,
+  poison_random_enemy_passive,
+} from "@/logic/player_move/passive_abilities/passives_in_hand/poison"
+import { add_armor_passive } from "@/logic/player_move/passive_abilities/passives_in_hand/armor"
 
 export function hand_passives(card, gameObj, timeout = 1000) {
   if (!allowActionTimer(card)) return
@@ -40,5 +45,11 @@ export function hand_passives(card, gameObj, timeout = 1000) {
     spawn_random_in_hand(card, gameObj, timeout)
   } else if (pa === "incr-dmg-by-n-grave") {
     inc_dmg_by_len_grave(card, gameObj, timeout)
+  } else if (pa === "poison-random") {
+    poison_random_enemy_passive(card, gameObj, timeout)
+  } else if (pa === "poison-all") {
+    poison_all_enemies_passive(card, gameObj, timeout)
+  } else if (pa === "add-armor") {
+    add_armor_passive(card, timeout)
   }
 }

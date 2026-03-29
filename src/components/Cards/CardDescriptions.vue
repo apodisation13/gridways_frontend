@@ -132,6 +132,10 @@ export default {
           card?.damage !== undefined ? `{{ ${card.damage} }}` : "{damage}"
         )
         .replace(
+          /{armor}/g,
+          card?.armor !== undefined ? `{{ ${card.armor} }}` : "{armor}"
+        )
+        .replace(
           /{heal}/g,
           card?.heal !== undefined ? `{{ ${card.heal} }}` : "{heal}"
         )

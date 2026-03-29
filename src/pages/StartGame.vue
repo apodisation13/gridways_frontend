@@ -145,6 +145,7 @@ export default {
           type: GameStatsRecordType.play,
         })
         this.$store.commit("set_start_game_redirect", true)
+        this.$store.commit("set_armor", 0)
         this.$router.push("/game") // ВОТ ТУТ мы переходим на игру и ТОЛЬКО тут (с флагом, что запрос успешно)
         this.loading = false
       } catch (err) {

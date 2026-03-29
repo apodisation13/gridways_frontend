@@ -7,6 +7,7 @@
       <filter-colors @set-filter="setFilter" />
       <filter-passives @set-filter="setFilter" />
       <filter-unlocked @set-filter="setFilter" />
+      <filter-newlyadded @set-filter="setFilter" />
       <button class="cancel" @click="resetFilters">Сброс фильтров</button>
     </div>
   </base-modal>
@@ -20,9 +21,11 @@ import FilterPassives from "@/components/Pages/DeckbuildPage/FilterPassives"
 import FilterUnlocked from "@/components/Pages/DeckbuildPage/FilterUnlocked"
 import BaseModal from "@/components/ModalWindows/BaseModal"
 import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg"
+import FilterNewlyadded from "@/components/Pages/DeckbuildPage/FilterNewlyAdded.vue"
 
 export default {
   components: {
+    FilterNewlyadded,
     FilterFactions,
     FilterTypes,
     FilterColors,

@@ -1,0 +1,29 @@
+<svg width="28" height="40" viewBox="0 0 28 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M28 7.41818L14 0V20L28 7.41818Z" fill="#3EAA18"/>
+    <path d="M14 20H28V7.41818L14 20Z" fill="#60CC3A"/>
+    <path d="M14 0L0 7.41818L14 20V0Z" fill="#95EE62"/>
+    <path d="M14 20V40L28 32.5818L14 20Z" fill="#2D8A0D"/>
+    <path d="M14 20L28 32.5818V20H14Z" fill="#50BB2C"/>
+    <path d="M14 20L0 7.41818V20H14Z" fill="#70CC4A"/>
+    <path d="M14 20L0 32.5818L14 40V20Z" fill="#0D6000"/>
+    <path d="M0 20V32.5818L14 20H0Z" fill="#1F8008"/>
+    <path d="M21.0884 26.6182V13.4837L14.4711 9.57092L7.99711 13.4837V26.6182L14.4711 30.4146L21.0884 26.6182Z" fill="url(#poison_grad)"/>
+    <!-- Skull head -->
+    <path d="M14 12.5C10.8 12.5 8.5 14.9 8.5 17.7C8.5 19.8 9.7 21.5 11.3 22.3V24.5H16.7V22.3C18.3 21.5 19.5 19.8 19.5 17.7C19.5 14.9 17.2 12.5 14 12.5Z"
+          fill="#0D1A0D"/>
+    <!-- Eye sockets -->
+    <circle cx="11.5" cy="17.5" r="1.7" fill="#55CC33"/>
+    <circle cx="16.5" cy="17.5" r="1.7" fill="#55CC33"/>
+    <!-- Nose -->
+    <ellipse cx="14" cy="20.5" rx="0.9" ry="1.1" fill="#55CC33"/>
+    <!-- Teeth -->
+    <rect x="11.2" y="24.5" width="1.2" height="2" rx="0.3" fill="#0D1A0D"/>
+    <rect x="13.4" y="24.5" width="1.2" height="2.3" rx="0.3" fill="#0D1A0D"/>
+    <rect x="15.6" y="24.5" width="1.2" height="2" rx="0.3" fill="#0D1A0D"/>
+    <defs>
+        <linearGradient id="poison_grad" x1="10" y1="11" x2="19" y2="29" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#A8FF80"/>
+            <stop offset="1" stop-color="#2E8818"/>
+        </linearGradient>
+    </defs>
+</svg>

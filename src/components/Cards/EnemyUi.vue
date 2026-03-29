@@ -46,6 +46,7 @@
         <enemy-shield v-if="enemy.shield" />
         <enemy-locked v-if="enemy.locked" />
         <deathwish-ability v-if="enemy.has_deathwish" />
+        <enemy-status v-if="enemy.status" :enemy="enemy" />
         <heart-icon
           :health="enemy.hp"
           :hp_delta="enemy.hp_delta"
@@ -69,10 +70,12 @@ import EnemyLocked from "@/components/UI/CardsUI/Enemies/EnemyLocked"
 import AbilityCircleEnemy from "@/components/UI/CardsUI/Enemies/AbilityCircleEnemy"
 import EnemyShield from "@/components/UI/CardsUI/Enemies/EnemyShield"
 import CardPassive from "@/components/UI/CardsUI/CardPassive"
+import EnemyStatus from "@/components/UI/CardsUI/Enemies/EnemyStatus.vue"
 
 export default {
   name: "EnemyUi",
   components: {
+    EnemyStatus,
     DeathwishAbility,
     HeartIcon,
     CardDamageIcon,

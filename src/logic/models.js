@@ -9,6 +9,12 @@ export const CardColor = {
   Gold: "Gold",
 }
 
+export const EnemyStatus = {
+  Veil: "veil",
+  Poison: "poison",
+  Doomed: "doomed",
+}
+
 export const CardAbility = {
   Heal: "heal",
   DamageAll: "damage-all",
@@ -30,6 +36,10 @@ export const CardAbility = {
   SpawnTokensAtEnemyDeck: "spawn-tokens-at-enemy-deck",
   IncrDmgToAllHand: "incr-dmg-to-all-hand",
   IncrDmgToAllGrave: "incr-dmg-to-all-grave",
+  Poison: "poison",
+  PoisonAll: "poison-all",
+  Purify: "purify",
+  AddArmor: "add-armor",
   // special case abilities
   Resurrect: "resurrect",
   DrawTwoCards: "draw-two-cards",
