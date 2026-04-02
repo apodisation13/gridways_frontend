@@ -35,8 +35,6 @@ export function get_default_enemy(enemy) {
     store.getters["all_enemies"].find(e => e.id === enemy.id)
   )
   if (!defaultEnemy) return null
-
-  defaultEnemy.has_deathwish = false
   defaultEnemy.deathwish = null
   return defaultEnemy
 }

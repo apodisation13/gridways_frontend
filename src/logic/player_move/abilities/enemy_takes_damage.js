@@ -23,13 +23,13 @@ export function remove_dead_enemy(enemy, gameObj, timeout = 1000) {
     enemy_leader.hp = 0
     enemy_leader.status = null
     console.log("умер лидер врагов")
-    if (enemy_leader.has_deathwish) deathwish(enemy_leader, gameObj, timeout)
+    if (enemy_leader.deathwish?.name) deathwish(enemy_leader, gameObj, timeout)
   } else {
     field[field.indexOf(enemy)] = ""
     console.log("враг умер")
     enemy.hp = enemy.base_hp
     if (enemy.status !== EnemyStatus.Doomed) enemies_grave.push(enemy)
-    if (enemy.has_deathwish) deathwish(enemy, gameObj, timeout)
+    if (enemy.deathwish?.name) deathwish(enemy, gameObj, timeout)
   }
   check_win(field, enemies, enemy_leader, enemies_grave)
 }

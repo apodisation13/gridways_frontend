@@ -10,7 +10,6 @@ export function spawn_tokens_at_enemy_deck(card, enemy, gameObj) {
   token.hp = 1
   token.base_hp = 1
   token.damage = 1
-  token.has_deathwish = true
   token.deathwish_value = card.value // в value положили скольким врагам мы прибавим на 1 урон
   token.deathwish = {
     name: "incr-dmg-to-value-cards-by-1",

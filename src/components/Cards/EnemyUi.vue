@@ -45,7 +45,7 @@
         <card-passive v-if="enemy.passive_ability?.name" :card="enemy" />
         <enemy-shield v-if="enemy.shield" />
         <enemy-locked v-if="enemy.locked" />
-        <deathwish-ability v-if="enemy.has_deathwish" />
+        <deathwish-ability v-if="enemy.deathwish?.name" />
         <enemy-status v-if="enemy.status" :enemy="enemy" />
         <heart-icon
           :health="enemy.hp"

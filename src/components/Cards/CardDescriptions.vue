@@ -32,7 +32,7 @@
 
       <!--Описание абилки deathwish - для карт врагов-->
       <div
-        v-if="forEnemy && card.has_deathwish"
+        v-if="forEnemy && card.deathwish?.name"
         @click="showDeathwishAbility"
         class="inlines"
         :style="{
