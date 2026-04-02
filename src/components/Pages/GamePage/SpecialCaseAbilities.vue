@@ -118,7 +118,7 @@ export default {
         name: "damage-one",
         description: "Нанести {damage} урона одному врагу",
       }
-      card["charges"] = 1
+      card["data"]["charges"] = 1
     },
   },
   emits: [
