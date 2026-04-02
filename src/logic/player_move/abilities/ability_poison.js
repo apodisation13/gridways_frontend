@@ -25,7 +25,7 @@ function poison_all_enemies(gameObj, timeout = 1000) {
     if (enemy) poison_one_enemy(enemy, gameObj, timeout)
   })
 
-  if (enemy_leader.hp >= 0) poison_one_enemy(enemy_leader, gameObj, timeout)
+  if (enemy_leader.hp > 0) poison_one_enemy(enemy_leader, gameObj, timeout)
 }
 
 export { poison_one_enemy, poison_all_enemies }
