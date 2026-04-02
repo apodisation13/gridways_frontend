@@ -332,7 +332,7 @@ export default {
     targetEnemyLeaderByLeader() {
       return (
         this.isActive.player_leader &&
-        this.gameObj.leader.charges > 0 &&
+        this.gameObj.leader.data.charges > 0 &&
         this.isActive.enemy_leader &&
         this.gameObj.enemy_leader.hp > 0
       )

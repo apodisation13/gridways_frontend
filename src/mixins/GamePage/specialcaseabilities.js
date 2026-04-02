@@ -159,7 +159,7 @@ export default {
     confirm_selection(card) {
       // card - это та карта, которую мы выбрали из какого-либо дополнительного окна
       if (this.ability === CardAbility.Resurrect) {
-        card.charges = 1
+        card.data.charges = 1
         this.gameObj.hand.push(card)
         this.gameObj.grave.splice(this.gameObj.grave.indexOf(card), 1)
       } else if (this.ability === CardAbility.GiveChargesToCardInHand1) {
@@ -183,7 +183,7 @@ export default {
           this.ability === CardAbility.PlayFromGrave ||
           this.ability === CardAbility.PlaySpecialFromGrave
         ) {
-          card.charges = 1
+          card.data.charges = 1
         }
 
         // Показать эту выбранную для игры карту. А снимаем этот ФЛАГ уже в самом GamePage!
@@ -207,8 +207,8 @@ export default {
         random_card.damage += this.special_case_value
         this.incrDmg(random_card, this.special_case_value)
       } else if (this.ability === CardAbility.IncrDmgByNCharges) {
-        card.damage += card.charges
-        this.incrDmg(card, card.charges)
+        card.damage += card.data.charges
+        this.incrDmg(card, card.data.charges)
       } else if (this.ability === CardAbility.CreateAndPutToDeck) {
         this.gameObj.deck.push(card)
       } else if (this.ability === CardAbility.DrawExact) {

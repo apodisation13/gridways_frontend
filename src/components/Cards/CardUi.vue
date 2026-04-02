@@ -105,8 +105,8 @@
         <card-ability-circle :card="card" v-if="card.ability" />
         <card-passive :card="card" v-if="card.passive_ability?.name" />
         <card-charges
-          v-if="'charges' in card"
-          :charge="card.charges"
+          v-if="'charges' in card.data"
+          :charge="card.data.charges"
           :bgColor="background_color_charges(card.color)"
         />
         <heart-icon
