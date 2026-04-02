@@ -103,7 +103,7 @@
           :damage="card.damage"
         />
         <card-ability-circle :card="card" v-if="card.ability" />
-        <card-passive :card="card" v-if="card.has_passive" />
+        <card-passive :card="card" v-if="card.passive_ability?.name" />
         <card-charges
           v-if="'charges' in card"
           :charge="card.charges"

@@ -4,10 +4,10 @@
       :card="leader"
       :user_card="leader"
       :class="{
-        'not-charges': leader.charges === 0 && !leader.has_passive,
+        'not-charges': leader.charges === 0 && !leader.passive_ability?.name,
       }"
       :is_leader="true"
-      :is_previev="leader.charges === 0 && !leader.has_passive"
+      :is_previev="leader.charges === 0 && !leader.passive_ability?.name"
       @mousedown="handleCardMouseDown($event)"
       @touchstart="handleCardTouchStart($event)"
     />

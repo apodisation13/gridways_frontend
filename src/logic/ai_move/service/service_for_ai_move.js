@@ -14,8 +14,6 @@ export function set_already_jumped(field) {
 export function create_token(enemy) {
   const token = copyObj(enemy)
   token.passive_ability = null
-  token.has_passive = null
-  token.has_passive_in_field = null
   token.hp = 1
   token.base_hp = 1
   token.damage = 1

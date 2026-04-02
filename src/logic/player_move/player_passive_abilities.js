@@ -9,10 +9,10 @@ function player_passive_abilities_end_turn(gameObj, timeOut = 1000) {
   const { hand, deck, grave, leader } = gameObj
 
   // здесь мы создаем пул карт, для которых нужны пассивки!
-  let pool = hand.filter(c => c.has_passive_in_hand) // собрали пассивные карты из руки
-  if (leader.has_passive) pool.push(leader) // добавили туда ещё и лидера если у него есть пассивка
-  pool = pool.concat(deck.filter(c => c.has_passive_in_deck)) // собрали пассивные карты из колоды
-  pool = pool.concat(grave.filter(c => c.has_passive_in_grave)) // собрали пассивные карты из сброса
+  let pool = hand.filter(c => c.data.passive?.has_passive_in_hand) // собрали пассивные карты из руки
+  if (leader.passive_ability) pool.push(leader) // добавили туда ещё и лидера если у него есть пассивка
+  pool = pool.concat(deck.filter(c => c.data.passive?.has_passive_in_deck)) // собрали пассивные карты из колоды
+  pool = pool.concat(grave.filter(c => c.data.passive?.has_passive_in_grave)) // собрали пассивные карты из сброса
 
   let i = 0
   // вот именно в такой последовательности они и будут работать: рука, лидер, колода, сброс
@@ -24,11 +24,11 @@ function player_passive_abilities_end_turn(gameObj, timeOut = 1000) {
     } else {
       // МЕНЕДЖЕР пассивных абилок карт: рука, лидер, колода, сброс
       console.log("Выполняем пассивку номер", i)
-      if (pool[i].has_passive_in_hand || !pool[i].color)
+      if (pool[i].data.passive?.has_passive_in_hand || !pool[i].color)
         hand_passives(pool[i], gameObj, timeOut)
-      else if (pool[i].has_passive_in_deck)
+      else if (pool[i].data.passive?.has_passive_in_deck)
         deck_passives(pool[i], gameObj, timeOut)
-      else if (pool[i].has_passive_in_grave)
+      else if (pool[i].data.passive?.has_passive_in_grave)
         grave_passives(pool[i], gameObj, timeOut)
       i += 1
     }

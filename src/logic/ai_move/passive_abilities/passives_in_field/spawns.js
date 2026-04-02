@@ -13,8 +13,6 @@ export function spawn_self_at_deck(enemy, gameObj, timeout = 1000) {
   const { enemies } = gameObj
   const self = copyObj(enemy)
   self.passive_ability = null
-  self.has_passive = null
-  self.has_passive_in_field = null
   timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)
   enemies.push(copyObj(self))
 }

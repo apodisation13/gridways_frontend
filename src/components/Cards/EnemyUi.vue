@@ -42,7 +42,7 @@
           </span>
         </div>
 
-        <card-passive v-if="enemy.has_passive" :card="enemy" />
+        <card-passive v-if="enemy.passive_ability?.name" :card="enemy" />
         <enemy-shield v-if="enemy.shield" />
         <enemy-locked v-if="enemy.locked" />
         <deathwish-ability v-if="enemy.has_deathwish" />

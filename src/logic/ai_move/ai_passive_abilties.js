@@ -8,11 +8,14 @@ export function enemy_passive_abilities_end_turn(gameObj, timeout = 1000) {
 
   const { field, enemies_grave, enemies, enemy_leader } = gameObj
 
-  let pool = field.filter(e => e && e.has_passive_in_field)
+  let pool = field.filter(e => e && e.data.passive?.has_passive_in_field)
   // если у лидера врагов есть пассивка и он жив, его добавляем тоже
-  if (enemy_leader.has_passive && enemy_leader.hp > 0) pool.push(enemy_leader)
-  pool = pool.concat(enemies.filter(e => e.has_passive_in_deck)) // собрали пассивные карты из колоды
-  pool = pool.concat(enemies_grave.filter(e => e.has_passive_in_grave)) // собрали пассивные карты из сброса
+  if (enemy_leader.passive_ability?.name && enemy_leader.hp > 0)
+    pool.push(enemy_leader)
+  pool = pool.concat(enemies.filter(e => e.data.passive?.has_passive_in_deck)) // собрали пассивные карты из колоды
+  pool = pool.concat(
+    enemies_grave.filter(e => e.data.passive?.has_passive_in_grave)
+  ) // собрали пассивные карты из сброса
 
   let i = 0
   let passive_time = setInterval(() => {
@@ -23,11 +26,11 @@ export function enemy_passive_abilities_end_turn(gameObj, timeout = 1000) {
       // ДИСПЕТЧЕР пассивных абилок врагов
       console.log("Выполняем пассивку номер", i)
       // пассивка врагов на поле или пассивка лидера врагов (у него нет поля color)
-      if (pool[i].has_passive_in_field || !pool[i].color)
+      if (pool[i].data.passive?.has_passive_in_field || !pool[i].color)
         field_passives(pool[i], gameObj, timeout)
-      else if (pool[i].has_passive_in_deck)
+      else if (pool[i].data.passive?.has_passive_in_deck)
         deck_passives(pool[i], gameObj, timeout)
-      else if (pool[i].has_passive_in_grave)
+      else if (pool[i].data.passive?.has_passive_in_grave)
         grave_passives(pool[i], gameObj, timeout)
       i += 1
     }

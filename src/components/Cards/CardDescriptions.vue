@@ -24,7 +24,7 @@
 
       <!--Описание пассивной абилки-->
       <card-passive
-        v-if="card.has_passive"
+        v-if="card.passive_ability"
         :card="card"
         inline
         @click="showPassiveAbility"
@@ -55,16 +55,16 @@
     <div class="text" v-if="show_passive && card.passive_ability.name">
       {{ formatCardPassiveAbility(card) }} <br />
       <br />
-      <span v-if="card.has_passive_in_field">
+      <span v-if="card.data.passive?.has_passive_in_field">
         Срабатывает когда карта <b>НА ПОЛЕ</b>
       </span>
-      <span v-else-if="card.has_passive_in_hand">
+      <span v-else-if="card.data.passive?.has_passive_in_hand">
         Срабатывает когда карта <b>В РУКЕ</b>
       </span>
-      <span v-else-if="card.has_passive_in_deck">
+      <span v-else-if="card.data.passive?.has_passive_in_deck">
         Срабатывает когда карта <b>В КОЛОДЕ</b>
       </span>
-      <span v-else-if="card.has_passive_in_grave">
+      <span v-else-if="card.data.passive?.has_passive_in_grave">
         Срабатывает когда карта <b>В СБРОСЕ</b>
       </span>
       <br />
