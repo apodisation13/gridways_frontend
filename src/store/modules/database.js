@@ -1,5 +1,9 @@
 import { useToast } from "vue-toastification"
-import { USER_DATABASE } from "@/store/const/api_urls"
+import {
+  CARDS_DATABASE,
+  USER_DATABASE,
+  USER_DATABASE_V2,
+} from "@/store/const/api_urls"
 import { callApi, GET } from "@/lib/api/api"
 
 const toast = useToast()
@@ -19,6 +23,15 @@ const state = {
 
   enemies: [],
   enemy_leaders: [],
+
+  cardsdb: {},
+  leadersdb: {},
+  enemiesdb: {},
+  enemyleadersdb: {},
+  cardsv2: [],
+  leadersv2: [],
+  decksv2: [],
+  seasonsv2: [],
 }
 
 const getters = {
@@ -55,23 +68,23 @@ const getters = {
         })
       )
     if (query.count === null) {
-      return applyFilter(state.cards, query)
+      return applyFilter(state.cardsv2, query)
     }
 
     if (query.count === 0) {
       return applyFilter(
-        state.cards.filter(card => card.count === 0),
+        state.cardsv2.filter(card => card.count === 0),
         query
       )
     }
 
     return applyFilter(
-      state.cards.filter(card => card.count >= query.count),
+      state.cardsv2.filter(card => card.count >= query.count),
       query
     )
   },
   filtered_leaders: state => selected_faction => {
-    return state.leaders.filter(leader =>
+    return state.leadersv2.filter(leader =>
       leader.card.faction.includes(selected_faction)
     )
   },
@@ -110,6 +123,68 @@ const mutations = {
   set_enemy_leaders(state, payload) {
     state.enemy_leaders = payload
   },
+
+  set_cardsdb(state, result) {
+    state.cardsdb = new Map(result.cards.map(card => [card.id, card]))
+    state.leadersdb = new Map(result.leaders.map(card => [card.id, card]))
+    state.enemiesdb = result.enemies
+    state.enemyleadersdb = result.enemy_leaders
+  },
+  set_db_v2(state, data) {
+    const cardsdb = state.cardsdb
+    const usercards = data.user_cards
+    state.cardsv2 = Array.from(cardsdb.values()).map(card => {
+      const userCard = usercards[card.id]
+      return {
+        card,
+        count: userCard ? userCard.count : 0,
+        id: userCard ? userCard.user_card_id : null,
+      }
+    })
+
+    const leadersdb = state.leadersdb
+    const userleaders = data.user_leaders
+    state.leadersv2 = Array.from(leadersdb.values()).map(card => {
+      const userLeader = userleaders[card.id]
+      return {
+        card,
+        count: userLeader ? userLeader.count : 0,
+        id: userLeader ? userLeader.user_leader_id : null,
+      }
+    })
+
+    state.decksv2 = data.user_decks.map(userDeck => ({
+      id: userDeck.user_deck_id,
+      deck: {
+        id: userDeck.deck.id,
+        name: userDeck.deck.name,
+        leader: state.leadersdb.get(userDeck.deck.leader_id),
+        cards: userDeck.deck.cards.map(cardId => state.cardsdb.get(cardId)),
+        health: userDeck.deck.health,
+      },
+    }))
+
+    const usersSeasons = data.user_seasons
+
+    state.seasonsv2 = usersSeasons.map(userSeason => ({
+      id: userSeason.id,
+      finished: userSeason.finished,
+      season: {
+        ...userSeason.season,
+        levels: userSeason.season.levels.map(userLevel => ({
+          ...userLevel,
+          level: {
+            ...userLevel.level,
+            enemy_leader: state.enemyleadersdb[userLevel.level.enemy_leader],
+            enemies: userLevel.level.enemies.map(
+              enemyId => state.enemiesdb[enemyId]
+            ),
+          },
+        })),
+      },
+      stats: userSeason.stats,
+    }))
+  },
 }
 
 const actions = {
@@ -127,13 +202,13 @@ const actions = {
         user_database,
         seasons,
         resources,
-        enemies,
-        enemy_leaders,
+        // enemies,
+        // enemy_leaders,
         game_const,
       } = response.data
 
-      commit("set_leaders", user_database.leaders)
-      commit("set_cards", user_database.cards)
+      // commit("set_leaders", user_database.leaders)
+      // commit("set_cards", user_database.cards)
 
       commit("set_decks", user_database.decks)
       dispatch("set_deck_in_play", user_database.decks[0]) // устанавливаем для игры первую колоду
@@ -144,8 +219,8 @@ const actions = {
 
       commit("set_resource", resources)
 
-      commit("set_enemies", enemies)
-      commit("set_enemy_leaders", enemy_leaders)
+      // commit("set_enemies", enemies)
+      // commit("set_enemy_leaders", enemy_leaders)
 
       commit("set_game_const", game_const) // рука, карт в колоде, распределение рандомных врагов
 
@@ -156,6 +231,18 @@ const actions = {
       commit("set_cards_resources_prices", game_const.cards_resources_prices) // крафт/милл карт и лидеров
 
       toast.success("Успешно загрузили всю вашу базу данных")
+
+      let r = await callApi({
+        method: GET,
+        url: CARDS_DATABASE.replace("{userId}", userId),
+      })
+      commit("set_cardsdb", r.data)
+
+      let rr = await callApi({
+        method: GET,
+        url: USER_DATABASE_V2.replace("{userId}", userId),
+      })
+      commit("set_db_v2", rr.data)
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Ошибка загрузки базы данных!")
