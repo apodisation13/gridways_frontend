@@ -28,10 +28,10 @@ const state = {
   leadersdb: {},
   enemiesdb: {},
   enemyleadersdb: {},
-  cardsv2: [],
-  leadersv2: [],
+  // cardsv2: [],
+  // leadersv2: [],
   decksv2: [],
-  seasonsv2: [],
+  // seasonsv2: [],
 }
 
 const getters = {
@@ -68,23 +68,23 @@ const getters = {
         })
       )
     if (query.count === null) {
-      return applyFilter(state.cardsv2, query)
+      return applyFilter(state.cards, query)
     }
 
     if (query.count === 0) {
       return applyFilter(
-        state.cardsv2.filter(card => card.count === 0),
+        state.cards.filter(card => card.count === 0),
         query
       )
     }
 
     return applyFilter(
-      state.cardsv2.filter(card => card.count >= query.count),
+      state.cards.filter(card => card.count >= query.count),
       query
     )
   },
   filtered_leaders: state => selected_faction => {
-    return state.leadersv2.filter(leader =>
+    return state.leaders.filter(leader =>
       leader.card.faction.includes(selected_faction)
     )
   },
@@ -133,7 +133,7 @@ const mutations = {
   set_db_v2(state, data) {
     const cardsdb = state.cardsdb
     const usercards = data.user_cards
-    state.cardsv2 = Array.from(cardsdb.values()).map(card => {
+    state.cards = Array.from(cardsdb.values()).map(card => {
       const userCard = usercards[card.id]
       return {
         card,
@@ -144,7 +144,7 @@ const mutations = {
 
     const leadersdb = state.leadersdb
     const userleaders = data.user_leaders
-    state.leadersv2 = Array.from(leadersdb.values()).map(card => {
+    state.leaders = Array.from(leadersdb.values()).map(card => {
       const userLeader = userleaders[card.id]
       return {
         card,
@@ -153,20 +153,23 @@ const mutations = {
       }
     })
 
-    state.decksv2 = data.user_decks.map(userDeck => ({
+    state.decks = data.user_decks.map(userDeck => ({
       id: userDeck.user_deck_id,
       deck: {
         id: userDeck.deck.id,
         name: userDeck.deck.name,
         leader: state.leadersdb.get(userDeck.deck.leader_id),
-        cards: userDeck.deck.cards.map(cardId => state.cardsdb.get(cardId)),
+        cards: userDeck.deck.cards.map(cardId => ({
+          card: state.cardsdb.get(cardId),
+          count: 1,
+        })),
         health: userDeck.deck.health,
       },
     }))
 
     const usersSeasons = data.user_seasons
 
-    state.seasonsv2 = usersSeasons.map(userSeason => ({
+    state.seasons = usersSeasons.map(userSeason => ({
       id: userSeason.id,
       finished: userSeason.finished,
       season: {
@@ -184,6 +187,7 @@ const mutations = {
       },
       stats: userSeason.stats,
     }))
+    state.season = state.seasons[0]
   },
 }
 
@@ -200,7 +204,7 @@ const actions = {
 
       const {
         user_database,
-        seasons,
+        // seasons,
         resources,
         // enemies,
         // enemy_leaders,
@@ -213,9 +217,9 @@ const actions = {
       commit("set_decks", user_database.decks)
       dispatch("set_deck_in_play", user_database.decks[0]) // устанавливаем для игры первую колоду
 
-      commit("set_seasons", seasons)
-      commit("set_season", seasons[0].season)
-      dispatch("set_level_in_play", seasons[0].season.levels[0]) // устанавливаем для игры первый уровень
+      // commit("set_seasons", seasons)
+      // commit("set_season", seasons[0].season)
+      // dispatch("set_level_in_play", seasons[0].season.levels[0]) // устанавливаем для игры первый уровень
 
       commit("set_resource", resources)
 
@@ -243,6 +247,11 @@ const actions = {
         url: USER_DATABASE_V2.replace("{userId}", userId),
       })
       commit("set_db_v2", rr.data)
+
+      // commit("set_resource", rr.data.resources)
+
+      dispatch("set_deck_in_play", getters["all_decks"][0])
+      dispatch("set_level_in_play", getters["all_seasons"][0].season.levels[0]) // устанавливаем для игры первый уровень
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Ошибка загрузки базы данных!")
