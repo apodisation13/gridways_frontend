@@ -24,7 +24,7 @@
 
       <!--Описание пассивной абилки-->
       <card-passive
-        v-if="card.passive_ability"
+        v-if="card.passive_ability?.name"
         :card="card"
         inline
         @click="showPassiveAbility"
@@ -68,12 +68,13 @@
         Срабатывает когда карта <b>В СБРОСЕ</b>
       </span>
       <br />
-      <span v-if="card.each_tick">
+      <span v-if="card.data?.passive?.each_tick">
         <b>Срабатывает каждый ход пока таймер не равен 0</b>
       </span>
       <br />
-      <span v-if="card.reset_timer">
-        Восстанавливает таймер. Значение таймера {{ card.default_timer }}
+      <span v-if="card.data?.passive?.reset_timer">
+        Восстанавливает таймер. Значение таймера
+        {{ card.data.passive.default_timer }}
       </span>
     </div>
     <!--Описание абилки deathwish, только для врага-->
@@ -154,6 +155,10 @@ export default {
           card.data.passive?.value !== undefined
             ? `{{ ${card.data.passive.value} }}`
             : "{value}"
+        )
+        .replace(
+          /{value}/g,
+          card.data.value !== undefined ? `{{ ${card.data.value} }}` : "{value}"
         )
     },
     formatEnemyMove(enemy) {

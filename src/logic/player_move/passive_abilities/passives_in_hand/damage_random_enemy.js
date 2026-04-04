@@ -11,7 +11,7 @@ function damage_random_enemy(card, gameObj, timeout = 1000) {
 
   hit_one_enemy(
     target,
-    { damage: card.data.passive.value },
+    { data: { damage: card.data.passive.value } },
     gameObj,
     timeout * 0.5
   )

@@ -5,18 +5,18 @@ function poison_one_enemy(enemy, gameObj, timeout = 1000) {
   // добавляем врагу яд - если у него уже есть яд, убиваем его
 
   // врагу со статусом "завеса" нельзя добавить яд
-  if (enemy.status === EnemyStatus.Veil) {
+  if (enemy.data.status === EnemyStatus.Veil) {
     return
   }
 
   // если у врага уже есть яд, убиваем его (снимаем ему в кладбище статус)
-  if (enemy.status === EnemyStatus.Poison) {
-    enemy.status = null
+  if (enemy.data.status === EnemyStatus.Poison) {
+    enemy.data.status = null
     remove_dead_enemy(enemy, gameObj, timeout)
     return
   }
 
-  enemy.status = EnemyStatus.Poison
+  enemy.data.status = EnemyStatus.Poison
 }
 
 function poison_all_enemies(gameObj, timeout = 1000) {

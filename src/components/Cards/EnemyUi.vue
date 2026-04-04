@@ -43,10 +43,10 @@
         </div>
 
         <card-passive v-if="enemy.passive_ability?.name" :card="enemy" />
-        <enemy-shield v-if="enemy.shield" />
+        <enemy-shield v-if="enemy.data.shield" />
         <enemy-locked v-if="enemy.locked" />
         <deathwish-ability v-if="enemy.deathwish?.name" />
-        <enemy-status v-if="enemy.status" :enemy="enemy" />
+        <enemy-status v-if="enemy.data.status" :enemy="enemy" />
         <heart-icon
           :health="enemy.data.hp"
           :hp_delta="enemy.hp_delta"

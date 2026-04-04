@@ -5,7 +5,9 @@
       :style="{
         'background-image':
           'url(' +
-          require(`@/assets/icons/enemy/enemy_status_${enemy.status}.svg`) +
+          require(
+            `@/assets/icons/enemy/enemy_status_${enemy.data.status}.svg`
+          ) +
           ')',
       }"
     ></div>

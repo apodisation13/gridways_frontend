@@ -11,7 +11,7 @@ function ai_move(field, timeout = 1000) {
   store.commit("set_ai_move", true)
   set_already_jumped(field) // установить false параметр enemy.already_jumped
 
-  let enemies = get_all_enemies(field, { hp: 0 })
+  let enemies = get_all_enemies(field, null)
   enemies.reverse() // чтобы враги начинали снизу!!!!! ))))))
 
   let i = 0

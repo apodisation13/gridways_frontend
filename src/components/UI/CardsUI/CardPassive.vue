@@ -1,8 +1,11 @@
 <template>
   <div class="passive" :class="{ 'passive-inline': inline }">
-    <div class="passive-clock" v-if="!card || card.timer === 0"></div>
+    <div
+      class="passive-clock"
+      v-if="!card || card.data?.passive?.timer === 0"
+    ></div>
     <div class="passive-timer" v-else>
-      <span class="passive-timer-value">{{ card.timer }}</span>
+      <span class="passive-timer-value">{{ card.data.passive?.timer }}</span>
     </div>
   </div>
 </template>

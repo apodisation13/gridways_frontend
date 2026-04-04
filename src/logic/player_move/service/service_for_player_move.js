@@ -24,7 +24,7 @@ function get_all_enemies(field, enemy_leader) {
       enemy_list.push(enemy)
     }
   })
-  if (enemy_leader.data.hp > 0) enemy_list.push(enemy_leader)
+  if (enemy_leader && enemy_leader.data.hp > 0) enemy_list.push(enemy_leader)
   return enemy_list
 }
 
