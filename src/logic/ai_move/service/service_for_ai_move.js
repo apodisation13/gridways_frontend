@@ -14,18 +14,18 @@ export function set_already_jumped(field) {
 export function create_token(enemy) {
   const token = copyObj(enemy)
   token.passive_ability = null
-  token.hp = 1
-  token.base_hp = 1
-  token.damage = 1
+  token.data.hp = 1
+  token.data.base.base_hp = 1
+  token.data.damage = 1
   return token
 }
 
 // создает токен врага и НЕ снимает у него пассивную способность
 export function create_token_with_passive(enemy) {
   const token = copyObj(enemy)
-  token.hp = 1
-  token.base_hp = 1
-  token.damage = 1
+  token.data.hp = 1
+  token.data.base.base_hp = 1
+  token.data.damage = 1
   return token
 }
 

@@ -48,7 +48,7 @@ export default {
     in_cross: {
       immediate: true,
       handler(newVal) {
-        if (newVal && !this.isAnimating && this.enemy_leader.hp > 0) {
+        if (newVal && !this.isAnimating && this.enemy_leader.data.hp > 0) {
           this.startAnimation()
         } else if (!newVal && this.isAnimating) {
           this.stopAnimation()

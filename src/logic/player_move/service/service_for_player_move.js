@@ -24,7 +24,7 @@ function get_all_enemies(field, enemy_leader) {
       enemy_list.push(enemy)
     }
   })
-  if (enemy_leader?.hp > 0) enemy_list.push(enemy_leader)
+  if (enemy_leader.data.hp > 0) enemy_list.push(enemy_leader)
   return enemy_list
 }
 
@@ -39,7 +39,7 @@ function get_random_enemy(field, enemy_leader) {
 function get_empty_field_indexes(field) {
   let emptyIndexesArray = []
   for (let i = 0; i < field.length; i++) {
-    if (!field[i] || field[i].hp <= 0) emptyIndexesArray.push(i)
+    if (!field[i] || field[i].data.hp <= 0) emptyIndexesArray.push(i)
   }
   return emptyIndexesArray
 }

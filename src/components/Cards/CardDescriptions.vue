@@ -129,42 +129,54 @@ export default {
       return card.ability.description
         .replace(
           /{damage}/g,
-          card?.damage !== undefined ? `{{ ${card.damage} }}` : "{damage}"
+          card.data?.damage !== undefined
+            ? `{{ ${card.data.damage} }}`
+            : "{damage}"
         )
         .replace(
           /{armor}/g,
-          card?.armor !== undefined ? `{{ ${card.armor} }}` : "{armor}"
+          card.data?.armor !== undefined
+            ? `{{ ${card.data.armor} }}`
+            : "{armor}"
         )
         .replace(
           /{heal}/g,
-          card?.heal !== undefined ? `{{ ${card.heal} }}` : "{heal}"
+          card.data?.heal !== undefined ? `{{ ${card.data.heal} }}` : "{heal}"
         )
         .replace(
           /{damage_once}/g,
-          card?.value !== undefined ? `{{ ${card.value} }}` : "{damage_once}"
+          card.data?.value !== undefined
+            ? `{{ ${card.data.value} }}`
+            : "{damage_once}"
         )
         .replace(
           /{value}/g,
-          card?.value !== undefined ? `{{ ${card.value} }}` : "{value}"
+          card.data.passive?.value !== undefined
+            ? `{{ ${card.data.passive.value} }}`
+            : "{value}"
         )
     },
     formatEnemyMove(enemy) {
       return enemy.move.description.replace(
         /{damage}/g,
-        enemy.damage !== undefined ? `{{ ${enemy.damage} }}` : "{damage}"
+        enemy.data.damage !== undefined
+          ? `{{ ${enemy.data.damage} }}`
+          : "{damage}"
       )
     },
     formatCardPassiveAbility(card) {
       return card.passive_ability.description.replace(
         /{value}/g,
-        card.value !== undefined ? `{{ ${card.value} }}` : "{value}"
+        card.data.passive?.value !== undefined
+          ? `{{ ${card.data.passive.value} }}`
+          : "{value}"
       )
     },
     formatEnemyDeathwish(enemy) {
       return enemy.deathwish.description.replace(
         /{deathwish_value}/g,
-        enemy.deathwish_value !== undefined
-          ? `{{ ${enemy.deathwish_value} }}`
+        enemy.data.deathwish?.value !== undefined
+          ? `{{ ${enemy.data.deathwish.value} }}`
           : "{deathwish_value}"
       )
     },
