@@ -9,7 +9,7 @@ export function deck_passives(enemy, gameObj, timeout = 1000) {
 
   const { enemy_leader, field, enemies } = gameObj
 
-  const pea = enemy.passive_ability.name
+  const pea = enemy.passive_ability?.name
 
   if (pea === "heal-random") {
     heal_random(enemy, field, enemy_leader, timeout)

@@ -34,7 +34,7 @@ export function field_passives(enemy, gameObj, timeout = 1000) {
   if (!allowActionTimer(enemy)) return
 
   const { enemy_leader, field, hand } = gameObj
-  const pea = enemy.passive_ability.name
+  const pea = enemy.passive_ability?.name
 
   if (pea === "incr-self-dmg") {
     incr_self_dmg(enemy, timeout)
