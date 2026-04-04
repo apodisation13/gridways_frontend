@@ -10,7 +10,7 @@ function spread_damage(card, gameObj, timeout = 1000) {
 
   let j = 0
   let id = setInterval(() => {
-    if (j === card.damage || enemy_list.length === 0) {
+    if (j === card.data.damage || enemy_list.length === 0) {
       // до урона карты или пока врагов не осталось
       clearInterval(id)
       return
@@ -20,7 +20,7 @@ function spread_damage(card, gameObj, timeout = 1000) {
     let random_enemy = choice(enemy_list)
     console.log(`попали во врага ${enemy_list[random_enemy].id}`)
 
-    let temp = enemy_list[random_enemy].hp
+    let temp = enemy_list[random_enemy].data.hp
     hit_one_enemy(
       enemy_list[random_enemy],
       { damage: 1 },

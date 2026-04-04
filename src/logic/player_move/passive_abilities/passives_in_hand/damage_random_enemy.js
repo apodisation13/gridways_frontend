@@ -9,7 +9,12 @@ function damage_random_enemy(card, gameObj, timeout = 1000) {
 
   if (!target) return // если щас нет врагов на поле и нет живого лидера врагов, выходим
 
-  hit_one_enemy(target, { damage: card.value }, gameObj, timeout * 0.5)
+  hit_one_enemy(
+    target,
+    { damage: card.data.passive.value },
+    gameObj,
+    timeout * 0.5
+  )
   timeoutAnimationFlag(card, "p_damages_enemy", sound_damage_one, timeout * 0.5)
 }
 

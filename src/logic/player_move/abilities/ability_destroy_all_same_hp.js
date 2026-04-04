@@ -6,11 +6,11 @@ function destroy_all_same_hp(enemy, gameObj, timeout = 1000) {
   const { field, enemy_leader } = gameObj
 
   let all_enemies = get_all_enemies(field, enemy_leader)
-  let targets = all_enemies.filter(e => e.hp === enemy.hp)
+  let targets = all_enemies.filter(e => e.data.hp === enemy.data.hp)
 
   sound_destroy_enemy()
   targets.forEach(e => {
-    enemy_takes_damage(e, { damage: e.hp }, gameObj, timeout)
+    enemy_takes_damage(e, { damage: e.data.hp }, gameObj, timeout)
   })
 }
 

@@ -16,7 +16,7 @@ function destroy_2_enemies(card, gameObj, timeout = 1000) {
   const targets = [target_1, target_2]
 
   targets.forEach(e => {
-    if (e) enemy_takes_damage(e, { damage: e.hp }, gameObj, timeout * 0.5)
+    if (e) enemy_takes_damage(e, { damage: e.data.hp }, gameObj, timeout * 0.5)
     card.data.charges = 0
   })
   remove_dead_card(card, grave, hand, deck)

@@ -10,7 +10,7 @@ export function enemy_passive_abilities_end_turn(gameObj, timeout = 1000) {
 
   let pool = field.filter(e => e && e.data.passive?.has_passive_in_field)
   // если у лидера врагов есть пассивка и он жив, его добавляем тоже
-  if (enemy_leader.passive_ability?.name && enemy_leader.hp > 0)
+  if (enemy_leader.passive_ability?.name && enemy_leader.data.hp > 0)
     pool.push(enemy_leader)
   pool = pool.concat(enemies.filter(e => e.data.passive?.has_passive_in_deck)) // собрали пассивные карты из колоды
   pool = pool.concat(

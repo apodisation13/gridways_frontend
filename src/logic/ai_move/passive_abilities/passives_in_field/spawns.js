@@ -21,7 +21,7 @@ export function spawn_self_at_deck(enemy, gameObj, timeout = 1000) {
 export function spawn_tokens_in_deck(enemy, gameObj, timeout = 1000) {
   const { enemies } = gameObj
   const token = create_token(enemy)
-  for (let i = 0; i < enemy.value; i++) {
+  for (let i = 0; i < enemy.data.passive.value; i++) {
     enemies.push(copyObj(token))
   }
   timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)

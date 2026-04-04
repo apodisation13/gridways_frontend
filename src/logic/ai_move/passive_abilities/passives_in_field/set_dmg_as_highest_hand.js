@@ -7,10 +7,10 @@ export function set_dmg_as_highest_hand(enemy, gameObj, timeout = 1000) {
   if (!hand.length) return
 
   const hand_sort = copyObj(hand)
-  hand_sort.sort((a, b) => b.damage - a.damage)
+  hand_sort.sort((a, b) => b.data.damage - a.data.damage)
   let target = hand_sort[0]
 
-  enemy.damage = target.damage
+  enemy.data.damage = target.data.damage
   timeoutAnimationFlag(
     enemy,
     "incr_dmg",

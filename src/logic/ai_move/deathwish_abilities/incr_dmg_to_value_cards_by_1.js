@@ -7,9 +7,9 @@ export function incr_dmg_to_value_cards_by_1(enemy, gameObj, timeout = 1000) {
 
   sound_passive_increase_damage()
   // для deathwish_value количества карт в руке игрока увеличим их урон на 1
-  for (let i = 0; i < enemy.deathwish_value; i++) {
+  for (let i = 0; i < enemy.data.deathwish.value; i++) {
     const random_hand = choice_element(hand)
-    random_hand.damage += 1
+    random_hand.data.damage += 1
     random_hand.incr_dmg = true
   }
 

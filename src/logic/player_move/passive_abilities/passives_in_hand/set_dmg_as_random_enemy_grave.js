@@ -6,7 +6,7 @@ export function set_dmg_as_random_enemy_grave(card, gameObj, timeout = 1000) {
   const { enemies_grave } = gameObj
   if (!enemies_grave.length) return
 
-  card.damage = choice_element(enemies_grave).damage
+  card.data.damage = choice_element(enemies_grave).data.damage
 
   timeoutAnimationFlag(
     card,

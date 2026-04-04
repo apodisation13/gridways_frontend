@@ -19,7 +19,7 @@ function damage_player(field, i, timeout = 1000) {
 
   sound_enemy_damage_player()
 
-  store.commit("change_health", -field[i].damage)
+  store.commit("change_health", -field[i].data.damage)
   timeoutAnimationFlag(field[i], "damages_player", null, timeout * 0.5)
   check_lose()
 }

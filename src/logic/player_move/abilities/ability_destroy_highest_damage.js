@@ -3,23 +3,17 @@ import { sound_destroy_enemy } from "@/logic/play_sounds"
 import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
 
 function destroy_highest_damage(gameObj, timeout = 1000) {
-  const { field, enemy_leader } = gameObj
+  const { field } = gameObj
 
-  let all_enemies
-  if (enemy_leader.damage_per_turn && enemy_leader.hp > 0) {
-    all_enemies = get_all_enemies(field, {
-      hp: enemy_leader.hp,
-      damage: enemy_leader.damage_per_turn,
-    })
-  } else all_enemies = get_all_enemies(field, { hp: 0 })
+  let all_enemies = get_all_enemies(field, { hp: 0 })
 
   if (!all_enemies.length) return
 
-  all_enemies.sort((a, b) => b.damage - a.damage)
+  all_enemies.sort((a, b) => b.data.damage - a.data.damage)
   let target = all_enemies[0]
 
   sound_destroy_enemy()
-  enemy_takes_damage(target, { damage: target.hp }, gameObj, timeout)
+  enemy_takes_damage(target, { damage: target.data.hp }, gameObj, timeout)
 }
 
 export { destroy_highest_damage }

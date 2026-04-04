@@ -4,15 +4,15 @@ import { EnemyStatus } from "@/logic/models"
 
 export function enemy_takes_damage(enemy, card, gameObj, timeout = 1000) {
   // поставили на 0.5 врагу это поле, чтобы проиграть анимацию урона
-  enemy.hp_delta = -card.damage
+  enemy.hp_delta = -card.data.damage
   setTimeout(() => {
     enemy.hp_delta = null
   }, timeout)
 
-  enemy.hp -= card.damage
+  enemy.data.hp -= card.data.damage
 
   setTimeout(() => {
-    if (enemy.hp <= 0) remove_dead_enemy(enemy, gameObj, timeout)
+    if (enemy.data.hp <= 0) remove_dead_enemy(enemy, gameObj, timeout)
   }, timeout)
 }
 
@@ -20,7 +20,7 @@ export function remove_dead_enemy(enemy, gameObj, timeout = 1000) {
   const { field, enemy_leader, enemies, enemies_grave } = gameObj
 
   if (!enemy.color) {
-    enemy_leader.hp = 0
+    enemy_leader.data.hp = 0
     enemy_leader.status = null
     console.log("умер лидер врагов")
     if (enemy_leader.deathwish?.name) deathwish(enemy_leader, gameObj, timeout)
