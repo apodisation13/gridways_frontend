@@ -105,7 +105,7 @@ function damage_ai_card(card, enemy, gameObj) {
     poison_all_enemies(gameObj, timeout)
   } else if (ability === CardAbility.AddArmor) {
     damage_one(enemy, card, gameObj, timeout)
-    add_armor(card.armor, timeout)
+    add_armor(card.data.armor, timeout)
   } else if (ability === CardAbility.Purify) {
     purify(enemy)
     damage_one(enemy, card, gameObj, timeout)

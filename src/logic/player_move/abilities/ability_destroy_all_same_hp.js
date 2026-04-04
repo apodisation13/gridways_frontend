@@ -10,7 +10,7 @@ function destroy_all_same_hp(enemy, gameObj, timeout = 1000) {
 
   sound_destroy_enemy()
   targets.forEach(e => {
-    enemy_takes_damage(e, { damage: e.data.hp }, gameObj, timeout)
+    enemy_takes_damage(e, { data: { damage: e.data.hp } }, gameObj, timeout)
   })
 }
 

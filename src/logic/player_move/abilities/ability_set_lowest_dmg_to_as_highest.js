@@ -5,8 +5,12 @@ import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 export function set_lowest_dmg_to_as_highest(gameObj, timeout = 1000) {
   const { hand } = gameObj
   const hand_calc = copyObj(hand)
-  const highest_dmg_card = hand_calc.sort((a, b) => b.data.damage - a.data.damage)[0]
-  const lowest_dmg_card = hand_calc.sort((a, b) => a.data.damage - b.data.damage)[0]
+  const highest_dmg_card = hand_calc.sort(
+    (a, b) => b.data.damage - a.data.damage
+  )[0]
+  const lowest_dmg_card = hand_calc.sort(
+    (a, b) => a.data.damage - b.data.damage
+  )[0]
   const card = hand.filter(c => c.id === lowest_dmg_card.id)[0]
   hand[hand.indexOf(card)].data.damage = highest_dmg_card.data.damage
   timeoutAnimationFlag(

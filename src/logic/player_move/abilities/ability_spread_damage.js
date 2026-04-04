@@ -23,7 +23,7 @@ function spread_damage(card, gameObj, timeout = 1000) {
     let temp = enemy_list[random_enemy].data.hp
     hit_one_enemy(
       enemy_list[random_enemy],
-      { damage: 1 },
+      { data: { damage: 1 } },
       gameObj,
       timeout * 0.2
     )

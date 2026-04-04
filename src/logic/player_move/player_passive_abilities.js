@@ -10,7 +10,7 @@ function player_passive_abilities_end_turn(gameObj, timeOut = 1000) {
 
   // здесь мы создаем пул карт, для которых нужны пассивки!
   let pool = hand.filter(c => c.data.passive?.has_passive_in_hand) // собрали пассивные карты из руки
-  if (leader.passive_ability) pool.push(leader) // добавили туда ещё и лидера если у него есть пассивка
+  if (leader.passive_ability?.name) pool.push(leader) // добавили туда ещё и лидера если у него есть пассивка
   pool = pool.concat(deck.filter(c => c.data.passive?.has_passive_in_deck)) // собрали пассивные карты из колоды
   pool = pool.concat(grave.filter(c => c.data.passive?.has_passive_in_grave)) // собрали пассивные карты из сброса
 

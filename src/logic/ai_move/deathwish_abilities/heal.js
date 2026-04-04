@@ -12,6 +12,6 @@ export function deathwish_heal_all(enemy, gameObj, timeout = 1000) {
     setTimeout(() => {
       e.hp_delta = null
     }, timeout)
-    e.hp += enemy.data.deathwish.value
+    e.data.hp += enemy.data.deathwish.value
   })
 }

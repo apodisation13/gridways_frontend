@@ -5,8 +5,8 @@ import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 function hit_one_enemy(enemy, card, gameObj, timeout = 1000) {
   timeoutAnimationFlag(card, "damages_enemy", null, timeout * 0.5)
 
-  if (enemy.shield) {
-    enemy.shield = false
+  if (enemy.data.shield) {
+    enemy.data.shield = false
     sound_hit_shield()
     card.damages_enemy = false
     return
