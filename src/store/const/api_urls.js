@@ -18,8 +18,9 @@ export const USER_PREFERENCES = `${getDomain()}/preferences/user-preferences/{us
 
 // user_database for database.js
 export const USER_DATABASE = `${getDomain()}/user-progress/{userId}`
-export const USER_DATABASE_V2 = `${getDomain()}/user-progress/v2/{userId}`
-export const CARDS_DATABASE = `${getDomain()}/cards/{userId}`
+// data for database.js
+export const CARDS_DATABASE = `${getDomain()}/cards`
+export const GAME_CONST = `${getDomain()}/game_const`
 
 // post deck, + carddecks + userdeck, user_actions: post_deck
 export const CREATE_USER_DECK = `${getDomain()}/user-progress/{userId}/create-deck`
