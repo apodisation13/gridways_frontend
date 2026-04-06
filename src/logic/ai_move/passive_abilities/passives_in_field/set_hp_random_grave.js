@@ -6,6 +6,6 @@ export function set_hp_random_grave(enemy, gameObj, timeout = 1000) {
   const { enemies_grave } = gameObj
   if (!enemies_grave.length) return
 
-  enemy.hp = choice_element(enemies_grave).hp
+  enemy.data.hp = choice_element(enemies_grave).data.hp
   timeoutAnimationFlag(enemy, "healing", sound_heal, timeout * 0.5)
 }

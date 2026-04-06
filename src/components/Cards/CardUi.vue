@@ -15,7 +15,7 @@
           >
             <div class="damage-icon-wrap">
               <div class="damage-icon"></div>
-              <span class="damage-icon-text">{{ -card.damage }}</span>
+              <span class="damage-icon-text">{{ -card.data.damage }}</span>
             </div>
           </div>
         </transition>
@@ -28,7 +28,9 @@
           >
             <div class="damage-icon-wrap">
               <div class="damage-icon"></div>
-              <span class="damage-icon-text">{{ -card.value }}</span>
+              <span class="damage-icon-text">
+                {{ -card.data.passive.value }}
+              </span>
             </div>
           </div>
         </transition>
@@ -41,7 +43,7 @@
           >
             <div class="heal-icon-wrap">
               <span class="heal-icon">💚</span>
-              <span class="heal-icon-text">+{{ card.value }}</span>
+              <span class="heal-icon-text">+{{ card.data.passive.value }}</span>
             </div>
           </div>
         </transition>
@@ -98,20 +100,20 @@
           v-if="card.type === 'Special'"
         />
         <card-damage-icon
-          v-if="'damage' in card"
+          v-if="'damage' in card.data"
           :style="background_color(card)"
-          :damage="card.damage"
+          :damage="card.data.damage"
         />
         <card-ability-circle :card="card" v-if="card.ability" />
-        <card-passive :card="card" v-if="card.has_passive" />
+        <card-passive :card="card" v-if="card.passive_ability?.name" />
         <card-charges
-          v-if="'charges' in card"
-          :charge="card.charges"
+          v-if="'charges' in card.data"
+          :charge="card.data.charges"
           :bgColor="background_color_charges(card.color)"
         />
         <heart-icon
           v-if="hp_needed"
-          :health="card.hp"
+          :health="card.data.hp"
           :bgColor="background_color_hp(card.color)"
         />
         <card-count-triangle

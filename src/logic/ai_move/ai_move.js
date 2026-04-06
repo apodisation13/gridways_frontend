@@ -11,7 +11,7 @@ function ai_move(field, timeout = 1000) {
   store.commit("set_ai_move", true)
   set_already_jumped(field) // установить false параметр enemy.already_jumped
 
-  let enemies = get_all_enemies(field, { hp: 0 })
+  let enemies = get_all_enemies(field, null)
   enemies.reverse() // чтобы враги начинали снизу!!!!! ))))))
 
   let i = 0
@@ -43,15 +43,16 @@ function ai_move(field, timeout = 1000) {
 function enemy_leader_ai_move_once(gameObj) {
   const { enemy_leader, deck } = gameObj
   const ela = enemy_leader.ability?.name
-  console.log(ela)
+
   if (!ela) return // есть лидеры у кого абилки нет
+
   if (ela === "damage-once") {
-    store.commit("change_health", -enemy_leader.value)
+    store.commit("change_health", -enemy_leader.data.value)
     check_lose()
   } else if (ela === "decrease-all-player-damage") {
     deck.forEach(card => {
-      card.damage -= enemy_leader.value
-      if (card.damage < 0) card.damage = 0
+      card.data.damage -= enemy_leader.data.value
+      if (card.data.damage < 0) card.data.damage = 0
     })
   }
 }

@@ -73,7 +73,7 @@ export default {
         )
       } else if (ability === CardAbility.IncrDmgToHandBySelfDmg) {
         // выбираем карту из руки, увеличиваем её урон на значение урона той карты, которую мы играли
-        this.special_case_value = this.selected_card.damage // сохранили значение урона
+        this.special_case_value = this.selected_card.data.damage // сохранили значение урона
         this.cards_pool = this.gameObj.hand.filter(
           card => card.id !== this.selected_card.id
         )
@@ -100,7 +100,7 @@ export default {
         this.enemyView = true
       } else if (ability === CardAbility.DecrDmgToHandIncrToRandomHand) {
         // выбираем карту, уменьшаем ее урон на value, прибавляем value урона рандомной карте в руке
-        this.special_case_value = this.selected_card.value // сохранили значение урона
+        this.special_case_value = this.selected_card.data.value // сохранили значение урона
         this.cards_pool = this.gameObj.hand.filter(
           card => card.id !== this.selected_card.id
         )
@@ -159,7 +159,7 @@ export default {
     confirm_selection(card) {
       // card - это та карта, которую мы выбрали из какого-либо дополнительного окна
       if (this.ability === CardAbility.Resurrect) {
-        card.charges = 1
+        card.data.charges = 1
         this.gameObj.hand.push(card)
         this.gameObj.grave.splice(this.gameObj.grave.indexOf(card), 1)
       } else if (this.ability === CardAbility.GiveChargesToCardInHand1) {
@@ -183,7 +183,7 @@ export default {
           this.ability === CardAbility.PlayFromGrave ||
           this.ability === CardAbility.PlaySpecialFromGrave
         ) {
-          card.charges = 1
+          card.data.charges = 1
         }
 
         // Показать эту выбранную для игры карту. А снимаем этот ФЛАГ уже в самом GamePage!
@@ -193,22 +193,22 @@ export default {
         this.isActive.player_leader = false // а лидер теперь неактивен
         this.setActive() // поле и лидер врагов теперь активны
       } else if (this.ability === CardAbility.IncrDmgToHandBySelfDmg) {
-        card.damage += this.special_case_value
+        card.data.damage += this.special_case_value
         this.incrDmg(card, this.special_case_value)
       } else if (this.ability === CardAbility.MoveEnemyFromDeckToGrave) {
         const cd = this.gameObj.enemies.findIndex(c => c.id === card.id)
         this.gameObj.enemies.splice(cd, 1)
-        card.hp = card.base_hp
+        card.data.hp = card.data.base.base_hp
         this.gameObj.enemies_grave.push(card)
       } else if (this.ability === CardAbility.DecrDmgToHandIncrToRandomHand) {
-        card.damage -= this.special_case_value
-        if (card.damage < 0) card.damage = 0
+        card.data.damage -= this.special_case_value
+        if (card.data.damage < 0) card.data.damage = 0
         const random_card = choice_element(this.gameObj.hand)
-        random_card.damage += this.special_case_value
+        random_card.data.damage += this.special_case_value
         this.incrDmg(random_card, this.special_case_value)
       } else if (this.ability === CardAbility.IncrDmgByNCharges) {
-        card.damage += card.charges
-        this.incrDmg(card, card.charges)
+        card.data.damage += card.data.charges
+        this.incrDmg(card, card.data.charges)
       } else if (this.ability === CardAbility.CreateAndPutToDeck) {
         this.gameObj.deck.push(card)
       } else if (this.ability === CardAbility.DrawExact) {

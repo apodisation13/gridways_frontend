@@ -46,7 +46,8 @@ function damage_ai_card(card, enemy, gameObj) {
     heal(card)
   } else if (ability === CardAbility.DamageAll) {
     damage_all(field, card, gameObj, timeout)
-    if (enemy_leader.hp > 0) hit_one_enemy(enemy_leader, card, gameObj, timeout)
+    if (enemy_leader.data.hp > 0)
+      hit_one_enemy(enemy_leader, card, gameObj, timeout)
     setTimeout(
       () => check_win(field, enemies, enemy_leader, enemies_grave),
       timeout * 1.2
@@ -104,7 +105,7 @@ function damage_ai_card(card, enemy, gameObj) {
     poison_all_enemies(gameObj, timeout)
   } else if (ability === CardAbility.AddArmor) {
     damage_one(enemy, card, gameObj, timeout)
-    add_armor(card.armor, timeout)
+    add_armor(card.data.armor, timeout)
   } else if (ability === CardAbility.Purify) {
     purify(enemy)
     damage_one(enemy, card, gameObj, timeout)

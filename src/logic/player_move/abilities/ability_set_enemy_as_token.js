@@ -1,4 +1,4 @@
 export function set_enemy_as_token(enemy) {
-  enemy.hp = 1
-  enemy.damage = 1
+  enemy.data.hp = 1
+  enemy.data.damage = 1
 }

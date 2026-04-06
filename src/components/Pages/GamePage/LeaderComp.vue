@@ -4,10 +4,11 @@
       :card="leader"
       :user_card="leader"
       :class="{
-        'not-charges': leader.charges === 0 && !leader.has_passive,
+        'not-charges':
+          leader.data.charges === 0 && !leader.passive_ability?.name,
       }"
       :is_leader="true"
-      :is_previev="leader.charges === 0 && !leader.has_passive"
+      :is_previev="leader.data.charges === 0 && !leader.passive_ability?.name"
       @mousedown="handleCardMouseDown($event)"
       @touchstart="handleCardTouchStart($event)"
     />
@@ -44,7 +45,7 @@ export default {
     handleCardMouseDown(e) {
       e.preventDefault()
       e.stopPropagation()
-      if (this.leader.charges === 0) return
+      if (this.leader.data.charges === 0) return
       const el = document.querySelector(".leader-comp")
       if (!el) return
       this.$emit("exec_leader")
@@ -53,7 +54,7 @@ export default {
     handleCardTouchStart(e) {
       e.preventDefault()
       e.stopPropagation()
-      if (this.leader.charges === 0) return
+      if (this.leader.data.charges === 0) return
       const el = document.querySelector(".leader-comp")
       if (!el) return
       const touch = e.touches[0]

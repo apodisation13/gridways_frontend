@@ -1,5 +1,9 @@
 import { useToast } from "vue-toastification"
-import { USER_DATABASE } from "@/store/const/api_urls"
+import {
+  CARDS_DATABASE,
+  GAME_CONST,
+  USER_DATABASE,
+} from "@/store/const/api_urls"
 import { callApi, GET } from "@/lib/api/api"
 
 const toast = useToast()
@@ -19,6 +23,11 @@ const state = {
 
   enemies: [],
   enemy_leaders: [],
+
+  cardsdb: {},
+  leadersdb: {},
+  enemiesdb: {},
+  enemyleadersdb: {},
 }
 
 const getters = {
@@ -84,71 +93,119 @@ const getters = {
 }
 
 const mutations = {
-  set_leaders(state, result) {
-    // гет запрос на лидеров
-    state.leaders = result
-  },
-  set_cards(state, result) {
-    // гет запрос на базу карт
-    state.cards = result
-  },
-  set_decks(state, result) {
-    // гет запрос на сохранённые колоды
-    state.decks = result
-  },
-  set_seasons(state, result) {
-    state.seasons = result
-  },
   set_resource(state, result) {
-    // {scraps, wood, kegs, big_kegs, chests}
     state.resource = result
   },
 
-  set_enemies(state, payload) {
-    state.enemies = payload
+  set_cardsdb(state, result) {
+    state.cardsdb = new Map(result.cards.map(card => [card.id, card]))
+    state.leadersdb = new Map(result.leaders.map(card => [card.id, card]))
+    state.enemiesdb = result.enemies
+    state.enemies = Object.values(result.enemies)
+    state.enemyleadersdb = result.enemy_leaders
+    state.enemy_leaders = Object.values(result.enemy_leaders)
   },
-  set_enemy_leaders(state, payload) {
-    state.enemy_leaders = payload
+
+  set_cards_v2(state, user_cards) {
+    state.cards = Array.from(state.cardsdb.values()).map(card => {
+      const userCard = user_cards[card.id]
+      return {
+        card,
+        count: userCard ? userCard.count : 0,
+        id: userCard ? userCard.user_card_id : null,
+      }
+    })
+  },
+  set_leaders_v2(state, user_leaders) {
+    state.leaders = Array.from(state.leadersdb.values()).map(card => {
+      const userLeader = user_leaders[card.id]
+      return {
+        card,
+        count: userLeader ? userLeader.count : 0,
+        id: userLeader ? userLeader.user_leader_id : null,
+      }
+    })
+  },
+  set_decks_v2(state, user_decks) {
+    state.decks = user_decks.map(userDeck => ({
+      id: userDeck.user_deck_id,
+      deck: {
+        id: userDeck.deck.id,
+        name: userDeck.deck.name,
+        leader: state.leadersdb.get(userDeck.deck.leader_id),
+        cards: userDeck.deck.cards.map(cardId => ({
+          card: state.cardsdb.get(cardId),
+          count: 1,
+        })),
+        health: userDeck.deck.health,
+      },
+    }))
+  },
+  set_seasons_v2(state, user_seasons) {
+    state.seasons = user_seasons.map(userSeason => ({
+      id: userSeason.id,
+      finished: userSeason.finished,
+      season: {
+        ...userSeason.season,
+        levels: userSeason.season.levels.map(userLevel => ({
+          ...userLevel,
+          level: {
+            ...userLevel.level,
+            enemy_leader: state.enemyleadersdb[userLevel.level.enemy_leader],
+            enemies: userLevel.level.enemies.map(
+              enemyId => state.enemiesdb[enemyId]
+            ),
+          },
+        })),
+      },
+      stats: userSeason.stats,
+    }))
   },
 }
 
 const actions = {
-  // в ответе user_database: cards,leaders,u_d(колоды),levels, resources: тут ресурсы
+  // TODO: написать
   async getUserDatabase({ commit, getters, dispatch }) {
-    let userId = getters["getUser"].user_id
+    const userId = getters["getUser"].user_id
 
     try {
-      let response = await callApi({
+      const cards_response = await callApi({
+        method: GET,
+        url: CARDS_DATABASE,
+      })
+      commit("set_cardsdb", cards_response.data)
+
+      const user_database = await callApi({
         method: GET,
         url: USER_DATABASE.replace("{userId}", userId),
       })
 
       const {
-        user_database,
-        seasons,
-        resources,
-        enemies,
-        enemy_leaders,
-        game_const,
-      } = response.data
+        user_cards,
+        user_leaders,
+        user_decks,
+        user_seasons,
+        user_resources,
+      } = user_database.data
 
-      commit("set_leaders", user_database.leaders)
-      commit("set_cards", user_database.cards)
+      commit("set_cards_v2", user_cards)
+      commit("set_leaders_v2", user_leaders)
+      commit("set_decks_v2", user_decks)
+      commit("set_seasons_v2", user_seasons)
 
-      commit("set_decks", user_database.decks)
-      dispatch("set_deck_in_play", user_database.decks[0]) // устанавливаем для игры первую колоду
+      commit("set_season", getters["all_seasons"][0].season)
 
-      commit("set_seasons", seasons)
-      commit("set_season", seasons[0].season)
-      dispatch("set_level_in_play", seasons[0].season.levels[0]) // устанавливаем для игры первый уровень
+      commit("set_resource", user_resources)
 
-      commit("set_resource", resources)
+      dispatch("set_deck_in_play", getters["all_decks"][0])
+      dispatch("set_level_in_play", getters["all_seasons"][0].season.levels[0]) // устанавливаем для игры первый уровень
 
-      commit("set_enemies", enemies)
-      commit("set_enemy_leaders", enemy_leaders)
-
+      const game_const_response = await callApi({
+        method: GET,
+        url: GAME_CONST,
+      })
+      const game_const = game_const_response.data
       commit("set_game_const", game_const) // рука, карт в колоде, распределение рандомных врагов
-
       commit("set_resources_transitions", game_const.resources_transitions) // покупка/продажа ресурсов
       commit("set_keys_rewards", game_const.keys_rewards) // награды за открытие ключей
       commit("set_win_level_rewards", game_const.win_level_rewards) // награды за прохождение уровня
@@ -161,6 +218,7 @@ const actions = {
       throw new Error("Ошибка загрузки базы данных!")
     }
   },
+
   error_action(_, err) {
     let message = "Неизвестная ошибка"
 

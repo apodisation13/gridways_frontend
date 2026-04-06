@@ -8,8 +8,8 @@ import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 export function spawn_tokens(enemy, gameObj) {
   const defaultEnemy = get_default_enemy(enemy)
   if (!defaultEnemy) return
-  defaultEnemy.hp = 1
-  defaultEnemy.damage = 1
+  defaultEnemy.data.hp = 1
+  defaultEnemy.data.damage = 1
 
   sound_deathwish()
 
@@ -24,14 +24,14 @@ export function spawn_tokens(enemy, gameObj) {
 export function spawn_tokens_at_deck(enemy, gameObj, timeout = 1000) {
   const defaultEnemy = get_default_enemy(enemy)
   if (!defaultEnemy) return
-  defaultEnemy.hp = 1
-  defaultEnemy.damage = 1
+  defaultEnemy.data.hp = 1
+  defaultEnemy.data.damage = 1
 
   sound_deathwish()
 
   const { enemies } = gameObj
 
-  for (let i = 0; i < enemy.deathwish_value; i++) {
+  for (let i = 0; i < enemy.data.deathwish.value; i++) {
     enemies.push(copyObj(defaultEnemy))
   }
   timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)

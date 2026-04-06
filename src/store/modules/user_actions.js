@@ -64,7 +64,7 @@ const actions = {
         data: body,
       })
       toast.success("Успешно добавили колоду")
-      commit("set_decks", response.data.decks)
+      commit("set_decks_v2", response.data.decks)
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при добавлении деки")
@@ -83,7 +83,7 @@ const actions = {
         data: {},
       })
       toast.success("Успешно удалили колоду")
-      commit("set_decks", response.data.decks)
+      commit("set_decks_v2", response.data.decks)
       // после удаления колоды, устанавливаем базовую деку для игры (вдруг мы удалили ту которая была)
       dispatch("set_deck_in_play")
     } catch (err) {
@@ -105,7 +105,7 @@ const actions = {
         data: deck_body,
       })
       toast.success("Успешно изменили колоду")
-      commit("set_decks", response.data.decks)
+      commit("set_decks_v2", response.data.decks)
       // после изменения колоды тоже, устанавливаем базовую деку для игры (вдруг мы изменили ту, которая уже была)
       dispatch("set_deck_in_play")
     } catch (err) {
@@ -129,7 +129,6 @@ const actions = {
         data: body,
       })
       commit("set_resource", response.data)
-      return response.data
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при менеджменте ресурсов")
@@ -160,12 +159,12 @@ const actions = {
         subtype === CraftMillCardActionSubtype.craftCard ||
         subtype === CraftMillCardActionSubtype.millCard
       ) {
-        commit("set_cards", response.data.cards)
+        commit("set_cards_v2", response.data.cards)
       } else if (
         subtype === CraftMillCardActionSubtype.craftLeader ||
         subtype === CraftMillCardActionSubtype.millLeader
       ) {
-        commit("set_leaders", response.data.cards)
+        commit("set_leaders_v2", response.data.cards)
       }
     } catch (err) {
       dispatch("error_action", err)
@@ -182,7 +181,7 @@ const actions = {
         data: { cards_ids: cardsIds },
       })
       toast.success("Успешно добавили карту")
-      commit("set_cards", response.data.cards)
+      commit("set_cards_v2", response.data.cards)
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при создании карты")
@@ -219,9 +218,9 @@ const actions = {
         data: {},
       })
       const seasons = response.data.seasons
-      commit("set_seasons", seasons)
-      commit("set_season", seasons[0].season)
-      dispatch("set_level_in_play", seasons[0].season.levels[0]) // устанавливаем для игры первый уровень
+      commit("set_seasons_v2", seasons)
+      commit("set_season", getters["all_seasons"][0].season)
+      dispatch("set_level_in_play", getters["all_seasons"][0].season.levels[0])
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при открытии уровней")

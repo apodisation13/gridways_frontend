@@ -1,7 +1,7 @@
 // сбрасываем карту из руки или из колоды в сброс, если у нее 0 зарядов
 // если лидер - не сбрасываем его никуда (у него нет card.color)
 function remove_dead_card(card, grave, hand, deck) {
-  if (card.charges > 0) return // если у карты зарядов не 0, ничего делать не нужно
+  if (card.data.charges > 0) return // если у карты зарядов не 0, ничего делать не нужно
   if (card.color === undefined) return // случай лидера, его не надо сбрасывать никуда
 
   grave.push(card) // поместили карту в кладбище
@@ -24,7 +24,7 @@ function get_all_enemies(field, enemy_leader) {
       enemy_list.push(enemy)
     }
   })
-  if (enemy_leader?.hp > 0) enemy_list.push(enemy_leader)
+  if (enemy_leader && enemy_leader.data.hp > 0) enemy_list.push(enemy_leader)
   return enemy_list
 }
 
@@ -39,13 +39,13 @@ function get_random_enemy(field, enemy_leader) {
 function get_empty_field_indexes(field) {
   let emptyIndexesArray = []
   for (let i = 0; i < field.length; i++) {
-    if (!field[i] || field[i].hp <= 0) emptyIndexesArray.push(i)
+    if (!field[i] || field[i].data.hp <= 0) emptyIndexesArray.push(i)
   }
   return emptyIndexesArray
 }
 
 function change_card_charges(card, value, timeout = 1000) {
-  card.charges += value
+  card.data.charges += value
   // а это для анимации изменения зарядов
   card.charges_delta = value
   setTimeout(() => {

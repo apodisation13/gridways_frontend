@@ -9,7 +9,7 @@ export function grave_passives(enemy, gameObj, timeout = 1000) {
 
   const { enemy_leader, field, enemies_grave } = gameObj
 
-  const pea = enemy.passive_ability.name
+  const pea = enemy.passive_ability?.name
 
   if (pea === "heal-random") {
     heal_random(enemy, field, enemy_leader, timeout)

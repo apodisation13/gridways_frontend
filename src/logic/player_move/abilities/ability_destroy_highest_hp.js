@@ -6,11 +6,16 @@ function destroy_highest_hp(gameObj, timeout = 1000) {
   const { field, enemy_leader } = gameObj
 
   let all_enemies = get_all_enemies(field, enemy_leader)
-  all_enemies.sort((a, b) => b.hp - a.hp)
+  all_enemies.sort((a, b) => b.data.hp - a.data.hp)
   let target = all_enemies[0]
 
   sound_destroy_enemy()
-  enemy_takes_damage(target, { damage: target.hp }, gameObj, timeout)
+  enemy_takes_damage(
+    target,
+    { data: { damage: target.data.hp } },
+    gameObj,
+    timeout
+  )
 }
 
 export { destroy_highest_hp }

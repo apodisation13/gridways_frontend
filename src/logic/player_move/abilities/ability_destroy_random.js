@@ -8,7 +8,7 @@ function destroy_random(gameObj, timeout = 1000) {
   let target = get_random_enemy(field, enemy_leader)
 
   sound_destroy_enemy()
-  enemy_takes_damage(target, { damage: target.hp }, gameObj, timeout)
+  enemy_takes_damage(target, { data: { damage: target.hp } }, gameObj, timeout)
 }
 
 export { destroy_random }

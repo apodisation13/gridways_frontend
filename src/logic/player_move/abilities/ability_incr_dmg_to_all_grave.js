@@ -5,7 +5,7 @@ export function incr_dmg_to_all_grave(card, gameObj, timeout = 1000) {
   if (!grave.length) return
 
   grave.forEach(c => {
-    c.damage += card.value
+    c.data.damage += card.data.value
   })
   timeoutAnimationFlag(grave[0], "trigger_grave_passive", null, timeout * 0.5)
 }

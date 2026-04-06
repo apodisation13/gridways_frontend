@@ -14,20 +14,18 @@ export function set_already_jumped(field) {
 export function create_token(enemy) {
   const token = copyObj(enemy)
   token.passive_ability = null
-  token.has_passive = null
-  token.has_passive_in_field = null
-  token.hp = 1
-  token.base_hp = 1
-  token.damage = 1
+  token.data.hp = 1
+  token.data.base.base_hp = 1
+  token.data.damage = 1
   return token
 }
 
 // создает токен врага и НЕ снимает у него пассивную способность
 export function create_token_with_passive(enemy) {
   const token = copyObj(enemy)
-  token.hp = 1
-  token.base_hp = 1
-  token.damage = 1
+  token.data.hp = 1
+  token.data.base.base_hp = 1
+  token.data.damage = 1
   return token
 }
 
@@ -37,8 +35,6 @@ export function get_default_enemy(enemy) {
     store.getters["all_enemies"].find(e => e.id === enemy.id)
   )
   if (!defaultEnemy) return null
-
-  defaultEnemy.has_deathwish = false
   defaultEnemy.deathwish = null
   return defaultEnemy
 }

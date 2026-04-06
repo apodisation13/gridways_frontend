@@ -10,11 +10,11 @@ function incr_self_dmg(enemy, timeout = 1000) {
     sound_passive_increase_damage,
     timeout * 0.5
   )
-  enemy.dmg_delta = enemy.value
+  enemy.dmg_delta = enemy.data.passive.value
   setTimeout(() => {
     enemy.dmg_delta = null
   }, timeout * 0.5)
-  enemy.damage += enemy.value
+  enemy.data.damage += enemy.data.passive.value
 }
 
 function incr_random_dmg(enemy, field, timeout = 1000) {
@@ -28,11 +28,11 @@ function incr_random_dmg(enemy, field, timeout = 1000) {
     sound_passive_increase_damage,
     timeout * 0.5
   )
-  random_enemy.dmg_delta = enemy.value
+  random_enemy.dmg_delta = enemy.data.passive.value
   setTimeout(() => {
     random_enemy.dmg_delta = null
   }, timeout * 0.5)
-  random_enemy.damage += enemy.value
+  random_enemy.data.damage += enemy.data.passive.value
 }
 
 function incr_dmg_row(enemy, field, timeout = 1000) {
@@ -43,11 +43,11 @@ function incr_dmg_row(enemy, field, timeout = 1000) {
   timeoutAnimationFlag(enemy, "incr_dmg", null, timeout * 0.5)
   field.slice(min, max).forEach(e => {
     if (e) {
-      e.dmg_delta = enemy.value
+      e.dmg_delta = enemy.data.passive.value
       setTimeout(() => {
         e.dmg_delta = null
       }, timeout * 0.5)
-      e.damage += enemy.value
+      e.data.damage += enemy.data.passive.value
     }
   })
 }
@@ -59,11 +59,11 @@ function incr_dmg_column(enemy, field, timeout = 1000) {
   timeoutAnimationFlag(enemy, "incr_dmg", null, timeout * 0.5)
   indexes.forEach(i => {
     if (field[i]) {
-      field[i].dmg_delta = enemy.value
+      field[i].dmg_delta = enemy.data.passive.value
       setTimeout(() => {
         field[i].dmg_delta = null
       }, timeout * 0.5)
-      field[i].damage += enemy.value
+      field[i].data.damage += enemy.data.passive.value
     }
   })
 }

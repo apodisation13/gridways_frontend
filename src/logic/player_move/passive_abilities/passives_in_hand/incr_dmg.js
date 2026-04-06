@@ -9,11 +9,11 @@ export function incr_self_dmg(card, deck_or_grave = false, timeout = 1000) {
     deck_or_grave ? null : sound_passive_increase_damage,
     timeout * 0.5
   )
-  card.p_dmg_delta = card.value
+  card.p_dmg_delta = card.data.passive.value
   setTimeout(() => {
     card.p_dmg_delta = null
   }, timeout * 0.5)
-  card.damage += card.value
+  card.data.damage += card.data.passive.value
 }
 
 export function incr_dmg_to_random(
@@ -45,11 +45,11 @@ export function incr_dmg_to_random(
     deck_or_grave ? null : sound_passive_increase_damage,
     timeout * 0.5
   )
-  target.p_dmg_delta = card.value
+  target.p_dmg_delta = card.data.passive.value
   setTimeout(() => {
     target.p_dmg_delta = null
   }, timeout * 0.5)
-  target.damage += card.value
+  target.data.damage += card.data.passive.value
 }
 
 export function inc_dmg_by_len_grave(card, gameObj, timeout = 1000) {
@@ -65,7 +65,7 @@ export function inc_dmg_by_len_grave(card, gameObj, timeout = 1000) {
   setTimeout(() => {
     card.p_dmg_delta = null
   }, timeout * 0.5)
-  card.damage += grave.length
+  card.data.damage += grave.length
 }
 
 export function incr_dmg_by_len_deck(card, gameObj, timeout = 1000) {
@@ -81,7 +81,7 @@ export function incr_dmg_by_len_deck(card, gameObj, timeout = 1000) {
   setTimeout(() => {
     card.p_dmg_delta = null
   }, timeout * 0.5)
-  card.damage += deck.length
+  card.data.damage += deck.length
 }
 
 export function incr_dmg_by_n_enemies_grave(card, gameObj, timeout = 1000) {
@@ -98,5 +98,5 @@ export function incr_dmg_by_n_enemies_grave(card, gameObj, timeout = 1000) {
   setTimeout(() => {
     card.p_dmg_delta = null
   }, timeout * 0.5)
-  card.damage += enemies_grave.length
+  card.data.damage += enemies_grave.length
 }

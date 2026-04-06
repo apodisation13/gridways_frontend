@@ -11,8 +11,8 @@ export function player_passive_abilities_upon_playing_a_card(
   enemy
 ) {
   // здесь карты из руки проверяем
-  if (!leader.has_passive) return
   const lpa = leader.passive_ability.name
+  if (!lpa) return
   if (lpa === "add-charges-to-leader-if-play-special") {
     add_charges_to_leader_if_play_special(player_card, leader)
   } else if (lpa === "add-charges-to-leader-if-play-d-all") {

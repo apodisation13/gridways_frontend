@@ -99,10 +99,12 @@ export default {
   },
   computed: {
     charges() {
-      const leader_charges = this.deck.leader ? this.deck.leader.charges : 0
+      const leader_charges = this.deck.leader
+        ? this.deck.leader.data.charges
+        : 0
       return (
         this.deck.deck_is_progress.reduce(
-          (acc, val) => acc + val.card.charges,
+          (acc, val) => acc + val.card.data.charges,
           0
         ) + leader_charges
       )

@@ -3,7 +3,7 @@
     <div class="card-body">
       <div
         class="card-enemy"
-        :class="{ 'not-charges': enemy.hp <= 0 }"
+        :class="{ 'not-charges': enemy.data.hp <= 0 }"
         :style="[
           { backgroundImage: `url(${enemy.image})` },
           card_margin(enemy),
@@ -17,7 +17,7 @@
           >
             <div class="damage-icon-wrap">
               <div class="damage-icon"></div>
-              <span class="damage-icon-text">{{ -enemy.damage }}</span>
+              <span class="damage-icon-text">{{ -enemy.data.damage }}</span>
             </div>
           </div>
         </transition>
@@ -27,9 +27,9 @@
         <ability-circle-enemy :enemy="enemy" v-if="enemy.move" />
         <!--Иконка урона, для всех врагов или если у лидера врага есть урон-->
         <card-damage-icon
-          v-if="enemy.damage"
+          v-if="enemy.data.damage"
           :style="background_color(enemy)"
-          :damage="enemy.damage"
+          :damage="enemy.data.damage"
         />
         <!-- отдельный анимированный ромб, damage-comp не трогаем -->
         <div
@@ -42,13 +42,13 @@
           </span>
         </div>
 
-        <card-passive v-if="enemy.has_passive" :card="enemy" />
-        <enemy-shield v-if="enemy.shield" />
+        <card-passive v-if="enemy.passive_ability?.name" :card="enemy" />
+        <enemy-shield v-if="enemy.data.shield" />
         <enemy-locked v-if="enemy.locked" />
-        <deathwish-ability v-if="enemy.has_deathwish" />
-        <enemy-status v-if="enemy.status" :enemy="enemy" />
+        <deathwish-ability v-if="enemy.deathwish?.name" />
+        <enemy-status v-if="enemy.data.status" :enemy="enemy" />
         <heart-icon
-          :health="enemy.hp"
+          :health="enemy.data.hp"
           :hp_delta="enemy.hp_delta"
           :bgColor="background_color_hp(enemy.color)"
         />

@@ -204,7 +204,7 @@ export default {
       if (this.can_add_card(card)) {
         this.deck.deck_is_progress.push(card)
         this.deck.deck_body.push(card.card.id)
-        this.deck.health += card.card.hp
+        this.deck.health += card.card.data.hp
         this.init() // это нужно, так как при добавлении карты, мы хотим убрать ее из пула (для удобства)
         return
       }
@@ -215,7 +215,7 @@ export default {
 
     // удалить из деки в процессе по нажатию дважды ЛКМ
     delete_card_from_deck(card) {
-      this.deck.health -= card.card.hp
+      this.deck.health -= card.card.data.hp
       this.deck.deck_is_progress.splice(
         this.deck.deck_is_progress.indexOf(card),
         1
@@ -238,10 +238,10 @@ export default {
         return
       }
       if (this.deck.leader) {
-        this.deck.health -= this.deck.leader.hp
+        this.deck.health -= this.deck.leader.data.hp
       }
       this.deck.leader = leader.card
-      this.deck.health += leader.card.hp
+      this.deck.health += leader.card.data.hp
     },
 
     change_name_deck(value) {

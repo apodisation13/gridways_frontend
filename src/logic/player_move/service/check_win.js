@@ -4,7 +4,7 @@ import store from "@/store"
 // проверка выигрыша - если осталось 0 врагов и на поле никого
 function check_win(field, enemy_list, enemy_leader, enemies_grave) {
   if (enemy_list.length !== 0) return
-  if (enemy_leader.hp > 0 || isNaN(enemy_leader.hp)) return
+  if (enemy_leader.data.hp > 0) return
 
   for (let i = 0; i < field.length; i++) {
     if (field[i]) return

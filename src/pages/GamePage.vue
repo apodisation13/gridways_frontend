@@ -313,7 +313,7 @@ export default {
     targetEnemyByLeader() {
       return (
         this.isActive.player_leader &&
-        this.gameObj.leader.charges > 0 &&
+        this.gameObj.leader.data.charges > 0 &&
         this.isActive.enemy_cards &&
         this.selected_enemy
       )
@@ -324,7 +324,7 @@ export default {
         (this.isActive.player_cards &&
           !this.isActive.player_leader &&
           this.isActive.enemy_leader &&
-          this.gameObj.enemy_leader.hp > 0) ||
+          this.gameObj.enemy_leader.data.hp > 0) ||
         this.sca
       )
     },
@@ -332,9 +332,9 @@ export default {
     targetEnemyLeaderByLeader() {
       return (
         this.isActive.player_leader &&
-        this.gameObj.leader.charges > 0 &&
+        this.gameObj.leader.data.charges > 0 &&
         this.isActive.enemy_leader &&
-        this.gameObj.enemy_leader.hp > 0
+        this.gameObj.enemy_leader.data.hp > 0
       )
     },
   },

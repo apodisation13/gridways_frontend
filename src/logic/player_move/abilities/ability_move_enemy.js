@@ -24,7 +24,7 @@ export function move_enemy(enemy, gameObj) {
     field[target_index] = ""
     // кладем в сброс и восстанавливаем его здорове
     enemies_grave.push(prev_enemy)
-    prev_enemy.hp = prev_enemy.base_hp
+    prev_enemy.data.hp = prev_enemy.data.base.base_hp
     // новый враг прыгаем туда со своей старой клетки
     field[target_index] = enemy
     field[prev_index] = ""

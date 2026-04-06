@@ -60,7 +60,7 @@ export default {
   padding: 55px 40px 40px;
 }
 .cancel {
-  margin: auto;
+  margin: 20px auto auto;
   width: 98%;
   height: 30px;
 }
