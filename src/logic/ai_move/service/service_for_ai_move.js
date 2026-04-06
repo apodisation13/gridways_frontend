@@ -31,9 +31,7 @@ export function create_token_with_passive(enemy) {
 
 // достает из списка врагов убитого врага (для deathwish), снимает у того deathwish
 export function get_default_enemy(enemy) {
-  const defaultEnemy = copyObj(
-    store.getters["all_enemies"].find(e => e.id === enemy.id)
-  )
+  const defaultEnemy = copyObj(store.getters["all_enemies_db"][enemy.id])
   if (!defaultEnemy) return null
   defaultEnemy.deathwish = null
   return defaultEnemy
