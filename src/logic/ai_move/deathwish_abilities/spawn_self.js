@@ -27,7 +27,8 @@ export function spawn_self_at_deck(enemy, gameObj, timeout = 1000) {
   sound_deathwish()
   const { enemies } = gameObj
 
-  for (let i = 0; i < enemy.data.deathwish.value; i++) {
+  const value_number = enemy.data?.deathwish?.value || 1
+  for (let i = 0; i < value_number; i++) {
     enemies.push(copyObj(defaultEnemy))
   }
   timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)
@@ -41,7 +42,8 @@ export function spawn_self_at_grave(enemy, gameObj, timeout = 1000) {
   sound_deathwish()
   const { enemies_grave } = gameObj
 
-  for (let i = 0; i < enemy.data.deathwish.value; i++) {
+  const value_number = enemy.data?.deathwish?.value || 1
+  for (let i = 0; i < value_number; i++) {
     enemies_grave.push(copyObj(defaultEnemy))
   }
   timeoutAnimationFlag(

@@ -31,6 +31,7 @@ import {
 } from "@/logic/player_move/abilities/ability_poison"
 import { add_armor } from "@/logic/player_move/abilities/ability_armor"
 import { purify } from "@/logic/player_move/abilities/ability_purify"
+import { give_charges_to_all } from "@/logic/player_move/abilities/ability_give_charges_to_all"
 
 // Сюда заходим если там есть враг
 // card - карта, которую мы играем (или из руки, или лидер).
@@ -109,6 +110,9 @@ function damage_ai_card(card, enemy, gameObj) {
   } else if (ability === CardAbility.Purify) {
     purify(enemy)
     damage_one(enemy, card, gameObj, timeout)
+  } else if (ability === CardAbility.GiveChargesToAll) {
+    damage_one(enemy, card, gameObj, timeout)
+    give_charges_to_all(card, gameObj, timeout)
   } else damage_one(enemy, card, gameObj, timeout)
 
   // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда
