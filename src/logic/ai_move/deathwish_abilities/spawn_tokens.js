@@ -26,12 +26,14 @@ export function spawn_tokens_at_deck(enemy, gameObj, timeout = 1000) {
   if (!defaultEnemy) return
   defaultEnemy.data.hp = 1
   defaultEnemy.data.damage = 1
+  defaultEnemy.deathwish = null
 
   sound_deathwish()
 
   const { enemies } = gameObj
 
-  for (let i = 0; i < enemy.data.deathwish.value; i++) {
+  const value_number = enemy.data?.deathwish?.value || 1
+  for (let i = 0; i < value_number; i++) {
     enemies.push(copyObj(defaultEnemy))
   }
   timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)

@@ -86,6 +86,7 @@ const getters = {
   },
 
   all_enemies: state => state.enemies,
+  all_enemies_db: state => state.enemiesdb,
   bronze_enemies: state => state.enemies.filter(e => e.color === "Bronze"),
   silver_enemies: state => state.enemies.filter(e => e.color === "Silver"),
   gold_enemies: state => state.enemies.filter(e => e.color === "Gold"),
@@ -106,7 +107,7 @@ const mutations = {
     state.enemy_leaders = Object.values(result.enemy_leaders)
   },
 
-  set_cards_v2(state, user_cards) {
+  set_cards(state, user_cards) {
     state.cards = Array.from(state.cardsdb.values()).map(card => {
       const userCard = user_cards[card.id]
       return {
@@ -116,7 +117,7 @@ const mutations = {
       }
     })
   },
-  set_leaders_v2(state, user_leaders) {
+  set_leaders(state, user_leaders) {
     state.leaders = Array.from(state.leadersdb.values()).map(card => {
       const userLeader = user_leaders[card.id]
       return {
@@ -126,7 +127,7 @@ const mutations = {
       }
     })
   },
-  set_decks_v2(state, user_decks) {
+  set_decks(state, user_decks) {
     state.decks = user_decks.map(userDeck => ({
       id: userDeck.user_deck_id,
       deck: {
@@ -141,7 +142,7 @@ const mutations = {
       },
     }))
   },
-  set_seasons_v2(state, user_seasons) {
+  set_seasons(state, user_seasons) {
     state.seasons = user_seasons.map(userSeason => ({
       id: userSeason.id,
       finished: userSeason.finished,
@@ -188,10 +189,10 @@ const actions = {
         user_resources,
       } = user_database.data
 
-      commit("set_cards_v2", user_cards)
-      commit("set_leaders_v2", user_leaders)
-      commit("set_decks_v2", user_decks)
-      commit("set_seasons_v2", user_seasons)
+      commit("set_cards", user_cards)
+      commit("set_leaders", user_leaders)
+      commit("set_decks", user_decks)
+      commit("set_seasons", user_seasons)
 
       commit("set_season", getters["all_seasons"][0].season)
 

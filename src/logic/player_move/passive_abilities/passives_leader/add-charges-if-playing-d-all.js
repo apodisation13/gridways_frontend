@@ -1,4 +1,3 @@
-import { timer } from "@/logic/game_logic/timers"
 import { change_card_charges } from "@/logic/player_move/service/service_for_player_move"
 
 export function add_charges_if_playing_d_all(card, leader, upon_playing_card) {
@@ -11,7 +10,6 @@ export function add_charges_if_playing_d_all(card, leader, upon_playing_card) {
     change_card_charges(leader, 1)
   }
   if (upon_playing_card && card.ability.name === "damage-all" && card.color) {
-    if (!timer(leader)) return
     change_card_charges(leader, 1)
   }
 }

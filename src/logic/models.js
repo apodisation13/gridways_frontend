@@ -40,6 +40,7 @@ export const CardAbility = {
   PoisonAll: "poison-all",
   Purify: "purify",
   AddArmor: "add-armor",
+  GiveChargesToAll: "give-charges-to-all",
   // special case abilities
   Resurrect: "resurrect",
   DrawTwoCards: "draw-two-cards",
