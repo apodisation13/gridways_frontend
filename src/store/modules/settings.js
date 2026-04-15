@@ -1,4 +1,4 @@
-import { callApi, GET, PATCH } from "@/lib/api/api"
+import { callApi, HttpMethod } from "@/lib/api/api"
 import { USER_PREFERENCES } from "@/store/const/api_urls"
 import { useToast } from "vue-toastification"
 
@@ -50,7 +50,7 @@ const actions = {
     const userId = getters["getUser"].user_id
     try {
       const response = await callApi({
-        method: GET,
+        method: HttpMethod.GET,
         url: USER_PREFERENCES.replace("{userId}", userId),
       })
       commit("setPreferences", response.data)
@@ -71,7 +71,7 @@ const actions = {
     }
     try {
       await callApi({
-        method: PATCH,
+        method: HttpMethod.PATCH,
         url: USER_PREFERENCES.replace("{userId}", userId),
         data: body,
       })
