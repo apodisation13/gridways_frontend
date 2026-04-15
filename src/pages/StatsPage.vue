@@ -77,40 +77,49 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import FactionItem from "@/components/Pages/DeckbuildPage/FactionItem.vue"
-import { mapGetters } from "vuex"
+import { defineComponent } from "vue"
+import type { FactionStats, CollectionStats, ProgressStats } from "@/types"
 
-export default {
+export default defineComponent({
   name: "StatsPage",
   components: { FactionItem },
   computed: {
-    userId() {
+    userId(): string | number {
       return this.$route.query.userId || this.$store.getters["getUser"].user_id
     },
-    username() {
+    username(): string {
       return this.$route.query.username || this.$store.state.login.user.username
     },
-    selectedAvatar() {
+    selectedAvatar(): string | undefined {
       return (
         this.$route.query.userProfileAvatar ||
         this.$store.getters["selectedAvatar"]
       )
     },
-    ...mapGetters([
-      "userStats",
-      "cardsStats",
-      "leaderStats",
-      "levelsStats",
-      "seasonsStats",
-    ]),
+    userStats(): Record<string, FactionStats> {
+      return this.$store.getters["userStats"]
+    },
+    cardsStats(): CollectionStats {
+      return this.$store.getters["cardsStats"]
+    },
+    leaderStats(): CollectionStats {
+      return this.$store.getters["leaderStats"]
+    },
+    levelsStats(): ProgressStats {
+      return this.$store.getters["levelsStats"]
+    },
+    seasonsStats(): ProgressStats {
+      return this.$store.getters["seasonsStats"]
+    },
   },
   async created() {
     const for_user = this.$route.query.userId
     if (for_user) await this.$store.dispatch("getUserStatistic", for_user)
     else this.$store.dispatch("getUserStatistic")
   },
-}
+})
 </script>
 
 <style scoped>

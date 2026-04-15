@@ -61,30 +61,33 @@
   </div>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
+<script lang="ts">
+import { defineComponent } from "vue"
 import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon"
 import LeaderboardFilters from "@/components/Pages/LeaderboardPage/LeaderboardFilters.vue"
 import LeaderboardTable from "@/components/Pages/LeaderboardPage/LeaderboardTable.vue"
+import type { LeaderboardEntry } from "@/types"
 
-export default {
+export default defineComponent({
   components: { LeaderboardTable, ButtonIcon, LeaderboardFilters },
 
   data() {
     return {
-      activeTab: this.$route.query.world ? "all" : "me",
-      showFilters: false,
-      selectedFaction: null,
-      selectedMode: null,
+      activeTab: (this.$route.query.world ? "all" : "me") as "me" | "all",
+      showFilters: false as boolean,
+      selectedFaction: null as string | null,
+      selectedMode: null as string | null,
     }
   },
 
   computed: {
-    ...mapGetters(["userLeaderboard"]),
-    emptyFilters() {
+    userLeaderboard(): LeaderboardEntry[] {
+      return this.$store.getters["userLeaderboard"]
+    },
+    emptyFilters(): boolean {
       return !this.selectedFaction && !this.selectedMode
     },
-    availableFactions() {
+    availableFactions(): string[] {
       return [...new Set(this.userLeaderboard.map(e => e.faction_name))]
     },
   },
@@ -93,12 +96,11 @@ export default {
       this.selectedFaction = null
       this.selectedMode = null
     },
-    setFaction(prop, value) {
-      console.log(prop, value)
+    setFaction(_prop: string, value: string) {
       this.selectedFaction = value
     },
   },
-}
+})
 </script>
 
 <style scoped>
