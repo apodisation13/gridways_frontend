@@ -10,10 +10,11 @@ export function spawn_tokens_at_enemy_deck(card, enemy, gameObj) {
   token.data.hp = 1
   token.data.base.base_hp = 1
   token.data.damage = 1
-  token.data.deathwish.value = card.data.value // в value положили скольким врагам мы прибавим на 1 урон
+  token.data.deathwish = { value: card.data.value }
+  token.data.value = card.data.value
   token.deathwish = {
-    name: "incr-dmg-to-value-cards-by-1",
-    description: "Увеличьте {value} случайным картам в РУКЕ урон на 1",
+    name: "incr-dmg-to-hand-by-value",
+    description: "Увеличьте всем картам в РУКЕ урон на {deathwish_value}",
   }
 
   // card.value раз положили этот токен врага в его колоду

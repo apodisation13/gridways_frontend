@@ -7,7 +7,7 @@ import {
   spawn_tokens,
   spawn_tokens_at_deck,
 } from "@/logic/ai_move/deathwish_abilities/spawn_tokens"
-import { incr_dmg_to_value_cards_by_1 } from "@/logic/ai_move/deathwish_abilities/incr_dmg_to_value_cards_by_1"
+import { deathwish_incr_dmg_to_all_hand } from "@/logic/ai_move/deathwish_abilities/incr_dmg_to_all_hand"
 import { deathwish_heal_all } from "@/logic/ai_move/deathwish_abilities/heal"
 import { destroy_player_card_in_deck } from "@/logic/ai_move/deathwish_abilities/destroy_player_card"
 import {
@@ -31,8 +31,8 @@ export function deathwish(deathwish_enemy, gameObj, timeout = 1000) {
   const d = deathwish_enemy.deathwish.name
   if (d === "spawn-self") spawn_self(deathwish_enemy, gameObj)
   else if (d === "spawn-tokens") spawn_tokens(deathwish_enemy, gameObj)
-  else if (d === "incr-dmg-to-value-cards-by-1") {
-    incr_dmg_to_value_cards_by_1(deathwish_enemy, gameObj, timeout)
+  else if (d === "incr-dmg-to-hand-by-value") {
+    deathwish_incr_dmg_to_all_hand(deathwish_enemy, gameObj, timeout)
   } else if (d === "heal-all")
     deathwish_heal_all(deathwish_enemy, gameObj, timeout)
   else if (d === "spawn-self-at-deck") {
