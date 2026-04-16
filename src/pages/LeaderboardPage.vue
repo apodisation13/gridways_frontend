@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon"
+import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon.vue"
 import LeaderboardFilters from "@/components/Pages/LeaderboardPage/LeaderboardFilters.vue"
 import LeaderboardTable from "@/components/Pages/LeaderboardPage/LeaderboardTable.vue"
 import type { LeaderboardEntry } from "@/types"
@@ -88,7 +88,7 @@ export default defineComponent({
       return !this.selectedFaction && !this.selectedMode
     },
     availableFactions(): string[] {
-      return [...new Set(this.userLeaderboard.map(e => e.faction_name))]
+      return Array.from(new Set(this.userLeaderboard.map(e => e.faction_name)))
     },
   },
   methods: {
