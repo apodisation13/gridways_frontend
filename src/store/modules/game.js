@@ -3,6 +3,7 @@ const state = {
   hand_size: undefined, // СКОЛЬКО КАРТ В РУКЕ
 
   random_level_enemies_count: {}, // разбросы количества врагов на рандомных уровнях
+  max_random_n_enemies: 0,
 
   whole_deck: {},
   current_deck: [], // дека выбранная для игры, deck.cards
@@ -39,6 +40,7 @@ const mutations = {
     state.hand_size = payload.hand_size
     state.cards_in_deck = payload.number_of_cards_in_deck
     state.random_level_enemies_count = payload.random_level_enemies_count
+    state.max_random_n_enemies = payload.max_random_n_enemies || 55
   },
   set_whole_deck(state, deck) {
     state.whole_deck = deck

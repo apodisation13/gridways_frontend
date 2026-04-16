@@ -4,7 +4,7 @@ import {
   GAME_CONST,
   USER_DATABASE,
 } from "@/store/const/api_urls"
-import { callApi, GET } from "@/lib/api/api"
+import { callApi, HttpMethod } from "@/lib/api/api"
 
 const toast = useToast()
 
@@ -171,13 +171,13 @@ const actions = {
 
     try {
       const cards_response = await callApi({
-        method: GET,
+        method: HttpMethod.GET,
         url: CARDS_DATABASE,
       })
       commit("set_cardsdb", cards_response.data)
 
       const user_database = await callApi({
-        method: GET,
+        method: HttpMethod.GET,
         url: USER_DATABASE.replace("{userId}", userId),
       })
 
@@ -202,7 +202,7 @@ const actions = {
       dispatch("set_level_in_play", getters["all_seasons"][0].season.levels[0]) // устанавливаем для игры первый уровень
 
       const game_const_response = await callApi({
-        method: GET,
+        method: HttpMethod.GET,
         url: GAME_CONST,
       })
       const game_const = game_const_response.data

@@ -9,7 +9,7 @@ import {
   CRAFT_BONUS_CARD,
 } from "@/store/const/api_urls"
 import { useToast } from "vue-toastification"
-import { callApi, DELETE, PATCH, POST } from "@/lib/api/api"
+import { callApi, HttpMethod } from "@/lib/api/api"
 import { CraftMillCardActionSubtype } from "@/store/const/const"
 
 const toast = useToast()
@@ -59,7 +59,7 @@ const actions = {
     try {
       const userId = getters["getUser"].user_id
       const response = await callApi({
-        method: POST,
+        method: HttpMethod.POST,
         url: CREATE_USER_DECK.replace("{userId}", userId),
         data: body,
       })
@@ -75,7 +75,7 @@ const actions = {
     try {
       const userId = getters["getUser"].user_id
       const response = await callApi({
-        method: DELETE,
+        method: HttpMethod.DELETE,
         url: ALTER_USER_DECK.replace("{userId}", userId).replace(
           "{deckId}",
           deckId
@@ -97,7 +97,7 @@ const actions = {
       const userId = getters["getUser"].user_id
       const { deck_id, ...deck_body } = deck
       const response = await callApi({
-        method: PATCH,
+        method: HttpMethod.PATCH,
         url: ALTER_USER_DECK.replace("{userId}", userId).replace(
           "{deckId}",
           deck_id
@@ -124,7 +124,7 @@ const actions = {
 
     try {
       const response = await callApi({
-        method: PATCH,
+        method: HttpMethod.PATCH,
         url: USER_RESOURCE.replace("{userId}", userId),
         data: body,
       })
@@ -140,7 +140,7 @@ const actions = {
     const subtype = body.subtype
     try {
       const response = await callApi({
-        method: POST,
+        method: HttpMethod.POST,
         url: CARD_ACTION.replace("{userId}", userId).replace(
           "{cardId}",
           body.cardId
@@ -176,7 +176,7 @@ const actions = {
     let userId = getters["getUser"].user_id
     try {
       const response = await callApi({
-        method: POST,
+        method: HttpMethod.POST,
         url: CRAFT_BONUS_CARD.replace("{userId}", userId),
         data: { cards_ids: cardsIds },
       })
@@ -210,7 +210,7 @@ const actions = {
     const userId = getters["getUser"].user_id
     try {
       const response = await callApi({
-        method: PATCH,
+        method: HttpMethod.PATCH,
         url: OPEN_RELATED_LEVELS.replace("{userId}", userId).replace(
           "{userLevelId}",
           userLevelId
