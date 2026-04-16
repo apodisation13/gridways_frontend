@@ -5,10 +5,59 @@ import {
   USER_DATABASE,
 } from "@/store/const/api_urls"
 import { callApi, HttpMethod } from "@/lib/api/api"
+import {
+  Card,
+  CardEntry,
+  LeaderEntry,
+  Leader,
+  Enemy,
+  EnemyLeader,
+  UserSeason,
+  UserResources,
+  CardsResponse,
+  UserProgressResponse,
+  GameConst,
+  Faction,
+  DeckEntry,
+  SeasonEntry,
+  Deck,
+} from "@/types/database"
 
 const toast = useToast()
 
-const state = {
+interface ActionContext {
+  getters: Record<string, any>
+  commit: Function
+  dispatch: Function
+}
+
+interface ApiError {
+  error?:
+    | string
+    | {
+        error?: { message?: string }
+        detail?: string
+      }
+}
+
+interface DatabaseState {
+  factions: Faction[]
+  leaders: LeaderEntry[]
+  cards: CardEntry[]
+  decks: DeckEntry[]
+  seasons: SeasonEntry[]
+  resource: UserResources | Record<string, never>
+
+  enemies: Enemy[]
+  enemy_leaders: EnemyLeader[]
+
+  cardsdb: Map<number, Card>
+  leadersdb: Map<number, Leader>
+  enemiesdb: Record<number, Enemy>
+  enemyleadersdb: Record<number, EnemyLeader>
+}
+
+const state: DatabaseState = {
   factions: [
     { name: "Soldiers" },
     { name: "Monsters" },
@@ -24,22 +73,23 @@ const state = {
   enemies: [],
   enemy_leaders: [],
 
-  cardsdb: {},
-  leadersdb: {},
+  cardsdb: new Map<number, Card>(),
+  leadersdb: new Map<number, Leader>(),
   enemiesdb: {},
   enemyleadersdb: {},
 }
 
 const getters = {
-  all_factions: state => state.factions,
-  all_leaders: state => state.leaders,
-  all_cards: state => state.cards,
-  all_decks: state => state.decks,
-  all_seasons: state => state.seasons,
-  resource: state => state.resource,
+  all_factions: (state: DatabaseState) => state.factions,
+  all_leaders: (state: DatabaseState) => state.leaders,
+  all_cards: (state: DatabaseState) => state.cards,
+  all_decks: (state: DatabaseState) => state.decks,
+  all_seasons: (state: DatabaseState) => state.seasons,
+  resource: (state: DatabaseState) => state.resource,
 
-  filtered_cards: state => query => {
-    const applyFilter = (data, query) =>
+  // TODO: has_passive фильтр — баг, типизация query временно any
+  filtered_cards: (state: DatabaseState) => (query: any) => {
+    const applyFilter = (data: CardEntry[], query: any) =>
       data.filter(obj =>
         Object.entries(query).every(([prop, find]) => {
           if ("count" === prop) {
@@ -49,7 +99,7 @@ const getters = {
             return true
           }
           if ("has_passive" === prop) {
-            return obj.card[prop] === find
+            return (obj.card as any)[prop] === find
           }
           if ("newly_added" === prop && find === null) {
             return true
@@ -58,9 +108,14 @@ const getters = {
             return obj.card[prop] === find
           }
           if ("faction" === prop) {
-            return obj.card[prop].includes(find) || obj.card[prop] === "Neutral"
+            return (
+              (obj.card[prop] as string).includes(find as string) ||
+              obj.card[prop] === "Neutral"
+            )
           }
-          return obj.card[prop].includes(find)
+          return (obj.card[prop as keyof Card] as string).includes(
+            find as string
+          )
         })
       )
     if (query.count === null) {
@@ -79,26 +134,29 @@ const getters = {
       query
     )
   },
-  filtered_leaders: state => selected_faction => {
+  filtered_leaders: (state: DatabaseState) => (selected_faction: string) => {
     return state.leaders.filter(leader =>
       leader.card.faction.includes(selected_faction)
     )
   },
 
-  all_enemies: state => state.enemies,
-  all_enemies_db: state => state.enemiesdb,
-  bronze_enemies: state => state.enemies.filter(e => e.color === "Bronze"),
-  silver_enemies: state => state.enemies.filter(e => e.color === "Silver"),
-  gold_enemies: state => state.enemies.filter(e => e.color === "Gold"),
-  all_enemy_leaders: state => state.enemy_leaders,
+  all_enemies: (state: DatabaseState) => state.enemies,
+  all_enemies_db: (state: DatabaseState) => state.enemiesdb,
+  bronze_enemies: (state: DatabaseState) =>
+    state.enemies.filter(e => e.color === "Bronze"),
+  silver_enemies: (state: DatabaseState) =>
+    state.enemies.filter(e => e.color === "Silver"),
+  gold_enemies: (state: DatabaseState) =>
+    state.enemies.filter(e => e.color === "Gold"),
+  all_enemy_leaders: (state: DatabaseState) => state.enemy_leaders,
 }
 
 const mutations = {
-  set_resource(state, result) {
+  set_resource(state: DatabaseState, result: UserResources) {
     state.resource = result
   },
 
-  set_cardsdb(state, result) {
+  set_cardsdb(state: DatabaseState, result: CardsResponse) {
     state.cardsdb = new Map(result.cards.map(card => [card.id, card]))
     state.leadersdb = new Map(result.leaders.map(card => [card.id, card]))
     state.enemiesdb = result.enemies
@@ -107,7 +165,10 @@ const mutations = {
     state.enemy_leaders = Object.values(result.enemy_leaders)
   },
 
-  set_cards(state, user_cards) {
+  set_cards(
+    state: DatabaseState,
+    user_cards: Record<number, { count: number; user_card_id: number }>
+  ) {
     state.cards = Array.from(state.cardsdb.values()).map(card => {
       const userCard = user_cards[card.id]
       return {
@@ -117,7 +178,10 @@ const mutations = {
       }
     })
   },
-  set_leaders(state, user_leaders) {
+  set_leaders(
+    state: DatabaseState,
+    user_leaders: Record<number, { count: number; user_leader_id: number }>
+  ) {
     state.leaders = Array.from(state.leadersdb.values()).map(card => {
       const userLeader = user_leaders[card.id]
       return {
@@ -127,7 +191,13 @@ const mutations = {
       }
     })
   },
-  set_decks(state, user_decks) {
+  set_decks(
+    state: DatabaseState,
+    user_decks: Array<{
+      user_deck_id: number
+      deck: Deck
+    }>
+  ) {
     state.decks = user_decks.map(userDeck => ({
       id: userDeck.user_deck_id,
       deck: {
@@ -136,13 +206,13 @@ const mutations = {
         leader: state.leadersdb.get(userDeck.deck.leader_id),
         cards: userDeck.deck.cards.map(cardId => ({
           card: state.cardsdb.get(cardId),
-          count: 1,
+          count: 1 as const,
         })),
         health: userDeck.deck.health,
       },
     }))
   },
-  set_seasons(state, user_seasons) {
+  set_seasons(state: DatabaseState, user_seasons: UserSeason[]) {
     state.seasons = user_seasons.map(userSeason => ({
       id: userSeason.id,
       finished: userSeason.finished,
@@ -166,17 +236,17 @@ const mutations = {
 
 const actions = {
   // TODO: написать
-  async getUserDatabase({ commit, getters, dispatch }) {
+  async getUserDatabase({ commit, getters, dispatch }: ActionContext) {
     const userId = getters["getUser"].user_id
 
     try {
-      const cards_response = await callApi({
+      const cards_response = await callApi<CardsResponse>({
         method: HttpMethod.GET,
         url: CARDS_DATABASE,
       })
       commit("set_cardsdb", cards_response.data)
 
-      const user_database = await callApi({
+      const user_database = await callApi<UserProgressResponse>({
         method: HttpMethod.GET,
         url: USER_DATABASE.replace("{userId}", userId),
       })
@@ -201,7 +271,7 @@ const actions = {
       dispatch("set_deck_in_play", getters["all_decks"][0])
       dispatch("set_level_in_play", getters["all_seasons"][0].season.levels[0]) // устанавливаем для игры первый уровень
 
-      const game_const_response = await callApi({
+      const game_const_response = await callApi<GameConst>({
         method: HttpMethod.GET,
         url: GAME_CONST,
       })
@@ -220,7 +290,7 @@ const actions = {
     }
   },
 
-  error_action(_, err) {
+  error_action(_: ActionContext, err: ApiError) {
     let message = "Неизвестная ошибка"
 
     if (typeof err.error === "string") {
@@ -237,13 +307,15 @@ const actions = {
     toast.error(`Ошибка при загрузке базы данных: ${message}`)
   },
 
-  async render_all_images({ getters, commit }) {
-    const cards = getters["all_cards"]
-    const leaders = getters["all_leaders"]
-    const enemies = getters["all_enemies"]
-    const enemy_leaders = getters["all_enemy_leaders"]
+  async render_all_images({ getters, commit }: ActionContext) {
+    const cards: CardEntry[] = getters["all_cards"]
+    const leaders: LeaderEntry[] = getters["all_leaders"]
+    const enemies: Enemy[] = getters["all_enemies"]
+    const enemy_leaders: EnemyLeader[] = getters["all_enemy_leaders"]
 
-    const all_cards = cards
+    const all_cards = (
+      cards as Array<CardEntry | Enemy | EnemyLeader | LeaderEntry>
+    )
       .concat(leaders)
       .concat(enemies)
       .concat(enemy_leaders)
@@ -251,11 +323,13 @@ const actions = {
       commit("set_images_rendered", true)
       return
     }
-    const images = all_cards.map(imageSrc => {
-      return new Promise((resolve, reject) => {
+    const images = all_cards.map(item => {
+      return new Promise<void>((resolve, reject) => {
         const img = new Image()
-        img.src = imageSrc.card ? imageSrc.card.image : imageSrc.image
-        img.onload = resolve
+        img.src = (item as any).card
+          ? (item as any).card.image
+          : (item as any).image
+        img.onload = () => resolve()
         img.onerror = reject
       })
     })

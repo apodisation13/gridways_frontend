@@ -10,11 +10,38 @@ import {
 } from "@/store/const/api_urls"
 import { useToast } from "vue-toastification"
 import { callApi, HttpMethod } from "@/lib/api/api"
-import { CraftMillCardActionSubtype } from "@/store/const/const"
+import type {
+  UserResources,
+  CreateDeckRequest,
+  ListDecksResponse,
+  CardCraftMillResponse,
+  CardCraftBonusResponse,
+  OpenRelatedLevelsResponse,
+  PatchDeckPayload,
+  ProcessCraftMillPayload,
+  ResourcesPayload,
+} from "@/types"
+import { CraftMillCardActionSubtype } from "@/types"
 
 const toast = useToast()
 
-const state = {
+interface UserActionsState {
+  cards_resources_prices: Record<string, unknown>
+  resources_transitions: Record<string, unknown>
+  keys_rewards: Record<string, unknown>
+  win_level_rewards: Record<string, unknown>
+  start_level_prices: Record<string, unknown>
+
+  win_redirect: boolean
+}
+
+interface ActionContext {
+  getters: Record<string, any>
+  commit: Function
+  dispatch: Function
+}
+
+const state: UserActionsState = {
   cards_resources_prices: {},
   resources_transitions: {},
   keys_rewards: {},
@@ -25,43 +52,63 @@ const state = {
 }
 
 const getters = {
-  cards_resources_prices: state => state.cards_resources_prices,
-  resources_transitions: state => state.resources_transitions,
-  keys_rewards: state => state.keys_rewards,
-  win_level_rewards: state => state.win_level_rewards,
-  start_level_prices: state => state.start_level_prices,
+  cards_resources_prices: (state: UserActionsState) =>
+    state.cards_resources_prices,
+  resources_transitions: (state: UserActionsState) =>
+    state.resources_transitions,
+  keys_rewards: (state: UserActionsState) => state.keys_rewards,
+  win_level_rewards: (state: UserActionsState) => state.win_level_rewards,
+  start_level_prices: (state: UserActionsState) => state.start_level_prices,
 }
 
 const mutations = {
-  set_win_redirect(state, payload) {
+  set_win_redirect(state: UserActionsState, payload: boolean) {
     state.win_redirect = payload
   },
 
-  set_cards_resources_prices(state, cards_resources_prices) {
+  set_cards_resources_prices(
+    state: UserActionsState,
+    cards_resources_prices: Record<string, unknown>
+  ) {
     state.cards_resources_prices = cards_resources_prices
   },
-  set_resources_transitions(state, resources_transitions) {
+  set_resources_transitions(
+    state: UserActionsState,
+    resources_transitions: Record<string, unknown>
+  ) {
     state.resources_transitions = resources_transitions
   },
-  set_keys_rewards(state, keys_rewards) {
+  set_keys_rewards(
+    state: UserActionsState,
+    keys_rewards: Record<string, unknown>
+  ) {
     state.keys_rewards = keys_rewards
   },
-  set_win_level_rewards(state, win_level_rewards) {
+  set_win_level_rewards(
+    state: UserActionsState,
+    win_level_rewards: Record<string, unknown>
+  ) {
     state.win_level_rewards = win_level_rewards
   },
-  set_start_level_prices(state, start_level_prices) {
+  set_start_level_prices(
+    state: UserActionsState,
+    start_level_prices: Record<string, unknown>
+  ) {
     state.start_level_prices = start_level_prices
   },
 }
 
 const actions = {
-  async createUserDeck({ getters, dispatch, commit }, body) {
+  async createUserDeck(
+    { getters, dispatch, commit }: ActionContext,
+    body: CreateDeckRequest
+  ) {
     try {
       const userId = getters["getUser"].user_id
-      const response = await callApi({
+      const response = await callApi<ListDecksResponse>({
         method: HttpMethod.POST,
         url: CREATE_USER_DECK.replace("{userId}", userId),
-        data: body,
+        data: body as unknown as Record<string, unknown>,
       })
       toast.success("Успешно добавили колоду")
       commit("set_decks", response.data.decks)
@@ -71,14 +118,17 @@ const actions = {
     }
   },
 
-  async deleteUserDeck({ getters, dispatch, commit }, deckId) {
+  async deleteUserDeck(
+    { getters, dispatch, commit }: ActionContext,
+    deckId: number
+  ) {
     try {
       const userId = getters["getUser"].user_id
-      const response = await callApi({
+      const response = await callApi<ListDecksResponse>({
         method: HttpMethod.DELETE,
         url: ALTER_USER_DECK.replace("{userId}", userId).replace(
           "{deckId}",
-          deckId
+          String(deckId)
         ),
         data: {},
       })
@@ -92,17 +142,20 @@ const actions = {
     }
   },
 
-  async patchUserDeck({ getters, dispatch, commit }, deck) {
+  async patchUserDeck(
+    { getters, dispatch, commit }: ActionContext,
+    deck: PatchDeckPayload
+  ) {
     try {
       const userId = getters["getUser"].user_id
       const { deck_id, ...deck_body } = deck
-      const response = await callApi({
+      const response = await callApi<ListDecksResponse>({
         method: HttpMethod.PATCH,
         url: ALTER_USER_DECK.replace("{userId}", userId).replace(
           "{deckId}",
-          deck_id
+          String(deck_id)
         ),
-        data: deck_body,
+        data: deck_body as unknown as Record<string, unknown>,
       })
       toast.success("Успешно изменили колоду")
       commit("set_decks", response.data.decks)
@@ -114,7 +167,10 @@ const actions = {
     }
   },
 
-  async processResources({ commit, getters, dispatch }, body) {
+  async processResources(
+    { commit, getters, dispatch }: ActionContext,
+    body: ResourcesPayload
+  ) {
     // в body придет обязательно subtype, data
     // data: { wood: 201, crops: 210 } - для оплаты игры на уровне сезона
     // data: { wood: 201, scraps: 185, etc } - для получения ресурсов после прохождения уровня сезона
@@ -123,10 +179,10 @@ const actions = {
     const userId = getters["getUser"].user_id
 
     try {
-      const response = await callApi({
+      const response = await callApi<UserResources>({
         method: HttpMethod.PATCH,
         url: USER_RESOURCE.replace("{userId}", userId),
-        data: body,
+        data: body as unknown as Record<string, unknown>,
       })
       commit("set_resource", response.data)
     } catch (err) {
@@ -135,15 +191,18 @@ const actions = {
     }
   },
 
-  async processCraftMillCard({ getters, commit, dispatch }, body) {
-    let userId = getters["getUser"].user_id
+  async processCraftMillCard(
+    { getters, commit, dispatch }: ActionContext,
+    body: ProcessCraftMillPayload
+  ) {
+    const userId = getters["getUser"].user_id
     const subtype = body.subtype
     try {
-      const response = await callApi({
+      const response = await callApi<CardCraftMillResponse>({
         method: HttpMethod.POST,
         url: CARD_ACTION.replace("{userId}", userId).replace(
           "{cardId}",
-          body.cardId
+          String(body.cardId)
         ),
         data: { subtype: subtype, recipe: body.recipe },
       })
@@ -172,10 +231,13 @@ const actions = {
     }
   },
 
-  async processCraftBonusCard({ getters, commit, dispatch }, cardsIds) {
-    let userId = getters["getUser"].user_id
+  async processCraftBonusCard(
+    { getters, commit, dispatch }: ActionContext,
+    cardsIds: number[]
+  ) {
+    const userId = getters["getUser"].user_id
     try {
-      const response = await callApi({
+      const response = await callApi<CardCraftBonusResponse>({
         method: HttpMethod.POST,
         url: CRAFT_BONUS_CARD.replace("{userId}", userId),
         data: { cards_ids: cardsIds },
@@ -188,11 +250,9 @@ const actions = {
     }
   },
 
-  // тестоввый экшен, сбрасывает все уровни юзера кроме первого
-  async reset_levels({ dispatch, getters }) {
-    let header = getters["getHeader"]
-    // нужно присылать id записи UserLevel (то есть первого уровня), у которой поставить finished=False
-    // const user_level_id = getters["all_levels"][0].id
+  // тестовый экшен, сбрасывает все уровни юзера кроме первого
+  async reset_levels({ dispatch, getters }: ActionContext) {
+    const header = getters["getHeader"]
     let url = `${patch_levels}1/`
 
     try {
@@ -206,14 +266,17 @@ const actions = {
 
   // открывает related_levels для текущего, а текущему ставит finished,
   // возвращает полный список всех сезонов
-  async openRelatedLevels({ dispatch, getters, commit }, userLevelId) {
+  async openRelatedLevels(
+    { dispatch, getters, commit }: ActionContext,
+    userLevelId: number
+  ) {
     const userId = getters["getUser"].user_id
     try {
-      const response = await callApi({
+      const response = await callApi<OpenRelatedLevelsResponse>({
         method: HttpMethod.PATCH,
         url: OPEN_RELATED_LEVELS.replace("{userId}", userId).replace(
           "{userLevelId}",
-          userLevelId
+          String(userLevelId)
         ),
         data: {},
       })

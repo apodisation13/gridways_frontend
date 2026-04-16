@@ -72,7 +72,7 @@ import ModalWindow from "@/components/ModalWindows/ModalWindow"
 import CardUi from "@/components/Cards/CardUi"
 import EnemyUi from "@/components/Cards/EnemyUi"
 import CardDescriptions from "@/components/Cards/CardDescriptions"
-import { CraftMillCardActionSubtype } from "@/store/const/const"
+import { CraftMillCardActionSubtype } from "@/types"
 import CardActionModal from "@/components/ModalWindows/CardActionModal.vue"
 import { useToast } from "vue-toastification"
 export default {

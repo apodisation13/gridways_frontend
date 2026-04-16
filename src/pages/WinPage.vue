@@ -76,8 +76,11 @@
 <script>
 import { getRewardForLevel } from "@/logic/random_rewards"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
-import { PayResourcesSubtype } from "@/store/const/const"
-import { GameStatsRecordType, LeaderboardGameMode } from "@/types"
+import {
+  GameStatsRecordType,
+  LeaderboardGameMode,
+  PayResourcesSubtype,
+} from "@/types"
 export default {
   name: "win-page",
   components: { ResourceItem },
