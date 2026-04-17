@@ -1,5 +1,3 @@
-import type { CreateDeckRequest } from "@/types/database"
-
 export enum PayResourcesSubtype {
   startSeasonLevel = "start_season_level",
   winSeasonLevel = "win_season_level",
@@ -13,6 +11,12 @@ export enum CraftMillCardActionSubtype {
   craftLeader = "craft_leader",
   millCard = "mill_card",
   millLeader = "mill_leader",
+}
+
+export interface CreateDeckRequest {
+  deck_name: string
+  leader_id: number
+  cards: number[]
 }
 
 export interface PatchDeckPayload extends CreateDeckRequest {

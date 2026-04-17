@@ -21,15 +21,10 @@ import {
   DeckEntry,
   SeasonEntry,
   Deck,
-} from "@/types/database"
+  ActionContext,
+} from "@/types"
 
 const toast = useToast()
-
-interface ActionContext {
-  getters: Record<string, any>
-  commit: Function
-  dispatch: Function
-}
 
 interface ApiError {
   error?:

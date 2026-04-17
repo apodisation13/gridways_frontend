@@ -7,7 +7,8 @@ import {
   StoredUser,
   UserLoginResponse,
   UserRegisterResponse,
-} from "@/types/login"
+  ActionContext,
+} from "@/types"
 
 const toast = useToast()
 
@@ -16,12 +17,6 @@ interface LoginState {
   is_logged_in: boolean
   header: { headers: { Authorization: string } } | string
   authorization: boolean
-}
-
-interface ActionContext {
-  getters: Record<string, any>
-  dispatch: Function
-  commit: Function
 }
 
 const state: LoginState = {

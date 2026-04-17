@@ -20,6 +20,7 @@ import type {
   PatchDeckPayload,
   ProcessCraftMillPayload,
   ResourcesPayload,
+  ActionContext,
 } from "@/types"
 import { CraftMillCardActionSubtype } from "@/types"
 
@@ -33,12 +34,6 @@ interface UserActionsState {
   start_level_prices: Record<string, unknown>
 
   win_redirect: boolean
-}
-
-interface ActionContext {
-  getters: Record<string, any>
-  commit: Function
-  dispatch: Function
 }
 
 const state: UserActionsState = {

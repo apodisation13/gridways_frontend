@@ -1,6 +1,6 @@
 import { LIST_NEWS } from "@/store/const/api_urls"
 import { callApi, HttpMethod } from "@/lib/api/api"
-import { NewsItem } from "@/types"
+import { NewsItem, ActionContext } from "@/types"
 
 interface NewsState {
   news: NewsItem[] | null
@@ -21,13 +21,7 @@ const mutations = {
 }
 
 const actions = {
-  async fetchNews({
-    dispatch,
-    commit,
-  }: {
-    dispatch: Function
-    commit: Function
-  }) {
+  async fetchNews({ dispatch, commit }: ActionContext) {
     try {
       const response = await callApi<NewsItem[]>({
         method: HttpMethod.GET,

@@ -192,12 +192,6 @@ export interface UserProgressResponse {
   user_seasons: UserSeason[]
 }
 
-export interface CreateDeckRequest {
-  deck_name: string
-  leader_id: number
-  cards: number[]
-}
-
 export interface ListDecksResponse {
   decks: UserDeck[]
 }

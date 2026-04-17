@@ -7,7 +7,8 @@ import type {
   MappedLevel,
   MappedUserLevel,
   MappedSeason,
-} from "@/types/database"
+  ActionContext,
+} from "@/types"
 
 interface GameState {
   cards_in_deck: number | undefined
@@ -40,11 +41,8 @@ interface GameState {
   start_game_redirect: boolean
 }
 
-interface ActionContext {
+interface GameActionContext extends ActionContext {
   state: GameState
-  getters: Record<string, any>
-  commit: Function
-  dispatch: Function
 }
 
 const state: GameState = {
@@ -187,7 +185,7 @@ const actions = {
     commit("set_level", level)
     commit("set_enemy_leader", level.level.enemy_leader)
   },
-  re_set_deck({ state, getters, dispatch }: ActionContext, timeout = 3000) {
+  re_set_deck({ state, getters, dispatch }: GameActionContext, timeout = 3000) {
     const deck: DeckEntry =
       getters["all_decks"][state.current_deck_index as number]
     if (!deck) return

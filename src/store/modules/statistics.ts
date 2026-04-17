@@ -12,6 +12,7 @@ import {
   UserStatistics,
   GameStatsRecordType,
   LeaderboardGameMode,
+  ActionContext,
 } from "@/types"
 
 interface StatisticsState {
@@ -58,11 +59,6 @@ const mutations = {
   setWorldLeaderboard(state: StatisticsState, payload: LeaderboardEntry[]) {
     state.worldLeaderboard = payload
   },
-}
-
-interface ActionContext {
-  getters: Record<string, any>
-  commit: Function
 }
 
 const actions = {

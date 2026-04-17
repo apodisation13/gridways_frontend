@@ -1,7 +1,7 @@
 import { callApi, HttpMethod } from "@/lib/api/api"
 import { USER_PREFERENCES } from "@/store/const/api_urls"
 import { useToast } from "vue-toastification"
-import { UserPreferencesResponse } from "@/types"
+import { UserPreferencesResponse, ActionContext } from "@/types"
 
 const toast = useToast()
 
@@ -11,11 +11,6 @@ interface SettingsState {
   soundOn: boolean
   animationOn: boolean
   moveTimeout: number
-}
-
-interface ActionContext {
-  getters: Record<string, any>
-  commit: Function
 }
 
 const state: SettingsState = {
