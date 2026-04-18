@@ -1,3 +1,79 @@
+export interface CardData {
+  damage: number
+  charges: number
+  hp: number
+  base: {
+    base_damage: number
+    base_charges: number
+    base_hp: number
+  }
+  heal?: number
+  armor?: number
+  value?: number
+  tokens_number?: number
+  passive: {
+    value?: number
+    has_passive_in_hand?: boolean
+    has_passive_in_deck?: boolean
+    has_passive_in_grave?: boolean
+    timer?: number
+    default_timer?: number
+    reset_timer?: boolean
+    each_tick?: boolean
+  }
+}
+
+export interface LeaderData {
+  damage: number
+  charges: number
+  hp: number
+  base: {
+    base_damage: number
+    base_charges: number
+    base_hp: number
+  }
+  passive?: {
+    value?: number
+    timer?: number
+    default_timer?: number
+    reset_timer?: boolean
+    each_tick?: boolean
+  }
+}
+
+export interface EnemyData {
+  hp: number
+  damage: number
+  base: {
+    base_hp: number
+    base_damage?: number
+  }
+  shield?: boolean | string
+  status?: string | null
+  passive: {
+    value?: number
+    has_passive_in_field?: boolean
+    has_passive_in_deck?: boolean
+    has_passive_in_grave?: boolean
+    timer?: number
+    default_timer?: number
+    reset_timer?: boolean
+    each_tick?: boolean
+  }
+  deathwish?: { value?: number }
+}
+
+export interface EnemyLeaderData {
+  hp: number
+  status?: string | null
+  value?: number
+  passive?: {
+    timer?: number
+    default_timer?: number
+    reset_timer?: boolean
+  }
+}
+
 export interface Ability {
   name: string
   description: string
@@ -37,9 +113,17 @@ export interface Card {
   type: string
   ability: Ability
   passive_ability: PassiveAbility
-  data: Record<string, unknown>
+  data: CardData
   image: string
   newly_added: boolean
+  // animation fields
+  dmg_delta?: number | null
+  charges_delta?: number | null
+  incr_dmg?: boolean | null
+  damages_enemy?: boolean | null
+  healing?: boolean | null
+  p_dmg_delta?: number | null
+  passive_poisoning?: boolean | null
 }
 
 export interface Leader {
@@ -49,9 +133,13 @@ export interface Leader {
   faction: string
   ability: Ability
   passive_ability: PassiveAbility
-  data: Record<string, unknown>
+  data: LeaderData
   image: string
   newly_added: boolean
+  // animation fields
+  charges_delta?: number | null
+  damages_enemy?: boolean | null
+  passive_poisoning?: boolean | null
 }
 
 export interface Enemy {
@@ -62,8 +150,16 @@ export interface Enemy {
   move: Move
   passive_ability: EnemyPassiveAbility
   deathwish: Deathwish
-  data: Record<string, unknown>
+  data: EnemyData
   image: string
+  // animation fields
+  hp_delta?: number | null
+  already_jumped?: boolean
+  locked?: boolean
+  dmg_delta?: number | null
+  p_dmg_delta?: number | null
+  trigger_deck_passive?: boolean
+  trigger_grave_passive?: boolean
 }
 
 export interface EnemyLeader {
@@ -72,8 +168,10 @@ export interface EnemyLeader {
   faction: string
   ability: EnemyLeaderAbility
   passive_ability: EnemyPassiveAbility
-  data: Record<string, unknown>
+  data: EnemyLeaderData
   image: string
+  // animation fields
+  hp_delta?: number | null
 }
 
 export interface Deck {
