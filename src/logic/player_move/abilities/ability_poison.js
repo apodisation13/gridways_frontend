@@ -1,5 +1,5 @@
 import { remove_dead_enemy } from "@/logic/player_move/abilities/enemy_takes_damage"
-import { EnemyStatus } from "@/logic/models"
+import { EnemyStatus } from "@/types"
 
 function poison_one_enemy(enemy, gameObj, timeout = 1000) {
   // добавляем врагу яд - если у него уже есть яд, убиваем его

@@ -1,10 +1,10 @@
-declare module '*.vue' {
-  import type { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
-}
+import { Store } from 'vuex'
+import type { RouteLocationNormalizedLoaded, Router } from 'vue-router'
 
-declare module '*.css' {
-  const styles: Record<string, string>
-  export default styles
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $store: Store<any>
+    $route: RouteLocationNormalizedLoaded
+    $router: Router
+  }
 }

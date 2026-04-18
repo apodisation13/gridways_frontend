@@ -1,4 +1,4 @@
-import { EnemyStatus } from "@/logic/models"
+import { EnemyStatus } from "@/types"
 
 export function lock_enemy(enemy) {
   if (enemy.data.status === EnemyStatus.Veil) return

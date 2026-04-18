@@ -1,6 +1,6 @@
 import { getEnv } from "@/store/const/const"
 
-function getDomain() {
+function getDomain(): string {
   if (getEnv() === "development_local") return "http://127.0.0.1:8001/api/v1"
   else if (getEnv() === "docker_local") return "http://127.0.0.1:8002/api/v1"
   return process.env.VUE_APP_DOMAIN

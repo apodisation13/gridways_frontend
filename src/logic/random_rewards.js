@@ -1,6 +1,6 @@
 import { randInt } from "@/lib/utils"
 import store from "@/store"
-import { CardColor } from "@/logic/models"
+import { CardColor } from "@/types"
 
 function getValue(cfg) {
   if (cfg.type === "simple") return cfg.value

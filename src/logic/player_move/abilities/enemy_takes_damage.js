@@ -1,6 +1,6 @@
 import { check_win } from "@/logic/player_move/service/check_win"
 import { deathwish } from "@/logic/ai_move/ai_deathwish_abilities"
-import { EnemyStatus } from "@/logic/models"
+import { EnemyStatus } from "@/types"
 
 export function enemy_takes_damage(enemy, card, gameObj, timeout = 1000) {
   // поставили на 0.5 врагу это поле, чтобы проиграть анимацию урона

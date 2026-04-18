@@ -1,5 +1,5 @@
 import store from "@/store"
-import { CardAbility } from "@/logic/models"
+import { CardAbility } from "@/types"
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
 import { heal } from "@/logic/player_move/abilities/ability_heal"
 import { damage_one } from "@/logic/player_move/abilities/ability_damage_one"
