@@ -102,7 +102,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import { damage_ai_card } from "@/logic/player_move/player_move"
 import draw from "@/mixins/GamePage/draw"
 import specialcaseabilities from "@/mixins/GamePage/specialcaseabilities"
@@ -122,7 +123,16 @@ import HandComp from "@/components/Pages/GamePage/HandComp"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities"
 import RedrawComp from "@/components/Pages/GamePage/RedrawComp"
 import { remove_dead_card } from "@/logic/player_move/service/service_for_player_move"
-export default {
+import type {
+  Card,
+  Leader,
+  Enemy,
+  EnemyLeader as EnemyLeaderType,
+  GameObj,
+  IsActive,
+} from "@/types"
+
+export default defineComponent({
   components: {
     RedrawComp,
     FieldComp,
@@ -140,7 +150,7 @@ export default {
   },
   mixins: [draw, specialcaseabilities, execaimove, startgame],
 
-  async created() {
+  async created(): Promise<void> {
     // если мы перешли на эту страницу НЕ со страницы начала игры, где стоит этот флаг, нас отсюда перекинет
     if (!this.$store.state.game.start_game_redirect) {
       this.$router.push("/start_game")
@@ -153,33 +163,36 @@ export default {
     return {
       // объект со всеми параметрами игры
       gameObj: {
-        deck: [], // остаток сколько карт осталось в колоде
-        hand: [],
-        leader: null,
-        grave: [], // кладбище карт у которых 0 зарядов
-        field: ["", "", "", "", "", "", "", "", "", "", "", ""],
-        enemy_leader: null,
-        enemies: [], // колода врагов, приходит из start_game
-        enemies_grave: [], // кладбище врагов
-      },
+        deck: [] as Card[], // остаток сколько карт осталось в колоде
+        hand: [] as Card[],
+        leader: null as Leader | null,
+        grave: [] as Card[], // кладбище карт у которых 0 зарядов
+        field: ["", "", "", "", "", "", "", "", "", "", "", ""] as (
+          | Enemy
+          | ""
+        )[],
+        enemy_leader: null as EnemyLeaderType | null,
+        enemies: [] as Enemy[], // колода врагов, приходит из start_game
+        enemies_grave: [] as Enemy[], // кладбище врагов
+      } as GameObj,
       // объект активны ли разные карты, то есть можно ли на них тыкать
       isActive: {
         player_cards: true, // карты в руке всегда активны в начале хода, но после хода не активны до след хода
         player_leader: false,
         enemy_cards: false,
         enemy_leader: false,
-      },
-      selected_card: null, // объект выбранной карты путём дважды ЛКМ на карте в руке
-      selected_enemy: null, // объект выбранного врага, по которому ткнули дважды ЛКМ, из field-comp
+      } as IsActive,
+      selected_card: null as Card | Leader | null, // объект выбранной карты путём дважды ЛКМ на карте в руке
+      selected_enemy: null as Enemy | null, // объект выбранного врага, по которому ткнули дважды ЛКМ, из field-comp
 
       // если лидер врагов или враг под прицелом, у него будет анимация свечения
       inCrossEnemyLeader: false,
-      inCrossEnemyIndex: null,
+      inCrossEnemyIndex: null as number | null,
     }
   },
   methods: {
     // по нажатию на карту игрока, из hand-comp, card - вся карта целиком
-    chose_player_card(card) {
+    chose_player_card(card: Card): void {
       this.sca = false // как только потянули за карту из руки сразу скинули этот признак игры доп карты
       if (!this.isActive.player_cards) return
       this.selected_card = card // ВОТ ЗДЕСЬ МЫ ЗАПОМНИЛИ КАРТУ ИЗ РУКИ НА КОТОРУЮ ТКНУЛИ
@@ -188,27 +201,27 @@ export default {
     },
 
     // по нажатию на лидера игрока
-    chose_leader() {
+    chose_leader(): void {
       this.sca = false // или если потянули за лидера сразу скинули этот признак игры доп карты
-      if (this.gameObj.leader.charges <= 0) return
+      if (this.gameObj.leader.data.charges <= 0) return
       this.selected_card = this.gameObj.leader // ВОТ ЗДЕСЬ МЫ ЗАПОМНИЛИ ЛИДЕРА ДЛЯ special_case
       this.isActive.player_leader = true
       this.setActive()
     },
 
     // поле и лидер врагов - теперь активны, КАЖДЫЙ РАЗ при выборе карты или лидера
-    setActive() {
+    setActive(): void {
       this.isActive.enemy_cards = true // только теперь можно тыкать на карты противника!!!
       this.isActive.enemy_leader = true // и лидер врагов активен тоже
     },
-    setNotActive() {
+    setNotActive(): void {
       this.isActive.enemy_cards = false
       this.isActive.enemy_leader = false
     },
 
     // после хода картой или лидером, открываем sp-case-abilities, обнуляем карту которой изначально играли
-    afterDamage() {
-      // особие абилки, которые требуют открытия окон
+    afterDamage(): void {
+      // особые абилки, которые требуют открытия окон
       this.special_case_abilities()
       // если не надо играть особые абилки, сбрасываем карту в сброс СРАЗУ тут же
       // а если надо, то сбросим ПОСЛЕ того как закроем окно с выбором карты, чтобы анимации увидеть тут
@@ -226,9 +239,9 @@ export default {
     },
 
     // если ткнули ранее на карту игрока или лидера, а потом на поле, ходим // enemy - объект врага (field[i])
-    exec_damage_enemy_card(enemy) {
+    exec_damage_enemy_card(enemy: Enemy | ""): void {
       if (!enemy) return
-      this.selected_enemy = enemy
+      this.selected_enemy = enemy as Enemy
       this.can_draw = false // если хотя бы раз сюда попали, то дро нельзя
       // далее выполним ИЛИ одну функцию, ИЛИ другую! то есть или картой выстрелим, или лидером
       this.damageEnemyByCard()
@@ -236,7 +249,7 @@ export default {
     },
 
     // если ранее ткнули на карту игрока, а потом на поле
-    damageEnemyByCard() {
+    damageEnemyByCard(): void {
       if (!this.targetEnemyByCard) return
 
       damage_ai_card(this.selected_card, this.selected_enemy, this.gameObj)
@@ -248,7 +261,7 @@ export default {
       this.afterDamage()
     },
     // если ранее ткнули на лидера, а потом на поле
-    damageEnemyByLeader() {
+    damageEnemyByLeader(): void {
       if (!this.targetEnemyByLeader) return
 
       damage_ai_card(this.gameObj.leader, this.selected_enemy, this.gameObj)
@@ -257,14 +270,14 @@ export default {
     },
 
     // если ранее ткнули на карту игрока или лидера игрока, а потом на лидера врагов!
-    exec_damage_enemy_leader() {
+    exec_damage_enemy_leader(): void {
       this.can_draw = false
       // аналогично, выполняем только одну из этих функций, бьем лидера врагов или картой, или своим лидером
       this.damageEnemyLeaderByCard()
       this.damageEnemyLeaderByLeader()
     },
 
-    damageEnemyLeaderByCard() {
+    damageEnemyLeaderByCard(): void {
       if (!this.targetEnemyLeaderByCard) return
 
       damage_ai_card(
@@ -276,7 +289,7 @@ export default {
       this.afterDamage()
     },
     // ткнули на лидера игрока, а потом на лидера врагов
-    damageEnemyLeaderByLeader() {
+    damageEnemyLeaderByLeader(): void {
       if (!this.targetEnemyLeaderByLeader) return
 
       damage_ai_card(
@@ -288,11 +301,11 @@ export default {
       this.isActive.player_leader = false // лидер снова неактивен, чтобы ходить им снова - надо опять на него тыкать
     },
     // переключить анимацию, что лидер врагов под целью мышки
-    switch_enemy_leader_in_cross(in_cross) {
+    switch_enemy_leader_in_cross(in_cross: boolean): void {
       this.inCrossEnemyIndex = null
       this.inCrossEnemyLeader = in_cross
     },
-    switch_enemy_in_cross(index) {
+    switch_enemy_in_cross(index: number | null): void {
       // index - это или null если мы ушли мышкой с клетки поля, или индекс поля врага
       this.inCrossEnemyLeader = false
       this.inCrossEnemyIndex = index
@@ -300,8 +313,8 @@ export default {
   },
   computed: {
     // можем ли мы сыграть КАРТОЙ в ПОЛЕ: карты активны, лидер неактивен ИЛИ мы играем карту из sca
-    targetEnemyByCard() {
-      return (
+    targetEnemyByCard(): boolean {
+      return !!(
         (this.isActive.player_cards &&
           !this.isActive.player_leader &&
           this.isActive.enemy_cards &&
@@ -309,9 +322,9 @@ export default {
         this.sca
       )
     },
-    // можем ли мы сыграть ЛИДЕРОМ в ПОЛЕ: лидер активны, у него больше нуля зарядов
-    targetEnemyByLeader() {
-      return (
+    // можем ли мы сыграть ЛИДЕРОМ в ПОЛЕ: лидер активен, у него больше нуля зарядов
+    targetEnemyByLeader(): boolean {
+      return !!(
         this.isActive.player_leader &&
         this.gameObj.leader.data.charges > 0 &&
         this.isActive.enemy_cards &&
@@ -319,8 +332,8 @@ export default {
       )
     },
     // можем ли мы сыграть КАРТОЙ в ЛИДЕРА ВРАГОВ: карты активны, лидер неактивен ИЛИ мы играем карту из sca
-    targetEnemyLeaderByCard() {
-      return (
+    targetEnemyLeaderByCard(): boolean {
+      return !!(
         (this.isActive.player_cards &&
           !this.isActive.player_leader &&
           this.isActive.enemy_leader &&
@@ -329,8 +342,8 @@ export default {
       )
     },
     // можем ли мы сыграть ЛИДЕРОМ в ЛИДЕРА ВРАГОВ: лидеры активны, у них больше нуля зарядов и нуля жизней
-    targetEnemyLeaderByLeader() {
-      return (
+    targetEnemyLeaderByLeader(): boolean {
+      return !!(
         this.isActive.player_leader &&
         this.gameObj.leader.data.charges > 0 &&
         this.isActive.enemy_leader &&
@@ -338,7 +351,7 @@ export default {
       )
     },
   },
-}
+})
 </script>
 
 <style scoped>

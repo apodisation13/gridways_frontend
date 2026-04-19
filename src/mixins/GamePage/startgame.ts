@@ -6,7 +6,10 @@ import type { Card } from "@/types"
 
 export default defineComponent({
   methods: {
+    // НАЧАЛО ИГРЫ: копируем лидера, лидера врагов, врагов, колоду
+    // расставляем врагов, пассивка лидера врагов по началу, тянем руку и показываем окно редро
     start_game(): void {
+      // оставили только card, нам уже не нужны id записей UserCard
       const deck: Card[] = this.$store.state.game.current_deck.map(
         (c: { card: Card }) => c.card
       )
@@ -22,11 +25,14 @@ export default defineComponent({
         JSON.stringify(this.$store.state.game.level.enemies)
       )
 
+      // рандомно расставит врагов по полю, изменяет поле и врагов
       place_enemies(this.gameObj.field, this.gameObj.enemies)
+      // АБИЛКИ ЛИДЕРА врага в самом начале
       enemy_leader_ai_move_once(this.gameObj)
+      // вытянет руку, остальное оставит в деке, изменяет руку и деку
       draw_hand(this.gameObj.hand, this.gameObj.deck)
 
-      this.draw = true
+      this.draw = true // показать окно редро
     },
   },
 })

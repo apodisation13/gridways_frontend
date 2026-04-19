@@ -1,16 +1,17 @@
+import { defineComponent } from "vue"
 import { player_passive_abilities_end_turn } from "@/logic/player_move/player_passive_abilities"
 import { ai_move } from "@/logic/ai_move/ai_move"
 import { enemy_passive_abilities_end_turn } from "@/logic/ai_move/ai_passive_abilties"
 import { appear_new_enemy } from "@/logic/game_logic/place_enemies"
 import store from "@/store"
 
-export default {
+export default defineComponent({
   methods: {
     // нажал ПАС - переход хода компу
-    exec_ai_move() {
+    exec_ai_move(): void {
       this.$store.commit("set_player_turn", false) // кнопка пас сразу пропала и дро тоже
 
-      let timeout = store.getters["selectedMoveTimeout"]
+      const timeout: number = store.getters["selectedMoveTimeout"]
 
       // А ДАЛЬШЕ последовательно выполняются
       // - пассивки карт игрока + пассивка лидера игрока
@@ -20,19 +21,19 @@ export default {
       // - переход хода снова игроку
       player_passive_abilities_end_turn(this.gameObj, timeout)
 
-      let await_ppa_end_turn = setInterval(() => {
+      const await_ppa_end_turn = setInterval(() => {
         if (!this.$store.state.game.ppa_end_turn) {
           console.log("закончили ppa_end_turn, начинает ходить комп")
           clearInterval(await_ppa_end_turn)
           ai_move(this.gameObj.field, timeout)
 
-          let await_ai_move = setInterval(() => {
+          const await_ai_move = setInterval(() => {
             if (!this.$store.state.game.ai_move) {
               console.log("закончили ходить комп, теперь пассивки врагов")
               clearInterval(await_ai_move)
               enemy_passive_abilities_end_turn(this.gameObj, timeout)
 
-              let await_epa_end_turn = setInterval(() => {
+              const await_epa_end_turn = setInterval(() => {
                 if (!this.$store.state.game.epa_end_turn) {
                   console.log(
                     "всё закончили, щас появится новый враг и можно ходить снова"
@@ -50,4 +51,4 @@ export default {
       }, timeout * 0.5)
     },
   },
-}
+})

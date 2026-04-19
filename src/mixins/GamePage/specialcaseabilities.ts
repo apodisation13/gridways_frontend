@@ -1,26 +1,26 @@
 import { choice_element, copyObj } from "@/lib/utils"
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
-import { CardAbility, CardColor, CardType } from "@/logic/models"
+import { CardAbility, CardColor, CardType } from "@/types"
+import type { Card, Enemy, Leader } from "@/types"
 import {
   change_card_charges,
   remove_dead_card,
 } from "@/logic/player_move/service/service_for_player_move"
+import { defineComponent } from "vue"
 
-export default {
+export default defineComponent({
   data() {
     return {
-      ability: "", // параметр для выхода из эмита
-      selectedCardAbilityDescription: "", // описание абилки той карты, которую мы изначально играли
-      cards_pool: [], // список карт, которые будем показывать в окне
-      show_pick_a_card_selection: false, // показать ли окно
+      ability: "" as string, // параметр для выхода из эмита
+      selectedCardAbilityDescription: "" as string, // описание абилки той карты, которую мы изначально играли
+      cards_pool: [] as (Card | Enemy)[], // список карт, которые будем показывать в окне
+      show_pick_a_card_selection: false,
       show_picked_card: false, // показать ли выбранную карту из абилок play_from_
-      special_case_value: null, // сохраняем какое-то особое значения для абилок
+      special_case_value: null as number | null, // сохраняем какое-то особое значения для абилок
       enemyView: false, // показать окно с картами или с картами, или с врагами
-
       sca: false, // КОСТЫЛЬ: играем ли мы доп карту! (чтобы не заблокировать руку когда доп карта играется из лидера!)
-
-      dead_card: null, // КОСТЫЛЬ: тут мы запоминаем исходную карту, которой играли 1й раз, чтобы сбросить ее ПОСЛЕ закрытия окна
+      dead_card: null as Card | Leader | null, // КОСТЫЛЬ: тут мы запоминаем исходную карту, которой играли 1й раз, чтобы сбросить ее ПОСЛЕ закрытия окна
     }
   },
   methods: {
@@ -156,12 +156,12 @@ export default {
     },
 
     // А ЭТО МЕНЕДЖЕР абилок той карты, которую мы выбрали из открывшегося окна!
-    confirm_selection(card) {
+    confirm_selection(card: Card | Enemy): void {
       // card - это та карта, которую мы выбрали из какого-либо дополнительного окна
       if (this.ability === CardAbility.Resurrect) {
-        card.data.charges = 1
-        this.gameObj.hand.push(card)
-        this.gameObj.grave.splice(this.gameObj.grave.indexOf(card), 1)
+        ;(card as Card).data.charges = 1
+        this.gameObj.hand.push(card as Card)
+        this.gameObj.grave.splice(this.gameObj.grave.indexOf(card as Card), 1)
       } else if (this.ability === CardAbility.GiveChargesToCardInHand1) {
         change_card_charges(card, 1)
       } else if (this.ability === CardAbility.DiscardDraw2) {
@@ -183,7 +183,7 @@ export default {
           this.ability === CardAbility.PlayFromGrave ||
           this.ability === CardAbility.PlaySpecialFromGrave
         ) {
-          card.data.charges = 1
+          ;(card as Card).data.charges = 1
         }
 
         // Показать эту выбранную для игры карту. А снимаем этот ФЛАГ уже в самом GamePage!
@@ -196,10 +196,11 @@ export default {
         card.data.damage += this.special_case_value
         this.incrDmg(card, this.special_case_value)
       } else if (this.ability === CardAbility.MoveEnemyFromDeckToGrave) {
-        const cd = this.gameObj.enemies.findIndex(c => c.id === card.id)
+        const enemy = card as Enemy
+        const cd = this.gameObj.enemies.findIndex(c => c.id === enemy.id)
         this.gameObj.enemies.splice(cd, 1)
-        card.data.hp = card.data.base.base_hp
-        this.gameObj.enemies_grave.push(card)
+        enemy.data.hp = enemy.data.base.base_hp
+        this.gameObj.enemies_grave.push(enemy)
       } else if (this.ability === CardAbility.DecrDmgToHandIncrToRandomHand) {
         card.data.damage -= this.special_case_value
         if (card.data.damage < 0) card.data.damage = 0
@@ -207,8 +208,9 @@ export default {
         random_card.data.damage += this.special_case_value
         this.incrDmg(random_card, this.special_case_value)
       } else if (this.ability === CardAbility.IncrDmgByNCharges) {
-        card.data.damage += card.data.charges
-        this.incrDmg(card, card.data.charges)
+        const c = card as Card
+        c.data.damage += c.data.charges
+        this.incrDmg(c, c.data.charges)
       } else if (this.ability === CardAbility.CreateAndPutToDeck) {
         this.gameObj.deck.push(card)
       } else if (this.ability === CardAbility.DrawExact) {
@@ -234,7 +236,7 @@ export default {
     },
 
     // чтобы показать фиолетовую рамку для этой карты и проиграть анимацию
-    incrDmg(card, value) {
+    incrDmg(card: Card, value: number): void {
       timeoutAnimationFlag(
         card,
         "incr_dmg",
@@ -247,4 +249,4 @@ export default {
       }, this.$store.getters["selectedMoveTimeout"] * 0.5)
     },
   },
-}
+})
