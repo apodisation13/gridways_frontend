@@ -1,7 +1,12 @@
 import { remove_dead_enemy } from "@/logic/player_move/abilities/enemy_takes_damage"
 import { EnemyStatus } from "@/types"
+import type { Enemy, EnemyLeader, GameObj } from "@/types"
 
-function poison_one_enemy(enemy, gameObj, timeout = 1000) {
+export function poison_one_enemy(
+  enemy: Enemy | EnemyLeader,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   // добавляем врагу яд - если у него уже есть яд, убиваем его
 
   // врагу со статусом "завеса" нельзя добавить яд
@@ -19,7 +24,7 @@ function poison_one_enemy(enemy, gameObj, timeout = 1000) {
   enemy.data.status = EnemyStatus.Poison
 }
 
-function poison_all_enemies(gameObj, timeout = 1000) {
+export function poison_all_enemies(gameObj: GameObj, timeout = 1000): void {
   const { field, enemy_leader } = gameObj
   field.forEach(enemy => {
     if (enemy) poison_one_enemy(enemy, gameObj, timeout)
@@ -27,5 +32,3 @@ function poison_all_enemies(gameObj, timeout = 1000) {
 
   if (enemy_leader.data.hp > 0) poison_one_enemy(enemy_leader, gameObj, timeout)
 }
-
-export { poison_one_enemy, poison_all_enemies }

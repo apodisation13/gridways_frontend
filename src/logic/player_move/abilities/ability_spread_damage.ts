@@ -2,8 +2,13 @@ import { get_all_enemies } from "@/logic/player_move/service/service_for_player_
 import { sound_spread_damage } from "@/logic/play_sounds"
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
 import { choice } from "@/lib/utils"
+import type { Card, GameObj } from "@/types"
 
-function spread_damage(card, gameObj, timeout = 1000) {
+export function spread_damage(
+  card: Card | { data: { damage: number } },
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { field, enemy_leader } = gameObj
 
   let enemy_list = get_all_enemies(field, enemy_leader) // собрать всех врагов в один список
@@ -37,5 +42,3 @@ function spread_damage(card, gameObj, timeout = 1000) {
     sound_spread_damage()
   }, timeout * 0.4)
 }
-
-export { spread_damage }

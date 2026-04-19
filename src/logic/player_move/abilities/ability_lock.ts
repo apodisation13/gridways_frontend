@@ -1,6 +1,6 @@
-import { EnemyStatus } from "@/types"
+import { Enemy, EnemyLeader, EnemyStatus } from "@/types"
 
-export function lock_enemy(enemy) {
+export function lock_enemy(enemy: Enemy | EnemyLeader): void {
   if (enemy.data.status === EnemyStatus.Veil) return
   enemy.data.shield = false
   enemy.passive_ability = null

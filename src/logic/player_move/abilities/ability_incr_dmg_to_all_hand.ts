@@ -1,7 +1,12 @@
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import type { GameObj } from "@/types"
 
-export function incr_dmg_to_all_hand(card, gameObj, timeout = 1000) {
+export function incr_dmg_to_all_hand(
+  card: { data: { value?: number } },
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { hand } = gameObj
   if (!hand.length) return
 

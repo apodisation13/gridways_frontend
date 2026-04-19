@@ -1,12 +1,17 @@
 import { copyObj } from "@/lib/utils"
+import type { Card, Enemy, EnemyLeader, GameObj } from "@/types"
 
-export function spawn_tokens_at_enemy_deck(card, enemy, gameObj) {
-  if (!enemy.color) return // лидера врагов нельзя так насоздавать
+export function spawn_tokens_at_enemy_deck(
+  card: Card,
+  enemy: Enemy | EnemyLeader,
+  gameObj: GameObj
+): void {
+  if (!(enemy as Enemy).color) return // лидера врагов нельзя так насоздавать
 
   const { enemies } = gameObj
 
   // создали токена врага, у него прописали его deathwish из абилки карты
-  const token = copyObj(enemy)
+  const token = copyObj(enemy as Enemy)
   token.data.hp = 1
   token.data.base.base_hp = 1
   token.data.damage = 1
