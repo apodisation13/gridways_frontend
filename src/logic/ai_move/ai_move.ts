@@ -6,8 +6,9 @@ import { check_lose } from "@/logic/ai_move/service/check_lose"
 import { set_already_jumped } from "@/logic/ai_move/service/service_for_ai_move"
 import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
 import { right_move } from "@/logic/ai_move/moves/move_right"
+import type { Enemy, GameObj } from "@/types"
 
-function ai_move(field, timeout = 1000) {
+export function ai_move(field: (Enemy | "")[], timeout = 1000): void {
   store.commit("set_ai_move", true)
   set_already_jumped(field) // установить false параметр enemy.already_jumped
 
@@ -21,17 +22,17 @@ function ai_move(field, timeout = 1000) {
       store.commit("set_ai_move", false)
     } else {
       // ДИСПЕТЧЕР способностей хода врагов
-      if (enemies[i].move.name === "stand") {
-        stand_still(field, field.indexOf(enemies[i]), timeout)
+      if ((enemies[i] as Enemy).move.name === "stand") {
+        stand_still(field, field.indexOf(enemies[i] as Enemy), timeout)
       } else if (
-        enemies[i].move.name === "random" &&
-        !enemies[i].already_jumped
+        (enemies[i] as Enemy).move.name === "random" &&
+        !(enemies[i] as Enemy).already_jumped
       ) {
-        random_move(field, field.indexOf(enemies[i]), timeout)
-      } else if (enemies[i].move.name === "down") {
-        down_move(field, field.indexOf(enemies[i]), timeout)
-      } else if (enemies[i].move.name === "right") {
-        right_move(field, field.indexOf(enemies[i]), timeout)
+        random_move(field, field.indexOf(enemies[i] as Enemy), timeout)
+      } else if ((enemies[i] as Enemy).move.name === "down") {
+        down_move(field, field.indexOf(enemies[i] as Enemy), timeout)
+      } else if ((enemies[i] as Enemy).move.name === "right") {
+        right_move(field, field.indexOf(enemies[i] as Enemy), timeout)
       }
 
       i += 1
@@ -40,7 +41,7 @@ function ai_move(field, timeout = 1000) {
 }
 
 // эта функция срабатывает для лидера врагов только в начале игры 1 раз
-function enemy_leader_ai_move_once(gameObj) {
+export function enemy_leader_ai_move_once(gameObj: GameObj): void {
   const { enemy_leader, deck } = gameObj
   const ela = enemy_leader.ability?.name
 
@@ -56,5 +57,3 @@ function enemy_leader_ai_move_once(gameObj) {
     })
   }
 }
-
-export { ai_move, enemy_leader_ai_move_once }

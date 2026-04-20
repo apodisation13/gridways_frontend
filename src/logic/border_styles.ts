@@ -1,4 +1,6 @@
-function border_for_card(card) {
+import type { Card, Enemy, Leader, EnemyLeader } from "@/types"
+
+function border_for_card(card: Card | Enemy): Record<string, string> {
   if (card.color === "Bronze") {
     return {
       // padding: "1px",
@@ -21,9 +23,9 @@ function border_for_card(card) {
   return {}
 }
 
-function card_margin(card) {
-  if (card.damages_player) return { border: "outset 4px red" } // враг наносит урон игроку
-  if (card.damages_enemy) return { border: "outset 4px orange" } // карта игрока наносит урон врагу
+function card_margin(card: Card | Enemy): Record<string, string> {
+  if ((card as Enemy).damages_player) return { border: "outset 4px red" } // враг наносит урон игроку
+  if ((card as Card).damages_enemy) return { border: "outset 4px orange" } // карта игрока наносит урон врагу
   if (card.incr_dmg) return { border: "outset 4px purple" } // карта игрока или враг увеличивают свой урон
   if (card.healing) return { border: "outset 4px lime" } // карта игрока или враг увеличивают свои жизни
   // карта игрока или враг кого-то создают (карту или токен)
@@ -46,7 +48,7 @@ function card_margin(card) {
   }
 }
 
-function border_leader(leader) {
+function border_leader(leader: Leader | EnemyLeader): Record<string, string> {
   if (leader.faction === "Soldiers") return { border: "solid 3px blue" }
   else if (leader.faction === "Monsters") return { border: "solid 3px red" }
   else if (leader.faction === "Animals") return { border: "solid 3px green" }
@@ -54,7 +56,7 @@ function border_leader(leader) {
 }
 
 // задний фон значка урона для всех карт и значка пассивок
-function background_color(card) {
+function background_color(card: Card | Enemy): Record<string, string> {
   if (card.faction === "Soldiers") {
     if (card.color === "Bronze") return { backgroundColor: "blue" }
     else if (card.color === "Silver") {
@@ -86,7 +88,7 @@ function background_color(card) {
   } else return {}
 }
 
-function background_color_hp(color) {
+function background_color_hp(color: string): string {
   switch (color) {
     case "Bronze":
       return "#a9916e"
@@ -99,7 +101,7 @@ function background_color_hp(color) {
   }
 }
 
-function background_color_charges(color) {
+function background_color_charges(color: string): string {
   switch (color) {
     case "Bronze":
       return "#857359"
@@ -112,7 +114,7 @@ function background_color_charges(color) {
   }
 }
 
-function background_color_leader(factionColor) {
+function background_color_leader(factionColor: string): string {
   switch (factionColor) {
     case "Soldiers":
       return "blue"
@@ -127,7 +129,9 @@ function background_color_leader(factionColor) {
   }
 }
 
-function background_color_deck(deck) {
+function background_color_deck(deck: {
+  leader: { faction: string }
+}): Record<string, string> {
   if (deck.leader.faction === "Soldiers") return { backgroundColor: "blue" }
   else if (deck.leader.faction === "Monsters") return { backgroundColor: "red" }
   else if (deck.leader.faction === "Animals")
@@ -137,7 +141,7 @@ function background_color_deck(deck) {
 
 // используется для определения значка способности в зависимости от способности карты
 // сейчас юзается в CardModal/CardDescriptions
-function ability_icon(ability) {
+function ability_icon(ability: string): string {
   if (ability === "damage-all")
     return `url(${require("@/assets/icons/card/all_attack.svg")})`
   else if (ability === "heal")
@@ -188,7 +192,7 @@ function ability_icon(ability) {
 }
 
 // цвета доступных тем в игре, рамки
-function styleOuter(el) {
+function styleOuter(el: number): Record<string, string> | undefined {
   if (el === 1)
     // зеленый
     return {
@@ -215,7 +219,7 @@ function styleOuter(el) {
     }
 }
 
-function styleWrapper(el) {
+function styleWrapper(el: number): Record<string, string> | undefined {
   if (el === 1)
     // зеленый
     return {

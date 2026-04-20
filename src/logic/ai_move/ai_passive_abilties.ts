@@ -2,13 +2,19 @@ import store from "@/store"
 import { field_passives } from "@/logic/ai_move/passive_abilities/passives_field"
 import { deck_passives } from "@/logic/ai_move/passive_abilities/passives_deck"
 import { grave_passives } from "@/logic/ai_move/passive_abilities/passives_grave"
+import type { GameObj } from "@/types"
 
-export function enemy_passive_abilities_end_turn(gameObj, timeout = 1000) {
+export function enemy_passive_abilities_end_turn(
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   store.commit("set_epa_end_turn", true)
 
   const { field, enemies_grave, enemies, enemy_leader } = gameObj
 
-  let pool = field.filter(e => e && e.data.passive?.has_passive_in_field)
+  let pool: any[] = field.filter(
+    e => e && (e as any).data.passive?.has_passive_in_field
+  )
   // если у лидера врагов есть пассивка и он жив, его добавляем тоже
   if (enemy_leader.passive_ability?.name && enemy_leader.data.hp > 0)
     pool.push(enemy_leader)
