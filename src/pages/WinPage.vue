@@ -80,7 +80,7 @@ import {
   GameStatsRecordType,
   LeaderboardGameMode,
   PayResourcesSubtype,
-} from "@/store/const/const"
+} from "@/types"
 export default {
   name: "win-page",
   components: { ResourceItem },

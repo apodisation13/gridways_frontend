@@ -86,7 +86,7 @@
 
 <script>
 import ResourceList from "@/components/ResourceList.vue"
-import { CardColor } from "@/logic/models"
+import { CardColor } from "@/types"
 
 export default {
   name: "card-action-modal",

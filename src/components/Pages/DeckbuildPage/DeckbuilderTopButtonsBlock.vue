@@ -40,10 +40,10 @@
 </template>
 
 <script>
-import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions"
-import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon"
-import BaseModal from "@/components/ModalWindows/BaseModal"
-import ButtonToggleCardList from "@/components/Pages/DeckbuildPage/Buttons/ButtonToggleCardList"
+import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions.vue"
+import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon.vue"
+import BaseModal from "@/components/ModalWindows/BaseModal.vue"
+import ButtonToggleCardList from "@/components/Pages/DeckbuildPage/Buttons/ButtonToggleCardList.vue"
 
 export default {
   components: {

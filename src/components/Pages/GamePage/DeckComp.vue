@@ -99,9 +99,9 @@
 </template>
 
 <script>
-import ModalWindow from "@/components/ModalWindows/ModalWindow"
-import ButtonClose from "@/components/UI/Buttons/ButtonClose"
-import CardListComponent from "@/components/Cards/CardListComponent"
+import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
+import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
+import CardListComponent from "@/components/Cards/CardListComponent.vue"
 export default {
   name: "deck-comp",
   components: { CardListComponent, ButtonClose, ModalWindow },

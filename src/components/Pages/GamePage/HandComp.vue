@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import CardItem from "@/components/Cards/CardItem"
+import CardItem from "@/components/Cards/CardItem.vue"
 import { arrowMixin } from "@/mixins/GamePage/arrow_draw"
 export default {
   name: "hand-comp",

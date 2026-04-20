@@ -58,12 +58,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue"
 import CardItem from "@/components/Cards/CardItem.vue"
 import FactionItem from "@/components/Pages/DeckbuildPage/FactionItem.vue"
-import { mapActions, mapGetters } from "vuex"
+import type { LeaderboardEntry } from "@/types"
 
-export default {
+export default defineComponent({
   name: "LeaderboardTable",
   components: { FactionItem, CardItem },
   props: {
@@ -72,28 +73,32 @@ export default {
       default: false,
     },
     selectedFaction: {
-      type: [String, null],
+      type: String as PropType<string | null>,
       required: true,
     },
     selectedMode: {
-      type: [String, null],
+      type: String as PropType<string | null>,
       required: true,
     },
   },
   async created() {
-    await this.getUserLeaderboard()
-    await this.getWorldLeaderboard()
+    if (this.is_world) await this.$store.dispatch("getWorldLeaderboard")
+    else await this.$store.dispatch("getUserLeaderboard")
   },
   computed: {
-    ...mapGetters(["userLeaderboard", "worldLeaderboard"]),
-    username() {
+    username(): string {
       return this.$store.state.login.user.username
     },
-    userLeaderboardData() {
-      if (this.is_world) return this.worldLeaderboard
-      else return this.userLeaderboard
+    userLeaderboard(): LeaderboardEntry[] {
+      return this.$store.getters["userLeaderboard"]
     },
-    filteredLeaderboard() {
+    worldLeaderboard(): LeaderboardEntry[] {
+      return this.$store.getters["worldLeaderboard"]
+    },
+    userLeaderboardData(): LeaderboardEntry[] {
+      return this.is_world ? this.worldLeaderboard : this.userLeaderboard
+    },
+    filteredLeaderboard(): LeaderboardEntry[] {
       return this.userLeaderboardData.filter(e => {
         if (this.selectedFaction && e.faction_name !== this.selectedFaction)
           return false
@@ -102,24 +107,23 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["getUserLeaderboard", "getWorldLeaderboard"]),
-    findLeader(leaderId) {
+    findLeader(leaderId: number) {
       return this.$store.getters["all_leaders"].find(
-        item => item.card.id === leaderId
+        (item: any) => item.card.id === leaderId
       )
     },
-    goToStats(entry) {
+    goToStats(entry: LeaderboardEntry) {
       this.$router.push({
         path: "/stats",
         query: {
-          userId: entry.user_id,
+          userId: String(entry.user_id),
           username: entry.username,
-          userProfileAvatar: entry.avatar,
+          userProfileAvatar: entry.user_avatar,
         },
       })
     },
   },
-}
+})
 </script>
 
 <style scoped>

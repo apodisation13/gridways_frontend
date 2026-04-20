@@ -22,8 +22,8 @@
 
 <script>
 import { border_for_card } from "@/logic/border_styles"
-import EnemyUi from "@/components/Cards/EnemyUi"
-import CardModal from "@/components/ModalWindows/CardModal"
+import EnemyUi from "@/components/Cards/EnemyUi.vue"
+import CardModal from "@/components/ModalWindows/CardModal.vue"
 export default {
   name: "enemy-comp",
   components: {

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import BaseButton from "@/components/UI/Buttons/BaseButton"
+import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 export default {
   name: "SettingAnimation",
   components: { BaseButton },

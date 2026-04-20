@@ -11,10 +11,10 @@
 </template>
 
 <script>
-import ModalWindow from "@/components/ModalWindows/ModalWindow"
-import ButtonClose from "@/components/UI/Buttons/ButtonClose"
-import EnemyLeader from "@/components/Cards/EnemyLeader"
-import EnemyList from "@/components/Cards/EnemyList"
+import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
+import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
+import EnemyLeader from "@/components/Cards/EnemyLeader.vue"
+import EnemyList from "@/components/Cards/EnemyList.vue"
 export default {
   name: "level-modal",
   components: { EnemyList, EnemyLeader, ButtonClose, ModalWindow },

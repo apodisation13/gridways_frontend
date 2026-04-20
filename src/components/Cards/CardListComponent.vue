@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import CardItem from "@/components/Cards/CardItem"
+import CardItem from "@/components/Cards/CardItem.vue"
 export default {
   components: {
     CardItem,

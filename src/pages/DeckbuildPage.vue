@@ -78,12 +78,12 @@
 
 <script>
 import _ from "lodash"
-import DecksListModal from "@/components/ModalWindows/DecksListModal"
-import DeckbuilderTopButtonsBlock from "@/components/Pages/DeckbuildPage/DeckbuilderTopButtonsBlock"
-import BlockAssemblingTheDeck from "@/components/Pages/DeckbuildPage/BlockAssemblingTheDeck"
-import DeckbuilderFilters from "@/components/Pages/DeckbuildPage/DeckbuilderFilters"
-import CardListComponent from "@/components/Cards/CardListComponent"
-import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks"
+import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
+import DeckbuilderTopButtonsBlock from "@/components/Pages/DeckbuildPage/DeckbuilderTopButtonsBlock.vue"
+import BlockAssemblingTheDeck from "@/components/Pages/DeckbuildPage/BlockAssemblingTheDeck.vue"
+import DeckbuilderFilters from "@/components/Pages/DeckbuildPage/DeckbuilderFilters.vue"
+import CardListComponent from "@/components/Cards/CardListComponent.vue"
+import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
 import { useToast } from "vue-toastification"
 import { copyObj } from "@/lib/utils"
 

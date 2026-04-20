@@ -58,10 +58,12 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import "vue3-carousel/dist/carousel.css"
 import { Carousel, Slide } from "vue3-carousel"
-export default {
+import type { NewsItem } from "@/types"
+export default defineComponent({
   name: "news-list",
   mounted() {
     const carouselEl = this.$refs.carousel?.$el
@@ -77,7 +79,7 @@ export default {
     }
   },
   computed: {
-    news() {
+    news(): NewsItem[] | null {
       return this.$store.getters["allNews"]
     },
   },
@@ -94,7 +96,7 @@ export default {
     prev() {
       this.$refs.carousel.prev()
     },
-    setDay(data, option) {
+    setDay(data: string, option: "month" | "day"): string | undefined {
       const date = new Date(data)
 
       if (option === "month") {
@@ -103,7 +105,7 @@ export default {
         return date.toLocaleString("en-GB", { day: "2-digit" })
       }
     },
-    preventCarouselDrag(event) {
+    preventCarouselDrag(event: Event) {
       event.stopPropagation()
     },
     hideNews() {
@@ -114,7 +116,7 @@ export default {
     Carousel,
     Slide,
   },
-}
+})
 </script>
 
 <style scoped>

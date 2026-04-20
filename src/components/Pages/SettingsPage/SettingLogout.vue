@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import ConfirmModal from "@/components/ModalWindows/ConfirmModal"
-import BaseButton from "@/components/UI/Buttons/BaseButton"
+import ConfirmModal from "@/components/ModalWindows/ConfirmModal.vue"
+import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 
 export default {
   components: {

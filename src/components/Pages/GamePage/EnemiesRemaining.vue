@@ -127,9 +127,9 @@
 </template>
 
 <script>
-import ModalWindow from "@/components/ModalWindows/ModalWindow"
-import ButtonClose from "@/components/UI/Buttons/ButtonClose"
-import EnemyList from "@/components/Cards/EnemyList"
+import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
+import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
+import EnemyList from "@/components/Cards/EnemyList.vue"
 export default {
   name: "remaining-enemies",
   components: { EnemyList, ButtonClose, ModalWindow },

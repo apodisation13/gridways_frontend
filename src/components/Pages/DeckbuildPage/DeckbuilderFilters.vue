@@ -14,13 +14,13 @@
 </template>
 
 <script>
-import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions"
-import FilterTypes from "@/components/Pages/DeckbuildPage/FilterTypes"
-import FilterColors from "@/components/Pages/DeckbuildPage/FilterColors"
-import FilterPassives from "@/components/Pages/DeckbuildPage/FilterPassives"
-import FilterUnlocked from "@/components/Pages/DeckbuildPage/FilterUnlocked"
-import BaseModal from "@/components/ModalWindows/BaseModal"
-import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg"
+import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions.vue"
+import FilterTypes from "@/components/Pages/DeckbuildPage/FilterTypes.vue"
+import FilterColors from "@/components/Pages/DeckbuildPage/FilterColors.vue"
+import FilterPassives from "@/components/Pages/DeckbuildPage/FilterPassives.vue"
+import FilterUnlocked from "@/components/Pages/DeckbuildPage/FilterUnlocked.vue"
+import BaseModal from "@/components/ModalWindows/BaseModal.vue"
+import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 import FilterNewlyadded from "@/components/Pages/DeckbuildPage/FilterNewlyAdded.vue"
 
 export default {

@@ -66,13 +66,13 @@ import {
   background_color_leader,
   background_color_hp,
 } from "@/logic/border_styles"
-import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle"
-import ButtonClose from "@/components/UI/Buttons/ButtonClose"
-import ModalWindow from "@/components/ModalWindows/ModalWindow"
-import CardUi from "@/components/Cards/CardUi"
-import EnemyUi from "@/components/Cards/EnemyUi"
-import CardDescriptions from "@/components/Cards/CardDescriptions"
-import { CraftMillCardActionSubtype } from "@/store/const/const"
+import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle.vue"
+import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
+import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
+import CardUi from "@/components/Cards/CardUi.vue"
+import EnemyUi from "@/components/Cards/EnemyUi.vue"
+import CardDescriptions from "@/components/Cards/CardDescriptions.vue"
+import { CraftMillCardActionSubtype } from "@/types"
 import CardActionModal from "@/components/ModalWindows/CardActionModal.vue"
 import { useToast } from "vue-toastification"
 export default {

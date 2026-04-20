@@ -46,7 +46,7 @@
 <script>
 import BonusPageResource from "@/components/Pages/BonusPage/BonusPageResource.vue"
 import RewardComp from "@/components/Pages/BonusPage/RewardComp.vue"
-import { PayResourcesSubtype } from "@/store/const/const"
+import { PayResourcesSubtype } from "@/types"
 import { choice } from "@/lib/utils"
 import { getRandomReward } from "@/logic/random_rewards"
 

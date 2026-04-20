@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import FactionItem from "@/components/Pages/DeckbuildPage/FactionItem"
-import BaseTitleText from "@/components/UI/BaseTitleText"
+import FactionItem from "@/components/Pages/DeckbuildPage/FactionItem.vue"
+import BaseTitleText from "@/components/UI/BaseTitleText.vue"
 
 export default {
   components: {

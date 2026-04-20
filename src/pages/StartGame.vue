@@ -67,7 +67,7 @@
 
 <script>
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
-import { GameStatsRecordType, PayResourcesSubtype } from "@/store/const/const"
+import { GameStatsRecordType, PayResourcesSubtype } from "@/types"
 import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
 import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
 import LevelPreviewComp from "@/components/LevelPreviewComp.vue"

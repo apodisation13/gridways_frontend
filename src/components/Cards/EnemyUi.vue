@@ -63,13 +63,13 @@ import {
   background_color_hp,
   card_margin,
 } from "@/logic/border_styles"
-import DeathwishAbility from "@/components/UI/CardsUI/Enemies/DeathwishAbility"
-import HeartIcon from "@/components/UI/CardsUI/HeartIcon"
-import CardDamageIcon from "@/components/UI/CardsUI/CardDamageIcon"
-import EnemyLocked from "@/components/UI/CardsUI/Enemies/EnemyLocked"
-import AbilityCircleEnemy from "@/components/UI/CardsUI/Enemies/AbilityCircleEnemy"
-import EnemyShield from "@/components/UI/CardsUI/Enemies/EnemyShield"
-import CardPassive from "@/components/UI/CardsUI/CardPassive"
+import DeathwishAbility from "@/components/UI/CardsUI/Enemies/DeathwishAbility.vue"
+import HeartIcon from "@/components/UI/CardsUI/HeartIcon.vue"
+import CardDamageIcon from "@/components/UI/CardsUI/CardDamageIcon.vue"
+import EnemyLocked from "@/components/UI/CardsUI/Enemies/EnemyLocked.vue"
+import AbilityCircleEnemy from "@/components/UI/CardsUI/Enemies/AbilityCircleEnemy.vue"
+import EnemyShield from "@/components/UI/CardsUI/Enemies/EnemyShield.vue"
+import CardPassive from "@/components/UI/CardsUI/CardPassive.vue"
 import EnemyStatus from "@/components/UI/CardsUI/Enemies/EnemyStatus.vue"
 
 export default {

@@ -13,9 +13,9 @@
 </template>
 
 <script>
-import BaseModal from "@/components/ModalWindows/BaseModal"
-import BaseTitleText from "@/components/UI/BaseTitleText"
-import ButtonToFullscreen from "@/components/UI/Buttons/ButtonToFullscreen"
+import BaseModal from "@/components/ModalWindows/BaseModal.vue"
+import BaseTitleText from "@/components/UI/BaseTitleText.vue"
+import ButtonToFullscreen from "@/components/UI/Buttons/ButtonToFullscreen.vue"
 export default {
   components: {
     BaseModal,

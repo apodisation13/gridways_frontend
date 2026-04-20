@@ -161,9 +161,9 @@
 </template>
 
 <script>
-import EnemyList from "@/components/Cards/EnemyList"
-import ButtonClose from "@/components/UI/Buttons/ButtonClose"
-import ModalWindow from "@/components/ModalWindows/ModalWindow"
+import EnemyList from "@/components/Cards/EnemyList.vue"
+import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
+import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 
 export default {
   name: "enemies-grave",

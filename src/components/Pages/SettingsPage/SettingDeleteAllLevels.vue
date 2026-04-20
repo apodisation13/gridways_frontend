@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import BaseButton from "@/components/UI/Buttons/BaseButton"
-import ConfirmModal from "@/components/ModalWindows/ConfirmModal"
+import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
+import ConfirmModal from "@/components/ModalWindows/ConfirmModal.vue"
 export default {
   name: "SettingDeleteAllLevels",
   components: { ConfirmModal, BaseButton },

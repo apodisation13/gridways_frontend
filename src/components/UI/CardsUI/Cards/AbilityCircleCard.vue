@@ -71,8 +71,8 @@
 </template>
 
 <script>
-import HealAbility from "@/components/UI/CardsUI/HealAbility"
-import { CardAbility } from "@/logic/models"
+import HealAbility from "@/components/UI/CardsUI/HealAbility.vue"
+import { CardAbility } from "@/types"
 import AbilityIcon from "@/components/UI/CardsUI/Cards/Abilities/AbilityIcon.vue"
 export default {
   name: "card-ability-circle",

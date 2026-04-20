@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import DeckSelection from "@/components/DeckSelection"
+import DeckSelection from "@/components/DeckSelection.vue"
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
 import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 export default {

@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { CardType } from "@/logic/models"
+import { CardType } from "@/types"
 
 export default {
   name: "filter-types",

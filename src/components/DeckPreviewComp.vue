@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import DeckModal from "@/components/ModalWindows/DeckModal"
+import DeckModal from "@/components/ModalWindows/DeckModal.vue"
 import { background_color_deck } from "@/logic/border_styles"
 
 export default {

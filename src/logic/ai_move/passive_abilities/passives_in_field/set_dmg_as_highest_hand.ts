@@ -1,0 +1,25 @@
+import { copyObj } from "@/lib/utils"
+import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import { sound_passive_increase_damage } from "@/logic/play_sounds"
+import type { Enemy, GameObj } from "@/types"
+
+export function set_dmg_as_highest_hand(
+  enemy: Enemy,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
+  const { hand } = gameObj
+  if (!hand.length) return
+
+  const hand_sort = copyObj(hand)
+  hand_sort.sort((a, b) => b.data.damage - a.data.damage)
+  let target = hand_sort[0]
+
+  enemy.data.damage = target.data.damage
+  timeoutAnimationFlag(
+    enemy,
+    "incr_dmg",
+    sound_passive_increase_damage,
+    timeout * 0.5
+  )
+}

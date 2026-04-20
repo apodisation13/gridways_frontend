@@ -180,8 +180,11 @@ export default {
         this.inputNumberEnemiesRandomLevel !== null &&
         this.inputNumberEnemiesRandomLevel !== "" &&
         this.inputNumberEnemiesRandomLevel >= 5 &&
-        this.inputNumberEnemiesRandomLevel <= 55
+        this.inputNumberEnemiesRandomLevel <= this.max_random_n_enemies
       )
+    },
+    max_random_n_enemies() {
+      return this.$store.state.game.max_random_n_enemies
     },
     errorMessage() {
       if (
@@ -193,8 +196,8 @@ export default {
       if (this.inputNumberEnemiesRandomLevel < 5) {
         return "Минимальное значение: 5"
       }
-      if (this.inputNumberEnemiesRandomLevel > 55) {
-        return "Максимальное значение: 55"
+      if (this.inputNumberEnemiesRandomLevel > this.max_random_n_enemies) {
+        return `Максимальное значение: ${this.max_random_n_enemies}`
       }
       return ""
     },

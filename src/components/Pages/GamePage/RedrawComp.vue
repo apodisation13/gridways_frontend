@@ -14,10 +14,10 @@
 </template>
 
 <script>
-import ModalWindow from "@/components/ModalWindows/ModalWindow"
-import ButtonClose from "@/components/UI/Buttons/ButtonClose"
+import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
+import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import { choice } from "@/lib/utils"
-import CardListComponent from "@/components/Cards/CardListComponent"
+import CardListComponent from "@/components/Cards/CardListComponent.vue"
 export default {
   name: "redraw-comp",
   components: { CardListComponent, ButtonClose, ModalWindow },
