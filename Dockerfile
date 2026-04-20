@@ -1,4 +1,4 @@
-FROM node:16-alpine AS build-stage
+FROM node:20-alpine AS build-stage
 
 
 # Принимаем аргументы сборки
