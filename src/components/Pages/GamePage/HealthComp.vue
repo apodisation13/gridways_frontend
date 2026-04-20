@@ -34,46 +34,53 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+
+interface Delta {
+  text: string
+  type: "heal" | "damage"
+}
+
+export default defineComponent({
   name: "health-comp",
   data() {
     return {
-      delta: null,
-      deltaTimer: null,
-      armorAnimClass: null,
-      armorAnimTimer: null,
+      delta: null as Delta | null,
+      deltaTimer: null as ReturnType<typeof setTimeout> | null,
+      armorAnimClass: null as string | null,
+      armorAnimTimer: null as ReturnType<typeof setTimeout> | null,
     }
   },
   computed: {
-    health() {
+    health(): number {
       return this.$store.state.game.health
     },
-    armor() {
+    armor(): number {
       return this.$store.state.game.armor
     },
-    armorDelta() {
+    armorDelta(): number {
       return this.$store.state.game.armor_delta
     },
-    flashDuration() {
+    flashDuration(): number {
       return this.$store.getters["selectedMoveTimeout"]
     },
-    barStyle() {
+    barStyle(): Record<string, string> {
       if (this.health < 20) return { backgroundColor: "rgba(255, 59, 48, 0.2)" }
       if (this.health < 35) return { backgroundColor: "rgba(255, 149, 0, 0.2)" }
       if (this.health < 50) return { backgroundColor: "rgba(255, 204, 0, 0.2)" }
       return { backgroundColor: "rgba(52, 199, 89, 0.2)" }
     },
-    fillStyle() {
+    fillStyle(): Record<string, string> {
       const percent = Math.min(Math.max(this.health, 0), 100)
       return { width: `${percent}%` }
     },
   },
   watch: {
-    health(newVal, oldVal) {
+    health(newVal: number, oldVal: number) {
       const diff = newVal - oldVal
       if (diff === 0) return
-      clearTimeout(this.deltaTimer)
+      if (this.deltaTimer !== null) clearTimeout(this.deltaTimer)
       this.delta = {
         text: diff > 0 ? `+${diff}` : `${diff}`,
         type: diff > 0 ? "heal" : "damage",
@@ -82,9 +89,9 @@ export default {
         this.delta = null
       }, this.flashDuration)
     },
-    armorDelta(newVal) {
+    armorDelta(newVal: number) {
       if (!newVal || newVal === 0) return
-      clearTimeout(this.armorAnimTimer)
+      if (this.armorAnimTimer !== null) clearTimeout(this.armorAnimTimer)
       this.armorAnimClass =
         newVal > 0 ? "armor-flash--gain" : "armor-flash--damage"
       this.armorAnimTimer = setTimeout(() => {
@@ -92,7 +99,7 @@ export default {
       }, this.flashDuration * 0.5)
     },
   },
-}
+})
 </script>
 
 <style scoped>

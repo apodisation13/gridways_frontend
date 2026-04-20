@@ -23,12 +23,14 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import { border_leader } from "@/logic/border_styles"
 import CardModal from "@/components/ModalWindows/CardModal.vue"
 import EnemyUi from "@/components/Cards/EnemyUi.vue"
+import type { EnemyLeader as EnemyLeaderType } from "@/types"
 
-export default {
+export default defineComponent({
   name: "enemy-leader",
   components: {
     EnemyUi,
@@ -37,17 +39,18 @@ export default {
   props: {
     enemy_leader: {
       required: true,
-      type: Object,
+      type: Object as PropType<EnemyLeaderType>,
     },
     in_cross: {
       required: false,
       default: false,
+      type: Boolean,
     },
   },
   watch: {
     in_cross: {
       immediate: true,
-      handler(newVal) {
+      handler(newVal: boolean) {
         if (newVal && !this.isAnimating && this.enemy_leader.data.hp > 0) {
           this.startAnimation()
         } else if (!newVal && this.isAnimating) {
@@ -62,61 +65,58 @@ export default {
   data() {
     return {
       show_enemy_leader_modal: false,
-      animationId: null,
-      animationStartTime: null,
+      animationId: null as number | null,
+      animationStartTime: null as number | null,
       isAnimating: false,
     }
   },
   methods: {
-    open_card_modal() {
+    open_card_modal(): void {
       this.show_enemy_leader_modal = true
     },
-    border(leader) {
+    border(leader: EnemyLeaderType): Record<string, string> {
       return border_leader(leader)
     },
-    exec_enemy_leader() {
+    exec_enemy_leader(): void {
       this.$emit("exec_enemy_leader")
     },
-    startAnimation() {
-      if (this.isAnimating) return // Уже запущена — не трогаем!
+    startAnimation(): void {
+      if (this.isAnimating) return
 
       this.isAnimating = true
       this.animationStartTime = performance.now()
       this.animate()
     },
 
-    stopAnimation() {
+    stopAnimation(): void {
       this.isAnimating = false
-      if (this.animationId) {
+      if (this.animationId !== null) {
         cancelAnimationFrame(this.animationId)
         this.animationId = null
       }
 
-      // Возвращаем в исходное состояние
-      const el = this.$refs.leaderRef
+      const el = this.$refs.leaderRef as HTMLElement | undefined
       if (el) {
         el.style.transform = ""
         el.style.boxShadow = "-4px 0 4px rgb(0 0 0 / 50%)"
       }
     },
 
-    animate() {
+    animate(): void {
       if (!this.isAnimating) return
 
-      const el = this.$refs.leaderRef
+      const el = this.$refs.leaderRef as HTMLElement | undefined
       if (!el) return
 
-      const elapsed = performance.now() - this.animationStartTime
-      const duration = 1200 // 0.8 секунды на цикл
-      const progress = (elapsed % duration) / duration // 0 to 1
+      const elapsed = performance.now() - (this.animationStartTime as number)
+      const duration = 1200
+      const progress = (elapsed % duration) / duration
 
-      // Дрожание
       const shakeX =
         Math.sin(progress * Math.PI * 10) * 4 * (1 - progress * 0.5)
       const shakeRotate =
         Math.sin(progress * Math.PI * 8) * 0.5 * (1 - progress * 0.5)
 
-      // Мерцание цвета (переключение между голубым и розовым)
       const glowPhase = Math.sin(progress * Math.PI * 6)
       const isBlue = glowPhase > 0
 
@@ -132,7 +132,7 @@ export default {
     },
   },
   emits: ["exec_enemy_leader"],
-}
+})
 </script>
 
 <style scoped>

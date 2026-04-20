@@ -160,22 +160,24 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import EnemyList from "@/components/Cards/EnemyList.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
+import type { Enemy, EnemyLeader } from "@/types"
 
-export default {
+export default defineComponent({
   name: "enemies-grave",
   components: { EnemyList, ButtonClose, ModalWindow },
   props: {
     enemies_grave: {
       required: true,
-      type: Array,
+      type: Array as PropType<Enemy[]>,
     },
     enemy_leader: {
       required: true,
-      type: Object,
+      type: Object as PropType<EnemyLeader>,
     },
   },
   data() {
@@ -184,17 +186,17 @@ export default {
     }
   },
   computed: {
-    enemies_len() {
+    enemies_len(): number {
       return this.enemies_grave.length
     },
-    background_color() {
+    background_color(): string {
       if (this.enemies_len === 0) return "black"
       if (this.enemy_leader.faction === "Soldiers") return "blue"
       else if (this.enemy_leader.faction === "Monsters") return "red"
       else if (this.enemy_leader.faction === "Animals") return "green"
       return ""
     },
-    trigger_passive() {
+    trigger_passive(): boolean {
       for (const e of this.enemies_grave) {
         if (e.trigger_grave_passive) return true
       }
@@ -202,11 +204,11 @@ export default {
     },
   },
   methods: {
-    close_self() {
+    close_self(): void {
       this.visible = false
     },
   },
-}
+})
 </script>
 
 <style scoped>

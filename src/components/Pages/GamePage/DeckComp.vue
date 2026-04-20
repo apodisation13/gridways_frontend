@@ -98,21 +98,29 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
-export default {
+import type { Card, Leader } from "@/types"
+
+interface FactionColors {
+  base: string
+  light?: string
+}
+
+export default defineComponent({
   name: "deck-comp",
   components: { CardListComponent, ButtonClose, ModalWindow },
   props: {
     deck: {
       required: true,
-      type: Array,
+      type: Array as PropType<Card[]>,
     },
     leader: {
       required: true,
-      type: Object,
+      type: Object as PropType<Leader>,
     },
   },
   data() {
@@ -121,39 +129,27 @@ export default {
     }
   },
   computed: {
-    deck_len() {
+    deck_len(): number {
       return this.deck.length
     },
-    factionConfig() {
-      const FACTION_CONFIG = {
-        Soldiers: {
-          base: "#2563eb",
-          light: "#60a5fa",
-        },
-        Monsters: {
-          base: "#dc2626",
-          light: "#f87171",
-        },
-        Animals: {
-          base: "#16a34a",
-          light: "#4ade80",
-        },
-        default: {
-          base: "#000000",
-        },
+    factionConfig(): FactionColors {
+      const FACTION_CONFIG: Record<string, FactionColors> = {
+        Soldiers: { base: "#2563eb", light: "#60a5fa" },
+        Monsters: { base: "#dc2626", light: "#f87171" },
+        Animals: { base: "#16a34a", light: "#4ade80" },
+        default: { base: "#000000" },
       }
       if (this.deck_len === 0) return FACTION_CONFIG.default
 
-      const config = FACTION_CONFIG[this.leader.faction]
-      return config || FACTION_CONFIG.default
+      return FACTION_CONFIG[this.leader.faction] || FACTION_CONFIG.default
     },
-    background_color() {
+    background_color(): string {
       return this.factionConfig.base
     },
-    light_background_color() {
+    light_background_color(): string | undefined {
       return this.factionConfig.light
     },
-    trigger_passive() {
+    trigger_passive(): boolean {
       for (const card of this.deck) {
         if (card.trigger_deck_passive) return true
       }
@@ -161,11 +157,11 @@ export default {
     },
   },
   methods: {
-    close_self() {
+    close_self(): void {
       this.flag = false
     },
   },
-}
+})
 </script>
 
 <style scoped>

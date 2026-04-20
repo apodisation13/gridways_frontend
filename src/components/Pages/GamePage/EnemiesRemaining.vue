@@ -126,21 +126,29 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import EnemyList from "@/components/Cards/EnemyList.vue"
-export default {
+import type { Enemy, EnemyLeader } from "@/types"
+
+interface FactionColors {
+  base: string
+  light?: string
+}
+
+export default defineComponent({
   name: "remaining-enemies",
   components: { EnemyList, ButtonClose, ModalWindow },
   props: {
     enemies: {
       required: true,
-      type: Array,
+      type: Array as PropType<Enemy[]>,
     },
     enemy_leader: {
       required: true,
-      type: Object,
+      type: Object as PropType<EnemyLeader>,
     },
   },
   data() {
@@ -149,39 +157,27 @@ export default {
     }
   },
   computed: {
-    enemies_len() {
+    enemies_len(): number {
       return this.enemies.length
     },
-    factionConfig() {
-      const FACTION_CONFIG = {
-        Soldiers: {
-          base: "#2563eb",
-          light: "#60a5fa",
-        },
-        Monsters: {
-          base: "#dc2626",
-          light: "#f87171",
-        },
-        Animals: {
-          base: "#16a34a",
-          light: "#4ade80",
-        },
-        default: {
-          base: "#000000",
-        },
+    factionConfig(): FactionColors {
+      const FACTION_CONFIG: Record<string, FactionColors> = {
+        Soldiers: { base: "#2563eb", light: "#60a5fa" },
+        Monsters: { base: "#dc2626", light: "#f87171" },
+        Animals: { base: "#16a34a", light: "#4ade80" },
+        default: { base: "#000000" },
       }
       if (this.enemies_len === 0) return FACTION_CONFIG.default
 
-      const config = FACTION_CONFIG[this.enemy_leader.faction]
-      return config || FACTION_CONFIG.default
+      return FACTION_CONFIG[this.enemy_leader.faction] || FACTION_CONFIG.default
     },
-    background_color() {
+    background_color(): string {
       return this.factionConfig.base
     },
-    light_background_color() {
+    light_background_color(): string | undefined {
       return this.factionConfig.light
     },
-    trigger_passive() {
+    trigger_passive(): boolean {
       for (const e of this.enemies) {
         if (e.trigger_deck_passive) return true
       }
@@ -189,11 +185,11 @@ export default {
     },
   },
   methods: {
-    close_self() {
+    close_self(): void {
       this.visible = false
     },
   },
-}
+})
 </script>
 
 <style scoped>

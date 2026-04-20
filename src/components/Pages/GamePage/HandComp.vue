@@ -15,31 +15,33 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import CardItem from "@/components/Cards/CardItem.vue"
 import { arrowMixin } from "@/mixins/GamePage/arrow_draw"
-export default {
+import type { Card, Enemy, EnemyLeader } from "@/types"
+
+export default defineComponent({
   name: "hand-comp",
   components: { CardItem },
   mixins: [arrowMixin],
   props: {
     hand: {
       required: true,
-      type: Array,
+      type: Array as PropType<Card[]>,
     },
     field: {
       required: true,
-      type: Array,
+      type: Array as PropType<(Enemy | "")[]>,
     },
     enemy_leader: {
       required: true,
-      type: Object,
+      type: Object as PropType<EnemyLeader>,
     },
     player_cards_active: {
       required: true,
       type: Boolean,
     },
-    // 2 параметра для анимации карт в руке - появление и исчезновение
     drawing: {
       type: Boolean,
       default: false,
@@ -55,7 +57,7 @@ export default {
     }
   },
   computed: {
-    displayedHand() {
+    displayedHand(): Card[] {
       if (this.drawing) {
         return this.hand.slice(0, this.initialHandSize)
       }
@@ -63,15 +65,15 @@ export default {
     },
   },
   mounted() {
-    this.initArrowCanvas()
-    window.addEventListener("resize", this.handleResize)
+    ;(this as any).initArrowCanvas()
+    window.addEventListener("resize", (this as any).handleResize)
   },
   beforeUnmount() {
-    window.removeEventListener("resize", this.handleResize)
-    this.removeArrowCanvas()
+    window.removeEventListener("resize", (this as any).handleResize)
+    ;(this as any).removeArrowCanvas()
   },
   methods: {
-    cardStyle(index) {
+    cardStyle(index: number): Record<string, string | number> {
       const mid = (this.displayedHand.length - 1) / 2
       const offset = index - mid
       return {
@@ -81,16 +83,21 @@ export default {
       }
     },
 
-    handleCardMouseDown(e, index) {
+    handleCardMouseDown(e: MouseEvent, index: number): void {
       e.preventDefault()
       e.stopPropagation()
       if (!this.player_cards_active) return
       const el = document.querySelectorAll(".card_in_hand")[index]
       if (!el) return
       this.$emit("chose_player_card", this.hand[index])
-      this.beginArrowDrawing(el, e.clientX, e.clientY, this.hand[index].faction)
+      ;(this as any).beginArrowDrawing(
+        el,
+        e.clientX,
+        e.clientY,
+        this.hand[index].faction
+      )
     },
-    handleCardTouchStart(e, index) {
+    handleCardTouchStart(e: TouchEvent, index: number): void {
       e.preventDefault()
       e.stopPropagation()
       if (!this.player_cards_active) return
@@ -98,7 +105,7 @@ export default {
       if (!el) return
       const touch = e.touches[0]
       this.$emit("chose_player_card", this.hand[index])
-      this.beginArrowDrawing(
+      ;(this as any).beginArrowDrawing(
         el,
         touch.clientX,
         touch.clientY,
@@ -113,7 +120,7 @@ export default {
     "enemy_leader_in_cross",
     "enemy_in_cross",
   ],
-}
+})
 </script>
 
 <style scoped>

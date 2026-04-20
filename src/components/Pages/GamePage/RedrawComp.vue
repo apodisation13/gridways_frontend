@@ -13,42 +13,45 @@
   </modal-window>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import { choice } from "@/lib/utils"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
-export default {
+import type { Card, GameObj } from "@/types"
+
+export default defineComponent({
   name: "redraw-comp",
   components: { CardListComponent, ButtonClose, ModalWindow },
-  data() {
-    return {
-      visible: true,
-      redraws: this.redrawNumber,
-      hand: this.gameObj.hand.slice(),
-      deck: this.gameObj.deck.slice(),
-      redraw_array: [],
-    }
-  },
   props: {
     gameObj: {
       required: true,
-      type: Object,
+      type: Object as PropType<GameObj>,
     },
     redrawNumber: {
       type: Number,
       required: true,
     },
   },
+  data() {
+    return {
+      visible: true,
+      redraws: this.redrawNumber,
+      hand: this.gameObj.hand.slice() as Card[],
+      deck: this.gameObj.deck.slice() as Card[],
+      redraw_array: [] as Card[],
+    }
+  },
   created() {
     if (!this.gameObj.deck.length) this.close_self()
   },
   methods: {
-    close_self() {
+    close_self(): void {
       this.visible = false
 
       this.redraw_array.forEach(element => {
-        this.deck.push(element) // вернуть в деку карты
+        this.deck.push(element)
       })
 
       this.$emit("redraw_finished", {
@@ -57,17 +60,16 @@ export default {
       })
     },
 
-    chose_player_card(card) {
+    chose_player_card(card: Card): void {
       this.redraws -= 1
-      this.redraw_array.push(card) // добавили карту в темп-список
-      let random = choice(this.deck)
-      // заменяем ту карту, на которую ткнули, на новую случайную карту из колоды
+      this.redraw_array.push(card)
+      const random = choice(this.deck)
       this.hand.splice(this.hand.indexOf(card), 1, this.deck[random])
-      this.deck.splice(random, 1) // удалить этот i-й элемент
+      this.deck.splice(random, 1)
       if (this.redraws === 0 || !this.deck.length) this.close_self()
     },
   },
-}
+})
 </script>
 
 <style scoped>

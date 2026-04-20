@@ -29,28 +29,30 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import CardItem from "@/components/Cards/CardItem.vue"
 import EnemyList from "@/components/Cards/EnemyList.vue"
 import { arrowMixin } from "@/mixins/GamePage/arrow_draw"
-export default {
+import type { Card, Enemy } from "@/types"
+
+export default defineComponent({
   name: "special-case-abilities",
   mixins: [arrowMixin],
   mounted() {
-    this.initArrowCanvas(999)
+    ;(this as any).initArrowCanvas(999)
   },
   beforeUnmount() {
-    this.removeArrowCanvas()
+    ;(this as any).removeArrowCanvas()
   },
   components: { EnemyList, CardItem, CardListComponent, ModalWindow },
   props: {
     cards_pool: {
       required: true,
-      type: Array,
+      type: Array as PropType<(Card | Enemy)[]>,
     },
-    // если мы играем как-то врагов, то пришлем этот флаг
     enemyView: {
       required: false,
       default: false,
@@ -61,64 +63,59 @@ export default {
       type: Boolean,
     },
     show_picked_card: {
-      // флаг, показывать ли саму выбранную карту из колоды
       required: true,
       type: Boolean,
     },
-    // это описание абилки той карты, которую мы изначально играли
     card_ability: {
       type: String,
       required: true,
     },
-    // это для рисования стрелки
     field: {
       required: true,
-      type: Array,
+      type: Array as PropType<(Enemy | "")[]>,
     },
   },
 
   data() {
     return {
-      picked_card: null,
+      picked_card: null as Card | Enemy | null,
     }
   },
 
   methods: {
-    handleCardMouseDown(e) {
+    handleCardMouseDown(e: MouseEvent): void {
       e.preventDefault()
       e.stopPropagation()
-      this.beginArrowDrawing(
+      ;(this as any).beginArrowDrawing(
         e.currentTarget,
         e.clientX,
         e.clientY,
-        this.picked_card.faction
+        (this.picked_card as Card | Enemy).faction
       )
     },
-    handleCardTouchStart(e) {
+    handleCardTouchStart(e: TouchEvent): void {
       e.preventDefault()
       e.stopPropagation()
       const touch = e.touches[0]
-      this.beginArrowDrawing(
+      ;(this as any).beginArrowDrawing(
         e.currentTarget,
         touch.clientX,
         touch.clientY,
-        this.picked_card.faction
+        (this.picked_card as Card | Enemy).faction
       )
     },
 
-    confirm_selection(card) {
-      // добавим врагу костыль, если мы его играем!
+    confirm_selection(card: Card | Enemy): void {
       if (this.enemyView) this.forEnemy(card)
       this.$emit("confirm_selection", card)
       this.picked_card = card
     },
-    // если мы играем ВРАГА, у него нет абилки никакой, эта функция добавит ему базовую абилку на урон одному
-    forEnemy(card) {
-      card["ability"] = {
+    forEnemy(card: Card | Enemy): void {
+      ;(card as any)["ability"] = {
         name: "damage-one",
         description: "Нанести {damage} урона одному врагу",
       }
-      card["data"]["charges"] = 1
+      ;(card as any)["data"]["charges"] = 1
     },
   },
   emits: [
@@ -128,7 +125,7 @@ export default {
     "enemy_leader_in_cross",
     "enemy_in_cross",
   ],
-}
+})
 </script>
 
 <style scoped>
