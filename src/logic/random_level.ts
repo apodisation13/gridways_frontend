@@ -1,5 +1,6 @@
 import store from "@/store"
 import { CardColor } from "@/types"
+import type { Enemy, EnemyLeader } from "@/types"
 
 function getRandomLevelConst() {
   const stateInfo = store.state.game.random_level_enemies_count
@@ -24,8 +25,13 @@ function getRandomLevelConst() {
   return [easy, easy, easy, normal, normal, normal, hard, hard]
 }
 
-function random_pick_enemies(dict) {
-  let enemies = []
+function random_pick_enemies(dict: {
+  Bronzes: number[]
+  Silvers: number[]
+  Golds: number[]
+  diff: string
+}): Enemy[] {
+  let enemies: Enemy[] = []
 
   let random_bronzes =
     dict.Bronzes[Math.floor(Math.random() * dict.Bronzes.length)]
@@ -55,9 +61,9 @@ function random_pick_enemies(dict) {
   return enemies
 }
 
-function random_level_generator() {
-  let random_levels = []
-  const e_leaders = store.getters["all_enemy_leaders"]
+export function random_level_generator(): any[] {
+  let random_levels: any[] = []
+  const e_leaders: EnemyLeader[] = store.getters["all_enemy_leaders"]
   const diff = getRandomLevelConst()
 
   diff.forEach(d => {
@@ -79,11 +85,14 @@ function random_level_generator() {
   return random_levels
 }
 
-function calculateCounts(total, distribution) {
+function calculateCounts(
+  total: number,
+  distribution: Record<string, number>
+): Record<string, number> {
   const colors = Object.keys(distribution)
 
-  const exact = {}
-  const floors = {}
+  const exact: Record<string, number> = {}
+  const floors: Record<string, number> = {}
 
   for (const color of colors) {
     exact[color] = total * distribution[color]
@@ -105,18 +114,18 @@ function calculateCounts(total, distribution) {
   return result
 }
 
-function getRandomItems(items, totalCount) {
+function getRandomItems(items: Enemy[], totalCount: number): Enemy[] {
   const distribution = { bronze: 0.45, silver: 0.35, gold: 0.2 }
 
   const counts = calculateCounts(totalCount, distribution)
 
-  const byColor = {
+  const byColor: Record<string, Enemy[]> = {
     bronze: items.filter(item => item.color === CardColor.Bronze),
     silver: items.filter(item => item.color === CardColor.Silver),
     gold: items.filter(item => item.color === CardColor.Gold),
   }
 
-  const result = []
+  const result: Enemy[] = []
 
   for (const [color, count] of Object.entries(counts)) {
     const colorItems = byColor[color]
@@ -130,9 +139,9 @@ function getRandomItems(items, totalCount) {
   return result
 }
 
-function random_level_generator_by_number(total_number) {
-  const all_enemies = store.getters["all_enemies"]
-  const e_leaders = store.getters["all_enemy_leaders"]
+export function random_level_generator_by_number(total_number: number): any {
+  const all_enemies: Enemy[] = store.getters["all_enemies"]
+  const e_leaders: EnemyLeader[] = store.getters["all_enemy_leaders"]
   let enemy_leader = e_leaders[Math.floor(Math.random() * e_leaders.length)]
   const enemies = getRandomItems(all_enemies, total_number)
   let difficulty = "easy"
@@ -149,5 +158,3 @@ function random_level_generator_by_number(total_number) {
     },
   }
 }
-
-export { random_level_generator, random_level_generator_by_number }

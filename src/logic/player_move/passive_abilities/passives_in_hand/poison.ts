@@ -3,8 +3,13 @@ import {
   poison_all_enemies,
   poison_one_enemy,
 } from "@/logic/player_move/abilities/ability_poison"
+import type { Card, GameObj } from "@/types"
 
-function poison_random_enemy_passive(card, gameObj, timeout = 1000) {
+export function poison_random_enemy_passive(
+  card: Card,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { field, enemy_leader } = gameObj
   let target = get_random_enemy(field, enemy_leader) // взяли всех врагов, из них взяли одного
 
@@ -17,12 +22,14 @@ function poison_random_enemy_passive(card, gameObj, timeout = 1000) {
   poison_one_enemy(target, gameObj, timeout)
 }
 
-function poison_all_enemies_passive(card, gameObj, timeout = 1000) {
+export function poison_all_enemies_passive(
+  card: Card,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   card.passive_poisoning = true
   setTimeout(() => {
     card.passive_poisoning = null
   }, timeout * 0.5)
   poison_all_enemies(gameObj, timeout)
 }
-
-export { poison_random_enemy_passive, poison_all_enemies_passive }

@@ -1,5 +1,6 @@
 import store from "@/store"
 import { CardAbility } from "@/types"
+import type { Card, Leader, Enemy, EnemyLeader, GameObj } from "@/types"
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
 import { heal } from "@/logic/player_move/abilities/ability_heal"
 import { damage_one } from "@/logic/player_move/abilities/ability_damage_one"
@@ -36,7 +37,11 @@ import { give_charges_to_all } from "@/logic/player_move/abilities/ability_give_
 // Сюда заходим если там есть враг
 // card - карта, которую мы играем (или из руки, или лидер).
 // enemy - тот враг, в которого мы стреляем (или карта на поле, или лидер врагов).
-function damage_ai_card(card, enemy, gameObj) {
+export function damage_ai_card(
+  card: Card | Leader,
+  enemy: Enemy | EnemyLeader,
+  gameObj: GameObj
+): void {
   const { field, enemy_leader, enemies, leader, enemies_grave } = gameObj
 
   const ability = card?.ability?.name
@@ -74,7 +79,7 @@ function damage_ai_card(card, enemy, gameObj) {
     damage_one(enemy, card, gameObj, timeout)
     move_enemy(enemy, gameObj)
   } else if (ability === CardAbility.SetEnemyAsToken) {
-    set_enemy_as_token(enemy)
+    set_enemy_as_token(enemy as Enemy)
   } else if (ability === CardAbility.SpawnSelfAtDeck) {
     spawn_self_at_deck(card, gameObj, timeout)
     damage_one(enemy, card, gameObj, timeout)
@@ -85,34 +90,34 @@ function damage_ai_card(card, enemy, gameObj) {
     destroy_random_enemy_in_deck(gameObj)
     damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.PlaceSelfInField) {
-    place_self_in_field(card, enemy, gameObj)
+    place_self_in_field(card as Card, enemy as Enemy, gameObj)
   } else if (ability === CardAbility.SetLowestDmgToAsHighest) {
     set_lowest_dmg_to_as_highest(gameObj, timeout)
     damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.SpawnTokensAtEnemyDeck) {
-    spawn_tokens_at_enemy_deck(card, enemy, gameObj)
+    spawn_tokens_at_enemy_deck(card as Card, enemy, gameObj)
     damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.IncrDmgToAllHand) {
     damage_one(enemy, card, gameObj, timeout)
-    incr_dmg_to_all_hand(card, gameObj, timeout)
+    incr_dmg_to_all_hand(card as Card, gameObj, timeout)
   } else if (ability === CardAbility.IncrDmgToAllGrave) {
     damage_one(enemy, card, gameObj, timeout)
-    incr_dmg_to_all_grave(card, gameObj, timeout)
+    incr_dmg_to_all_grave(card as Card, gameObj, timeout)
   } else if (ability === CardAbility.Poison) {
     damage_one(enemy, card, gameObj, timeout)
-    poison_one_enemy(enemy, gameObj, timeout)
+    poison_one_enemy(enemy as Enemy, gameObj, timeout)
   } else if (ability === CardAbility.PoisonAll) {
     damage_one(enemy, card, gameObj, timeout)
     poison_all_enemies(gameObj, timeout)
   } else if (ability === CardAbility.AddArmor) {
     damage_one(enemy, card, gameObj, timeout)
-    add_armor(card.data.armor, timeout)
+    add_armor((card as Card).data.armor, timeout)
   } else if (ability === CardAbility.Purify) {
     purify(enemy)
     damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.GiveChargesToAll) {
     damage_one(enemy, card, gameObj, timeout)
-    give_charges_to_all(card, gameObj, timeout)
+    give_charges_to_all(card as Card, gameObj, timeout)
   } else damage_one(enemy, card, gameObj, timeout)
 
   // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда
@@ -123,5 +128,3 @@ function damage_ai_card(card, enemy, gameObj) {
   // пассивные абилки от хода
   player_passive_abilities_upon_playing_a_card(card, leader, enemy)
 }
-
-export { damage_ai_card }

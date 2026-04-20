@@ -1,8 +1,12 @@
 import store from "@/store" // stote.state OR store.commit
 import { sound_appear_new_enemy } from "@/logic/play_sounds"
+import type { Enemy } from "@/types"
 
 // расставить врагов, только первые 9 клеток, + параметр из уровня, сколько в начале появляется сразу врагов
-function place_enemies(field, enemy_list) {
+export function place_enemies(
+  field: (Enemy | "")[],
+  enemy_list: Enemy[]
+): void {
   for (let i = 0; i < store.state.game.level.starting_enemies_number; i++) {
     let random = Math.floor(Math.random() * 9) // 9, чтобы внизу не появлялись
     let random_enemy = Math.floor(Math.random() * enemy_list.length)
@@ -12,7 +16,10 @@ function place_enemies(field, enemy_list) {
   }
 }
 
-function appear_new_enemy(field, enemy_list) {
+export function appear_new_enemy(
+  field: (Enemy | "")[],
+  enemy_list: Enemy[]
+): void {
   // враги появляются только наверху
   let random = Math.floor(Math.random() * 3)
 
@@ -23,5 +30,3 @@ function appear_new_enemy(field, enemy_list) {
     sound_appear_new_enemy()
   }
 }
-
-export { place_enemies, appear_new_enemy }

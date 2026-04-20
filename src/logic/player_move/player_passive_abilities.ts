@@ -2,14 +2,18 @@ import store from "@/store"
 import { hand_passives } from "@/logic/player_move/passive_abilities/passives_hand"
 import { deck_passives } from "@/logic/player_move/passive_abilities/passives_deck"
 import { grave_passives } from "@/logic/player_move/passive_abilities/passives_graves"
+import type { GameObj } from "@/types"
 
-function player_passive_abilities_end_turn(gameObj, timeOut = 1000) {
+export function player_passive_abilities_end_turn(
+  gameObj: GameObj,
+  timeOut = 1000
+): void {
   store.commit("set_ppa_end_turn", true) // установили флаг начала пассивок
 
   const { hand, deck, grave, leader } = gameObj
 
   // здесь мы создаем пул карт, для которых нужны пассивки!
-  let pool = hand.filter(c => c.data.passive?.has_passive_in_hand) // собрали пассивные карты из руки
+  let pool: any[] = hand.filter(c => c.data.passive?.has_passive_in_hand) // собрали пассивные карты из руки
   if (leader.passive_ability?.name) pool.push(leader) // добавили туда ещё и лидера если у него есть пассивка
   pool = pool.concat(deck.filter(c => c.data.passive?.has_passive_in_deck)) // собрали пассивные карты из колоды
   pool = pool.concat(grave.filter(c => c.data.passive?.has_passive_in_grave)) // собрали пассивные карты из сброса
@@ -34,5 +38,3 @@ function player_passive_abilities_end_turn(gameObj, timeOut = 1000) {
     }
   }, timeOut)
 }
-
-export { player_passive_abilities_end_turn }

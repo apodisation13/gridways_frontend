@@ -2,12 +2,25 @@ import { randInt } from "@/lib/utils"
 import store from "@/store"
 import { CardColor } from "@/types"
 
-function getValue(cfg) {
+interface RewardConfig {
+  type: "simple" | "diapason"
+  value?: number
+  min?: number
+  max?: number
+  probability?: number
+}
+
+type RewardsConfig = Record<string, RewardConfig>
+
+function getValue(cfg: RewardConfig): number {
   if (cfg.type === "simple") return cfg.value
   if (cfg.type === "diapason") return randInt(cfg.min, cfg.max)
 }
 
-export function getRandomReward(rewards_config) {
+export function getRandomReward(rewards_config: RewardsConfig): {
+  resource: string
+  value: number
+} {
   // расчет награды за открытый ключ
   const entries = Object.entries(rewards_config)
   const totalWeight = entries.reduce((sum, [, cfg]) => sum + cfg.probability, 0)
@@ -25,7 +38,9 @@ export function getRandomReward(rewards_config) {
   return { resource, value: getValue(cfg) }
 }
 
-function getRewardsForEnemiesGrave(rewards) {
+function getRewardsForEnemiesGrave(
+  rewards: Record<string, number>
+): Record<string, number> {
   const enemies_grave = store.getters["enemies_grave"]
 
   const bronze_enemies = enemies_grave.filter(
@@ -45,9 +60,11 @@ function getRewardsForEnemiesGrave(rewards) {
   return rewards
 }
 
-export function getRewardForLevel(rewards_config) {
+export function getRewardForLevel(
+  rewards_config: RewardsConfig
+): Record<string, number> {
   // награда за прохождение уровня, с учетом конфига и убитых врагов
-  let result = {}
+  let result: Record<string, number> = {}
 
   for (const [resource, cfg] of Object.entries(rewards_config)) {
     // если probability не указано — выпадает всегда
