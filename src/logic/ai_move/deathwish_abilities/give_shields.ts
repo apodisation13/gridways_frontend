@@ -1,7 +1,8 @@
 import { sound_enemy_regain_shield } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import type { GameObj } from "@/types"
 
-export function give_shields_to_all(gameObj) {
+export function give_shields_to_all(gameObj: GameObj): void {
   const { field } = gameObj
 
   field.forEach(e => {
@@ -10,7 +11,10 @@ export function give_shields_to_all(gameObj) {
   sound_enemy_regain_shield()
 }
 
-export function give_shield_to_all_deck(gameObj, timeout = 1000) {
+export function give_shield_to_all_deck(
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { enemies } = gameObj
   if (!enemies.length) return
 

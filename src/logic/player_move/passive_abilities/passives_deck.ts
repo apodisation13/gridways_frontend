@@ -7,8 +7,13 @@ import {
   incr_dmg_to_random,
   incr_self_dmg,
 } from "@/logic/player_move/passive_abilities/passives_in_hand/incr_dmg"
+import type { Card, GameObj } from "@/types"
 
-export function deck_passives(card, gameObj, timeout = 1000) {
+export function deck_passives(
+  card: Card,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   if (!allowActionTimer(card)) return
 
   timeoutAnimationFlag(card, "trigger_deck_passive", null, timeout * 0.5)

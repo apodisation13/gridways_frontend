@@ -1,7 +1,12 @@
 import { sound_enemy_move_down } from "@/logic/play_sounds"
 import { damage_player } from "@/logic/ai_move/moves/damage"
+import type { Enemy } from "@/types"
 
-function right_move(field, i, timeout = 1000) {
+export function right_move(
+  field: (Enemy | "")[],
+  i: number,
+  timeout = 1000
+): void {
   // враг, который стоит снизу справа, ячейка номер 11
   if (i === 11) {
     damage_player(field, i, timeout)
@@ -21,5 +26,3 @@ function right_move(field, i, timeout = 1000) {
   field[i] = ""
   sound_enemy_move_down()
 }
-
-export { right_move }

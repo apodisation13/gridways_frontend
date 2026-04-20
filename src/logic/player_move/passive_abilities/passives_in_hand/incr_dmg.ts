@@ -1,8 +1,13 @@
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { choice } from "@/lib/utils"
+import type { Card, GameObj } from "@/types"
 
-export function incr_self_dmg(card, deck_or_grave = false, timeout = 1000) {
+export function incr_self_dmg(
+  card: Card,
+  deck_or_grave = false,
+  timeout = 1000
+): void {
   timeoutAnimationFlag(
     card,
     "incr_dmg",
@@ -17,12 +22,12 @@ export function incr_self_dmg(card, deck_or_grave = false, timeout = 1000) {
 }
 
 export function incr_dmg_to_random(
-  card,
-  gameObj,
-  to,
+  card: Card,
+  gameObj: GameObj,
+  to: string,
   deck_or_grave = false,
   timeout = 1000
-) {
+): void {
   const { hand, deck, grave } = gameObj
   let target
   if (to === "hand") {
@@ -52,7 +57,11 @@ export function incr_dmg_to_random(
   target.data.damage += card.data.passive.value
 }
 
-export function inc_dmg_by_len_grave(card, gameObj, timeout = 1000) {
+export function inc_dmg_by_len_grave(
+  card: Card,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { grave } = gameObj
 
   timeoutAnimationFlag(
@@ -68,7 +77,11 @@ export function inc_dmg_by_len_grave(card, gameObj, timeout = 1000) {
   card.data.damage += grave.length
 }
 
-export function incr_dmg_by_len_deck(card, gameObj, timeout = 1000) {
+export function incr_dmg_by_len_deck(
+  card: Card,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { deck } = gameObj
 
   timeoutAnimationFlag(
@@ -84,7 +97,11 @@ export function incr_dmg_by_len_deck(card, gameObj, timeout = 1000) {
   card.data.damage += deck.length
 }
 
-export function incr_dmg_by_n_enemies_grave(card, gameObj, timeout = 1000) {
+export function incr_dmg_by_n_enemies_grave(
+  card: Card,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { enemies_grave } = gameObj
   if (!enemies_grave.length) return
 

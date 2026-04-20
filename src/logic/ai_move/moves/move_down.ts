@@ -1,7 +1,12 @@
 import { sound_enemy_move_down } from "@/logic/play_sounds"
 import { damage_player } from "@/logic/ai_move/moves/damage"
+import type { Enemy } from "@/types"
 
-function down_move(field, i, timeout = 1000) {
+export function down_move(
+  field: (Enemy | "")[],
+  i: number,
+  timeout = 1000
+): void {
   // враги которые уже стоят внизу
   if (i >= 9) {
     damage_player(field, i, timeout)
@@ -21,5 +26,3 @@ function down_move(field, i, timeout = 1000) {
   field[i] = ""
   sound_enemy_move_down()
 }
-
-export { down_move }

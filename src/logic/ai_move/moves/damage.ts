@@ -2,9 +2,14 @@ import store from "@/store"
 import { sound_enemy_damage_player, sound_hit_armor } from "@/logic/play_sounds"
 import { check_lose } from "@/logic/ai_move/service/check_lose"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import type { Enemy } from "@/types"
 
-function damage_player(field, i, timeout = 1000) {
-  if (field[i].locked) return
+export function damage_player(
+  field: (Enemy | "")[],
+  i: number,
+  timeout = 1000
+): void {
+  if ((field[i] as Enemy).locked) return
 
   if (store.state.game.armor > 0) {
     timeoutAnimationFlag(field[i], "damages_player", null, timeout * 0.5)
@@ -19,9 +24,7 @@ function damage_player(field, i, timeout = 1000) {
 
   sound_enemy_damage_player()
 
-  store.commit("change_health", -field[i].data.damage)
+  store.commit("change_health", -(field[i] as Enemy).data.damage)
   timeoutAnimationFlag(field[i], "damages_player", null, timeout * 0.5)
   check_lose()
 }
-
-export { damage_player }

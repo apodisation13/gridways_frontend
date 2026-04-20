@@ -1,8 +1,14 @@
 import router from "@/router/router"
 import store from "@/store"
+import type { Enemy, EnemyLeader } from "@/types"
 
 // проверка выигрыша - если осталось 0 врагов и на поле никого
-function check_win(field, enemy_list, enemy_leader, enemies_grave) {
+export function check_win(
+  field: (Enemy | "")[],
+  enemy_list: Enemy[],
+  enemy_leader: EnemyLeader,
+  enemies_grave: Enemy[]
+): void {
   if (enemy_list.length !== 0) return
   if (enemy_leader.data.hp > 0) return
 
@@ -14,5 +20,3 @@ function check_win(field, enemy_list, enemy_leader, enemies_grave) {
   store.commit("set_enemies_grave", enemies_grave)
   router.push("win")
 }
-
-export { check_win }

@@ -1,7 +1,12 @@
 import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
 import { sound_deathwish, sound_heal } from "@/logic/play_sounds"
+import type { Enemy, GameObj } from "@/types"
 
-export function deathwish_heal_all(enemy, gameObj, timeout = 1000) {
+export function deathwish_heal_all(
+  enemy: Enemy,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { field, enemy_leader } = gameObj
   let all_enemies = get_all_enemies(field, enemy_leader)
 

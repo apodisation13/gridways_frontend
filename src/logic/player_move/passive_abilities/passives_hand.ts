@@ -17,8 +17,13 @@ import {
   poison_random_enemy_passive,
 } from "@/logic/player_move/passive_abilities/passives_in_hand/poison"
 import { add_armor_passive } from "@/logic/player_move/passive_abilities/passives_in_hand/armor"
+import type { Card, GameObj } from "@/types"
 
-export function hand_passives(card, gameObj, timeout = 1000) {
+export function hand_passives(
+  card: Card,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   if (!allowActionTimer(card)) return
 
   // ДИСПЕТЧЕР ПАССИВНЫХ АБИЛОК В РУКЕ!

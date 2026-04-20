@@ -1,8 +1,14 @@
 import { check_win } from "@/logic/player_move/service/check_win"
 import { deathwish } from "@/logic/ai_move/ai_deathwish_abilities"
 import { EnemyStatus } from "@/types"
+import type { Enemy, EnemyLeader, GameObj } from "@/types"
 
-export function enemy_takes_damage(enemy, card, gameObj, timeout = 1000) {
+export function enemy_takes_damage(
+  enemy: Enemy | EnemyLeader,
+  card: { data: { damage: number } },
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   // поставили на 0.5 врагу это поле, чтобы проиграть анимацию урона
   enemy.hp_delta = -card.data.damage
   setTimeout(() => {
@@ -16,20 +22,26 @@ export function enemy_takes_damage(enemy, card, gameObj, timeout = 1000) {
   }, timeout)
 }
 
-export function remove_dead_enemy(enemy, gameObj, timeout = 1000) {
+export function remove_dead_enemy(
+  enemy: Enemy | EnemyLeader,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { field, enemy_leader, enemies, enemies_grave } = gameObj
 
-  if (!enemy.color) {
+  if (!(enemy as Enemy).color) {
     enemy_leader.data.hp = 0
     enemy_leader.data.status = null
     console.log("умер лидер врагов")
     if (enemy_leader.deathwish?.name) deathwish(enemy_leader, gameObj, timeout)
   } else {
-    field[field.indexOf(enemy)] = ""
+    field[field.indexOf(enemy as Enemy)] = ""
     console.log("враг умер")
-    enemy.data.hp = enemy.data.base.base_hp
-    if (enemy.data.status !== EnemyStatus.Doomed) enemies_grave.push(enemy)
-    if (enemy.deathwish?.name) deathwish(enemy, gameObj, timeout)
+    ;(enemy as Enemy).data.hp = (enemy as Enemy).data.base.base_hp
+    if ((enemy as Enemy).data.status !== EnemyStatus.Doomed)
+      enemies_grave.push(enemy as Enemy)
+    if ((enemy as Enemy).deathwish?.name)
+      deathwish(enemy as Enemy, gameObj, timeout)
   }
   check_win(field, enemies, enemy_leader, enemies_grave)
 }

@@ -5,8 +5,13 @@ import {
 import { sound_destroy_enemy } from "@/logic/play_sounds"
 import { choice_pop } from "@/lib/utils"
 import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
+import type { Card, GameObj } from "@/types"
 
-function destroy_2_enemies(card, gameObj, timeout = 1000) {
+export function destroy_2_enemies(
+  card: Card,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { field, enemy_leader, hand, grave, deck } = gameObj
 
   let all_enemies = get_all_enemies(field, enemy_leader)
@@ -27,5 +32,3 @@ function destroy_2_enemies(card, gameObj, timeout = 1000) {
   })
   remove_dead_card(card, grave, hand, deck)
 }
-
-export { destroy_2_enemies }

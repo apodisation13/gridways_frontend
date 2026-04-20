@@ -61,6 +61,7 @@ export interface EnemyData {
     each_tick?: boolean
   }
   deathwish?: { value?: number }
+  value?: number
 }
 
 export interface EnemyLeaderData {
@@ -72,6 +73,7 @@ export interface EnemyLeaderData {
     default_timer?: number
     reset_timer?: boolean
   }
+  shield?: boolean | string
 }
 
 export interface Ability {
@@ -124,6 +126,10 @@ export interface Card {
   healing?: boolean | null
   p_dmg_delta?: number | null
   passive_poisoning?: boolean | null
+  spawning?: boolean | null
+  p_damages_enemy?: boolean | null
+  trigger_deck_passive?: boolean | null
+  trigger_grave_passive?: boolean | null
 }
 
 export interface Leader {
@@ -148,16 +154,21 @@ export interface Enemy {
   faction: string
   color: string
   move: Move
-  passive_ability: EnemyPassiveAbility
-  deathwish: Deathwish
+  passive_ability: EnemyPassiveAbility | null
+  deathwish: Deathwish | null
   data: EnemyData
   image: string
+  token?: boolean
   // animation fields
   hp_delta?: number | null
   already_jumped?: boolean
   locked?: boolean
   dmg_delta?: number | null
   p_dmg_delta?: number | null
+  damages_player?: boolean | null
+  spawning?: boolean | null
+  incr_dmg?: boolean | null
+  healing?: boolean | null
   trigger_deck_passive?: boolean
   trigger_grave_passive?: boolean
 }
@@ -170,6 +181,8 @@ export interface EnemyLeader {
   passive_ability: EnemyPassiveAbility
   data: EnemyLeaderData
   image: string
+  deathwish?: Deathwish | null
+  locked?: boolean
   // animation fields
   hp_delta?: number | null
 }

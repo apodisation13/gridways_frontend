@@ -2,8 +2,13 @@ import { get_random_enemy } from "@/logic/player_move/service/service_for_player
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
 import { sound_damage_one } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import type { Card, GameObj } from "@/types"
 
-function damage_random_enemy(card, gameObj, timeout = 1000) {
+export function damage_random_enemy(
+  card: Card,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { field, enemy_leader } = gameObj
   let target = get_random_enemy(field, enemy_leader) // взяли всех врагов, из них взяли одного
 
@@ -17,5 +22,3 @@ function damage_random_enemy(card, gameObj, timeout = 1000) {
   )
   timeoutAnimationFlag(card, "p_damages_enemy", sound_damage_one, timeout * 0.5)
 }
-
-export { damage_random_enemy }

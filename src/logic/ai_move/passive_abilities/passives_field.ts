@@ -29,8 +29,13 @@ import {
   spawn_tokens_in_deck,
   spawn_faction_unit,
 } from "@/logic/ai_move/passive_abilities/passives_in_field/spawns"
+import type { Enemy, GameObj } from "@/types"
 
-export function field_passives(enemy, gameObj, timeout = 1000) {
+export function field_passives(
+  enemy: Enemy,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   if (!allowActionTimer(enemy)) return
 
   const { enemy_leader, field, hand } = gameObj
