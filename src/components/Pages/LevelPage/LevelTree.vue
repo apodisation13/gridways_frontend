@@ -64,7 +64,7 @@
 
 <script>
 import { useToast } from "vue-toastification"
-import LevelModal from "@/components/ModalWindows/LevelModal"
+import LevelModal from "@/components/ModalWindows/LevelModal.vue"
 
 export default {
   name: "LevelTree",

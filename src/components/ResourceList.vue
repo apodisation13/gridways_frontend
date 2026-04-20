@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import ResourceItem from "@/components/UI/ResourceItem"
+import ResourceItem from "@/components/UI/ResourceItem.vue"
 export default {
   components: { ResourceItem },
   name: "resource-comp",

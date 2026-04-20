@@ -30,9 +30,9 @@
 </template>
 
 <script>
-import ModalWindow from "@/components/ModalWindows/ModalWindow"
-import CardListComponent from "@/components/Cards/CardListComponent"
-import CardItem from "@/components/Cards/CardItem"
+import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
+import CardListComponent from "@/components/Cards/CardListComponent.vue"
+import CardItem from "@/components/Cards/CardItem.vue"
 import EnemyList from "@/components/Cards/EnemyList.vue"
 import { arrowMixin } from "@/mixins/GamePage/arrow_draw"
 export default {

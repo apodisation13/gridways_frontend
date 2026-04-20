@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import EnemyComp from "@/components/Cards/EnemyComp"
+import EnemyComp from "@/components/Cards/EnemyComp.vue"
 export default {
   name: "EnemyList",
   components: { EnemyComp },

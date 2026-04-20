@@ -31,8 +31,8 @@
 </template>
 
 <script>
-import BaseModal from "@/components/ModalWindows/BaseModal"
-import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg"
+import BaseModal from "@/components/ModalWindows/BaseModal.vue"
+import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions.vue"
 
 export default {

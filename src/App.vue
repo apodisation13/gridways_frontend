@@ -19,10 +19,10 @@
 </template>
 
 <script>
-import MenuFooter from "@/components/UI/Menu/MenuFooter"
-import MenuHeader from "@/components/UI/Menu/MenuHeader"
-import PageImage from "@/components/PageImage"
-import AppWrapperFullscreen from "@/components/Pages/AppWrapperFullscreen/AppWrapperFullscreen"
+import MenuFooter from "@/components/UI/Menu/MenuFooter.vue"
+import MenuHeader from "@/components/UI/Menu/MenuHeader.vue"
+import PageImage from "@/components/PageImage.vue"
+import AppWrapperFullscreen from "@/components/Pages/AppWrapperFullscreen/AppWrapperFullscreen.vue"
 
 export default {
   components: {

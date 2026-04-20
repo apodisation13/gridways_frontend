@@ -176,8 +176,8 @@
 
 <script>
 import { useToast } from "vue-toastification"
-import AgreementModal from "@/components/ModalWindows/AgreementModal"
-import PolicyModal from "@/components/ModalWindows/PolicyModal"
+import AgreementModal from "@/components/ModalWindows/AgreementModal.vue"
+import PolicyModal from "@/components/ModalWindows/PolicyModal.vue"
 export default {
   components: { AgreementModal, PolicyModal },
   setup() {

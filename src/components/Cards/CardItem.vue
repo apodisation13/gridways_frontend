@@ -23,8 +23,8 @@
 
 <script>
 import { border_for_card, border_leader } from "@/logic/border_styles"
-import CardModal from "@/components/ModalWindows/CardModal"
-import CardUi from "@/components/Cards/CardUi"
+import CardModal from "@/components/ModalWindows/CardModal.vue"
+import CardUi from "@/components/Cards/CardUi.vue"
 export default {
   components: {
     CardUi,

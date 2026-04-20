@@ -46,8 +46,8 @@
   </div>
 </template>
 <script>
-import CardListComponent from "@/components/Cards/CardListComponent"
-import ResourceCountRombus from "@/components/UI/ResourceCountRombus"
+import CardListComponent from "@/components/Cards/CardListComponent.vue"
+import ResourceCountRombus from "@/components/UI/ResourceCountRombus.vue"
 export default {
   components: { CardListComponent, ResourceCountRombus },
   name: "reward-comp",

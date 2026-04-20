@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import DeckPreviewComp from "@/components/DeckPreviewComp"
-import YesnoModal from "@/components/ModalWindows/YesnoModal"
+import DeckPreviewComp from "@/components/DeckPreviewComp.vue"
+import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
 export default {
   name: "deck-selection",
   components: { YesnoModal, DeckPreviewComp },

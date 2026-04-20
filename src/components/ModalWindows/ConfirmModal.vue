@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import BaseButton from "@/components/UI/Buttons/BaseButton"
-import BaseModal from "@/components/ModalWindows/BaseModal"
+import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
+import BaseModal from "@/components/ModalWindows/BaseModal.vue"
 
 export default {
   components: { BaseModal, BaseButton },

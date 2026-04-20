@@ -25,8 +25,8 @@
 
 <script>
 import { border_leader } from "@/logic/border_styles"
-import CardModal from "@/components/ModalWindows/CardModal"
-import EnemyUi from "@/components/Cards/EnemyUi"
+import CardModal from "@/components/ModalWindows/CardModal.vue"
+import EnemyUi from "@/components/Cards/EnemyUi.vue"
 
 export default {
   name: "enemy-leader",

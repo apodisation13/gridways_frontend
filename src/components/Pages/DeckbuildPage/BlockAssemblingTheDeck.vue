@@ -59,10 +59,10 @@
 </template>
 
 <script>
-import AssemblingPoolList from "@/components/Pages/DeckbuildPage/AssemblingPoolList"
-import InputNameForDeck from "@/components/Pages/DeckbuildPage/InputNameForDeck"
-import CreateButton from "@/components/Pages/DeckbuildPage/Buttons/CreateButton"
-import CardItem from "@/components/Cards/CardItem"
+import AssemblingPoolList from "@/components/Pages/DeckbuildPage/AssemblingPoolList.vue"
+import InputNameForDeck from "@/components/Pages/DeckbuildPage/InputNameForDeck.vue"
+import CreateButton from "@/components/Pages/DeckbuildPage/Buttons/CreateButton.vue"
+import CardItem from "@/components/Cards/CardItem.vue"
 export default {
   components: {
     AssemblingPoolList,

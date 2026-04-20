@@ -127,13 +127,13 @@
 </template>
 
 <script>
-import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle"
-import CardCharges from "@/components/UI/CardsUI/Cards/CardCharges"
-import CardPassive from "@/components/UI/CardsUI/CardPassive"
-import CardAbilityCircle from "@/components/UI/CardsUI/Cards/AbilityCircleCard"
-import CardDamageIcon from "@/components/UI/CardsUI/CardDamageIcon"
-import HeartIcon from "@/components/UI/CardsUI/HeartIcon"
-import SpecialTypeOfCard from "@/components/UI/CardsUI/Cards/SpecialTypeOfCard"
+import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle.vue"
+import CardCharges from "@/components/UI/CardsUI/Cards/CardCharges.vue"
+import CardPassive from "@/components/UI/CardsUI/CardPassive.vue"
+import CardAbilityCircle from "@/components/UI/CardsUI/Cards/AbilityCircleCard.vue"
+import CardDamageIcon from "@/components/UI/CardsUI/CardDamageIcon.vue"
+import HeartIcon from "@/components/UI/CardsUI/HeartIcon.vue"
+import SpecialTypeOfCard from "@/components/UI/CardsUI/Cards/SpecialTypeOfCard.vue"
 import {
   background_color,
   background_color_charges,
