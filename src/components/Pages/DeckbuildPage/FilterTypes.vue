@@ -9,26 +9,27 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import { CardType } from "@/types"
 
-export default {
+export default defineComponent({
   name: "filter-types",
   data() {
     return {
-      types: [CardType.Unit, CardType.Special],
+      types: [CardType.Unit, CardType.Special] as CardType[],
     }
   },
   methods: {
-    filtering(type) {
+    filtering(type: CardType): void {
       this.$emit("set-filter", "type", type)
     },
-    reset_filter_types() {
+    reset_filter_types(): void {
       this.$emit("reset-filter-types")
     },
   },
   emits: ["set-filter", "reset-filter-types"],
-}
+})
 </script>
 
 <style scoped>

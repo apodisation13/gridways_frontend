@@ -36,16 +36,18 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import DeckModal from "@/components/ModalWindows/DeckModal.vue"
 import { background_color_deck } from "@/logic/border_styles"
+import type { DeckEntry } from "@/types"
 
-export default {
+export default defineComponent({
   name: "deck-preview-comp",
   components: { DeckModal },
   props: {
     deck: {
-      type: Object,
+      type: Object as PropType<DeckEntry>,
       required: true,
     },
     deckbuilder: {
@@ -55,11 +57,11 @@ export default {
   },
   data() {
     return {
-      show_deck: false,
+      show_deck: false as boolean,
     }
   },
   computed: {
-    cardBorder() {
+    cardBorder(): Record<string, string> {
       const bg = background_color_deck(this.deck.deck)
       const color = bg?.backgroundColor || "#888"
       return {
@@ -67,23 +69,23 @@ export default {
         boxShadow: `0 0 10px ${color}44`,
       }
     },
-    leaderBg() {
+    leaderBg(): Record<string, string> {
       return {
-        backgroundImage: `url(${this.deck.deck.leader.image})`,
+        backgroundImage: `url(${this.deck.deck.leader?.image})`,
       }
     },
-    isSelected() {
+    isSelected(): boolean {
       if (this.deckbuilder) return false
       const current_deck_id = this.$store.state.game.current_deck_id
       return current_deck_id === this.deck.id // это user_decks.id
     },
   },
   methods: {
-    open_deck_view() {
+    open_deck_view(): void {
       this.show_deck = true
     },
   },
-}
+})
 </script>
 
 <style scoped>

@@ -10,19 +10,22 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
+import type { Card, Leader, Enemy } from "@/types"
+export default defineComponent({
   props: {
     card: {
       required: false,
       default: null,
+      type: Object as PropType<Card | Leader | Enemy | null>,
     },
     inline: {
       type: Boolean,
       default: false,
     },
   },
-}
+})
 </script>
 
 <style scoped>

@@ -10,12 +10,14 @@
   </modal-window>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import CardItem from "@/components/Cards/CardItem.vue"
-export default {
+import type { DeckCardEntry, Leader } from "@/types"
+export default defineComponent({
   name: "deck-modal",
   components: {
     CardItem,
@@ -25,21 +27,21 @@ export default {
   },
   props: {
     deck: {
-      type: Object,
+      type: Array as PropType<DeckCardEntry[]>,
       required: true,
     },
     leader: {
-      type: Object,
+      type: Object as PropType<Leader>,
       required: true,
     },
   },
   methods: {
-    close_self() {
+    close_self(): void {
       this.$emit("close_deck_modal")
     },
   },
   emits: ["close_deck_modal"],
-}
+})
 </script>
 
 <style scoped>

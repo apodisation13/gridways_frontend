@@ -15,11 +15,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import FactionItem from "@/components/Pages/DeckbuildPage/FactionItem.vue"
 import BaseTitleText from "@/components/UI/BaseTitleText.vue"
+import type { Faction } from "@/types"
 
-export default {
+export default defineComponent({
   components: {
     FactionItem,
     BaseTitleText,
@@ -38,19 +40,19 @@ export default {
     },
   },
   computed: {
-    factions() {
+    factions(): Faction[] {
       return this.$store.getters["all_factions"]
     },
   },
   methods: {
-    filtering(faction) {
+    filtering(faction: Faction): void {
       // выбранная фракция и флаг что выбрано ТРУ
       this.$emit("set-filter", "faction", faction.name)
       // this.$emit("filter-factions", [[faction.name, "Neutral"], true])
     },
   },
   emits: ["set-filter"],
-}
+})
 </script>
 
 <style scoped>

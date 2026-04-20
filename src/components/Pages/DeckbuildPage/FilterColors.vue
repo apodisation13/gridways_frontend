@@ -15,8 +15,9 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+export default defineComponent({
   name: "filter-colors",
   data() {
     return {
@@ -24,19 +25,19 @@ export default {
         ["Gold", "gold"],
         ["Silver", "silver"],
         ["Bronze", "lightsalmon"],
-      ],
+      ] as [string, string][],
     }
   },
   methods: {
-    filtering(color) {
+    filtering(color: [string, string]): void {
       this.$emit("set-filter", "color", color[0])
     },
-    reset_filter_colors() {
+    reset_filter_colors(): void {
       this.$emit("reset-filter-colors")
     },
   },
   emits: ["set-filter", "reset-filter-colors"],
-}
+})
 </script>
 
 <style scoped>

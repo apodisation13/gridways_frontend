@@ -10,11 +10,12 @@
   </base-modal>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import DeckSelection from "@/components/DeckSelection.vue"
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
 import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
-export default {
+export default defineComponent({
   name: "decks-list-modal",
   components: { ButtonCloseImg, BaseModal, DeckSelection },
   props: {
@@ -24,16 +25,16 @@ export default {
     },
   },
   methods: {
-    close_self() {
+    close_self(): void {
       this.$emit("close_decks_list_modal")
     },
-    show_deck(index) {
+    show_deck(index: number): void {
       this.$emit("change_deck", index)
       this.close_self()
     },
   },
   emits: ["close_decks_list_modal", "change_deck"],
-}
+})
 </script>
 
 <style scoped>

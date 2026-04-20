@@ -6,16 +6,18 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
+import type { Faction } from "@/types"
+export default defineComponent({
   props: {
     faction: {
-      type: Object,
+      type: Object as PropType<Faction>,
       required: true,
     },
   },
   methods: {
-    getTypeFaction(name) {
+    getTypeFaction(name: string): string | undefined {
       switch (name) {
         case "Neutral":
           return "faction-n"
@@ -28,7 +30,7 @@ export default {
       }
     },
   },
-}
+})
 </script>
 
 <style scoped>

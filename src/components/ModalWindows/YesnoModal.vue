@@ -53,11 +53,12 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
 import { styleWrapper } from "@/logic/border_styles"
 
-export default {
+export default defineComponent({
   name: "yesno-modal",
   components: { ResourceItem },
   props: {
@@ -92,38 +93,40 @@ export default {
   },
   data() {
     return {
-      quantity: 1,
+      quantity: 1 as number,
     }
   },
   computed: {
-    resource() {
+    resource(): Record<string, number> {
       return this.$store.getters["resource"]
     },
-    styleWrapper() {
+    styleWrapper(): Record<string, string> | undefined {
       return styleWrapper(this.$store.getters["selectedTheme"])
     },
   },
   methods: {
-    onClick(e) {
-      if (e.target.classList.contains("yes_no_modal-fade")) this.cancel()
+    onClick(e: MouseEvent): void {
+      if ((e.target as HTMLElement).classList.contains("yes_no_modal-fade"))
+        this.cancel()
     },
-    increment() {
-      if (this.item_price * (this.quantity + 1) > this.resource.wood) return
+    increment(): void {
+      if ((this.item_price ?? 0) * (this.quantity + 1) > this.resource.wood)
+        return
       this.quantity += 1
     },
-    decrement() {
+    decrement(): void {
       if (this.quantity === 1) return
       this.quantity -= 1
     },
-    confirm() {
+    confirm(): void {
       this.$emit("confirm", this.quantity)
     },
-    cancel() {
+    cancel(): void {
       this.$emit("cancel")
     },
   },
   emits: ["confirm", "cancel"],
-}
+})
 </script>
 
 <style scoped>

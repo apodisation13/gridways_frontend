@@ -39,13 +39,14 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions.vue"
 import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon.vue"
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
 import ButtonToggleCardList from "@/components/Pages/DeckbuildPage/Buttons/ButtonToggleCardList.vue"
 
-export default {
+export default defineComponent({
   components: {
     FilterFactions,
     ButtonIcon,
@@ -66,21 +67,21 @@ export default {
   },
   data() {
     return {
-      disable_start_animation: true, // флаг выключения первичной анимации
-      showNewDeckFactionSelect: false,
-      showFilters: false,
+      disable_start_animation: true as boolean, // флаг выключения первичной анимации
+      showNewDeckFactionSelect: false as boolean,
+      showFilters: false as boolean,
     }
   },
   methods: {
-    setFilter(prop, value) {
+    setFilter(prop: string, value: unknown): void {
       // если мы нажали кнопку фильтра фракций при сборе колоде, ещё ставим флаг сбора колоды и закрываем окно
       this.showNewDeckFactionSelect = false
       this.$emit("select_faction", prop, value)
     },
-    showList(value) {
+    showList(value: string): void {
       this.$emit("trigger_show_list", value)
     },
-    clickAddButton() {
+    clickAddButton(): void {
       if (!this.showNewDeckFactionSelect && !this.deckBuilding) {
         this.showNewDeckFactionSelect = true
         return
@@ -88,12 +89,12 @@ export default {
       this.showNewDeckFactionSelect = false
       this.$emit("reset")
     },
-    cancelFilters() {
+    cancelFilters(): void {
       this.$emit("reset-filters")
     },
   },
   computed: {
-    isCansel() {
+    isCansel(): boolean {
       return this.showNewDeckFactionSelect || this.deckBuilding
     },
   },
@@ -104,7 +105,7 @@ export default {
     "reset",
     "reset-filters",
   ],
-}
+})
 </script>
 
 <style scoped>

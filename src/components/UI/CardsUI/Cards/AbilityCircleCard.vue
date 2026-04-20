@@ -70,11 +70,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import HealAbility from "@/components/UI/CardsUI/HealAbility.vue"
 import { CardAbility } from "@/types"
 import AbilityIcon from "@/components/UI/CardsUI/Cards/Abilities/AbilityIcon.vue"
-export default {
+import type { Card, Leader } from "@/types"
+export default defineComponent({
   name: "card-ability-circle",
   computed: {
     CardAbility() {
@@ -87,11 +89,11 @@ export default {
   },
   props: {
     card: {
-      type: Object,
+      type: Object as PropType<Card | Leader>,
       required: true,
     },
   },
-}
+})
 </script>
 
 <style scoped></style>

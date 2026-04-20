@@ -18,8 +18,9 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+export default defineComponent({
   props: {
     health: {
       type: [Number, String],
@@ -33,7 +34,7 @@ export default {
     },
   },
   computed: {
-    bgImage() {
+    bgImage(): Record<string, string> {
       if (this.hp_delta < 0)
         return {
           backgroundImage: `url(${require("@/assets/icons/card/heart_red.svg")})`,
@@ -46,11 +47,11 @@ export default {
         backgroundImage: `url(${require("@/assets/icons/card/heart_green.svg")})`,
       }
     },
-    flashDuration() {
+    flashDuration(): number {
       return this.$store.getters["selectedMoveTimeout"]
     },
   },
-}
+})
 </script>
 
 <style scoped>

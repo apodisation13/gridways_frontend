@@ -2,15 +2,16 @@
   <div class="btn_close_img" v-on:click="close"></div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+export default defineComponent({
   methods: {
-    close() {
+    close(): void {
       this.$emit("handle_close")
     },
   },
   emits: ["handle_close"],
-}
+})
 </script>
 
 <style scoped>

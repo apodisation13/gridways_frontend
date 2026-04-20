@@ -2,15 +2,16 @@
   <div class="ability-icon" :style="{ backgroundImage: `url(${icon})` }"></div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+export default defineComponent({
   props: {
     icon: {
       type: String,
       required: true,
     },
   },
-}
+})
 </script>
 
 <style scoped>

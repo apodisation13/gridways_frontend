@@ -11,19 +11,20 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+export default defineComponent({
   name: "filter-unlocked",
   methods: {
-    filtering(count) {
+    filtering(count: number): void {
       this.$emit("set-filter", "count", count)
     },
-    reset_filter_types() {
+    reset_filter_types(): void {
       this.$emit("reset-filter-unlocked")
     },
   },
   emits: ["set-filter", "reset-filter-unlocked"],
-}
+})
 </script>
 
 <style scoped>

@@ -14,25 +14,27 @@
   </transition-group>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import CardItem from "@/components/Cards/CardItem.vue"
-export default {
+import type { DeckCardEntry } from "@/types"
+export default defineComponent({
   components: {
     CardItem,
   },
   props: {
     deck_is_progress: {
-      type: Array,
+      type: Array as PropType<DeckCardEntry[]>,
       default() {
         return []
       },
     },
   },
   methods: {
-    delete_card_from_deck(card) {
-      return this.$emit("delete_card_from_deck", card)
+    delete_card_from_deck(card: DeckCardEntry): void {
+      this.$emit("delete_card_from_deck", card)
     },
-    change_order(index) {
+    change_order(index: number): void {
       if (this.deck_is_progress.length === index + 1) {
         return
       }
@@ -40,7 +42,7 @@ export default {
     },
   },
   emits: ["delete_card_from_deck", "change_order_deck"],
-}
+})
 </script>
 
 <style scoped>
