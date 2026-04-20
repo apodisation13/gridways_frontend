@@ -1,8 +1,13 @@
 import { copyObj } from "@/lib/utils"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
+import type { Enemy, GameObj } from "@/types"
 
-export function set_dmg_as_highest_hand(enemy, gameObj, timeout = 1000) {
+export function set_dmg_as_highest_hand(
+  enemy: Enemy,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { hand } = gameObj
   if (!hand.length) return
 

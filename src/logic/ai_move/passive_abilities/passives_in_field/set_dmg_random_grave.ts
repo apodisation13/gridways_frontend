@@ -1,8 +1,13 @@
 import { choice_element } from "@/lib/utils"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
+import type { Enemy, GameObj } from "@/types"
 
-export function set_dmg_random_grave(enemy, gameObj, timeout = 1000) {
+export function set_dmg_random_grave(
+  enemy: Enemy,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const { enemies_grave } = gameObj
   if (!enemies_grave.length) return
 

@@ -2,7 +2,7 @@ import { choice_element, copyObj } from "@/lib/utils"
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { CardAbility, CardColor, CardType } from "@/types"
-import type { Card, Enemy, Leader } from "@/types"
+import type { Card, CardEntry, Enemy, Leader } from "@/types"
 import {
   change_card_charges,
   remove_dead_card,
@@ -111,7 +111,7 @@ export default defineComponent({
         )
       } else if (ability === CardAbility.CreateSpecial) {
         // вот это сложно... выбираем 3 случайные бронзовые спец карты НЕ из фракции
-        const pool = this.$store.getters["all_cards"].filter(
+        const pool = (this.$store.getters["all_cards"] as CardEntry[]).filter(
           c =>
             c.card.faction !== this.gameObj.leader.faction &&
             c.card.type === CardType.Special &&
@@ -123,7 +123,7 @@ export default defineComponent({
         }
       } else if (ability === CardAbility.CreateAnyUnit) {
         // выбираем 3 случайных ЮНИТА из всех карт этой фракции
-        const pool = this.$store.getters["all_cards"].filter(
+        const pool = (this.$store.getters["all_cards"] as CardEntry[]).filter(
           c =>
             c.card.faction === this.gameObj.leader.faction &&
             c.card.type === CardType.Unit
@@ -134,7 +134,7 @@ export default defineComponent({
         }
       } else if (ability === CardAbility.CreateAndPutToDeck) {
         // выбираем 3 случайных ЮНИТА из всех карт вообще и кладем его в КОЛОДУ
-        const pool = this.$store.getters["all_cards"].filter(
+        const pool = (this.$store.getters["all_cards"] as CardEntry[]).filter(
           c => c.card.type === CardType.Unit
         )
         for (let i = 0; i < 3; i++) {
@@ -163,7 +163,7 @@ export default defineComponent({
         this.gameObj.hand.push(card as Card)
         this.gameObj.grave.splice(this.gameObj.grave.indexOf(card as Card), 1)
       } else if (this.ability === CardAbility.GiveChargesToCardInHand1) {
-        change_card_charges(card, 1)
+        change_card_charges(card as Card, 1)
       } else if (this.ability === CardAbility.DiscardDraw2) {
         this.gameObj.grave.push(card)
         this.gameObj.hand.splice(this.gameObj.hand.indexOf(card), 1)
@@ -204,7 +204,7 @@ export default defineComponent({
       } else if (this.ability === CardAbility.DecrDmgToHandIncrToRandomHand) {
         card.data.damage -= this.special_case_value
         if (card.data.damage < 0) card.data.damage = 0
-        const random_card = choice_element(this.gameObj.hand)
+        const random_card = choice_element(this.gameObj.hand) as Card
         random_card.data.damage += this.special_case_value
         this.incrDmg(random_card, this.special_case_value)
       } else if (this.ability === CardAbility.IncrDmgByNCharges) {

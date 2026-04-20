@@ -3,9 +3,10 @@ import { get_empty_field_indexes } from "@/logic/player_move/service/service_for
 import { sound_deathwish } from "@/logic/play_sounds"
 import { get_default_enemy } from "@/logic/ai_move/service/service_for_ai_move"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import type { Enemy, GameObj } from "@/types"
 
 // создает на поле deathwish_value копий убитого врага без deathwish в случайных свободных клетках
-export function spawn_self(enemy, gameObj) {
+export function spawn_self(enemy: Enemy, gameObj: GameObj): void {
   const defaultEnemy = get_default_enemy(enemy)
   if (!defaultEnemy) return
 
@@ -20,7 +21,11 @@ export function spawn_self(enemy, gameObj) {
 }
 
 // создает в колоде врагов deathwish_value копий убитого врага без deathwish
-export function spawn_self_at_deck(enemy, gameObj, timeout = 1000) {
+export function spawn_self_at_deck(
+  enemy: Enemy,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const defaultEnemy = get_default_enemy(enemy)
   if (!defaultEnemy) return
 
@@ -35,7 +40,11 @@ export function spawn_self_at_deck(enemy, gameObj, timeout = 1000) {
 }
 
 // создает в сбросе врагов deathwish_value копий убитого врага без deathwish
-export function spawn_self_at_grave(enemy, gameObj, timeout = 1000) {
+export function spawn_self_at_grave(
+  enemy: Enemy,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const defaultEnemy = get_default_enemy(enemy)
   if (!defaultEnemy) return
 

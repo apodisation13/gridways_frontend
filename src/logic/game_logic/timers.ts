@@ -1,12 +1,12 @@
 import { sound_timer_down } from "@/logic/play_sounds"
 
 // Или обнуляем таймер, или нет
-function resetTimer(card) {
+function resetTimer(card: any): void {
   if (!card.data?.passive?.reset_timer) return
   card.data.passive.timer = card.data.passive.default_timer
 }
 
-export function timer(card) {
+export function timer(card: any): boolean {
   // если таймер УЖЕ равен 0, то мы не даем юзаться абилке в любом случае
   if (card.data?.passive?.timer === 0) return false
 
@@ -27,11 +27,11 @@ export function timer(card) {
 
 // Поставит выбранному key в объекте тру, а через таймут фолс, и звук воспроизведет
 export function timeoutAnimationFlag(
-  obj,
-  key,
-  soundFunction = null,
+  obj: any,
+  key: string,
+  soundFunction: (() => void) | null = null,
   timeout = 500
-) {
+): void {
   if (soundFunction) soundFunction()
   obj[key] = true
   setTimeout(() => {
@@ -39,7 +39,7 @@ export function timeoutAnimationFlag(
   }, timeout)
 }
 
-export function allowActionTimer(card) {
+export function allowActionTimer(card: any): boolean | undefined {
   // ретерн ТРУ значит что абилку мы выполним на ЭТОМ ШАГУ
   if (!card.data?.passive?.default_timer) return true
 

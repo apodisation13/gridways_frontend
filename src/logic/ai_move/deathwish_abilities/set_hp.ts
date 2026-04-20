@@ -6,16 +6,20 @@ import {
 } from "@/logic/play_sounds"
 import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import type { Enemy, GameObj } from "@/types"
 
 // устанавливает жизни игрока равными enemy.deathwish_value!
-export function set_hp(enemy) {
+export function set_hp(enemy: Enemy): void {
   sound_deathwish()
   store.commit("set_health", enemy.data.deathwish.value)
   sound_enemy_damage_player()
 }
 
 // устанавливает жизни самого слабого врага на поле, включая лидера врагов, равным жизням самого сильного врага на поле
-export function set_weakest_hp_as_highest(gameObj, timeout = 1000) {
+export function set_weakest_hp_as_highest(
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   sound_deathwish()
   const { field, enemy_leader } = gameObj
   let all_enemies = get_all_enemies(field, enemy_leader)
