@@ -106,24 +106,29 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import ResourceList from "@/components/ResourceList.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import type { Recipe } from "@/types"
 
-const ACTION_LABELS = {
+const ACTION_LABELS: Record<string, string> = {
   buy: "Купить",
   sell: "Продать",
   craft: "Создать",
   mill: "Переработать",
 }
 
-export default {
+export default defineComponent({
   name: "resource-action-modal",
   components: { ResourceItem, ResourceList },
   props: {
     resource_name: { type: String, required: true },
-    action: { type: String, required: true },
-    options: { type: Array, required: true },
+    action: {
+      type: String as PropType<"buy" | "sell" | "craft" | "mill">,
+      required: true,
+    },
+    options: { type: Array as PropType<Recipe[]>, required: true },
     step: { type: Number, default: 1 },
   },
   data() {
@@ -133,20 +138,20 @@ export default {
     }
   },
   computed: {
-    actionLabel() {
+    actionLabel(): string {
       return ACTION_LABELS[this.action] ?? this.action
     },
-    isSpending() {
+    isSpending(): boolean {
       return this.action === "sell" || this.action === "mill"
     },
-    optionsLabel() {
+    optionsLabel(): string {
       return this.isSpending ? "Получить" : "Заплатить"
     },
-    resources() {
+    resources(): Record<string, number> {
       return this.$store.getters["resource"]
     },
-    res() {
-      const RESOURCE_ORDER = {
+    res(): Record<string, number> {
+      const RESOURCE_ORDER: Record<string, number> = {
         scraps: 0,
         raw_bronze: 1,
         bronze_ingots: 1,
@@ -171,31 +176,30 @@ export default {
     },
   },
   methods: {
-    increase() {
+    increase(): void {
       this.quantity++
     },
-    decrease() {
+    decrease(): void {
       if (this.quantity > 1) this.quantity--
     },
-    startHold(fn) {
+    startHold(fn: () => void): void {
       fn() // сразу одно срабатывание по нажатию
-      this._holdTimer = setTimeout(() => {
-        this._holdInterval = setInterval(fn, 80) // потом быстро
+      ;(this as any)._holdTimer = setTimeout(() => {
+        ;(this as any)._holdInterval = setInterval(fn, 80) // потом быстро
       }, 400) // задержка перед началом автоповтора
     },
-    stopHold() {
-      clearTimeout(this._holdTimer)
-      clearInterval(this._holdInterval)
+    stopHold(): void {
+      clearTimeout((this as any)._holdTimer)
+      clearInterval((this as any)._holdInterval)
     },
-
-    getIcon(name) {
+    getIcon(name: string): string {
       try {
         return require(`@/assets/icons/resources/${name}.svg`)
       } catch {
         return ""
       }
     },
-    confirm() {
+    confirm(): void {
       if (this.selected === null) return
       this.$emit("confirm", {
         recipe: this.options[this.selected],
@@ -203,8 +207,7 @@ export default {
         step: this.step,
       })
     },
-
-    is_affordable(recipe) {
+    is_affordable(recipe: Recipe): boolean {
       if (this.action === "buy" || this.action === "craft") {
         return Object.entries(recipe).every(
           ([res, amount]) =>
@@ -220,7 +223,7 @@ export default {
           (this.resources[this.resource_name] || 0) >= this.quantity * this.step
         const hasCosts = Object.entries(recipe)
           // eslint-disable-next-line no-unused-vars
-          .filter(([_, amt]) => amt < 0)
+          .filter(([, amt]) => amt < 0)
           .every(
             ([res, amt]) =>
               (this.resources[res] || 0) >= Math.abs(amt) * this.quantity
@@ -228,8 +231,7 @@ export default {
         return hasMain && hasCosts
       }
     },
-
-    is_short(recipe, res) {
+    is_short(recipe: Recipe, res: string): boolean {
       if (this.action === "buy" || this.action === "craft") {
         return (
           (this.resources[res] || 0) < Math.abs(recipe[res]) * this.quantity
@@ -242,9 +244,12 @@ export default {
       }
       return false
     },
-
-    sortedRecipe(recipe) {
-      const order = { crops: 0, wood: 1, money: Infinity }
+    sortedRecipe(recipe: Recipe): [string, number][] {
+      const order: Record<string, number> = {
+        crops: 0,
+        wood: 1,
+        money: Infinity,
+      }
       return Object.entries(recipe).sort(([a], [b]) => {
         const aOrder = order[a] ?? 2
         const bOrder = order[b] ?? 2
@@ -253,7 +258,7 @@ export default {
     },
   },
   emits: ["confirm", "cancel"],
-}
+})
 </script>
 
 <style scoped>

@@ -56,7 +56,7 @@
       v-if="show_modal_mill"
       action="mill"
       :options="mill_options"
-      :card="card"
+      :card="playerCard"
       @confirm="confirm_mill"
       @cancel="show_modal_mill = false"
     />

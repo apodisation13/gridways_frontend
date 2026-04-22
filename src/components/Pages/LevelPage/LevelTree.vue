@@ -23,7 +23,7 @@
             :config="squareConfig(level)"
             @dblclick="setLevel(level)"
             @dbltap="setLevel(level)"
-            @pointerup="end(level)"
+            @pointerup="end"
             @pointerdown="start(level)"
           ></v-rect>
           <!--Текст внутри прямоугольника, или id или значок замка (закрыт)-->
@@ -32,7 +32,7 @@
             :config="textConfig(level)"
             @dblclick="setLevel(level)"
             @dbltap="setLevel(level)"
-            @pointerup="end(level)"
+            @pointerup="end"
             @pointerdown="start(level)"
           ></v-text>
           <!--Значок замка-->
@@ -41,7 +41,7 @@
             :config="imageConfig(level)"
             @dblclick="setLevel(index)"
             @dbltap="setLevel(index)"
-            @pointerup="end(level)"
+            @pointerup="end"
             @pointerdown="start(level)"
           ></v-image>
           <!--Линии связей-->
@@ -49,7 +49,7 @@
           <v-line
             v-for="line in level.level.lines"
             :key="line"
-            :config="lineConfig(line, level)"
+            :config="lineConfig(line)"
           ></v-line>
         </div>
       </v-layer>
@@ -62,26 +62,19 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import { useToast } from "vue-toastification"
 import LevelModal from "@/components/ModalWindows/LevelModal.vue"
+import type { MappedUserLevel, LevelRelatedLevel } from "@/types"
 
-export default {
+export default defineComponent({
   name: "LevelTree",
   components: { LevelModal },
   props: {
-    seasonName: {
-      type: String,
-      required: true,
-    },
-    levels: {
-      type: Array,
-      required: true,
-    },
-    userSeasonUnlocked: {
-      type: Boolean,
-      required: true,
-    },
+    seasonName: { type: String, required: true },
+    levels: { type: Array as PropType<MappedUserLevel[]>, required: true },
+    userSeasonUnlocked: { type: Boolean, required: true },
   },
   setup() {
     const toast = useToast()
@@ -99,23 +92,23 @@ export default {
     return {
       w: 28,
       configKonva: { width: 1000, height: 1000 },
-      levs: [],
-      timer: 0,
-      level: null,
+      levs: [] as any[],
+      timer: 0 as ReturnType<typeof setTimeout> | 0,
+      level: null as MappedUserLevel | null,
       show_level_modal: false,
     }
   },
   methods: {
-    init() {
+    init(): void {
       this.levs = [...this.levels]
-      this.levs.forEach(level => {
+      this.levs.forEach((level: any) => {
         level.level.lines = [] // добавляем такой ключ, чтобы потом положить туда линии
-        level.level.children.forEach(ch => {
+        level.level.children.forEach((ch: LevelRelatedLevel) => {
           this.calc_line(ch, level)
         })
       })
     },
-    squareConfig(item) {
+    squareConfig(item: any): Record<string, unknown> {
       const unlocked = this.userSeasonUnlocked
       return {
         x: item.level.x,
@@ -131,24 +124,25 @@ export default {
         shadowOpacity: unlocked ? 0.6 : 0,
       }
     },
-    levelColor(item) {
+    levelColor(item: any): string {
       if (!this.userSeasonUnlocked) return "grey"
       if (item.finished) return "rgba(255, 231, 183, 1)"
       if (item.unlocked) return "rgba(237, 177, 62, 1)"
       return "silver"
     },
-    levelBorder(item) {
+    levelBorder(item: any): string {
       if (!this.userSeasonUnlocked) return "grey"
       if (item.finished) return ""
       return "rgba(0, 0, 0, 0.13)"
     },
-    levelFaction(item) {
+    levelFaction(item: any): string {
       if (!this.userSeasonUnlocked) return "grey"
       if (item.level.enemy_leader.faction === "Soldiers") return "blue"
       if (item.level.enemy_leader.faction === "Monsters") return "red"
       if (item.level.enemy_leader.faction === "Animals") return "green"
+      return "grey"
     },
-    textConfig(item) {
+    textConfig(item: any): Record<string, unknown> {
       return {
         text: item.level.id,
         fontSize: 16,
@@ -162,7 +156,7 @@ export default {
             : item.level.y + this.w / 4 + 2,
       }
     },
-    imageConfig(item) {
+    imageConfig(item: any): Record<string, unknown> {
       const image = new Image()
       image.src = require("@/assets/icons/locked_level.png")
       return {
@@ -173,7 +167,7 @@ export default {
         image: image,
       }
     },
-    lineConfig(arrow) {
+    lineConfig(arrow: any): Record<string, unknown> {
       return {
         x: arrow.x,
         y: arrow.y,
@@ -188,7 +182,7 @@ export default {
         strokeWidth: 2,
       }
     },
-    starConfig(item, position) {
+    starConfig(item: any, position: number): Record<string, unknown> {
       return {
         x: item.level.x + position,
         y: item.level.y - 7,
@@ -199,15 +193,14 @@ export default {
         strokeWidth: 2,
       }
     },
-    calc_line(ch, item) {
+    calc_line(ch: LevelRelatedLevel, item: any): void {
       const { level } = item
       const connections = ch.connection?.split("-")
       if (!connections || !ch.line) return
-      let x1 = undefined
-      let y1 = undefined
-      let x2 = undefined
-      let y2 = undefined
-
+      let x1: number | undefined
+      let y1: number | undefined
+      let x2: number | undefined
+      let y2: number | undefined
       const levIndex = this.levels.findIndex(
         lev => lev.level.id === ch.related_level_id
       )
@@ -235,7 +228,14 @@ export default {
       }
       this.push_line(connections, level, x1, y1, x2, y2)
     },
-    push_line(connections, level, x1, y1, x2, y2) {
+    push_line(
+      connections: string[],
+      level: any,
+      x1: number | undefined,
+      y1: number | undefined,
+      x2: number | undefined,
+      y2: number | undefined
+    ): void {
       for (const l of connections) {
         if (!this.userSeasonUnlocked) {
           level.lines.push({
@@ -266,7 +266,7 @@ export default {
         points: [0, 0, x1, y1],
       })
     },
-    setLevel(level) {
+    setLevel(level: any): void {
       if (!this.userSeasonUnlocked) {
         // весь сезон закрыт, нельзя поиграть в него вообще
         this.toast.warning("Весь этот сезон закрыт!")
@@ -283,19 +283,19 @@ export default {
       this.$store.commit("set_level", level)
       this.$store.commit("set_enemy_leader", level.level.enemy_leader)
     },
-    start(level) {
+    start(level: any): void {
       this.timer = setTimeout(() => {
-        if (this.timer > 0) this.longTap(level)
+        if (this.timer) this.longTap(level)
       }, 1000)
     },
-    end() {
-      clearTimeout(this.timer)
+    end(): void {
+      clearTimeout(this.timer as ReturnType<typeof setTimeout>)
       this.timer = 0
     },
-    longTap(level) {
+    longTap(level: MappedUserLevel): void {
       this.level = level
       this.show_level_modal = true
     },
   },
-}
+})
 </script>

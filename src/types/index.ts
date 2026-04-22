@@ -1,4 +1,5 @@
 export * from "./news"
+export * from "./resources"
 export * from "./stats"
 export * from "./settings"
 export * from "./login"
