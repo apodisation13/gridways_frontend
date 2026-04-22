@@ -26,7 +26,7 @@ import { defineComponent, type PropType } from "vue"
 import { border_for_card, border_leader } from "@/logic/border_styles"
 import CardModal from "@/components/ModalWindows/CardModal.vue"
 import CardUi from "@/components/Cards/CardUi.vue"
-import type { Card, Leader, Enemy } from "@/types"
+import type { Card, Leader } from "@/types"
 export default defineComponent({
   components: {
     CardUi,
@@ -35,7 +35,7 @@ export default defineComponent({
   props: {
     // собственно сама карта
     card: {
-      type: Object as PropType<Card | Leader | Enemy>,
+      type: Object as PropType<Card | Leader>,
       required: true,
     },
     // весь объект карты, включая верхний уровень (где есть user_card_id, count)
@@ -87,15 +87,17 @@ export default defineComponent({
     }
   },
   methods: {
-    make_id(card: Card | Leader | Enemy, index: number | undefined): string {
+    make_id(card: Card | Leader, index: number | undefined): string {
       if (!index && index !== 0) return ""
       return `${card.name}_${index}`
     },
     show_modal(): void {
       this.show_card_modal = true
     },
-    border(card: Card | Leader | Enemy): Record<string, string> | undefined {
-      return this.is_leader ? border_leader(card) : border_for_card(card)
+    border(card: Card | Leader): Record<string, string> | undefined {
+      return this.is_leader
+        ? border_leader(card as Leader)
+        : border_for_card(card as Card)
     },
   },
   emits: ["open_card_modal"],
