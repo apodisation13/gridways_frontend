@@ -11,7 +11,7 @@
         />
         <enemy-list
           v-else
-          :enemies="cards_pool"
+          :enemies="enemyPool"
           @chose-enemy="confirm_enemy_selection"
         />
       </modal-window>
@@ -97,6 +97,9 @@ export default defineComponent({
         count: 1,
         id: null,
       }))
+    },
+    enemyPool(): Enemy[] {
+      return this.cards_pool as Enemy[]
     },
   },
 

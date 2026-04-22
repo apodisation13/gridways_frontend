@@ -20,11 +20,14 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import { border_for_card } from "@/logic/border_styles"
 import EnemyUi from "@/components/Cards/EnemyUi.vue"
 import CardModal from "@/components/ModalWindows/CardModal.vue"
-export default {
+import type { Enemy } from "@/types"
+
+export default defineComponent({
   name: "enemy-comp",
   components: {
     CardModal,
@@ -32,14 +35,14 @@ export default {
   },
   props: {
     enemy: {
+      type: Object as PropType<Enemy>,
       required: true,
     },
-    // индекс карты в руке, по нему считается id карты, чтобы потом понять на какую карту ткнули!
-    // ПРИХОДИТ ИЗ FIELD COMP!
     index: {
       type: Number,
     },
     in_cross: {
+      type: Boolean,
       required: false,
       default: false,
     },
@@ -47,16 +50,16 @@ export default {
   data() {
     return {
       show_enemy_modal: false,
-      animationId: null,
-      animationStartTime: null,
+      animationId: null as number | null,
+      animationStartTime: null as number | null,
       isAnimating: false,
-      enemyElement: null, // Храним ссылку на элемент здесь
+      enemyElement: null as HTMLElement | null,
     }
   },
   watch: {
     in_cross: {
       immediate: true,
-      handler(newVal) {
+      handler(newVal: boolean) {
         if (newVal && !this.isAnimating && this.enemy.data.hp > 0) {
           console.log(`[${this.index}] → startAnimation`)
           this.startAnimation()
@@ -71,27 +74,26 @@ export default {
     this.stopAnimation()
   },
   methods: {
-    border(e) {
+    border(e: Enemy): Record<string, string> {
       return border_for_card(e)
     },
-    show_modal() {
+    show_modal(): void {
       this.show_enemy_modal = true
     },
-    make_id(enemy, index) {
+    make_id(enemy: Enemy, index: number | undefined): string {
       return `${enemy.name}_${index}`
     },
-    setEnemyRef(el) {
+    setEnemyRef(el: HTMLElement | null): void {
       this.enemyElement = el
     },
-    startAnimation() {
-      if (this.isAnimating) return // Уже запущена — не трогаем!
+    startAnimation(): void {
+      if (this.isAnimating) return
 
       this.isAnimating = true
       this.animationStartTime = performance.now()
       this.animate()
     },
-
-    stopAnimation() {
+    stopAnimation(): void {
       this.isAnimating = false
       if (this.animationId) {
         cancelAnimationFrame(this.animationId)
@@ -105,16 +107,15 @@ export default {
         el.style.zIndex = ""
       }
     },
-
-    animate() {
+    animate(): void {
       if (!this.isAnimating) return
 
       const el = this.enemyElement
       if (!el) return
 
-      const elapsed = performance.now() - this.animationStartTime
-      const duration = 1200 // 0.8 секунды на цикл
-      const progress = (elapsed % duration) / duration // 0 to 1
+      const elapsed = performance.now() - (this.animationStartTime as number)
+      const duration = 1200
+      const progress = (elapsed % duration) / duration
 
       // Дрожание
       const shakeX =
@@ -137,7 +138,7 @@ export default {
       this.animationId = requestAnimationFrame(() => this.animate())
     },
   },
-}
+})
 </script>
 
 <style scoped>

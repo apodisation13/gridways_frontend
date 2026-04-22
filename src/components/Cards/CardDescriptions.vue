@@ -3,7 +3,7 @@
     <div class="inlines-wrapper">
       <!--Описание абилки - для карты игрока и лидера врагов тоже-->
       <div
-        v-if="!forEnemy && card.ability"
+        v-if="!forEnemy && c.ability"
         @click="showMainAbility"
         class="inlines"
         :style="{ 'background-image': icon }"
@@ -17,7 +17,7 @@
         :style="{
           'background-image':
             'url(' +
-            require(`@/assets/icons/enemy/enemy_move_${card.move.name}.svg`) +
+            require(`@/assets/icons/enemy/enemy_move_${c.move.name}.svg`) +
             ')',
         }"
       ></div>
@@ -25,14 +25,14 @@
       <!--Описание пассивной абилки-->
       <card-passive
         v-if="card.passive_ability?.name"
-        :card="card"
+        :card="c"
         inline
         @click="showPassiveAbility"
       />
 
       <!--Описание абилки deathwish - для карт врагов-->
       <div
-        v-if="forEnemy && card.deathwish?.name"
+        v-if="forEnemy && c.deathwish?.name"
         @click="showDeathwishAbility"
         class="inlines"
         :style="{
@@ -44,58 +44,58 @@
 
     <!--А дальше сами описания!!!-->
     <!--Описание абилки для карты игрока и для лидера врагов у которого она есть вообще-->
-    <div class="text" v-if="show_ability && !forEnemy && card?.ability?.name">
-      {{ formatCardAbility(card) }} <br />
+    <div class="text" v-if="show_ability && !forEnemy && c?.ability?.name">
+      {{ formatCardAbility(c) }} <br />
     </div>
     <!--Описание абилки для карты врага-->
     <div class="text" v-if="show_ability && forEnemy">
-      {{ formatEnemyMove(card) }} <br />
+      {{ formatEnemyMove(c) }} <br />
     </div>
     <!--Описание пассивной абилки, разделение для карты или для лидера врагов-->
-    <div class="text" v-if="show_passive && card.passive_ability.name">
-      {{ formatCardPassiveAbility(card) }} <br />
+    <div class="text" v-if="show_passive && card.passive_ability?.name">
+      {{ formatCardPassiveAbility(c) }} <br />
       <br />
-      <span v-if="card.data.passive?.has_passive_in_field">
+      <span v-if="c.data.passive?.has_passive_in_field">
         Срабатывает когда карта <b>НА ПОЛЕ</b>
       </span>
-      <span v-else-if="card.data.passive?.has_passive_in_hand">
+      <span v-else-if="c.data.passive?.has_passive_in_hand">
         Срабатывает когда карта <b>В РУКЕ</b>
       </span>
-      <span v-else-if="card.data.passive?.has_passive_in_deck">
+      <span v-else-if="c.data.passive?.has_passive_in_deck">
         Срабатывает когда карта <b>В КОЛОДЕ</b>
       </span>
-      <span v-else-if="card.data.passive?.has_passive_in_grave">
+      <span v-else-if="c.data.passive?.has_passive_in_grave">
         Срабатывает когда карта <b>В СБРОСЕ</b>
       </span>
       <br />
-      <span v-if="card.data?.passive?.each_tick">
+      <span v-if="c.data?.passive?.each_tick">
         <b>Срабатывает каждый ход пока таймер не равен 0</b>
       </span>
       <br />
-      <span v-if="card.data?.passive?.reset_timer">
+      <span v-if="c.data?.passive?.reset_timer">
         Восстанавливает таймер. Значение таймера
-        {{ card.data.passive.default_timer }}
+        {{ c.data.passive.default_timer }}
       </span>
     </div>
     <!--Описание абилки deathwish, только для врага-->
-    <div
-      class="text"
-      v-if="show_deathwish && forEnemy && card?.deathwish?.name"
-    >
-      {{ formatEnemyDeathwish(card) }} <br />
+    <div class="text" v-if="show_deathwish && forEnemy && c?.deathwish?.name">
+      {{ formatEnemyDeathwish(c) }} <br />
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import { ability_icon } from "@/logic/border_styles"
 import CardPassive from "@/components/UI/CardsUI/CardPassive.vue"
-export default {
+import type { Card, Leader, Enemy, EnemyLeader } from "@/types"
+
+export default defineComponent({
   name: "CardDescriptions",
   components: { CardPassive },
   props: {
     card: {
-      type: Object,
+      type: Object as PropType<Card | Leader | Enemy | EnemyLeader>,
       required: true,
     },
     // отображать описание для врага или нет
@@ -106,8 +106,8 @@ export default {
     },
   },
   created() {
-    // костыль для лидера врагов, у которого нет основной абилки
-    if (!this.card.ability && !this.card.move) {
+    const c = this.card as any
+    if (!c.ability && !c.move) {
       this.show_ability = false
       this.show_passive = true
     }
@@ -121,12 +121,15 @@ export default {
     }
   },
   computed: {
-    icon() {
-      return ability_icon(this.card?.ability?.name)
+    c(): any {
+      return this.card
+    },
+    icon(): string {
+      return ability_icon((this.card as any)?.ability?.name)
     },
   },
   methods: {
-    formatCardAbility(card) {
+    formatCardAbility(card: any): string {
       return card.ability.description
         .replace(
           /{damage}/g,
@@ -161,7 +164,7 @@ export default {
           card.data.value !== undefined ? `{{ ${card.data.value} }}` : "{value}"
         )
     },
-    formatEnemyMove(enemy) {
+    formatEnemyMove(enemy: any): string {
       return enemy.move.description.replace(
         /{damage}/g,
         enemy.data.damage !== undefined
@@ -169,7 +172,7 @@ export default {
           : "{damage}"
       )
     },
-    formatCardPassiveAbility(card) {
+    formatCardPassiveAbility(card: any): string {
       return card.passive_ability.description.replace(
         /{value}/g,
         card.data.passive?.value !== undefined
@@ -177,7 +180,7 @@ export default {
           : "{value}"
       )
     },
-    formatEnemyDeathwish(enemy) {
+    formatEnemyDeathwish(enemy: any): string {
       return enemy.deathwish.description.replace(
         /{deathwish_value}/g,
         enemy.data.deathwish?.value !== undefined
@@ -185,26 +188,26 @@ export default {
           : "{deathwish_value}"
       )
     },
-    showMainAbility() {
+    showMainAbility(): void {
       this.show_ability = true
       this.show_move = true
       this.show_passive = false
       this.show_deathwish = false
     },
-    showPassiveAbility() {
+    showPassiveAbility(): void {
       this.show_ability = false
       this.show_move = false
       this.show_passive = true
       this.show_deathwish = false
     },
-    showDeathwishAbility() {
+    showDeathwishAbility(): void {
       this.show_ability = false
       this.show_move = false
       this.show_passive = false
       this.show_deathwish = true
     },
   },
-}
+})
 </script>
 
 <style scoped>

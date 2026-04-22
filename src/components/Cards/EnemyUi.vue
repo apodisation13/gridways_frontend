@@ -11,38 +11,38 @@
       >
         <transition name="damage">
           <div
-            v-if="enemy.damages_player"
+            v-if="e.damages_player"
             class="damage-overlay"
             :style="{ '--flash-duration': flashDuration + 'ms' }"
           >
             <div class="damage-icon-wrap">
               <div class="damage-icon"></div>
-              <span class="damage-icon-text">{{ -enemy.data.damage }}</span>
+              <span class="damage-icon-text">{{ -e.data.damage }}</span>
             </div>
           </div>
         </transition>
       </div>
       <div class="card-enemy-information">
         <!--Иконка хода для всех врагов, а лидеру врагов не надо, отсюда и условие-->
-        <ability-circle-enemy :enemy="enemy" v-if="enemy.move" />
+        <ability-circle-enemy :enemy="enemy" v-if="e.move" />
         <!--Иконка урона, для всех врагов или если у лидера врага есть урон-->
         <card-damage-icon
-          v-if="enemy.data.damage"
+          v-if="e.data.damage"
           :style="background_color(enemy)"
-          :damage="enemy.data.damage"
+          :damage="e.data.damage"
         />
         <!-- отдельный анимированный ромб, damage-comp не трогаем -->
         <div
-          v-if="enemy.dmg_delta"
+          v-if="e.dmg_delta"
           class="dmg-anim"
           :style="{ '--flash-duration': flashDuration + 'ms' }"
         >
           <span class="dmg-anim-text">
-            {{ enemy.dmg_delta > 0 ? "+" : "" }}{{ enemy.dmg_delta }}
+            {{ e.dmg_delta > 0 ? "+" : "" }}{{ e.dmg_delta }}
           </span>
         </div>
 
-        <card-passive v-if="enemy.passive_ability?.name" :card="enemy" />
+        <card-passive v-if="enemy.passive_ability?.name" :card="e" />
         <enemy-shield v-if="enemy.data.shield" />
         <enemy-locked v-if="enemy.locked" />
         <deathwish-ability v-if="enemy.deathwish?.name" />
@@ -50,14 +50,15 @@
         <heart-icon
           :health="enemy.data.hp"
           :hp_delta="enemy.hp_delta"
-          :bgColor="background_color_hp(enemy.color)"
+          :bgColor="background_color_hp(enemyColor)"
         />
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import {
   background_color,
   background_color_hp,
@@ -71,8 +72,9 @@ import AbilityCircleEnemy from "@/components/UI/CardsUI/Enemies/AbilityCircleEne
 import EnemyShield from "@/components/UI/CardsUI/Enemies/EnemyShield.vue"
 import CardPassive from "@/components/UI/CardsUI/CardPassive.vue"
 import EnemyStatus from "@/components/UI/CardsUI/Enemies/EnemyStatus.vue"
+import type { Enemy, EnemyLeader } from "@/types"
 
-export default {
+export default defineComponent({
   name: "EnemyUi",
   components: {
     EnemyStatus,
@@ -86,41 +88,46 @@ export default {
   },
   props: {
     enemy: {
+      type: Object as PropType<Enemy | EnemyLeader>,
       required: true,
     },
   },
   computed: {
-    cardRarityClass() {
-      // это для карты врагов
-      const color = this.enemy.color
+    e(): Enemy {
+      return this.enemy as Enemy
+    },
+    cardRarityClass(): string {
+      const color = (this.enemy as Enemy).color
       if (color) {
         if (["gold", "silver", "bronze"].includes(color.toLowerCase())) {
           return color.toLowerCase()
         }
       }
-      // а это для карты лидера врагов
       const faction = this.enemy.faction.toLowerCase()
       if (["soldiers", "monsters", "animals"].includes(faction)) {
         return faction
       }
       return ""
     },
-    flashDuration() {
+    flashDuration(): number {
       return this.$store.getters["selectedMoveTimeout"]
+    },
+    enemyColor(): string {
+      return "color" in this.enemy ? (this.enemy as Enemy).color : ""
     },
   },
   methods: {
-    card_margin(card) {
-      return card_margin(card)
+    card_margin(card: Enemy | EnemyLeader): Record<string, string> {
+      return card_margin(card as Enemy)
     },
-    background_color(e) {
-      return background_color(e)
+    background_color(e: Enemy | EnemyLeader): Record<string, string> {
+      return background_color(e as Enemy)
     },
-    background_color_hp(color) {
+    background_color_hp(color: string): string {
       return background_color_hp(color)
     },
   },
-}
+})
 </script>
 
 <style scoped>

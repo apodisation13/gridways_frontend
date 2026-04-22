@@ -26,7 +26,7 @@ import { defineComponent, type PropType } from "vue"
 import { border_for_card, border_leader } from "@/logic/border_styles"
 import CardModal from "@/components/ModalWindows/CardModal.vue"
 import CardUi from "@/components/Cards/CardUi.vue"
-import type { Card, Leader } from "@/types"
+import type { Card, CardEntry, Leader, LeaderEntry } from "@/types"
 export default defineComponent({
   components: {
     CardUi,
@@ -40,7 +40,7 @@ export default defineComponent({
     },
     // весь объект карты, включая верхний уровень (где есть user_card_id, count)
     user_card: {
-      type: Object,
+      type: Object as PropType<CardEntry | LeaderEntry | null>,
       default() {
         return null
       },
