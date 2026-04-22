@@ -4,20 +4,21 @@
   </base-button>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
-export default {
+export default defineComponent({
   name: "SettingSound",
   components: { BaseButton },
   computed: {
-    soundOn() {
+    soundOn(): boolean {
       return this.$store.getters["soundOn"]
     },
   },
   methods: {
-    switchSound() {
+    switchSound(): void {
       this.$store.commit("switchSound")
     },
   },
-}
+})
 </script>

@@ -11,10 +11,12 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 import ConfirmModal from "@/components/ModalWindows/ConfirmModal.vue"
-export default {
+
+export default defineComponent({
   name: "SettingDeleteAllLevels",
   components: { ConfirmModal, BaseButton },
   data() {
@@ -23,16 +25,16 @@ export default {
     }
   },
   methods: {
-    toggleVisibleDialog() {
+    toggleVisibleDialog(): void {
       this.show_dialog = !this.show_dialog
     },
-    async resetLevels() {
+    async resetLevels(): Promise<void> {
       const result = await this.$store.dispatch("reset_levels")
       console.log(result)
       this.toggleVisibleDialog()
     },
   },
-}
+})
 </script>
 
 <style scoped>

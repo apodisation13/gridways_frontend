@@ -11,30 +11,28 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import ConfirmModal from "@/components/ModalWindows/ConfirmModal.vue"
 import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 
-export default {
-  components: {
-    ConfirmModal,
-    BaseButton,
-  },
+export default defineComponent({
+  components: { ConfirmModal, BaseButton },
   data() {
     return {
       show_dialog: false,
     }
   },
   methods: {
-    toggleVisibleDialog() {
+    toggleVisibleDialog(): void {
       this.show_dialog = !this.show_dialog
     },
-    logoutProcess() {
+    logoutProcess(): void {
       this.$store.dispatch("logOut")
       this.$router.push("/main")
     },
   },
-}
+})
 </script>
 
 <style scoped>

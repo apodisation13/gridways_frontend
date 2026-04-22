@@ -23,20 +23,21 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 
-export default {
-  name: "SettingAnimation",
+export default defineComponent({
+  name: "SettingMoveTimeout",
   components: { BaseButton },
   created() {
     this.moveTimeOutValue = this.moveTimeOut
   },
   computed: {
-    moveTimeOut() {
+    moveTimeOut(): number {
       return this.$store.getters["selectedMoveTimeout"]
     },
-    isValid() {
+    isValid(): boolean {
       return (
         this.moveTimeOutValue !== null &&
         this.moveTimeOutValue !== "" &&
@@ -44,7 +45,7 @@ export default {
         this.moveTimeOutValue <= 1000
       )
     },
-    errorMessage() {
+    errorMessage(): string {
       if (this.moveTimeOutValue === null || this.moveTimeOutValue === "") {
         return "Введите число"
       }
@@ -59,15 +60,15 @@ export default {
   },
   data() {
     return {
-      moveTimeOutValue: 1000,
+      moveTimeOutValue: 1000 as number | null | "",
     }
   },
   methods: {
-    setMoveTimeout() {
+    setMoveTimeout(): void {
       this.$store.commit("setMoveTimeout", this.moveTimeOutValue)
     },
   },
-}
+})
 </script>
 <style scoped>
 .form-wrapper {
