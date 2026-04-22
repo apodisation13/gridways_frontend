@@ -154,7 +154,7 @@
     <transition name="modal">
       <modal-window v-if="flag" v-touch:swipe="close_self">
         <button-close @close_self="close_self" />
-        <card-list-component :cards="grave" />
+        <card-list-component :cards="graveEntries" />
       </modal-window>
     </transition>
   </div>
@@ -165,7 +165,7 @@ import { defineComponent, type PropType } from "vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
-import type { Card, Leader } from "@/types"
+import type { Card, CardEntry, Leader } from "@/types"
 
 export default defineComponent({
   name: "grave-comp",
@@ -186,6 +186,9 @@ export default defineComponent({
     }
   },
   computed: {
+    graveEntries(): CardEntry[] {
+      return this.grave.map((card: Card) => ({ card, count: 1, id: null }))
+    },
     grave_len(): number {
       return this.grave.length
     },

@@ -3,13 +3,16 @@
     <button-close @close_self="close_self" />
 
     <h3 class="text">Это ваша рука</h3>
-    <card-list-component :cards="hand" @chose_player_card="chose_player_card" />
+    <card-list-component
+      :cards="handEntries"
+      @chose_player_card="chose_player_card"
+    />
 
     <div>
       <h1 class="text">Изменить карту можно ещё {{ redraws }} раз</h1>
     </div>
     <h2 class="text">В колоде осталось ещё {{ deck.length }} карт</h2>
-    <card-list-component :cards="deck" />
+    <card-list-component :cards="deckEntries" />
   </modal-window>
 </template>
 
@@ -19,7 +22,7 @@ import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import { choice } from "@/lib/utils"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
-import type { Card, GameObj } from "@/types"
+import type { Card, CardEntry, GameObj } from "@/types"
 
 export default defineComponent({
   name: "redraw-comp",
@@ -46,11 +49,19 @@ export default defineComponent({
   created() {
     if (!this.gameObj.deck.length) this.close_self()
   },
+  computed: {
+    handEntries(): CardEntry[] {
+      return this.hand.map((card: Card) => ({ card, count: 1, id: null }))
+    },
+    deckEntries(): CardEntry[] {
+      return this.deck.map((card: Card) => ({ card, count: 1, id: null }))
+    },
+  },
   methods: {
     close_self(): void {
       this.visible = false
 
-      this.redraw_array.forEach(element => {
+      this.redraw_array.forEach((element: Card) => {
         this.deck.push(element)
       })
 
@@ -60,8 +71,9 @@ export default defineComponent({
       })
     },
 
-    chose_player_card(card: Card): void {
+    chose_player_card(entry: CardEntry): void {
       this.redraws -= 1
+      const card = entry.card
       this.redraw_array.push(card)
       const random = choice(this.deck)
       this.hand.splice(this.hand.indexOf(card), 1, this.deck[random])
