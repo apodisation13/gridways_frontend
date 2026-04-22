@@ -14,22 +14,23 @@
   </base-modal>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
 
-export default {
+export default defineComponent({
   components: { BaseModal, BaseButton },
   methods: {
-    closeModal() {
+    closeModal(): void {
       this.$emit("close")
     },
-    confirmAction() {
+    confirmAction(): void {
       this.$emit("confirm")
     },
   },
   emits: ["close", "confirm"],
-}
+})
 </script>
 
 <style scoped>

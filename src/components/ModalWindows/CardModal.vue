@@ -48,7 +48,7 @@
       v-if="show_modal_craft"
       action="craft"
       :options="craft_options"
-      :card="card"
+      :card="playerCard"
       @confirm="confirm_craft"
       @cancel="show_modal_craft = false"
     />
@@ -166,12 +166,12 @@ export default defineComponent({
     card_color_key(): string {
       return (this.card as any).color ? (this.card as any).color : "leader"
     },
-    craft_options(): unknown[] {
+    craft_options(): Record<string, number>[] {
       const config = this.$store.getters["cards_resources_prices"]
       const cfg = config[this.card_color_key]
       return cfg["craft_card"] || cfg["craft_leader"] || []
     },
-    mill_options(): unknown[] {
+    mill_options(): Record<string, number>[] {
       const config = this.$store.getters["cards_resources_prices"]
       const cfg = config[this.card_color_key]
       return cfg["mill_card"] || cfg["mill_leader"]

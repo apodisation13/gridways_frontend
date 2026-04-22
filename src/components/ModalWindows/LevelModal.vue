@@ -6,30 +6,39 @@
       <enemy-leader :enemy_leader="level.enemy_leader" />
     </div>
     <h4 class="text">Врагов - {{ level.enemies.length }} <br /></h4>
-    <enemy-list :enemies="level.enemies" />
+    <enemy-list :enemies="filteredEnemies" />
   </modal-window>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import EnemyLeader from "@/components/Cards/EnemyLeader.vue"
 import EnemyList from "@/components/Cards/EnemyList.vue"
-export default {
+import type { Enemy, MappedLevel } from "@/types"
+
+export default defineComponent({
   name: "level-modal",
   components: { EnemyList, EnemyLeader, ButtonClose, ModalWindow },
   props: {
     level: {
+      type: Object as PropType<MappedLevel>,
       required: true,
     },
   },
+  computed: {
+    filteredEnemies(): Enemy[] {
+      return this.level.enemies.filter((e): e is Enemy => e !== undefined)
+    },
+  },
   methods: {
-    close_self() {
+    close_self(): void {
       this.$emit("close_level_modal")
     },
   },
   emits: ["close_level_modal"],
-}
+})
 </script>
 
 <style scoped>

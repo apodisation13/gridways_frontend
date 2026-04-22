@@ -32,12 +32,12 @@
                 <div class="rombica__wrapper">
                   <div class="rombica__date">
                     <span class="rombica__text">{{
-                      this.setDay(element.updated_at, "day")
+                      setDay(element.updated_at, "day")
                     }}</span>
                   </div>
                   <div class="rombica__date rombica__bottom-date">
                     <span class="rombica__text">{{
-                      this.setDay(element.updated_at, "month")
+                      setDay(element.updated_at, "month")
                     }}</span>
                   </div>
                 </div>
@@ -96,12 +96,12 @@ export default defineComponent({
     prev() {
       this.$refs.carousel.prev()
     },
-    setDay(data: string, option: "month" | "day"): string | undefined {
+    setDay(data: string, option: "month" | "day"): string {
       const date = new Date(data)
 
       if (option === "month") {
         return date.toLocaleString("en-GB", { month: "2-digit" })
-      } else if (option === "day") {
+      } else {
         return date.toLocaleString("en-GB", { day: "2-digit" })
       }
     },
