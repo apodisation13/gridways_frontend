@@ -13,7 +13,8 @@
   </base-modal>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions.vue"
 import FilterTypes from "@/components/Pages/DeckbuildPage/FilterTypes.vue"
 import FilterColors from "@/components/Pages/DeckbuildPage/FilterColors.vue"
@@ -23,7 +24,7 @@ import BaseModal from "@/components/ModalWindows/BaseModal.vue"
 import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 import FilterNewlyadded from "@/components/Pages/DeckbuildPage/FilterNewlyAdded.vue"
 
-export default {
+export default defineComponent({
   components: {
     FilterNewlyadded,
     FilterFactions,
@@ -40,18 +41,18 @@ export default {
     },
   },
   methods: {
-    closeModal() {
+    closeModal(): void {
       this.$emit("close-modal")
     },
-    resetFilters() {
+    resetFilters(): void {
       this.$emit("reset-filters")
     },
-    setFilter(prop, value) {
+    setFilter(prop: string, value: unknown): void {
       this.$emit("set-filter", prop, value)
     },
   },
   emits: ["close-modal", "reset-filters", "set-filter"],
-}
+})
 </script>
 
 <style scoped>

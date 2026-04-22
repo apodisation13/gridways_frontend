@@ -6,15 +6,16 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+export default defineComponent({
   props: {
     damage: {
       type: Number,
       require: true,
     },
   },
-}
+})
 </script>
 
 <style scoped>

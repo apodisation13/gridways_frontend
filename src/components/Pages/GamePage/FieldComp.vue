@@ -27,52 +27,56 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import EnemyComp from "@/components/Cards/EnemyComp.vue"
-export default {
+import type { Enemy } from "@/types"
+
+export default defineComponent({
   name: "field-comp",
   components: { EnemyComp },
   props: {
     field: {
       required: true,
-      type: Array,
+      type: Array as PropType<(Enemy | "")[]>,
     },
     in_cross_enemy_index: {
       required: false,
       default: null,
-      type: [Number, null],
+      type: Number as unknown as PropType<number | null>,
     },
   },
   data() {
     return {
-      movingIndices: [],
+      movingIndices: [] as number[],
     }
   },
 
   created() {
-    this._prevField = [...this.field] // не реактивно, просто снимок
+    ;(this as any)._prevField = [...this.field]
   },
 
   watch: {
     field: {
-      handler(newVal) {
-        const old = this._prevField
+      handler(newVal: (Enemy | "")[]) {
+        const old = (this as any)._prevField as (Enemy | "")[]
         const now = newVal
 
-        const disappeared = []
-        const appeared = []
+        const disappeared: { enemy: Enemy; i: number }[] = []
+        const appeared: { enemy: Enemy; i: number }[] = []
         for (let i = 0; i < now.length; i++) {
-          if (old[i] && !now[i]) disappeared.push({ enemy: old[i], i })
-          else if (!old[i] && now[i]) appeared.push({ enemy: now[i], i })
+          if (old[i] && !now[i]) disappeared.push({ enemy: old[i] as Enemy, i })
+          else if (!old[i] && now[i])
+            appeared.push({ enemy: now[i] as Enemy, i })
         }
 
-        const moved = []
+        const moved: number[] = []
         for (const d of disappeared) {
           const match = appeared.find(a => a.enemy === d.enemy)
           if (match) moved.push(d.i, match.i)
         }
 
-        this._prevField = [...now]
+        ;(this as any)._prevField = [...now]
 
         if (moved.length > 0) {
           this.movingIndices = moved
@@ -86,17 +90,15 @@ export default {
   },
 
   methods: {
-    get_index(i, j) {
-      // расчёт индекса клетки поля
+    get_index(i: number, j: number): number {
       return (i - 1) * 3 + (j - 1)
     },
-    exec_damage_ai_card(i) {
-      // эмиттим ВСЕГО врага
+    exec_damage_ai_card(i: number): void {
       this.$emit("exec_damage_ai_card", this.field[i])
     },
   },
   emits: ["exec_damage_ai_card"],
-}
+})
 </script>
 
 <style scoped>

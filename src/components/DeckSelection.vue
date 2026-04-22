@@ -33,10 +33,12 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import DeckPreviewComp from "@/components/DeckPreviewComp.vue"
 import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
-export default {
+import type { DeckEntry, Deck } from "@/types"
+export default defineComponent({
   name: "deck-selection",
   components: { YesnoModal, DeckPreviewComp },
   props: {
@@ -48,23 +50,23 @@ export default {
   },
   data() {
     return {
-      show_yesno: false, // показать да\нет по кнопке удалить деку
-      deck_id: undefined, // id деки, которую надо удалить
+      show_yesno: false as boolean, // показать да\нет по кнопке удалить деку
+      deck_id: undefined as number | undefined, // id деки, которую надо удалить
     }
   },
   methods: {
     // осуществить выбор деки для игры, дважды ЛКМ, только на странице игры и не на странице колод
-    select_deck(i) {
+    select_deck(i: number): void {
       if (!this.deckbuilder)
         this.$store.dispatch("set_deck_in_play", this.decks[i])
     },
 
-    delete_deck(deck) {
+    delete_deck(deck: Deck): void {
       this.show_yesno = true
       this.deck_id = deck.id // запоминаем id деки, которую надо удалить
     },
 
-    async confirm_delete() {
+    async confirm_delete(): Promise<void> {
       this.show_yesno = false
       try {
         await this.$store.dispatch("deleteUserDeck", this.deck_id)
@@ -74,23 +76,23 @@ export default {
       }
     },
 
-    cancel_delete() {
+    cancel_delete(): void {
       this.show_yesno = false
     },
 
-    change_deck(index) {
+    change_deck(index: number): void {
       this.$emit("emit_state_deck_index", index)
     },
   },
 
   computed: {
-    decks() {
+    decks(): DeckEntry[] {
       return this.$store.getters["all_decks"]
     },
   },
 
   emits: ["emit_state_deck_index"],
-}
+})
 </script>
 
 <style scoped>

@@ -15,10 +15,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import CardItem from "@/components/Cards/CardItem.vue"
 import { arrowMixin } from "@/mixins/GamePage/arrow_draw"
-export default {
+import type { Leader, Enemy } from "@/types"
+
+export default defineComponent({
   components: {
     CardItem,
   },
@@ -26,32 +29,37 @@ export default {
   props: {
     leader: {
       required: true,
-      type: Object,
+      type: Object as PropType<Leader>,
     },
     field: {
       required: false,
-      type: Array,
+      type: Array as PropType<(Enemy | "")[]>,
     },
   },
   mounted() {
-    this.initArrowCanvas(9998)
-    window.addEventListener("resize", this.handleResize)
+    ;(this as any).initArrowCanvas(9998)
+    window.addEventListener("resize", (this as any).handleResize)
   },
   beforeUnmount() {
-    window.removeEventListener("resize", this.handleResize)
-    this.removeArrowCanvas()
+    window.removeEventListener("resize", (this as any).handleResize)
+    ;(this as any).removeArrowCanvas()
   },
   methods: {
-    handleCardMouseDown(e) {
+    handleCardMouseDown(e: MouseEvent): void {
       e.preventDefault()
       e.stopPropagation()
       if (this.leader.data.charges === 0) return
       const el = document.querySelector(".leader-comp")
       if (!el) return
       this.$emit("exec_leader")
-      this.beginArrowDrawing(el, e.clientX, e.clientY, this.leader.faction)
+      ;(this as any).beginArrowDrawing(
+        el,
+        e.clientX,
+        e.clientY,
+        this.leader.faction
+      )
     },
-    handleCardTouchStart(e) {
+    handleCardTouchStart(e: TouchEvent): void {
       e.preventDefault()
       e.stopPropagation()
       if (this.leader.data.charges === 0) return
@@ -59,7 +67,7 @@ export default {
       if (!el) return
       const touch = e.touches[0]
       this.$emit("exec_leader")
-      this.beginArrowDrawing(
+      ;(this as any).beginArrowDrawing(
         el,
         touch.clientX,
         touch.clientY,
@@ -75,7 +83,7 @@ export default {
     "enemy_leader_in_cross",
     "enemy_in_cross",
   ],
-}
+})
 </script>
 
 <style>

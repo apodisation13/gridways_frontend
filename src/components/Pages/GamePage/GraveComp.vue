@@ -160,21 +160,24 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
-export default {
+import type { Card, Leader } from "@/types"
+
+export default defineComponent({
   name: "grave-comp",
   components: { CardListComponent, ButtonClose, ModalWindow },
   props: {
     grave: {
       required: true,
-      type: Array,
+      type: Array as PropType<Card[]>,
     },
     leader: {
       required: true,
-      type: Object,
+      type: Object as PropType<Leader>,
     },
   },
   data() {
@@ -183,17 +186,17 @@ export default {
     }
   },
   computed: {
-    grave_len() {
+    grave_len(): number {
       return this.grave.length
     },
-    background_color() {
+    background_color(): string {
       if (this.grave_len === 0) return "black"
       if (this.leader.faction === "Soldiers") return "blue"
       else if (this.leader.faction === "Monsters") return "red"
       else if (this.leader.faction === "Animals") return "green"
       return ""
     },
-    trigger_passive() {
+    trigger_passive(): boolean {
       for (const card of this.grave) {
         if (card.trigger_grave_passive) return true
       }
@@ -201,11 +204,11 @@ export default {
     },
   },
   methods: {
-    close_self() {
+    close_self(): void {
       this.flag = false
     },
   },
-}
+})
 </script>
 
 <style scoped>

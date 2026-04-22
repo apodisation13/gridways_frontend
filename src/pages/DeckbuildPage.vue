@@ -76,7 +76,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import _ from "lodash"
 import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
 import DeckbuilderTopButtonsBlock from "@/components/Pages/DeckbuildPage/DeckbuilderTopButtonsBlock.vue"
@@ -86,8 +87,27 @@ import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
 import { useToast } from "vue-toastification"
 import { copyObj } from "@/lib/utils"
+import type { CardEntry, LeaderEntry, DeckCardEntry, Leader } from "@/types"
 
-export default {
+interface Query {
+  faction: string
+  type: string
+  color: string
+  has_passive: boolean | null
+  count: number | null
+  newly_added: boolean | null
+}
+
+interface ActiveDeck {
+  deck_id: number | null
+  deck_name: string
+  deck_is_progress: DeckCardEntry[]
+  deck_body: number[]
+  leader: Leader | null
+  health: number
+}
+
+export default defineComponent({
   components: {
     DecksListModal,
     DeckbuilderTopButtonsBlock,
@@ -102,12 +122,12 @@ export default {
   },
   data() {
     return {
-      disable_start_animation: true, // флаг выключение первичной анимации
-      showingList: "pool", // показывать список игровых карт ('pool') или список лидеров ('leaders')
-      deckBuilding: false, // флаг - собираем мы колоду, или нет
-      showFilters: false, // флаг, показать ли окно с фильтрами
-      show_decks_list_modal: false, // показать окно с колодами
-      patch: false,
+      disable_start_animation: true as boolean, // флаг выключение первичной анимации
+      showingList: "pool" as string, // показывать список игровых карт ('pool') или список лидеров ('leaders')
+      deckBuilding: false as boolean, // флаг - собираем мы колоду, или нет
+      showFilters: false as boolean, // флаг, показать ли окно с фильтрами
+      show_decks_list_modal: false as boolean, // показать окно с колодами
+      patch: false as boolean,
       deck: {
         deck_id: null,
         deck_name: "",
@@ -115,7 +135,7 @@ export default {
         deck_body: [], // только {card: id} для пост-запроса
         leader: null, // сам выбранный лидер
         health: 0, // жизни текущей деки
-      },
+      } as ActiveDeck,
       query: {
         faction: "",
         type: "",
@@ -123,8 +143,8 @@ export default {
         has_passive: null,
         count: null,
         newly_added: null,
-      },
-      cardsPool: [],
+      } as Query,
+      cardsPool: [] as CardEntry[],
     }
   },
   created() {
@@ -142,24 +162,24 @@ export default {
     },
   },
   methods: {
-    init() {
+    init(): void {
       this.cardsPool = copyObj(this.pool)
       this.cardsPool = this.cardsPool.filter(
-        card => !this.deck.deck_body.some(c => c === card.card.id)
+        (card: CardEntry) => !this.deck.deck_body.some(c => c === card.card.id)
       )
     },
 
-    trigger_decks_list_modal(value) {
+    trigger_decks_list_modal(value: boolean): void {
       this.show_decks_list_modal = value
     },
 
-    cancelDeckBuilding() {
+    cancelDeckBuilding(): void {
       this.deckBuilding = false
       this.patch = false
       this.new_deck()
     },
 
-    change_order_deck(index) {
+    change_order_deck(index: number): void {
       this.deck.deck_is_progress.push(
         ...this.deck.deck_is_progress.splice(index, 1)
       )
@@ -168,13 +188,13 @@ export default {
     },
 
     // новая дека, обнуляем фильтры и сбрасываем все добавления
-    new_deck() {
+    new_deck(): void {
       // сброс фильтров
       this.query = this.default_query_param()
       this.deck = this.resetDeck()
     },
 
-    default_query_param() {
+    default_query_param(): Query {
       return {
         faction: "",
         type: "",
@@ -185,7 +205,7 @@ export default {
       }
     },
 
-    resetDeck() {
+    resetDeck(): ActiveDeck {
       return {
         deck_id: null,
         deck_name: "",
@@ -197,7 +217,7 @@ export default {
     },
 
     // добавляем карты в колоду из базы карт
-    append_into_deck_in_progress(card) {
+    append_into_deck_in_progress(card: CardEntry): void {
       if (!this.deckBuilding) {
         return
       }
@@ -214,21 +234,21 @@ export default {
     },
 
     // удалить из деки в процессе по нажатию дважды ЛКМ
-    delete_card_from_deck(card) {
-      this.deck.health -= card.card.data.hp
+    delete_card_from_deck(card: DeckCardEntry): void {
+      this.deck.health -= card.card?.data.hp ?? 0
       this.deck.deck_is_progress.splice(
         this.deck.deck_is_progress.indexOf(card),
         1
       )
       this.deck.deck_body.splice(
-        this.deck.deck_body.findIndex(card_id => card_id === card.card.id),
+        this.deck.deck_body.findIndex(card_id => card_id === card.card?.id),
         1
       )
       this.init() // а здесь наоборот - из колоды убрали, в пул хотим вернуть карту на ее место
     },
 
     // выбираем лидера для деки
-    chose_leader(leader) {
+    chose_leader(leader: LeaderEntry): void {
       if (!this.deckBuilding) {
         this.toast.warning("выберете фракцию!")
         return
@@ -244,11 +264,11 @@ export default {
       this.deck.health += leader.card.data.hp
     },
 
-    change_name_deck(value) {
+    change_name_deck(value: string): void {
       this.deck.deck_name = value
     },
 
-    async save_deck() {
+    async save_deck(): Promise<void> {
       if (!this.deck.leader) {
         return this.toast.warning("Необходимо выбрать лидера")
       }
@@ -266,8 +286,8 @@ export default {
       })
     },
 
-    can_add_card(card) {
-      if (this.deck.deck_is_progress.find(c => c.card.id === card.card.id)) {
+    can_add_card(card: CardEntry): boolean {
+      if (this.deck.deck_is_progress.find(c => c.card?.id === card.card.id)) {
         return false
       }
       if (card.count === 0) {
@@ -282,13 +302,13 @@ export default {
       return this.query.faction !== ""
     },
     // фильтр карт и лидеров по фракции по нажатию на кнопку фракции
-    select_faction(prop, value) {
+    select_faction(prop: string, value: unknown): void {
       this.disable_start_animation = this.disable_start_animation && false
       this.deckBuilding = true
       this.setFilter(prop, value) // для this.query.cards
     },
 
-    show_deck(index) {
+    show_deck(index: number): void {
       this.disable_start_animation = this.disable_start_animation && false
       this.new_deck()
       this.deckBuilding = true
@@ -300,22 +320,25 @@ export default {
       this.deck.deck_id = id
       this.deck.deck_name = name
       this.deck.deck_is_progress = [...cards] // колода в процессе - целиком объекты, для отображения
-      this.deck.deck_body = cards.map(card => card.card.id) // только [1,2,3,4] для пост-запроса
+      this.deck.deck_body = cards.map((card: DeckCardEntry) => card.card?.id) // только [1,2,3,4] для пост-запроса
       this.deck.leader = leader
       this.deck.health = health
       this.query.faction = leader.faction
     },
 
-    async patch_deck() {
+    async patch_deck(): Promise<void> {
       await this.send_data_to_store("patchUserDeck", {
         deck_name: this.deck.deck_name,
         cards: this.deck.deck_body,
-        leader_id: this.deck.leader.id,
+        leader_id: this.deck.leader?.id,
         deck_id: this.deck.deck_id,
       })
     },
 
-    async send_data_to_store(dispatch_name, body) {
+    async send_data_to_store(
+      dispatch_name: string,
+      body: Record<string, unknown>
+    ): Promise<void> {
       try {
         await this.$store.dispatch(dispatch_name, body)
         this.cancelDeckBuilding() // всё обнуляем!
@@ -325,7 +348,7 @@ export default {
       }
     },
 
-    resetFilters() {
+    resetFilters(): void {
       // в режиме сбора колоды - сбрасываем все фильтры КРОМЕ фракций, иначе - вообще все фильтры
       if (!this.deckBuilding) {
         this.query = this.default_query_param()
@@ -337,34 +360,34 @@ export default {
       }
     },
 
-    setFilter(prop, value) {
-      this.query[prop] = value
+    setFilter(prop: string, value: unknown): void {
+      ;(this.query as Record<string, unknown>)[prop] = value
     },
 
-    trigger_show_list(value) {
+    trigger_show_list(value: string): void {
       this.showingList = value
     },
   },
 
   computed: {
-    pool() {
+    pool(): CardEntry[] {
       return this.$store.getters.filtered_cards(this.query, this.query.count)
     },
-    leaders() {
+    leaders(): LeaderEntry[] {
       return this.$store.getters.filtered_leaders(this.query.faction)
     },
-    cant_save_deck() {
+    cant_save_deck(): boolean {
       const required_count_person = this.$store.state.game.cards_in_deck
       return (
         this.deck.deck_is_progress.length !== required_count_person ||
         !this.deck.leader
       )
     },
-    empty_filters() {
+    empty_filters(): boolean {
       return _.isEqual(this.default_query_param(), this.query)
     },
   },
-}
+})
 </script>
 
 <style scoped>

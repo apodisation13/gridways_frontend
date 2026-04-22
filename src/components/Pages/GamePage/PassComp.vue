@@ -14,17 +14,18 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import { styleWrapper } from "@/logic/border_styles"
 
-export default {
+export default defineComponent({
   name: "pass-comp",
   computed: {
-    themedStyle() {
+    themedStyle(): Record<string, string> | undefined {
       return styleWrapper(this.$store.getters["selectedTheme"])
     },
   },
-}
+})
 </script>
 
 <style scoped>

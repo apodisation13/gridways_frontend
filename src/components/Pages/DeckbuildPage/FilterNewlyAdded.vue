@@ -9,21 +9,22 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+export default defineComponent({
   name: "filter-newlyadded",
   data() {
     return {
-      passives: [true, false],
+      passives: [true, false] as boolean[],
     }
   },
   methods: {
-    filtering(passive) {
+    filtering(passive: boolean): void {
       this.$emit("set-filter", "newly_added", passive)
     },
   },
   emits: ["set-filter"],
-}
+})
 </script>
 
 <style scoped>

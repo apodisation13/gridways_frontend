@@ -12,13 +12,14 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+export default defineComponent({
   props: {
     deck_name: String,
   },
   emits: ["change_name_deck"],
-}
+})
 </script>
 
 <style scoped>

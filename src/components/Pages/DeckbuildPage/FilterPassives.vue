@@ -11,24 +11,25 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+export default defineComponent({
   name: "filter-passives",
   data() {
     return {
-      passives: [true, false],
+      passives: [true, false] as boolean[],
     }
   },
   methods: {
-    filtering(passive) {
+    filtering(passive: boolean): void {
       this.$emit("set-filter", "has_passive", passive)
     },
-    reset_filter_passives() {
+    reset_filter_passives(): void {
       this.$emit("reset-filter-passives")
     },
   },
   emits: ["set-filter", "reset-filter-passives"],
-}
+})
 </script>
 
 <style scoped>

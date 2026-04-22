@@ -126,7 +126,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle.vue"
 import CardCharges from "@/components/UI/CardsUI/Cards/CardCharges.vue"
 import CardPassive from "@/components/UI/CardsUI/CardPassive.vue"
@@ -141,8 +142,9 @@ import {
   background_color_hp,
   card_margin,
 } from "@/logic/border_styles"
+import type { Card, Leader, Enemy } from "@/types"
 
-export default {
+export default defineComponent({
   name: "CardUi",
   components: {
     CardCountTriangle,
@@ -156,7 +158,7 @@ export default {
   props: {
     // собственно сама карта
     card: {
-      type: Object,
+      type: Object as PropType<Card | Leader | Enemy>,
       required: true,
     },
     // брать ли границу карты как для карт (по цвету), ДЕФОЛТНОЕ, или как для лидеров (по фракции)
@@ -191,9 +193,9 @@ export default {
     },
   },
   computed: {
-    cardRarityClass() {
+    cardRarityClass(): string {
       if (!this.is_leader) {
-        const color = this.card.color.toLowerCase()
+        const color = (this.card as Card).color?.toLowerCase()
         if (["gold", "silver", "bronze"].includes(color)) {
           return color
         }
@@ -205,29 +207,29 @@ export default {
       }
       return ""
     },
-    flashDuration() {
+    flashDuration(): number {
       return this.$store.getters["selectedMoveTimeout"]
     },
   },
   methods: {
-    background_color_hp(color) {
+    background_color_hp(color: string): string | undefined {
       return this.is_leader
         ? background_color_leader(this.card.faction)
         : background_color_hp(color)
     },
-    background_color_charges(color) {
+    background_color_charges(color: string): string | undefined {
       return this.is_leader
         ? background_color_leader(this.card.faction)
         : background_color_charges(color)
     },
-    background_color(card) {
+    background_color(card: Card | Leader | Enemy): Record<string, string> {
       return background_color(card)
     },
-    card_margin(card) {
+    card_margin(card: Card | Leader | Enemy): Record<string, string> {
       return card_margin(card)
     },
   },
-}
+})
 </script>
 
 <style scoped>

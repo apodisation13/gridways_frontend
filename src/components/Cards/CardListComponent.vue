@@ -17,9 +17,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import CardItem from "@/components/Cards/CardItem.vue"
-export default {
+import type { CardEntry, LeaderEntry } from "@/types"
+export default defineComponent({
   components: {
     CardItem,
   },
@@ -27,7 +29,7 @@ export default {
     // собственно список карт, которые надо отрисовать
     cards: {
       required: true,
-      type: Array,
+      type: Array as PropType<(CardEntry | LeaderEntry)[]>,
     },
     // брать ли границу карты как для карт (по цвету), ДЕФОЛТНОЕ, или как для лидеров (по фракции)
     is_leader: {
@@ -52,12 +54,12 @@ export default {
     },
   },
   methods: {
-    chose_player_card(card) {
+    chose_player_card(card: CardEntry | LeaderEntry): void {
       this.$emit("chose_player_card", card) // передаем наверх ВСЮ выбранную карту!
     },
   },
   emits: ["chose_player_card"],
-}
+})
 </script>
 
 <style scoped>

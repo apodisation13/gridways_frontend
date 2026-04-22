@@ -58,12 +58,24 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import AssemblingPoolList from "@/components/Pages/DeckbuildPage/AssemblingPoolList.vue"
 import InputNameForDeck from "@/components/Pages/DeckbuildPage/InputNameForDeck.vue"
 import CreateButton from "@/components/Pages/DeckbuildPage/Buttons/CreateButton.vue"
 import CardItem from "@/components/Cards/CardItem.vue"
-export default {
+import type { DeckCardEntry, Leader } from "@/types"
+
+interface ActiveDeck {
+  deck_id: number | null
+  deck_name: string
+  deck_is_progress: DeckCardEntry[]
+  deck_body: number[]
+  leader: Leader | null
+  health: number
+}
+
+export default defineComponent({
   components: {
     AssemblingPoolList,
     InputNameForDeck,
@@ -72,7 +84,7 @@ export default {
   },
   props: {
     deck: {
-      type: Object,
+      type: Object as PropType<ActiveDeck>,
       required: true,
     },
     cant_save_deck: {
@@ -84,27 +96,28 @@ export default {
     },
   },
   methods: {
-    delete_card_from_deck(emit) {
+    delete_card_from_deck(emit: DeckCardEntry): void {
       this.$emit("delete_card", emit)
     },
-    change_order_deck(emit) {
+    change_order_deck(emit: number): void {
       this.$emit("change_order_deck", emit)
     },
-    save_deck() {
+    save_deck(): void {
       this.$emit("save_deck")
     },
-    patch_deck() {
+    patch_deck(): void {
       this.$emit("patch_deck")
     },
   },
   computed: {
-    charges() {
+    charges(): number {
       const leader_charges = this.deck.leader
         ? this.deck.leader.data.charges
         : 0
       return (
         this.deck.deck_is_progress.reduce(
-          (acc, val) => acc + val.card.data.charges,
+          (acc: number, val: DeckCardEntry) =>
+            acc + (val.card?.data.charges ?? 0),
           0
         ) + leader_charges
       )
@@ -117,7 +130,7 @@ export default {
     "change_name_deck",
     "change_order_deck",
   ],
-}
+})
 </script>
 
 <style scoped>
