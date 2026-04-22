@@ -145,6 +145,7 @@ export interface Leader {
   // animation fields
   charges_delta?: number | null
   damages_enemy?: boolean | null
+  p_damages_enemy?: boolean | null
   passive_poisoning?: boolean | null
 }
 
