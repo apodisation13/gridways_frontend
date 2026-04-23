@@ -7,7 +7,7 @@
             v-if="!!deck.leader"
             class="leader-selected"
             :card="deck.leader"
-            :user_card="deck.leader ? deck : null"
+            :user_card="deck.leader ? (deck as any) : null"
             :is_leader="true"
             :hp_needed="true"
           />

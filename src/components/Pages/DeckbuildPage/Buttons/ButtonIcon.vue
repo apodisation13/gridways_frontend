@@ -1,10 +1,5 @@
 <template>
-  <div
-    class="btn_icon"
-    :style="{
-      backgroundImage: `url(${require(`@/assets/icons/buttons/${this.image_name}`)})`,
-    }"
-  ></div>
+  <div class="btn_icon" :style="{ backgroundImage: `url(${iconUrl})` }"></div>
 </template>
 
 <script lang="ts">
@@ -14,6 +9,11 @@ export default defineComponent({
     image_name: {
       type: String,
       required: true,
+    },
+  },
+  computed: {
+    iconUrl(): string {
+      return require(`@/assets/icons/buttons/${this.image_name}`)
     },
   },
 })

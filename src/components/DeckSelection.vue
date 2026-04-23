@@ -37,7 +37,7 @@
 import { defineComponent } from "vue"
 import DeckPreviewComp from "@/components/DeckPreviewComp.vue"
 import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
-import type { DeckEntry, Deck } from "@/types"
+import type { DeckEntry, MappedDeck } from "@/types"
 export default defineComponent({
   name: "deck-selection",
   components: { YesnoModal, DeckPreviewComp },
@@ -61,7 +61,7 @@ export default defineComponent({
         this.$store.dispatch("set_deck_in_play", this.decks[i])
     },
 
-    delete_deck(deck: Deck): void {
+    delete_deck(deck: MappedDeck): void {
       this.show_yesno = true
       this.deck_id = deck.id // запоминаем id деки, которую надо удалить
     },

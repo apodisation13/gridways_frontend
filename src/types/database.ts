@@ -32,6 +32,7 @@ export interface LeaderData {
     base_charges: number
     base_hp: number
   }
+  heal?: number
   passive?: {
     value?: number
     timer?: number

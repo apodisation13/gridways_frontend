@@ -6,7 +6,9 @@
         type="text"
         placeholder="Введите название колоды"
         :value="deck_name"
-        @input="$emit('change_name_deck', $event.target.value)"
+        @input="
+          $emit('change_name_deck', ($event.target as HTMLInputElement).value)
+        "
       />
     </div>
   </div>

@@ -24,7 +24,7 @@
       </div>
       <div class="card-enemy-information">
         <!--Иконка хода для всех врагов, а лидеру врагов не надо, отсюда и условие-->
-        <ability-circle-enemy :enemy="enemy" v-if="e.move" />
+        <ability-circle-enemy :enemy="enemy as Enemy" v-if="e.move" />
         <!--Иконка урона, для всех врагов или если у лидера врага есть урон-->
         <card-damage-icon
           v-if="e.data.damage"

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="global_text filter_title">Добавлено недавно</div>
-    <div class="passives" v-for="passive in passives" :key="passive">
+    <div class="passives" v-for="passive in passives" :key="String(passive)">
       <button class="passive" @click="filtering(passive)">
         {{ passive }}
       </button>

@@ -15,8 +15,8 @@
           >
             <enemy-comp
               v-if="field[get_index(i, j)]"
-              :key="field[get_index(i, j)]?.id || get_index(i, j)"
-              :enemy="field[get_index(i, j)]"
+              :key="(field[get_index(i, j)] as Enemy)?.id || get_index(i, j)"
+              :enemy="field[get_index(i, j)] as Enemy"
               :index="get_index(i, j)"
               :in_cross="in_cross_enemy_index === get_index(i, j)"
             />
