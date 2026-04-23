@@ -11,8 +11,10 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+
+export default defineComponent({
   name: "resource-item",
   props: {
     name: {
@@ -24,7 +26,7 @@ export default {
       // default: 0,
     },
   },
-}
+})
 </script>
 <style scoped>
 .resource-item {

@@ -49,7 +49,7 @@
 import { defineComponent, type PropType } from "vue"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import ResourceCountRombus from "@/components/UI/ResourceCountRombus.vue"
-import type { CardEntry, KeyRewardItem } from "@/types"
+import type { CardEntry, KeyRewardResult } from "@/types"
 
 export default defineComponent({
   components: { CardListComponent, ResourceCountRombus },
@@ -58,7 +58,7 @@ export default defineComponent({
     name: { type: String, required: true },
     reward: { type: Array as PropType<CardEntry[]>, required: false },
     key_reward: {
-      type: Array as PropType<KeyRewardItem[]>,
+      type: Array as PropType<KeyRewardResult[]>,
       required: false,
       default: null,
     },
@@ -116,7 +116,7 @@ export default defineComponent({
       this.$emit("clear_reward")
       this.isLoading = false
     },
-    async accept_random_reward(res: KeyRewardItem): Promise<void> {
+    async accept_random_reward(res: KeyRewardResult): Promise<void> {
       this.$emit("accept_key_reward", res)
     },
     async accept_chest_reward(): Promise<void> {

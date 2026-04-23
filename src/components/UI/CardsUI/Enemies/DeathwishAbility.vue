@@ -2,10 +2,12 @@
   <div class="deathwish"></div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+
+export default defineComponent({
   name: "DeathwishAbility",
-}
+})
 </script>
 
 <style scoped>

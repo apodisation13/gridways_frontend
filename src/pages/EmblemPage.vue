@@ -7,10 +7,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import { getEnv } from "@/store/const/const"
 
-export default {
+export default defineComponent({
   name: "EmblemPage",
   data() {
     return {
@@ -19,25 +20,25 @@ export default {
     }
   },
   computed: {
-    authInProcess() {
+    authInProcess(): boolean {
       return this.$store.getters["getAuthState"]
     },
   },
   methods: {
     // эта функциональность присутствует по рекоммендации доки, после тестирования можно удалить
-    toggle() {
+    toggle(): void {
       this.fullscreen = true
     },
 
-    toggleApi() {
+    toggleApi(): void {
       // окно перехода в полноэкранный режим, запрашивается 1 раз при первичной загрузке приложения,
       // дальнейшая логика взаимодействия с полноэкранным режимом реализована в AppWrapperFullscreen
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
 
       if (getEnv() !== "development_local") {
-        if (!isIOS && this.$fullscreen.isEnabled) {
+        if (!isIOS && (this as any).$fullscreen.isEnabled) {
           // Fullscreen только для НЕ-iOS устройств
-          this.$fullscreen.toggle()
+          ;(this as any).$fullscreen.toggle()
         } else if (isIOS) {
           // Для iOS - скрываем адресную строку через скролл (хак)
           this.hideIOSAddressBar()
@@ -47,14 +48,14 @@ export default {
       this.$store.commit("gameStarting")
       this.goFullScreen()
     },
-    hideIOSAddressBar() {
+    hideIOSAddressBar(): void {
       // Небольшой хак для iOS - скролл вниз скрывает адресную строку
       setTimeout(() => {
         window.scrollTo(0, 1)
       }, 100)
     },
 
-    async goFullScreen() {
+    async goFullScreen(): Promise<void> {
       // если в локалсторадже нет данных входа, или вход не прошел, по кнопке начать пойдем на главную страницу
       if (!this.$store.getters["isLoggedIn"]) {
         this.$router.push("/main")
@@ -74,7 +75,7 @@ export default {
       }
     },
   },
-}
+})
 </script>
 
 <style scoped>

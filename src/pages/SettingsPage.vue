@@ -44,14 +44,16 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import SettingSound from "@/components/Pages/SettingsPage/SettingSound.vue"
 import SettingAnimation from "@/components/Pages/SettingsPage/SettingAnimation.vue"
 import SettingLogout from "@/components/Pages/SettingsPage/SettingLogout.vue"
 import SettingChooseTheme from "@/components/Pages/SettingsPage/SettingChooseTheme.vue"
 import SettingAvatar from "@/components/Pages/SettingsPage/SettingAvatar.vue"
 import SettingMoveTimeout from "@/components/Pages/SettingsPage/SettingMoveTimeout.vue"
-export default {
+
+export default defineComponent({
   name: "SettingsPage",
   components: {
     SettingAvatar,
@@ -103,31 +105,33 @@ export default {
           label: "Выйти",
           icon: require("@/assets/icons/settings/setting_logout.svg"),
         },
-      ],
+      ] as { id: string; label: string; icon: string }[],
     }
   },
   methods: {
-    handleWheel(e) {
-      if (this.$refs.scrollContainer) {
+    handleWheel(e: WheelEvent): void {
+      const container = this.$refs.scrollContainer as HTMLElement | undefined
+      if (container) {
         e.preventDefault()
-        this.$refs.scrollContainer.scrollLeft += e.deltaY
+        container.scrollLeft += e.deltaY
       }
     },
-    handleTouchStart(e) {
+    handleTouchStart(e: TouchEvent): void {
       this.touchStartX = e.touches[0].pageX
-      this.scrollLeft = this.$refs.scrollContainer.scrollLeft
+      this.scrollLeft = (this.$refs.scrollContainer as HTMLElement).scrollLeft
     },
-    handleTouchMove(e) {
+    handleTouchMove(e: TouchEvent): void {
       if (!this.touchStartX) return
       e.preventDefault()
       const touchX = e.touches[0].pageX
       const delta = this.touchStartX - touchX
-      this.$refs.scrollContainer.scrollLeft = this.scrollLeft + delta
+      ;(this.$refs.scrollContainer as HTMLElement).scrollLeft =
+        this.scrollLeft + delta
     },
-    handleTouchEnd() {
+    handleTouchEnd(): void {
       this.touchStartX = 0
     },
-    async updateSettings() {
+    async updateSettings(): Promise<void> {
       if (this.isLoading) return
       this.isLoading = true
       await this.$store.dispatch("updateUserPreferences")
@@ -135,18 +139,18 @@ export default {
     },
   },
   mounted() {
-    const container = this.$refs.scrollContainer
+    const container = this.$refs.scrollContainer as HTMLElement | undefined
     if (container) {
       container.addEventListener("touchend", this.handleTouchEnd)
     }
   },
   beforeUnmount() {
-    const container = this.$refs.scrollContainer
+    const container = this.$refs.scrollContainer as HTMLElement | undefined
     if (container) {
       container.removeEventListener("touchend", this.handleTouchEnd)
     }
   },
-}
+})
 </script>
 
 <style scoped>

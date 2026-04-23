@@ -11,15 +11,18 @@
   ></div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
+import type { Enemy } from "@/types"
+
+export default defineComponent({
   props: {
     enemy: {
-      type: Object,
+      type: Object as PropType<Enemy>,
       required: true,
     },
   },
-}
+})
 </script>
 
 <style scoped>

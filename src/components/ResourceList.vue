@@ -9,18 +9,20 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
-export default {
+
+export default defineComponent({
   components: { ResourceItem },
   name: "resource-comp",
   props: {
     resources: {
-      type: Object,
+      type: Object as PropType<Record<string, number>>,
       required: true,
     },
   },
-}
+})
 </script>
 
 <style scoped>

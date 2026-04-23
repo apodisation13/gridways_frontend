@@ -4,16 +4,18 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+
+export default defineComponent({
   name: "PageImage",
 
   data() {
     return {
-      time: "",
-      intervalId: null,
+      time: "" as string | number,
+      intervalId: null as ReturnType<typeof setInterval> | null,
       isWorking: true,
-      defaultImg: null,
+      defaultImg: null as string | null,
     }
   },
 
@@ -25,11 +27,11 @@ export default {
   },
 
   beforeUnmount() {
-    clearInterval(this.intervalId)
+    clearInterval(this.intervalId ?? undefined)
   },
 
   methods: {
-    updateTime() {
+    updateTime(): void {
       if (this.isWorking) {
         this.time = new Date().getHours()
       }
@@ -37,35 +39,35 @@ export default {
   },
 
   computed: {
-    path() {
+    path(): string | null {
       const image = this.$router.currentRoute.value.meta.image
       if (!image) return ""
 
-      if (image.default) {
-        clearInterval(this.intervalId)
-        return require("@/assets/" + image.default)
+      if ((image as any).default) {
+        clearInterval(this.intervalId ?? undefined)
+        return require("@/assets/" + (image as any).default)
       }
 
       if (this.time === "") return null
-      let actualtime = parseInt(this.time)
+      let actualtime = parseInt(String(this.time))
       // actualtime = 22 проверка ручками
       if (actualtime >= 5 && actualtime < 11) {
-        return require("@/assets/" + image.morning)
+        return require("@/assets/" + (image as any).morning)
       } else if (actualtime >= 11 && actualtime < 18) {
-        return require("@/assets/" + image.day)
+        return require("@/assets/" + (image as any).day)
       } else if (actualtime >= 18 && actualtime < 22) {
-        return require("@/assets/" + image.evening)
+        return require("@/assets/" + (image as any).evening)
       } else if (actualtime >= 22 || actualtime < 5) {
-        return require("@/assets/" + image.night)
+        return require("@/assets/" + (image as any).night)
       } else {
         return ""
       }
     },
-    withGradient() {
-      return this.$router.currentRoute.value.meta.withGradient
+    withGradient(): boolean {
+      return this.$router.currentRoute.value.meta.withGradient as boolean
     },
   },
-}
+})
 </script>
 
 <style scoped>

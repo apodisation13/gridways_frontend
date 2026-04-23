@@ -4,19 +4,20 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 
-export default {
+export default defineComponent({
   name: "button-close",
   components: { ThemedButton },
   methods: {
-    close() {
+    close(): void {
       this.$emit("close_self")
     },
   },
   emits: ["close_self"],
-}
+})
 </script>
 
 <style scoped>

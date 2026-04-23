@@ -43,14 +43,16 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import BonusPageResource from "@/components/Pages/BonusPage/BonusPageResource.vue"
 import RewardComp from "@/components/Pages/BonusPage/RewardComp.vue"
 import { PayResourcesSubtype } from "@/types"
+import type { CardEntry, KeyRewardResult, ResourceActions } from "@/types"
 import { choice } from "@/lib/utils"
 import { getRandomReward } from "@/logic/random_rewards"
 
-export default {
+export default defineComponent({
   components: { BonusPageResource, RewardComp },
   created() {
     this.init()
@@ -62,11 +64,11 @@ export default {
   },
   data() {
     return {
-      pool: [],
+      pool: [] as CardEntry[],
       show_reward_page: false,
       reward_name: "",
-      random_cards: [],
-      random_reward_choice: null,
+      random_cards: [] as CardEntry[],
+      random_reward_choice: null as KeyRewardResult[] | null,
       active_tab: 0,
       tabs: [
         { label: "Награды", keys: ["kegs", "big_kegs", "chests", "keys"] },
@@ -75,17 +77,18 @@ export default {
           keys: ["scraps", "bronze_ingots", "silver_ingots", "gold_ingots"],
         },
         { label: "Для уровней", keys: ["crops", "wood", "silk"] },
-      ],
+      ] as { label: string; keys: string[] }[],
+      keg_len: 0,
     }
   },
   computed: {
-    cards() {
+    cards(): CardEntry[] {
       return this.$store.getters["all_cards"]
     },
-    resource() {
+    resource(): Record<string, number> {
       return this.$store.getters["resource"]
     },
-    filtered_resources() {
+    filtered_resources(): Record<string, ResourceActions> {
       const keys = this.tabs[this.active_tab].keys
       return Object.fromEntries(
         Object.entries(this.resources_config).filter(([name]) =>
@@ -93,27 +96,30 @@ export default {
         )
       )
     },
-    sliderStyle() {
+    sliderStyle(): Record<string, string> {
       return {
         transform: `translateX(${this.active_tab * 100}%)`,
         width: `${100 / this.tabs.length}%`,
       }
     },
-    resources_config() {
+    resources_config(): Record<string, ResourceActions> {
       const transitions = this.$store.getters["resources_transitions"]
 
       return Object.keys(transitions)
         .sort((a, b) => transitions[a].index - transitions[b].index)
-        .reduce((acc, key) => {
-          acc[key] = transitions[key]
-          return acc
-        }, {})
+        .reduce(
+          (acc: Record<string, ResourceActions>, key: string) => {
+            acc[key] = transitions[key]
+            return acc
+          },
+          {} as Record<string, ResourceActions>
+        )
     },
   },
   methods: {
-    init() {
+    init(): void {
       this.pool = []
-      this.cards.forEach(card => {
+      this.cards.forEach((card: CardEntry) => {
         if (card.card.color === "Bronze") {
           for (let i = 0; i < 30; i++) {
             this.pool.push(card)
@@ -127,14 +133,27 @@ export default {
       })
     },
 
-    async pay_resource(data, subtype) {
+    async pay_resource(
+      data: Record<string, unknown>,
+      subtype: PayResourcesSubtype
+    ): Promise<void> {
       await this.$store.dispatch("processResources", {
         subtype: subtype,
         data,
       })
     },
 
-    async handleAction({ resource_name, action, recipe, quantity }) {
+    async handleAction({
+      resource_name,
+      action,
+      recipe,
+      quantity,
+    }: {
+      resource_name: string
+      action: string
+      recipe: Record<string, number>
+      quantity: number
+    }): Promise<void> {
       await this.pay_resource(
         {
           resource: resource_name,
@@ -146,7 +165,7 @@ export default {
       )
     },
 
-    async openResource(resource_name) {
+    async openResource(resource_name: string): Promise<void> {
       console.log(resource_name)
       if (resource_name === "kegs") await this.open_keg()
       else if (resource_name === "big_kegs") await this.open_big_keg()
@@ -154,7 +173,7 @@ export default {
       else if (resource_name === "keys") await this.open_key()
     },
 
-    async open_keg() {
+    async open_keg(): Promise<void> {
       if (this.resource.kegs <= 0) return
       await this.pay_resource(
         { kegs: -1 },
@@ -168,7 +187,7 @@ export default {
       }
       this.show_reward_page = true
     },
-    async open_big_keg() {
+    async open_big_keg(): Promise<void> {
       if (this.resource.big_kegs <= 0) return
       await this.pay_resource(
         { big_kegs: -1 },
@@ -182,7 +201,7 @@ export default {
       }
       this.show_reward_page = true
     },
-    async open_chest() {
+    async open_chest(): Promise<void> {
       if (this.resource.chests <= 0) return
       await this.pay_resource(
         { chests: -1 },
@@ -197,12 +216,12 @@ export default {
       this.show_reward_page = true
     },
 
-    async open_key() {
+    async open_key(): Promise<void> {
       await this.pay_resource(
         { keys: -1 },
         PayResourcesSubtype.openBonusResource
       )
-      const key_reward = []
+      const key_reward: KeyRewardResult[] = []
       for (let i = 0; i < 3; i++) {
         key_reward.push(getRandomReward(this.$store.getters["keys_rewards"]))
       }
@@ -211,7 +230,7 @@ export default {
       this.show_reward_page = true
     },
 
-    async accept_random_reward(res) {
+    async accept_random_reward(res: KeyRewardResult): Promise<void> {
       const { resource, value } = res
       await this.pay_resource(
         { [resource]: value },
@@ -220,13 +239,13 @@ export default {
       this.clear_reward()
     },
 
-    clear_reward() {
+    clear_reward(): void {
       this.random_cards = []
       this.random_reward_choice = null
       this.show_reward_page = false
     },
   },
-}
+})
 </script>
 
 <style scoped>

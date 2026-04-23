@@ -73,20 +73,23 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import { getRewardForLevel } from "@/logic/random_rewards"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
 import {
   GameStatsRecordType,
   LeaderboardGameMode,
   PayResourcesSubtype,
+  UserLevel,
 } from "@/types"
-export default {
+
+export default defineComponent({
   name: "win-page",
   components: { ResourceItem },
   data() {
     return {
-      pay_data: {},
+      pay_data: {} as Record<string, number>,
     }
   },
   async created() {
@@ -99,7 +102,7 @@ export default {
       type: GameStatsRecordType.win,
     })
     const level_name = this.$store.state.game.level.name
-    let gameMode
+    let gameMode: LeaderboardGameMode
     if (level_name === "random") gameMode = LeaderboardGameMode.random
     else if (level_name === "random_n") gameMode = LeaderboardGameMode.random_n
     else gameMode = LeaderboardGameMode.season
@@ -112,7 +115,7 @@ export default {
   },
   methods: {
     // награда ресурсов за прохождение уровня
-    async pay_resources() {
+    async pay_resources(): Promise<void> {
       const difficulty = this.$store.state.game.level.difficulty
       const win_level_rewards = this.$store.getters["win_level_rewards"]
       this.pay_data = getRewardForLevel(win_level_rewards[difficulty])
@@ -122,7 +125,7 @@ export default {
       })
     },
     // открытие всех связанных уровней при прохождении уровня
-    async open_levels() {
+    async open_levels(): Promise<void> {
       const currentLevel = this.$store.getters["currentLevel"]
 
       // при рандомном уровне сразу выходим отсюда
@@ -133,7 +136,7 @@ export default {
 
       // ищем уровень из списка уровней сезона
       const userLevel = season.levels.find(
-        lev => lev.level.id === currentLevel.id
+        (lev: UserLevel) => lev.level.id === currentLevel.id
       )
 
       // если уровень УЖЕ пройден, то нет смысла открывать его детей
@@ -142,7 +145,7 @@ export default {
       await this.$store.dispatch("openRelatedLevels", userLevel.id)
     },
   },
-}
+})
 </script>
 
 <style scoped>

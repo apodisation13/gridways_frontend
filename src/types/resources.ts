@@ -6,6 +6,8 @@ export interface ResourceActions {
   craft?: Recipe[]
   mill?: Recipe[]
   open?: boolean
+  step?: number
+  index?: number
 }
 
 export interface KeyRewardItem {
@@ -15,4 +17,9 @@ export interface KeyRewardItem {
   min?: number
   max?: number
   value?: number
+}
+
+export interface KeyRewardResult {
+  resource: string
+  value: number
 }
