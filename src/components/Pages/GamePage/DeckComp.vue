@@ -92,7 +92,7 @@
     <transition name="modal">
       <modal-window v-if="flag" v-touch:swipe="close_self">
         <button-close @close_self="close_self" />
-        <card-list-component :cards="deck" />
+        <card-list-component :cards="deckEntries" />
       </modal-window>
     </transition>
   </div>
@@ -103,7 +103,7 @@ import { defineComponent, type PropType } from "vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
-import type { Card, Leader } from "@/types"
+import type { Card, CardEntry, Leader } from "@/types"
 
 interface FactionColors {
   base: string
@@ -129,6 +129,9 @@ export default defineComponent({
     }
   },
   computed: {
+    deckEntries(): CardEntry[] {
+      return this.deck.map((card: Card) => ({ card, count: 1, id: null }))
+    },
     deck_len(): number {
       return this.deck.length
     },

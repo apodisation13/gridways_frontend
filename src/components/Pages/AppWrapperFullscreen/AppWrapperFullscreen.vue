@@ -12,16 +12,14 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
 import BaseTitleText from "@/components/UI/BaseTitleText.vue"
 import ButtonToFullscreen from "@/components/UI/Buttons/ButtonToFullscreen.vue"
-export default {
-  components: {
-    BaseModal,
-    BaseTitleText,
-    ButtonToFullscreen,
-  },
+
+export default defineComponent({
+  components: { BaseModal, BaseTitleText, ButtonToFullscreen },
   data() {
     return {
       // поле состояния режима полного экрана
@@ -30,18 +28,24 @@ export default {
       openModal: false,
     }
   },
+  computed: {
+    // поле указывающее что пользователь зашел в игру, устанавливается в true и втечение игры не меняется
+    // по заначению этого поля открывается модальное окно с запросом перехода в полноэкранный режим
+    gameStarted(): boolean {
+      return this.$store.state.fullscreen.isStarted
+    },
+  },
   methods: {
-    toggle() {
+    toggle(): void {
       this.fullscreen = true
     },
-
-    toggleApi() {
-      this.$fullscreen.toggle()
+    toggleApi(): void {
+      ;(this as any).$fullscreen.toggle()
     },
 
     // функция пересчета значения переменной vh при изменении размера экрана( при переходе в полноэкранный режим,
     // решение проблемы кроссбраузерности мобильных браузеров ), значение vh активно используется на DeckbuildPage
-    appHeight() {
+    appHeight(): void {
       document.documentElement.style.setProperty(
         "--vh",
         `${window.innerHeight * 0.01}px`
@@ -49,28 +53,21 @@ export default {
     },
 
     // функция установки положения в режим "portrait" в полноэкранном режиме
-    setOrientation() {
-      this.openModal = this.$fullscreen.isFullscreen ? false : true
-      if (this.$fullscreen.isFullscreen) {
+    setOrientation(): void {
+      const $fs = (this as any).$fullscreen
+      this.openModal = !$fs.isFullscreen
+      if ($fs.isFullscreen) {
         screen.orientation
           .lock("portrait")
           .then(() => {
             console.log(`Locked to ${"portrait"}\n`)
           })
-          .catch(error => {
+          .catch((error: Error) => {
             console.log(`${error}\n`)
           })
       }
 
       this.appHeight()
-    },
-  },
-  computed: {
-    // поле указывающее что пользователь зашел в игру, устанавливается в true и втечение игры не меняется
-    // по заначению этого поля открывается модальное окно с запросом перехода в полноэкранный режим
-
-    gameStarted() {
-      return this.$store.state.fullscreen.isStarted
     },
   },
 
@@ -87,7 +84,7 @@ export default {
     window.removeEventListener("resize", this.appHeight)
     window.removeEventListener("fullscreenchange", this.setOrientation)
   },
-}
+})
 </script>
 
 <style scoped>

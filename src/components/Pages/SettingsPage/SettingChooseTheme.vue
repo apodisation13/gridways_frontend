@@ -18,10 +18,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import { styleOuter, styleWrapper } from "@/logic/border_styles"
 
-export default {
+export default defineComponent({
   name: "SettingChooseTheme",
   data() {
     return {
@@ -29,17 +30,17 @@ export default {
     }
   },
   methods: {
-    styleOuter(el) {
+    styleOuter(el: number): Record<string, string> | undefined {
       return styleOuter(el)
     },
-    styleWrapper(el) {
+    styleWrapper(el: number): Record<string, string> | undefined {
       return styleWrapper(el)
     },
-    setSettingTheme(el) {
+    setSettingTheme(el: number): void {
       this.$store.commit("set_theme", el)
     },
   },
-}
+})
 </script>
 
 <style scoped>

@@ -6,13 +6,13 @@
         <h4 class="special-ability-header">{{ card_ability }}</h4>
         <card-list-component
           v-if="!enemyView"
-          :cards="cards_pool"
-          @chose_player_card="confirm_selection"
+          :cards="cardPoolEntries"
+          @chose_player_card="confirm_card_selection"
         />
         <enemy-list
           v-else
-          :enemies="cards_pool"
-          @chose-enemy="confirm_selection"
+          :enemies="enemyPool"
+          @chose-enemy="confirm_enemy_selection"
         />
       </modal-window>
     </transition>
@@ -24,7 +24,8 @@
       @mousedown="handleCardMouseDown($event)"
       @touchstart="handleCardTouchStart($event)"
     >
-      <card-item :card="picked_card" />
+      <card-item v-if="pickedCard" :card="pickedCard" />
+      <enemy-comp v-else-if="pickedEnemy" :enemy="pickedEnemy" />
     </div>
   </div>
 </template>
@@ -35,8 +36,9 @@ import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import CardItem from "@/components/Cards/CardItem.vue"
 import EnemyList from "@/components/Cards/EnemyList.vue"
+import EnemyComp from "@/components/Cards/EnemyComp.vue"
 import { arrowMixin } from "@/mixins/GamePage/arrow_draw"
-import type { Card, Enemy } from "@/types"
+import { Card, CardEntry, CardType, Enemy } from "@/types"
 
 export default defineComponent({
   name: "special-case-abilities",
@@ -47,7 +49,13 @@ export default defineComponent({
   beforeUnmount() {
     ;(this as any).removeArrowCanvas()
   },
-  components: { EnemyList, CardItem, CardListComponent, ModalWindow },
+  components: {
+    EnemyList,
+    CardItem,
+    EnemyComp,
+    CardListComponent,
+    ModalWindow,
+  },
   props: {
     cards_pool: {
       required: true,
@@ -78,44 +86,66 @@ export default defineComponent({
 
   data() {
     return {
-      picked_card: null as Card | Enemy | null,
+      pickedCard: null as Card | null,
+      pickedEnemy: null as Enemy | null,
     }
+  },
+  computed: {
+    cardPoolEntries(): CardEntry[] {
+      return (this.cards_pool as Card[]).map(card => ({
+        card,
+        count: 1,
+        id: null,
+      }))
+    },
+    enemyPool(): Enemy[] {
+      return this.cards_pool as Enemy[]
+    },
   },
 
   methods: {
     handleCardMouseDown(e: MouseEvent): void {
       e.preventDefault()
       e.stopPropagation()
+      const faction = (this.pickedCard ?? this.pickedEnemy)?.faction
       ;(this as any).beginArrowDrawing(
         e.currentTarget,
         e.clientX,
         e.clientY,
-        (this.picked_card as Card | Enemy).faction
+        faction
       )
     },
     handleCardTouchStart(e: TouchEvent): void {
       e.preventDefault()
       e.stopPropagation()
       const touch = e.touches[0]
+      const faction = (this.pickedCard ?? this.pickedEnemy)?.faction
       ;(this as any).beginArrowDrawing(
         e.currentTarget,
         touch.clientX,
         touch.clientY,
-        (this.picked_card as Card | Enemy).faction
+        faction
       )
     },
 
-    confirm_selection(card: Card | Enemy): void {
-      if (this.enemyView) this.forEnemy(card)
-      this.$emit("confirm_selection", card)
-      this.picked_card = card
+    confirm_card_selection(entry: CardEntry): void {
+      this.$emit("confirm_selection", entry.card)
+      this.pickedCard = entry.card
+      this.pickedEnemy = null
     },
-    forEnemy(card: Card | Enemy): void {
-      ;(card as any)["ability"] = {
+    confirm_enemy_selection(enemy: Enemy): void {
+      this.forEnemy(enemy)
+      this.$emit("confirm_selection", enemy)
+      this.pickedEnemy = enemy
+      this.pickedCard = null
+    },
+    forEnemy(enemy: Enemy): void {
+      ;(enemy as any)["ability"] = {
         name: "damage-one",
         description: "Нанести {damage} урона одному врагу",
       }
-      ;(card as any)["data"]["charges"] = 1
+      ;(enemy as any)["data"]["charges"] = 1
+      ;(enemy as any)["type"] = CardType.Unit
     },
   },
   emits: [

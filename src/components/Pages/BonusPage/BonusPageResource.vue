@@ -74,30 +74,33 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import ResourcesActionModal from "@/components/Pages/BonusPage/ResourcesActionModal.vue"
 import ResourceCountRombus from "@/components/UI/ResourceCountRombus.vue"
 import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
-export default {
+import type { ResourceActions } from "@/types"
+
+export default defineComponent({
   name: "bonus-page-resource",
   components: { YesnoModal, ResourceCountRombus, ResourcesActionModal },
   props: {
     resource_name: { type: String, required: true },
     resource_count: { type: Number, default: 0 },
-    actions: { type: Object, default: () => ({}) },
+    actions: { type: Object as PropType<ResourceActions>, default: () => ({}) },
     step: { type: Number, default: 1 },
   },
   data() {
     return {
-      active_action: null,
+      active_action: null as "buy" | "sell" | "craft" | "mill" | null,
       open_item_visible: false,
     }
   },
   methods: {
-    openModal(action) {
+    openModal(action: "buy" | "sell" | "craft" | "mill"): void {
       this.active_action = action
     },
-    handleConfirm(payload) {
+    handleConfirm(payload: Record<string, unknown>): void {
       const action = this.active_action
       this.active_action = null
       this.$emit("action", {
@@ -106,21 +109,21 @@ export default {
         ...payload,
       })
     },
-    async openResource() {
+    async openResource(): Promise<void> {
       if (this.resource_count <= 0) return
       // ресурсы, которые можно открыть, в конфиге имеют флаг open: true
       if (this.actions.open) this.open_item_visible = true
     },
-    open_item_confirm() {
+    open_item_confirm(): void {
       this.open_item_visible = true
       this.$emit("open-resource-confirm", this.resource_name)
     },
-    open_item_decline() {
+    open_item_decline(): void {
       this.open_item_visible = false
     },
   },
   emits: ["action", "open-resource-confirm"],
-}
+})
 </script>
 
 <style scoped>

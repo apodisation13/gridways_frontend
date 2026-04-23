@@ -35,17 +35,19 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import LevelModal from "@/components/ModalWindows/LevelModal.vue"
 import { background_color_leader } from "@/logic/border_styles"
+import type { MappedUserLevel } from "@/types"
 
-export default {
+export default defineComponent({
   name: "level-preview-comp",
   components: { LevelModal },
   props: {
     level: {
       required: true,
-      type: Object,
+      type: Object as PropType<MappedUserLevel>,
     },
   },
   data() {
@@ -54,7 +56,7 @@ export default {
     }
   },
   computed: {
-    cardBorder() {
+    cardBorder(): Record<string, string> {
       const bg = background_color_leader(this.level.level.enemy_leader?.faction)
       const color = bg || "#888"
       return {
@@ -62,18 +64,18 @@ export default {
         boxShadow: `0 0 10px ${color}44`,
       }
     },
-    leaderBg() {
+    leaderBg(): Record<string, string> {
       return {
         backgroundImage: `url(${this.level.level.enemy_leader?.image})`,
       }
     },
   },
   methods: {
-    open_level_modal() {
+    open_level_modal(): void {
       this.show_level_modal = true
     },
   },
-}
+})
 </script>
 
 <style scoped>

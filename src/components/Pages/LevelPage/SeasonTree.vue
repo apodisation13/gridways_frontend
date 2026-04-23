@@ -13,7 +13,7 @@
           <v-line
             v-for="line in season.season.lines"
             :key="line"
-            :config="lineConfig(line, season)"
+            :config="lineConfig(line)"
           ></v-line>
         </div>
       </v-layer>
@@ -186,27 +186,20 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import { useToast } from "vue-toastification"
 import LevelTree from "@/components/Pages/LevelPage/LevelTree.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import { styleWrapper } from "@/logic/border_styles"
+import type { SeasonEntry, MappedUserLevel, SeasonRelatedSeason } from "@/types"
 
-export default {
+export default defineComponent({
   name: "SeasonTree",
-  components: {
-    ThemedButton,
-    LevelTree,
-  },
+  components: { ThemedButton, LevelTree },
   props: {
-    seasons: {
-      type: Array,
-      required: true,
-    },
-    seasonLevelsTreeOpened: {
-      type: Boolean,
-      required: true,
-    },
+    seasons: { type: Array as PropType<SeasonEntry[]>, required: true },
+    seasonLevelsTreeOpened: { type: Boolean, required: true },
   },
   setup() {
     const toast = useToast()
@@ -227,7 +220,7 @@ export default {
     this.showSeasonLevelsTree = this.seasonLevelsTreeOpened
   },
   computed: {
-    styleWrapper() {
+    styleWrapper(): Record<string, string> | undefined {
       return styleWrapper(this.$store.getters["selectedTheme"])
     },
   },
@@ -235,32 +228,31 @@ export default {
     return {
       w: 100,
       configKonva: { width: 1000, height: 1000 },
-      seasonTree: [],
+      seasonTree: [] as any[],
       seasonName: "",
-      seasonLevels: [],
+      seasonLevels: [] as MappedUserLevel[],
       showSeasonLevelsTree: false,
       userSeasonUnlocked: false,
       lastTap: 0,
-      lastTappedId: null,
-      activeDescription: null, // хранит сезон с открытым описанием
-      activeStats: null, // хранит статистику сезона для попапа
+      lastTappedId: null as number | null,
+      activeDescription: null as SeasonEntry | null, // хранит сезон с открытым описанием
+      activeStats: null as SeasonEntry | null, // хранит статистику сезона для попапа
     }
   },
   methods: {
-    init() {
+    init(): void {
       this.seasonTree = [...this.seasons]
-      this.seasonTree.forEach(season => {
+      this.seasonTree.forEach((season: any) => {
         season.season.lines = [] // добавляем такой ключ, чтобы потом положить туда линии
-        season.season.children.forEach(ch => {
+        season.season.children.forEach((ch: SeasonRelatedSeason) => {
           this.calc_line(ch, season)
         })
       })
     },
     // Только для touch устройств
-    handleDoubleTap(event, season) {
+    handleDoubleTap(event: TouchEvent, season: any): void {
       const now = Date.now()
       const DOUBLE_TAP_DELAY = 300
-
       if (
         this.lastTappedId === season.season.id &&
         now - this.lastTap < DOUBLE_TAP_DELAY
@@ -269,12 +261,11 @@ export default {
         event.preventDefault()
         this.setSeason(season)
       }
-
       this.lastTap = now
       this.lastTappedId = season.season.id
     },
     // Стиль для HTML блока поверх прямоугольника
-    labelStyle(item) {
+    labelStyle(item: any): Record<string, string> {
       return {
         left: item.season.x + "px",
         top: item.season.y + "px",
@@ -282,22 +273,21 @@ export default {
         height: this.w + "px",
       }
     },
-    isLocked(season) {
+    isLocked(season: SeasonEntry): boolean {
       return season.id === null
     },
-    isFinished(season) {
+    isFinished(season: SeasonEntry): boolean {
       return season.stats.total_levels === season.stats.finished_levels
     },
-    progressPercent(season) {
+    progressPercent(season: SeasonEntry): number {
       const { finished_levels, total_levels } = season.stats ?? {}
       if (!total_levels) return 0
       return Math.round((finished_levels / total_levels) * 100)
     },
-    squareConfig(item) {
+    squareConfig(item: any): Record<string, unknown> {
       const isLocked = !item.id
       const isFinished = item.finished
-
-      const gradients = {
+      const gradients: Record<string, (string | number)[]> = {
         locked: [0, "#9e9e9e", 1, "#616161"],
         finished: [0, "rgba(255, 231, 183, 1)", 1, "rgba(255, 231, 183, 1)"],
         open: [0, "rgba(237, 177, 62, 1)", 1, "rgba(237, 177, 62, 1)"],
@@ -325,7 +315,7 @@ export default {
         strokeWidth: isLocked ? 0 : 2,
       }
     },
-    lineConfig(arrow) {
+    lineConfig(arrow: any): Record<string, unknown> {
       return {
         x: arrow.x,
         y: arrow.y,
@@ -340,19 +330,17 @@ export default {
         strokeWidth: 2,
       }
     },
-    calc_line(ch, item) {
+    calc_line(ch: SeasonRelatedSeason, item: any): void {
       const { season } = item
       const connections = ch.connection?.split("-")
       if (!connections || !ch.line) return
-      let x1 = undefined
-      let y1 = undefined
-      let x2 = undefined
-      let y2 = undefined
-
+      let x1: number | undefined
+      let y1: number | undefined
+      let x2: number | undefined
+      let y2: number | undefined
       const seasonIndex = this.seasons.findIndex(
         seas => seas.season.id === ch.related_season_id
       )
-
       if (ch.line === "right") {
         x1 = this.seasonTree[seasonIndex].season.x - season.x - this.w
         y1 = this.seasonTree[seasonIndex].season.y - season.y
@@ -376,7 +364,14 @@ export default {
       }
       this.push_line(connections, season, x1, y1, x2, y2)
     },
-    push_line(connections, level, x1, y1, x2, y2) {
+    push_line(
+      connections: string[],
+      level: any,
+      x1: number | undefined,
+      y1: number | undefined,
+      x2: number | undefined,
+      y2: number | undefined
+    ): void {
       for (const l of connections) {
         if (this.seasonTree[parseInt(l) - 1].finished) {
           level.lines.push({
@@ -395,7 +390,7 @@ export default {
         points: [0, 0, x1, y1],
       })
     },
-    setSeason(season) {
+    setSeason(season: any): void {
       if (season.id) this.$store.commit("set_season", season.season)
       this.seasonLevels = season.season.levels
       this.seasonName = season.season.name
@@ -403,21 +398,21 @@ export default {
       this.userSeasonUnlocked = season.id !== null
       this.$emit("level_selected", this.showSeasonLevelsTree)
     },
-    openDescription(season) {
+    openDescription(season: SeasonEntry): void {
       this.activeDescription = season
     },
-    closeDescription() {
+    closeDescription(): void {
       this.activeDescription = null
     },
-    openStats(season) {
+    openStats(season: SeasonEntry): void {
       this.activeStats = season
     },
-    closeStats() {
+    closeStats(): void {
       this.activeStats = null
     },
   },
   emits: ["level_selected"],
-}
+})
 </script>
 <style scoped>
 .stage-container {

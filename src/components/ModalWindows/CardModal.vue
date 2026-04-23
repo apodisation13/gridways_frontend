@@ -9,12 +9,16 @@
     <div
       class="card-ui"
       :style="[border(card)]"
-      v-if="!forEnemy || forEnemyLeader"
+      v-if="!forEnemy && !forEnemyLeader"
     >
-      <card-ui v-bind="$props" />
+      <card-ui v-bind="$props" :card="playerCard" />
     </div>
     <!--А это соответственно карта врага, у неё есть card.move-->
-    <div class="card-ui" :style="[border(card)]" v-if="forEnemy">
+    <div
+      class="card-ui"
+      :style="[border(card)]"
+      v-if="forEnemy || forEnemyLeader"
+    >
       <enemy-ui :enemy="card" />
     </div>
 
@@ -29,7 +33,7 @@
           </button>
           <card-count-triangle
             :count="count"
-            :card-color="background_color_triangle(card.color)"
+            :card-color="background_color_triangle(cardColor)"
           />
           <button class="global_text btn btn-craft" @click="craft">
             Создать ⚒
@@ -44,7 +48,7 @@
       v-if="show_modal_craft"
       action="craft"
       :options="craft_options"
-      :card="card"
+      :card="playerCard"
       @confirm="confirm_craft"
       @cancel="show_modal_craft = false"
     />
@@ -52,14 +56,15 @@
       v-if="show_modal_mill"
       action="mill"
       :options="mill_options"
-      :card="card"
+      :card="playerCard"
       @confirm="confirm_mill"
       @cancel="show_modal_mill = false"
     />
   </modal-window>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import {
   border_for_card,
   border_leader,
@@ -72,10 +77,19 @@ import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import CardUi from "@/components/Cards/CardUi.vue"
 import EnemyUi from "@/components/Cards/EnemyUi.vue"
 import CardDescriptions from "@/components/Cards/CardDescriptions.vue"
-import { CraftMillCardActionSubtype } from "@/types"
+import {
+  CraftMillCardActionSubtype,
+  type Card,
+  type Leader,
+  type Enemy,
+  type EnemyLeader,
+  type CardEntry,
+  type LeaderEntry,
+} from "@/types"
 import CardActionModal from "@/components/ModalWindows/CardActionModal.vue"
 import { useToast } from "vue-toastification"
-export default {
+
+export default defineComponent({
   name: "card-modal",
   components: {
     CardActionModal,
@@ -91,20 +105,18 @@ export default {
     return { toast }
   },
   props: {
-    // брать границу карты как для лидеров
     is_leader: {
       type: Boolean,
       default: false,
     },
     user_card: {
-      // объект противника по индексу поля
-      type: Object,
+      type: Object as PropType<CardEntry | LeaderEntry | null>,
       default() {
         return null
       },
     },
     card: {
-      type: Object,
+      type: Object as PropType<Card | Leader | Enemy | EnemyLeader>,
       required: true,
     },
     count: {
@@ -145,34 +157,43 @@ export default {
     }
   },
   computed: {
-    card_color_key() {
-      return this.card.color ? this.card.color : "leader"
+    playerCard(): Card | Leader {
+      return this.card as Card | Leader
     },
-    craft_options() {
+    cardColor(): string {
+      return (this.card as any).color ?? ""
+    },
+    card_color_key(): string {
+      return (this.card as any).color ? (this.card as any).color : "leader"
+    },
+    craft_options(): Record<string, number>[] {
       const config = this.$store.getters["cards_resources_prices"]
       const cfg = config[this.card_color_key]
       return cfg["craft_card"] || cfg["craft_leader"] || []
     },
-    mill_options() {
+    mill_options(): Record<string, number>[] {
       const config = this.$store.getters["cards_resources_prices"]
       const cfg = config[this.card_color_key]
       return cfg["mill_card"] || cfg["mill_leader"]
     },
   },
   methods: {
-    close_self() {
+    close_self(): void {
       this.$emit("close_card_modal")
     },
-    border(card) {
-      return this.is_leader ? border_leader(card) : border_for_card(card)
+    border(card: Card | Leader | Enemy | EnemyLeader): Record<string, string> {
+      return this.is_leader
+        ? border_leader(card as Leader | EnemyLeader)
+        : border_for_card(card as Card | Enemy)
     },
-    background_color_triangle(color) {
+    background_color_triangle(color: string): string {
       return this.is_leader
         ? background_color_leader(this.card.faction)
         : background_color_hp(color)
     },
-    mill() {
-      if (this.count === 0 || (this.count === 1 && this.card.unlocked)) {
+    mill(): void {
+      const c = this.card as any
+      if (this.count === 0 || (this.count === 1 && c.unlocked)) {
         this.toast.warning(
           "Нельзя размиллить карту из стартового набора или ту, которой и так 0"
         )
@@ -180,30 +201,29 @@ export default {
       }
       this.show_modal_mill = true
     },
-    craft() {
+    craft(): void {
       this.show_modal_craft = true
     },
-
-    async confirm_mill() {
+    async confirm_mill(): Promise<void> {
       this.show_modal_mill = false
       const subtypeCardAction =
-        this.user_card?.card?.color !== undefined
+        (this.user_card?.card as any)?.color !== undefined
           ? CraftMillCardActionSubtype.millCard
           : CraftMillCardActionSubtype.millLeader
       const data = {
-        cardId: this.user_card.card.id,
+        cardId: (this.user_card as CardEntry | LeaderEntry).card.id,
         subtype: subtypeCardAction,
       }
       await this.$store.dispatch("processCraftMillCard", data)
     },
-    async confirm_craft(recipe) {
+    async confirm_craft(recipe: unknown): Promise<void> {
       this.show_modal_craft = false
       const subtypeCardAction =
-        this.user_card?.card?.color !== undefined
+        (this.user_card?.card as any)?.color !== undefined
           ? CraftMillCardActionSubtype.craftCard
           : CraftMillCardActionSubtype.craftLeader
       const data = {
-        cardId: this.user_card.card.id,
+        cardId: (this.user_card as CardEntry | LeaderEntry).card.id,
         subtype: subtypeCardAction,
         recipe: recipe,
       }
@@ -211,7 +231,7 @@ export default {
     },
   },
   emits: ["close_card_modal"],
-}
+})
 </script>
 
 <style scoped>

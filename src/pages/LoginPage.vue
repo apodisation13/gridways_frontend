@@ -174,11 +174,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import { useToast } from "vue-toastification"
 import AgreementModal from "@/components/ModalWindows/AgreementModal.vue"
 import PolicyModal from "@/components/ModalWindows/PolicyModal.vue"
-export default {
+
+export default defineComponent({
   components: { AgreementModal, PolicyModal },
   setup() {
     const toast = useToast()
@@ -207,10 +209,10 @@ export default {
     }
   },
   computed: {
-    isRegistration() {
-      return this.$route.query.registration
+    isRegistration(): string | string[] {
+      return this.$route.query.registration as string | string[]
     },
-    userRegisterDisabled() {
+    userRegisterDisabled(): boolean {
       return (
         !this.is_user_agree ||
         !this.is_policy_agree ||
@@ -220,12 +222,12 @@ export default {
         !this.confirm_password
       )
     },
-    normalizedEmail() {
+    normalizedEmail(): string {
       return this.email.trim().toLowerCase()
     },
   },
   methods: {
-    async login() {
+    async login(): Promise<void> {
       this.reset_highlight()
       this.error = this.validate_form(false)
       if (this.error) return
@@ -240,14 +242,16 @@ export default {
         await this.$store.dispatch("getUserDatabase")
         await this.$store.dispatch("render_all_images")
         await this.$router.push("/main")
-      } catch (err) {
+      } catch (err: any) {
         this.error = err.message
-        document.getElementById("email").classList.toggle("form__data_error")
-        document.getElementById("password").classList.toggle("form__data_error")
+        document.getElementById("email")?.classList.toggle("form__data_error")
+        document
+          .getElementById("password")
+          ?.classList.toggle("form__data_error")
       }
     },
 
-    async userRegister() {
+    async userRegister(): Promise<void> {
       this.reset_highlight()
       this.error = this.validate_form(true)
       if (this.error) return
@@ -260,31 +264,31 @@ export default {
         })
         this.formLogin = true
       } catch (err) {
-        this.error = err
+        this.error = err as string
         throw err
       }
     },
 
-    toggle_policy_modal() {
+    toggle_policy_modal(): void {
       this.show_policy_modal = !this.show_policy_modal
     },
 
-    toggle_agreement_modal() {
+    toggle_agreement_modal(): void {
       this.show_agreement_modal = !this.show_agreement_modal
     },
-    toggle_pass_visibility(e) {
-      const pass_field = e.target
+    toggle_pass_visibility(e: MouseEvent): void {
+      const pass_field = (e.target as HTMLElement)
         .closest(".form__auth_pass")
-        .querySelector("input")
-      if (pass_field.value === "") return
-      if (pass_field.attributes.type.value === "password") {
+        ?.querySelector("input")
+      if (!pass_field || pass_field.value === "") return
+      if (pass_field.getAttribute("type") === "password") {
         pass_field.setAttribute("type", "text")
         return
       }
       pass_field.setAttribute("type", "password")
     },
 
-    bgImage(state) {
+    bgImage(state: boolean): Record<string, string> {
       if (!state) {
         return {
           backgroundImage: `url(${require("@/assets/icons/buttons/checkbox.svg")})`,
@@ -295,25 +299,25 @@ export default {
         }
     },
 
-    choseFormLogin() {
+    choseFormLogin(): void {
       this.error = ""
       this.formLogin = true
     },
-    choseFormRegister() {
+    choseFormRegister(): void {
       this.error = ""
       this.formLogin = false
       this.email = ""
       this.password = ""
     },
     // :disabled="!(email && password)"
-    reset_highlight() {
+    reset_highlight(): void {
       this.username_valid = true
       this.email_valid = true
       this.password_valid = true
       this.confirm_password_valid = true
     },
 
-    validate_form(register) {
+    validate_form(register: boolean): string {
       if (register && !this.username) {
         this.username_valid = false
         return "Поле имя не может быть пустым"
@@ -339,7 +343,7 @@ export default {
       return ""
     },
   },
-}
+})
 </script>
 
 <style scoped>

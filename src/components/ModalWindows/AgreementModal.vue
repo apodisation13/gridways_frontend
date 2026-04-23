@@ -592,8 +592,9 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+export default defineComponent({
   name: "PolicyModal",
   props: {
     text: {
@@ -602,12 +603,12 @@ export default {
     },
   },
   methods: {
-    hideModal() {
+    hideModal(): void {
       this.$emit("close-modal")
     },
   },
   emits: ["close-modal"],
-}
+})
 </script>
 
 <style scoped>

@@ -3,7 +3,7 @@
     <button
       v-if="$route.query.userId"
       class="back-btn"
-      @click="$router.push({ path: '/leaderboard', query: { world: true } })"
+      @click="$router.push({ path: '/leaderboard', query: { world: 'true' } })"
     >
       ← Назад
     </button>

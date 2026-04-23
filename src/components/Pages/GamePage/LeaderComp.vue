@@ -2,7 +2,6 @@
   <div class="leader-comp">
     <card-item
       :card="leader"
-      :user_card="leader"
       :class="{
         'not-charges':
           leader.data.charges === 0 && !leader.passive_ability?.name,

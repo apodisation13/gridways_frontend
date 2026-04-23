@@ -4,11 +4,11 @@
     <!--Двойной клик по карте - событие действия на картой-->
     <card-item
       v-for="user_card in cards"
-      :key="user_card.id"
+      :key="user_card.card.id"
       @dblclick="chose_player_card(user_card)"
       :count="user_card.count"
-      :card="user_card.card ? user_card.card : user_card"
-      :user_card="user_card.card ? user_card : null"
+      :card="user_card.card"
+      :user_card="user_card"
       :hp_needed="hp_needed"
       :deckbuilder="deckbuilder"
       :bonus="bonus"

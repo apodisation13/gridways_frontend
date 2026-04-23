@@ -37,7 +37,7 @@
         <!-- анимация со значком сердца на карте - пассивное лечение от карты в руке -->
         <transition name="heal">
           <div
-            v-if="card.healing"
+            v-if="c.healing"
             class="heal-overlay"
             :style="{ '--flash-duration': flashDuration + 'ms' }"
           >
@@ -66,22 +66,22 @@
       </div>
       <!-- увеличение урона при ХОДЕ картой -->
       <div
-        v-if="card.dmg_delta"
+        v-if="c.dmg_delta"
         class="dmg-anim"
         :style="{ '--flash-duration': flashDuration + 'ms' }"
       >
         <span class="dmg-anim-text">
-          {{ card.dmg_delta > 0 ? "+" : "" }}{{ card.dmg_delta }}
+          {{ c.dmg_delta > 0 ? "+" : "" }}{{ c.dmg_delta }}
         </span>
       </div>
       <!-- увеличение урона при ПАССИВНОЙ СПОСОБНОСТИ карты -->
       <div
-        v-if="card.p_dmg_delta"
+        v-if="c.p_dmg_delta"
         class="dmg-anim"
         :style="{ '--flash-duration': flashDuration + 'ms' }"
       >
         <span class="dmg-anim-text">
-          {{ card.p_dmg_delta > 0 ? "+" : "" }}{{ card.p_dmg_delta }}
+          {{ c.p_dmg_delta > 0 ? "+" : "" }}{{ c.p_dmg_delta }}
         </span>
       </div>
       <!-- увеличение зарядов -->
@@ -95,10 +95,7 @@
         </span>
       </div>
       <div class="card-item-information" v-if="!is_previev">
-        <special-type-of-card
-          :color="card.color"
-          v-if="card.type === 'Special'"
-        />
+        <special-type-of-card :color="c.color" v-if="c.type === 'Special'" />
         <card-damage-icon
           v-if="'damage' in card.data"
           :style="background_color(card)"
@@ -109,17 +106,17 @@
         <card-charges
           v-if="'charges' in card.data"
           :charge="card.data.charges"
-          :bgColor="background_color_charges(card.color)"
+          :bgColor="background_color_charges(c.color)"
         />
         <heart-icon
           v-if="hp_needed"
           :health="card.data.hp"
-          :bgColor="background_color_hp(card.color)"
+          :bgColor="background_color_hp(c.color)"
         />
         <card-count-triangle
           v-if="deckbuilder || bonus"
           :count="count"
-          :card-color="background_color_hp(card.color)"
+          :card-color="background_color_hp(c.color)"
         />
       </div>
     </div>
@@ -142,7 +139,7 @@ import {
   background_color_hp,
   card_margin,
 } from "@/logic/border_styles"
-import type { Card, Leader, Enemy } from "@/types"
+import type { Card, Leader } from "@/types"
 
 export default defineComponent({
   name: "CardUi",
@@ -158,7 +155,7 @@ export default defineComponent({
   props: {
     // собственно сама карта
     card: {
-      type: Object as PropType<Card | Leader | Enemy>,
+      type: Object as PropType<Card | Leader>,
       required: true,
     },
     // брать ли границу карты как для карт (по цвету), ДЕФОЛТНОЕ, или как для лидеров (по фракции)
@@ -193,6 +190,9 @@ export default defineComponent({
     },
   },
   computed: {
+    c(): Card {
+      return this.card as Card
+    },
     cardRarityClass(): string {
       if (!this.is_leader) {
         const color = (this.card as Card).color?.toLowerCase()
@@ -222,11 +222,14 @@ export default defineComponent({
         ? background_color_leader(this.card.faction)
         : background_color_charges(color)
     },
-    background_color(card: Card | Leader | Enemy): Record<string, string> {
-      return background_color(card)
+    background_color(card: Card | Leader): Record<string, string> {
+      if (this.is_leader)
+        return { backgroundColor: background_color_leader(card.faction) }
+      return background_color(card as Card)
     },
-    card_margin(card: Card | Leader | Enemy): Record<string, string> {
-      return card_margin(card)
+    card_margin(card: Card | Leader): Record<string, string> {
+      if (this.is_leader) return {}
+      return card_margin(card as Card)
     },
   },
 })

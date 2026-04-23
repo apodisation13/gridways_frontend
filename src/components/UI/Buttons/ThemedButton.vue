@@ -6,10 +6,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import { styleOuter, styleWrapper } from "@/logic/border_styles"
 
-export default {
+export default defineComponent({
   name: "ThemedButton",
   props: {
     title: {
@@ -18,14 +19,14 @@ export default {
     },
   },
   computed: {
-    styleOuter() {
+    styleOuter(): Record<string, string> | undefined {
       return styleOuter(this.$store.getters["selectedTheme"])
     },
-    styleWrapper() {
+    styleWrapper(): Record<string, string> | undefined {
       return styleWrapper(this.$store.getters["selectedTheme"])
     },
   },
-}
+})
 </script>
 
 <style scoped>

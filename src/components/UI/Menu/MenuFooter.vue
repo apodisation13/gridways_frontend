@@ -12,19 +12,20 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 
-export default {
+export default defineComponent({
   name: "MenuFooter",
   components: { ThemedButton },
   computed: {
     // меню не нужны, если в роутере есть notRequireMenu (страницы загрузки, игры)
-    menuNeeded() {
+    menuNeeded(): boolean {
       return !this.$router.currentRoute.value.meta.notRequireMenu
     },
   },
-}
+})
 </script>
 
 <style scoped>

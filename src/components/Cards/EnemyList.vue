@@ -1,29 +1,32 @@
 <template>
   <div class="enemies">
-    <div class="enemy" v-for="enemy in enemies" :key="enemy">
+    <div class="enemy" v-for="enemy in enemies" :key="enemy.id">
       <enemy-comp :enemy="enemy" @dblclick="choseEnemy(enemy)" />
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import EnemyComp from "@/components/Cards/EnemyComp.vue"
-export default {
+import type { Enemy } from "@/types"
+
+export default defineComponent({
   name: "EnemyList",
   components: { EnemyComp },
   props: {
     enemies: {
-      type: Array,
+      type: Array as PropType<Enemy[]>,
       required: true,
     },
   },
   methods: {
-    choseEnemy(enemy) {
+    choseEnemy(enemy: Enemy): void {
       this.$emit("chose-enemy", enemy)
     },
   },
   emits: ["chose-enemy"],
-}
+})
 </script>
 
 <style scoped>

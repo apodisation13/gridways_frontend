@@ -5,8 +5,10 @@
     </div>
   </div>
 </template>
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from "vue"
+
+export default defineComponent({
   name: "resource-count-rombus",
   props: {
     isZero: {
@@ -15,7 +17,7 @@ export default {
       default: false,
     },
   },
-}
+})
 </script>
 <style>
 .resource-count__container {

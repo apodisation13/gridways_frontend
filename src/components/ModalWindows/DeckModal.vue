@@ -6,7 +6,7 @@
       <card-item :card="leader" :is_leader="true" :hp_needed="true" />
     </div>
 
-    <card-list-component :cards="deck" :hp_needed="true" />
+    <card-list-component :cards="deckEntries" :hp_needed="true" />
   </modal-window>
 </template>
 
@@ -16,7 +16,7 @@ import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import CardItem from "@/components/Cards/CardItem.vue"
-import type { DeckCardEntry, Leader } from "@/types"
+import type { CardEntry, DeckCardEntry, Leader } from "@/types"
 export default defineComponent({
   name: "deck-modal",
   components: {
@@ -33,6 +33,19 @@ export default defineComponent({
     leader: {
       type: Object as PropType<Leader>,
       required: true,
+    },
+  },
+  computed: {
+    deckEntries(): CardEntry[] {
+      return this.deck
+        .filter(
+          (
+            entry
+          ): entry is DeckCardEntry & {
+            card: NonNullable<DeckCardEntry["card"]>
+          } => entry.card !== undefined
+        )
+        .map(entry => ({ card: entry.card, count: entry.count, id: null }))
     },
   },
   methods: {

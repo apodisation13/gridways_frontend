@@ -4,20 +4,21 @@
   </base-button>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
-export default {
+export default defineComponent({
   name: "SettingAnimation",
   components: { BaseButton },
   computed: {
-    animationOn() {
+    animationOn(): boolean {
       return this.$store.getters["animationOn"]
     },
   },
   methods: {
-    switchAnimation() {
+    switchAnimation(): void {
       this.$store.commit("switchAnimation")
     },
   },
-}
+})
 </script>

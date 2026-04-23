@@ -42,7 +42,7 @@
               class="level"
               :class="{ 'level-selected': level === selectedRandomLevel }"
               v-for="(level, index) in random_levels_easy"
-              :key="level"
+              :key="level.level.id"
               @dblclick="set_random_level(index, 'easy')"
             >
               <level-preview-comp :level="level" />
@@ -53,7 +53,7 @@
               class="level"
               :class="{ 'level-selected': level === selectedRandomLevel }"
               v-for="(level, index) in random_levels_normal"
-              :key="level"
+              :key="level.level.id"
               @dblclick="set_random_level(index, 'normal')"
             >
               <level-preview-comp :level="level" />
@@ -64,7 +64,7 @@
               class="level"
               :class="{ 'level-selected': level === selectedRandomLevel }"
               v-for="(level, index) in random_levels_hard"
-              :key="level"
+              :key="level.level.id"
               @dblclick="set_random_level(index, 'hard')"
             >
               <level-preview-comp :level="level" />
@@ -113,7 +113,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import { useToast } from "vue-toastification"
 import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
 import {
@@ -121,7 +122,14 @@ import {
   random_level_generator_by_number,
 } from "@/logic/random_level"
 import SeasonTree from "@/components/Pages/LevelPage/SeasonTree.vue"
-export default {
+import type { MappedUserLevel, SeasonEntry } from "@/types"
+
+interface GameType {
+  name: string
+  name_ru: string
+}
+
+export default defineComponent({
   components: {
     LevelPreviewComp,
     SeasonTree,
@@ -135,9 +143,9 @@ export default {
   },
   data() {
     return {
-      selectedLevel: undefined, // для подсветки выбранного уровня
-      selectedRandomLevel: undefined,
-      random_levels: [],
+      selectedLevel: undefined as MappedUserLevel | undefined, // для подсветки выбранного уровня
+      selectedRandomLevel: undefined as MappedUserLevel | undefined,
+      random_levels: [] as MappedUserLevel[],
       game_types: [
         {
           name: "seasons",
@@ -155,58 +163,57 @@ export default {
           name: "arena",
           name_ru: "Арена",
         },
-      ],
-      gameMod: null,
+      ] as GameType[],
+      gameMod: null as GameType | null,
       seasonLevelsTreeOpened: false,
-      randomLevelByNumber: null,
-      inputNumberEnemiesRandomLevel: 5,
+      randomLevelByNumber: null as MappedUserLevel | null,
+      inputNumberEnemiesRandomLevel: 5 as number | null | "",
     }
   },
   computed: {
-    seasons() {
+    seasons(): SeasonEntry[] {
       return this.$store.getters["all_seasons"]
     },
-    random_levels_easy() {
+    random_levels_easy(): MappedUserLevel[] {
       return this.random_levels.filter(l => l.level.difficulty === "easy")
     },
-    random_levels_normal() {
+    random_levels_normal(): MappedUserLevel[] {
       return this.random_levels.filter(l => l.level.difficulty === "normal")
     },
-    random_levels_hard() {
+    random_levels_hard(): MappedUserLevel[] {
       return this.random_levels.filter(l => l.level.difficulty === "hard")
     },
-    isValid() {
+    isValid(): boolean {
+      const val = this.inputNumberEnemiesRandomLevel
       return (
-        this.inputNumberEnemiesRandomLevel !== null &&
-        this.inputNumberEnemiesRandomLevel !== "" &&
-        this.inputNumberEnemiesRandomLevel >= 5 &&
-        this.inputNumberEnemiesRandomLevel <= this.max_random_n_enemies
+        val !== null &&
+        val !== "" &&
+        val >= 5 &&
+        val <= this.max_random_n_enemies
       )
     },
-    max_random_n_enemies() {
+    max_random_n_enemies(): number {
       return this.$store.state.game.max_random_n_enemies
     },
-    errorMessage() {
-      if (
-        this.inputNumberEnemiesRandomLevel === null ||
-        this.inputNumberEnemiesRandomLevel === ""
-      ) {
+    errorMessage(): string {
+      const val = this.inputNumberEnemiesRandomLevel
+      if (val === null || val === "") {
         return "Введите число"
       }
-      if (this.inputNumberEnemiesRandomLevel < 5) {
+      if (val < 5) {
         return "Минимальное значение: 5"
       }
-      if (this.inputNumberEnemiesRandomLevel > this.max_random_n_enemies) {
+      if (val > this.max_random_n_enemies) {
         return `Максимальное значение: ${this.max_random_n_enemies}`
       }
       return ""
     },
   },
   methods: {
-    selectGameMode(mode) {
+    selectGameMode(mode: GameType): void {
       this.gameMod = mode
     },
-    configureBackButton() {
+    configureBackButton(): void {
       this.seasonLevelsTreeOpened = true
     },
     /*
@@ -216,7 +223,7 @@ export default {
     2) А если все остальное - то мы сбросим выбор и будем на экране выбора
     режима игры
     */
-    cancelGameMod() {
+    cancelGameMod(): void {
       if (!this.seasonLevelsTreeOpened) {
         this.gameMod = null
         return
@@ -224,7 +231,7 @@ export default {
       this.gameMod = this.game_types[0]
       this.seasonLevelsTreeOpened = false
     },
-    set_random_level(index, difficulty) {
+    set_random_level(index: number, difficulty: string): void {
       this.toast.success(
         `Выбран рандомный уровень: ${index + 1} - ${difficulty}`,
         {
@@ -232,14 +239,13 @@ export default {
         }
       )
 
-      let levelsToChoseFrom = []
+      let levelsToChoseFrom: MappedUserLevel[] = []
       if (difficulty === "easy") levelsToChoseFrom = this.random_levels_easy
       else if (difficulty === "normal")
         levelsToChoseFrom = this.random_levels_normal
       else if (difficulty === "hard")
         levelsToChoseFrom = this.random_levels_hard
-
-      levelsToChoseFrom[index].level.random = true // ставим флаг, что уровень рандомный, чтобы потом не открывать его детей
+      ;(levelsToChoseFrom[index].level as any).random = true // ставим флаг, что уровень рандомный, чтобы потом не открывать его детей
       this.$store.commit("set_level", levelsToChoseFrom[index])
       this.$store.commit(
         "set_enemy_leader",
@@ -248,7 +254,9 @@ export default {
       this.selectedRandomLevel = levelsToChoseFrom[index]
       this.selectedLevel = undefined
     },
-    difficultyBorder(level) {
+    difficultyBorder(
+      level: MappedUserLevel
+    ): Record<string, string> | undefined {
       if (level.level.difficulty === "easy")
         return { border: "1px solid lightgreen" }
       else if (level.level.difficulty === "normal")
@@ -256,27 +264,27 @@ export default {
       else if (level.level.difficulty === "hard")
         return { border: "2px solid black" }
     },
-    generateRandomLevel() {
+    generateRandomLevel(): void {
       this.randomLevelByNumber = random_level_generator_by_number(
-        this.inputNumberEnemiesRandomLevel
+        this.inputNumberEnemiesRandomLevel as number
       )
     },
-    setRandomLevelByNumber() {
+    setRandomLevelByNumber(): void {
       this.toast.warning(
         "Выбран режим рандомных врагов по количеству на выбор!",
         {
           timeout: 1000,
         }
       )
-      this.randomLevelByNumber.level.random = true // ставим флаг, что уровень рандомный, чтобы потом не открывать его детей
+      ;(this.randomLevelByNumber!.level as any).random = true // ставим флаг, что уровень рандомный, чтобы потом не открывать его детей
       this.$store.commit("set_level", this.randomLevelByNumber)
       this.$store.commit(
         "set_enemy_leader",
-        this.randomLevelByNumber.level.enemy_leader
+        this.randomLevelByNumber!.level.enemy_leader
       )
     },
   },
-}
+})
 </script>
 
 <style scoped>

@@ -49,7 +49,7 @@
           <div class="expand-menu__top">
             <button
               v-for="button in routes"
-              :key="button"
+              :key="button.path"
               class="menu-btn"
               @click="push(button.path)"
             >
@@ -131,31 +131,34 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
-export default {
+import type { UserResources } from "@/types"
+
+export default defineComponent({
   name: "MenuHeader",
   components: {
     ResourceItem,
   },
   computed: {
     // меню не нужны, если в роутере есть notRequireMenu (страницы загрузки, игры)
-    menuNeeded() {
+    menuNeeded(): boolean {
       return !this.$router.currentRoute.value.meta.notRequireMenu
     },
-    isLoggedIn() {
+    isLoggedIn(): boolean {
       return this.$store.getters["isLoggedIn"]
     },
-    path_to_icon() {
+    path_to_icon(): string {
       return this.$store.getters["selectedAvatar"]
     },
-    resources() {
+    resources(): UserResources {
       return this.$store.getters["resource"]
     },
-    currentPath() {
+    currentPath(): string {
       return this.$route.path
     },
-    resources_list() {
+    resources_list(): Record<string, number> {
       if (this.currentPath === "/start_game") {
         return {
           crops: this.resources.crops,
@@ -203,31 +206,31 @@ export default {
         { title: "Статистика", path: "/stats", requireAuth: true },
         { title: "Доска лидеров", path: "/leaderboard", requireAuth: true },
         { title: "Настройки", path: "/settings", requireAuth: true },
-      ],
+      ] as { title: string; path: string; requireAuth?: boolean }[],
       expanded: false,
       expandedRight: false, // для правого меню
     }
   },
   methods: {
-    showRightMenu() {
+    showRightMenu(): void {
       this.expandedRight = !this.expandedRight
       if (this.expandedRight) this.expanded = false // закрываем левое, если открыто правое
     },
-    showExpandedMenu() {
+    showExpandedMenu(): void {
       this.expanded = !this.expanded
     },
-    push(path) {
+    push(path: string): void {
       if (!path) return
       this.expanded = false
       this.$router.push(path)
     },
-    goToBonus() {
+    goToBonus(): void {
       this.expandedRight = false
       this.expanded = false
       this.$router.push("/bonus")
     },
   },
-}
+})
 </script>
 
 <style scoped>

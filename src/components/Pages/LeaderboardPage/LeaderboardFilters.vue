@@ -30,30 +30,31 @@
   </base-modal>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
 import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions.vue"
 
-export default {
+export default defineComponent({
   components: { FilterFactions, BaseModal, ButtonCloseImg },
   props: {
-    factions: Array,
+    factions: { type: Array as PropType<string[]> },
     selectedFaction: { type: String, default: null },
     selectedMode: { type: String, default: null },
   },
   emits: ["close-modal", "reset-filters", "set-faction", "set-mode"],
   data() {
     return {
-      modes: ["arena", "season", "random", "random_n"],
+      modes: ["arena", "season", "random", "random_n"] as string[],
     }
   },
   methods: {
-    filterFaction(prop, value) {
+    filterFaction(prop: string, value: string): void {
       this.$emit("set-faction", prop, value)
     },
   },
-}
+})
 </script>
 
 <style scoped>

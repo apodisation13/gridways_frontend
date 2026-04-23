@@ -16,26 +16,29 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 
-export default {
+export default defineComponent({
   name: "SettingAvatar",
   components: { BaseButton },
   data() {
     return {
-      avatars: [{ link: "wood" }, { link: "kegs" }, { link: "chests" }],
+      avatars: [{ link: "wood" }, { link: "kegs" }, { link: "chests" }] as {
+        link: string
+      }[],
     }
   },
   methods: {
-    setAvatar(path) {
+    setAvatar(path: string): void {
       this.$store.commit("set_avatar", path)
     },
-    resetAvatar() {
+    resetAvatar(): void {
       this.$store.commit("set_avatar", "")
     },
   },
-}
+})
 </script>
 
 <style scoped>

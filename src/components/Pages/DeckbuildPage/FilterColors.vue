@@ -3,7 +3,7 @@
     <div class="global_text filter_title" @click="reset_filter_colors">
       Цвет
     </div>
-    <div class="colors" v-for="color in colors" :key="color">
+    <div class="colors" v-for="color in colors" :key="color[0]">
       <button
         class="color"
         :style="{ backgroundColor: color[1] }"

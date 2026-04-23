@@ -65,7 +65,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import { GameStatsRecordType, PayResourcesSubtype } from "@/types"
 import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
@@ -73,7 +74,8 @@ import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
 import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
 import DeckPreviewComp from "@/components/DeckPreviewComp.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
-export default {
+
+export default defineComponent({
   name: "StartGame",
   components: {
     ResourceItem,
@@ -94,40 +96,41 @@ export default {
   },
   computed: {
     // теперь это используется только для отображения, и всё равно мы на бэке всё валидируем
-    play_price() {
+    play_price(): Record<string, number> {
       const config = this.$store.getters["start_level_prices"]
       const diff = this.$store.state.game.level.difficulty
       const cards = this.selectedDeck.deck.cards
 
-      const result = {}
+      const result: Record<string, number> = {}
 
       // 1. Стоимость по сложности уровня
       const diff_costs = config.levels_difficulty_values[diff] || {}
       for (const [resource, cfg] of Object.entries(diff_costs)) {
-        result[resource] = (result[resource] || 0) + Math.abs(cfg.value)
+        result[resource] =
+          (result[resource] || 0) + Math.abs((cfg as any).value)
       }
 
       // 2. Стоимость каждой карты в колоде
       const card_costs = config.player_cards_values
       for (const card of cards) {
-        const color = card.card.color.toLowerCase() // "Bronze" → "bronze"
+        const color = (card as any).card.color.toLowerCase() // "Bronze" → "bronze"
         const color_costs = card_costs[color] || {}
         for (const [resource, value] of Object.entries(color_costs)) {
-          result[resource] = (result[resource] || 0) + Math.abs(value)
+          result[resource] = (result[resource] || 0) + Math.abs(value as number)
         }
       }
 
       return result
     },
-    selectedLevel() {
+    selectedLevel(): any {
       return this.$store.state.game.whole_level
     },
-    selectedDeck() {
+    selectedDeck(): any {
       return this.$store.state.game.whole_deck
     },
   },
   methods: {
-    async start_game() {
+    async start_game(): Promise<void> {
       this.loading = true
 
       // здесь мы все значения поставили с минусом, мы же списываем ресурс
@@ -153,11 +156,11 @@ export default {
         this.loading = false
       }
     },
-    trigger_decks_list_modal(value) {
+    trigger_decks_list_modal(value: boolean): void {
       this.show_decks_list_modal = value
     },
   },
-}
+})
 </script>
 
 <style scoped>

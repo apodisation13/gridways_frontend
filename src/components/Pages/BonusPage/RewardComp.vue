@@ -45,23 +45,20 @@
     </div>
   </div>
 </template>
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import ResourceCountRombus from "@/components/UI/ResourceCountRombus.vue"
-export default {
+import type { CardEntry, KeyRewardResult } from "@/types"
+
+export default defineComponent({
   components: { CardListComponent, ResourceCountRombus },
   name: "reward-comp",
   props: {
-    name: {
-      type: String,
-      required: true,
-    },
-    reward: {
-      type: Array,
-      required: false,
-    },
+    name: { type: String, required: true },
+    reward: { type: Array as PropType<CardEntry[]>, required: false },
     key_reward: {
-      type: Array,
+      type: Array as PropType<KeyRewardResult[]>,
       required: false,
       default: null,
     },
@@ -76,11 +73,11 @@ export default {
     }
   },
   computed: {
-    resources() {
+    resources(): Record<string, number> {
       return this.$store.getters["resource"]
     },
-    res() {
-      const RESOURCE_ORDER = {
+    res(): Record<string, number> {
+      const RESOURCE_ORDER: Record<string, number> = {
         scraps: 0,
         raw_bronze: 1,
         bronze_ingots: 1,
@@ -93,7 +90,7 @@ export default {
         silk: 6,
         money: Infinity,
       }
-      const sorted = [...this.key_reward].sort(
+      const sorted = [...(this.key_reward || [])].sort(
         (a, b) =>
           (RESOURCE_ORDER[a.resource] ?? 99) -
           (RESOURCE_ORDER[b.resource] ?? 99)
@@ -104,14 +101,13 @@ export default {
     },
   },
   methods: {
-    get_message(name) {
+    get_message(name: string): string {
       if (name === "kegs" || name === "big_kegs") return "Выбрать можно 1 карту"
       if (name === "chests") return "Все карты ваши"
       return "Выбрать можно 1 награду"
     },
-
     //Функция принятия наград с картами
-    async accept_reward(card) {
+    async accept_reward(card: CardEntry): Promise<void> {
       // Если мы открыли сундук, то в маунтеде мы уже сделали запросы на 3 карты.
       // Если же мы ещё ткнули на карту, то приходим сюда и просто закрываем окно
       if (this.isLoading) return
@@ -120,20 +116,21 @@ export default {
       this.$emit("clear_reward")
       this.isLoading = false
     },
-    async accept_random_reward(res) {
+    async accept_random_reward(res: KeyRewardResult): Promise<void> {
       this.$emit("accept_key_reward", res)
     },
-    async accept_chest_reward() {
+    async accept_chest_reward(): Promise<void> {
       if (this.name !== "chests") return
-      const cardIds = this.reward.map(elem => elem.card.id)
+      const cardIds = (this.reward || []).map(elem => elem.card.id)
       await this.$store.dispatch("processCraftBonusCard", cardIds)
       setTimeout(() => this.$emit("clear_reward"), 10000)
     },
-    clear_reward() {
+    clear_reward(): void {
       if (this.name === "chests") this.$emit("clear_reward")
     },
   },
-}
+  emits: ["clear_reward", "accept_key_reward"],
+})
 </script>
 <style scoped>
 .reward-comp {

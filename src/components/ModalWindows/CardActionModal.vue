@@ -84,17 +84,20 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
 import ResourceList from "@/components/ResourceList.vue"
-import { CardColor } from "@/types"
+import { CardColor, type Card, type Leader, type UserResources } from "@/types"
 
-export default {
+type Recipe = Record<string, number>
+
+export default defineComponent({
   name: "card-action-modal",
   components: { ResourceList },
   props: {
-    action: { type: String, required: true }, // 'craft' | 'mill'
-    options: { type: Array, required: true },
-    card: { type: Object, required: true },
+    action: { type: String as PropType<"craft" | "mill">, required: true },
+    options: { type: Array as PropType<Recipe[]>, required: true },
+    card: { type: Object as PropType<Card | Leader>, required: true },
   },
   data() {
     return {
@@ -108,91 +111,91 @@ export default {
         raw_gold: 3,
         gold_ingots: 3,
         money: Infinity,
-      },
+      } as Record<string, number>,
     }
   },
   computed: {
-    resources() {
+    resources(): UserResources {
       return this.$store.getters["resource"]
     },
-    res() {
-      if (this.card.color === CardColor.Bronze) {
+    res(): Record<string, number> {
+      const r = this.resources as Record<string, number>
+      if ((this.card as any).color === CardColor.Bronze) {
         return {
-          scraps: this.resources.scraps,
-          raw_bronze: this.resources.raw_bronze,
-          bronze_ingots: this.resources.bronze_ingots,
-          rare_gem: this.resources.rare_gem,
-          money: this.resources.money,
+          scraps: r.scraps,
+          raw_bronze: r.raw_bronze,
+          bronze_ingots: r.bronze_ingots,
+          rare_gem: r.rare_gem,
+          money: r.money,
         }
-      } else if (this.card.color === CardColor.Silver) {
+      } else if ((this.card as any).color === CardColor.Silver) {
         return {
-          scraps: this.resources.scraps,
-          raw_silver: this.resources.raw_silver,
-          silver_ingots: this.resources.silver_ingots,
-          rare_gem: this.resources.rare_gem,
-          money: this.resources.money,
+          scraps: r.scraps,
+          raw_silver: r.raw_silver,
+          silver_ingots: r.silver_ingots,
+          rare_gem: r.rare_gem,
+          money: r.money,
         }
-      } else if (this.card.color === CardColor.Gold) {
+      } else if ((this.card as any).color === CardColor.Gold) {
         return {
-          scraps: this.resources.scraps,
-          raw_gold: this.resources.raw_gold,
-          gold_ingots: this.resources.gold_ingots,
-          rare_gem: this.resources.rare_gem,
-          money: this.resources.money,
+          scraps: r.scraps,
+          raw_gold: r.raw_gold,
+          gold_ingots: r.gold_ingots,
+          rare_gem: r.rare_gem,
+          money: r.money,
         }
       }
-      // а это лидер
+      // лидер — показываем ресурсы из рецепта
       const keys = Object.keys(this.options[this.selected])
       const sorted = keys.sort(
         (a, b) =>
           (this.RESOURCE_ORDER[a] ?? 99) - (this.RESOURCE_ORDER[b] ?? 99)
       )
-      return Object.fromEntries(
-        sorted.map(key => [key, this.resources[key] || 0])
-      )
+      return Object.fromEntries(sorted.map(key => [key, r[key] || 0]))
     },
   },
   methods: {
-    getIcon(name) {
+    getIcon(name: string): string {
       try {
         return require(`@/assets/icons/resources/${name}.svg`)
       } catch {
         return ""
       }
     },
-    sortedRecipe(recipe) {
+    sortedRecipe(recipe: Recipe): [string, number][] {
       return Object.entries(recipe).sort(
         ([a], [b]) =>
           (this.RESOURCE_ORDER[a] ?? 2) - (this.RESOURCE_ORDER[b] ?? 2)
       )
     },
-    is_affordable(recipe) {
+    is_affordable(recipe: Recipe): boolean {
+      const r = this.resources as Record<string, number>
       if (this.action === "craft") {
         return Object.entries(recipe).every(
-          ([res, amt]) => (this.resources[res] || 0) >= Math.abs(amt)
+          ([res, amt]) => (r[res] || 0) >= Math.abs(amt)
         )
       }
-      // mill: проверяем только отрицательные (затраты)
       return Object.entries(recipe)
         .filter(([, amt]) => amt < 0)
-        .every(([res, amt]) => (this.resources[res] || 0) >= Math.abs(amt))
+        .every(([res, amt]) => (r[res] || 0) >= Math.abs(amt))
     },
-    is_short(recipe, res) {
+    is_short(recipe: Recipe, res: string): boolean {
+      const r = this.resources as Record<string, number>
       if (this.action === "craft") {
-        return (this.resources[res] || 0) < Math.abs(recipe[res])
+        return (r[res] || 0) < Math.abs(recipe[res])
       }
       if (this.action === "mill" && recipe[res] < 0) {
-        return (this.resources[res] || 0) < Math.abs(recipe[res])
+        return (r[res] || 0) < Math.abs(recipe[res])
       }
       return false
     },
-    confirm() {
+    confirm(): void {
       if (this.selected === null) return
       this.$emit("confirm", this.options[this.selected])
     },
   },
   emits: ["confirm", "cancel"],
-}
+})
 </script>
 
 <style scoped>

@@ -23,22 +23,23 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import NewsList from "@/components/Pages/MainPage/NewsList.vue"
+import { defineComponent } from "vue"
 
-export default {
-  computed: {
-    isLoggedIn() {
-      return this.$store.getters["isLoggedIn"]
-    },
-    username() {
-      return this.$store.state.login.user.username
-    },
-  },
+export default defineComponent({
   components: {
     NewsList,
   },
-}
+  computed: {
+    isLoggedIn(): boolean {
+      return this.$store.getters["isLoggedIn"]
+    },
+    username(): string {
+      return this.$store.state.login.user.username
+    },
+  },
+})
 </script>
 
 <style scoped>

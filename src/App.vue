@@ -18,13 +18,14 @@
   </app-wrapper-fullscreen>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
 import MenuFooter from "@/components/UI/Menu/MenuFooter.vue"
 import MenuHeader from "@/components/UI/Menu/MenuHeader.vue"
 import PageImage from "@/components/PageImage.vue"
 import AppWrapperFullscreen from "@/components/Pages/AppWrapperFullscreen/AppWrapperFullscreen.vue"
 
-export default {
+export default defineComponent({
   components: {
     PageImage,
     MenuHeader,
@@ -33,12 +34,12 @@ export default {
   },
 
   async created() {
-    const tg = window.Telegram.WebApp
+    const tg = (window as any).Telegram.WebApp
     tg.ready()
     tg.expand()
 
     // вот здесь мы просто добавим setTimeOut и переход дальше через 2сек
-    this.$store.dispatch("fetchNews")
+    await this.$store.dispatch("fetchNews")
     await this.$router.push("/")
     try {
       await this.$store.dispatch("checkAuth") // пытаемся послать запрос на логин с данными из локалсторадж
@@ -49,11 +50,11 @@ export default {
   },
 
   computed: {
-    isLoggedIn() {
+    isLoggedIn(): boolean {
       return this.$store.getters["isLoggedIn"]
     },
   },
-}
+})
 </script>
 
 <style>
