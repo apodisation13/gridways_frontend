@@ -24,8 +24,8 @@
       @mousedown="handleCardMouseDown($event)"
       @touchstart="handleCardTouchStart($event)"
     >
-      <card-item v-if="!enemyView && pickedCard" :card="pickedCard" />
-      <enemy-comp v-else-if="enemyView && pickedEnemy" :enemy="pickedEnemy" />
+      <card-item v-if="pickedCard" :card="pickedCard" />
+      <enemy-comp v-else-if="pickedEnemy" :enemy="pickedEnemy" />
     </div>
   </div>
 </template>
@@ -38,7 +38,7 @@ import CardItem from "@/components/Cards/CardItem.vue"
 import EnemyList from "@/components/Cards/EnemyList.vue"
 import EnemyComp from "@/components/Cards/EnemyComp.vue"
 import { arrowMixin } from "@/mixins/GamePage/arrow_draw"
-import type { Card, CardEntry, Enemy } from "@/types"
+import { Card, CardEntry, CardType, Enemy } from "@/types"
 
 export default defineComponent({
   name: "special-case-abilities",
@@ -145,6 +145,7 @@ export default defineComponent({
         description: "Нанести {damage} урона одному врагу",
       }
       ;(enemy as any)["data"]["charges"] = 1
+      ;(enemy as any)["type"] = CardType.Unit
     },
   },
   emits: [
