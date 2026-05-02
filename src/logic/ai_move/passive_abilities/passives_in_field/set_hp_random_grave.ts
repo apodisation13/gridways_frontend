@@ -1,5 +1,5 @@
-import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { choice_element } from "@/lib/utils"
+import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { sound_heal } from "@/logic/play_sounds"
 import type { Enemy, GameObj } from "@/types"
 

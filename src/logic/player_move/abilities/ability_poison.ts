@@ -1,6 +1,6 @@
 import { remove_dead_enemy } from "@/logic/player_move/abilities/enemy_takes_damage"
-import { EnemyStatus } from "@/types"
 import type { Enemy, EnemyLeader, GameObj } from "@/types"
+import { EnemyStatus } from "@/types"
 
 export function poison_one_enemy(
   enemy: Enemy | EnemyLeader,

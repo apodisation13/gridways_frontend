@@ -1,6 +1,6 @@
 import { copyObj } from "@/lib/utils"
-import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import type { GameObj } from "@/types"
 
 export function set_lowest_dmg_to_as_highest(

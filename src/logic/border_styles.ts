@@ -1,4 +1,4 @@
-import type { Card, Enemy, Leader, EnemyLeader } from "@/types"
+import type { Card, Enemy, EnemyLeader, Leader } from "@/types"
 
 function border_for_card(card: Card | Enemy): Record<string, string> {
   if (card.color === "Bronze") {
@@ -244,15 +244,15 @@ function styleWrapper(el: number): Record<string, string> | undefined {
 }
 
 export {
-  border_for_card,
-  card_margin,
-  border_leader,
+  ability_icon,
   background_color,
+  background_color_charges,
   background_color_deck,
   background_color_hp,
-  background_color_charges,
   background_color_leader,
-  ability_icon,
+  border_for_card,
+  border_leader,
+  card_margin,
   styleOuter,
   styleWrapper,
 }

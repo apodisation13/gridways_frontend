@@ -1,5 +1,5 @@
-import { sound_enemy_regain_shield } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import { sound_enemy_regain_shield } from "@/logic/play_sounds"
 import type { GameObj } from "@/types"
 
 export function give_shields_to_all(gameObj: GameObj): void {

@@ -1,5 +1,5 @@
-import store from "@/store"
 import { copyObj } from "@/lib/utils"
+import store from "@/store"
 import type { Enemy } from "@/types"
 
 // в начале хода компа установит всем врагам, кто должен прыгать, false

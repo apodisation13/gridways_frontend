@@ -1,6 +1,6 @@
 import { sound_destroy_enemy } from "@/logic/play_sounds"
-import { get_random_enemy } from "@/logic/player_move/service/service_for_player_move"
 import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
+import { get_random_enemy } from "@/logic/player_move/service/service_for_player_move"
 import { GameObj } from "@/types"
 
 export function destroy_random(gameObj: GameObj, timeout = 1000) {

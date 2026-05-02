@@ -1,7 +1,7 @@
-import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
+import { choice } from "@/lib/utils"
 import { sound_spread_damage } from "@/logic/play_sounds"
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
-import { choice } from "@/lib/utils"
+import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
 import type { Card, GameObj } from "@/types"
 
 export function spread_damage(

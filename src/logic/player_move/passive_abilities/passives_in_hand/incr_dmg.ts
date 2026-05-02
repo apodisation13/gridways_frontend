@@ -1,6 +1,6 @@
-import { sound_passive_increase_damage } from "@/logic/play_sounds"
-import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { choice } from "@/lib/utils"
+import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import type { Card, GameObj } from "@/types"
 
 export function incr_self_dmg(

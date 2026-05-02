@@ -1,8 +1,8 @@
-import { get_empty_field_indexes } from "@/logic/player_move/service/service_for_player_move"
 import { copyObj } from "@/lib/utils"
-import { sound_deathwish } from "@/logic/play_sounds"
 import { get_default_enemy } from "@/logic/ai_move/service/service_for_ai_move"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import { sound_deathwish } from "@/logic/play_sounds"
+import { get_empty_field_indexes } from "@/logic/player_move/service/service_for_player_move"
 import type { Enemy, GameObj } from "@/types"
 
 // создает в каждой свободной клетке токен данного врага без deathwish

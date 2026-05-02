@@ -1,5 +1,5 @@
-import store from "@/store" // stote.state OR store.commit
 import { sound_appear_new_enemy } from "@/logic/play_sounds"
+import store from "@/store" // stote.state OR store.commit
 import type { Enemy } from "@/types"
 
 // расставить врагов, только первые 9 клеток, + параметр из уровня, сколько в начале появляется сразу врагов

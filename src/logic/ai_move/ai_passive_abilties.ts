@@ -1,7 +1,7 @@
-import store from "@/store"
-import { field_passives } from "@/logic/ai_move/passive_abilities/passives_field"
 import { deck_passives } from "@/logic/ai_move/passive_abilities/passives_deck"
+import { field_passives } from "@/logic/ai_move/passive_abilities/passives_field"
 import { grave_passives } from "@/logic/ai_move/passive_abilities/passives_grave"
+import store from "@/store"
 import type { GameObj } from "@/types"
 
 export function enemy_passive_abilities_end_turn(

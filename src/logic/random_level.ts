@@ -1,6 +1,6 @@
 import store from "@/store"
-import { CardColor } from "@/types"
 import type { Enemy, EnemyLeader } from "@/types"
+import { CardColor } from "@/types"
 
 function getRandomLevelConst() {
   const stateInfo = store.state.game.random_level_enemies_count

@@ -1,6 +1,6 @@
 import { copyObj } from "@/lib/utils"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
-import type { Card, Leader, GameObj } from "@/types"
+import type { Card, GameObj, Leader } from "@/types"
 
 export function spawn_self_at_grave(
   card: Card | Leader,

@@ -1,11 +1,11 @@
-import store from "@/store"
 import { down_move } from "@/logic/ai_move/moves/move_down"
 import { random_move } from "@/logic/ai_move/moves/move_random"
+import { right_move } from "@/logic/ai_move/moves/move_right"
 import { stand_still } from "@/logic/ai_move/moves/move_stand_still"
 import { check_lose } from "@/logic/ai_move/service/check_lose"
 import { set_already_jumped } from "@/logic/ai_move/service/service_for_ai_move"
 import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
-import { right_move } from "@/logic/ai_move/moves/move_right"
+import store from "@/store"
 import type { Enemy, GameObj } from "@/types"
 
 export function ai_move(field: (Enemy | "")[], timeout = 1000): void {
@@ -48,11 +48,13 @@ export function enemy_leader_ai_move_once(gameObj: GameObj): void {
   if (!ela) return // есть лидеры у кого абилки нет
 
   if (ela === "damage-once") {
-    store.commit("change_health", -enemy_leader.data.value)
+    const value = enemy_leader.data?.value || 0
+    store.commit("change_health", -value)
     check_lose()
   } else if (ela === "decrease-all-player-damage") {
+    const value = enemy_leader.data?.value || 0
     deck.forEach(card => {
-      card.data.damage -= enemy_leader.data.value
+      card.data.damage -= value
       if (card.data.damage < 0) card.data.damage = 0
     })
   }

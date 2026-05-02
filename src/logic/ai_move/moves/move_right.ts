@@ -1,5 +1,5 @@
-import { sound_enemy_move_down } from "@/logic/play_sounds"
 import { damage_player } from "@/logic/ai_move/moves/damage"
+import { sound_enemy_move_down } from "@/logic/play_sounds"
 import type { Enemy } from "@/types"
 
 export function right_move(

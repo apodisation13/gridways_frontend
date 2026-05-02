@@ -1,8 +1,8 @@
-import { get_random_enemy } from "@/logic/player_move/service/service_for_player_move"
 import {
   poison_all_enemies,
   poison_one_enemy,
 } from "@/logic/player_move/abilities/ability_poison"
+import { get_random_enemy } from "@/logic/player_move/service/service_for_player_move"
 import type { Card, GameObj } from "@/types"
 
 export function poison_random_enemy_passive(

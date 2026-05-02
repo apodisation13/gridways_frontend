@@ -1,5 +1,5 @@
-import store from "@/store"
 import { choice_pop } from "@/lib/utils"
+import store from "@/store"
 import type { Card } from "@/types"
 
 // вытянули рандомом hand_size карт

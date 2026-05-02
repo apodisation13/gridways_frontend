@@ -1,11 +1,11 @@
 import {
-  allowActionTimer,
-  timeoutAnimationFlag,
-} from "@/logic/game_logic/timers"
-import {
   heal_random,
   heal_self,
 } from "@/logic/ai_move/passive_abilities/passives_in_field/heal"
+import {
+  allowActionTimer,
+  timeoutAnimationFlag,
+} from "@/logic/game_logic/timers"
 import type { Enemy, GameObj } from "@/types"
 
 export function deck_passives(

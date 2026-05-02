@@ -1,3 +1,14 @@
+import { destroy_player_card_in_deck } from "@/logic/ai_move/deathwish_abilities/destroy_player_card"
+import {
+  give_shield_to_all_deck,
+  give_shields_to_all,
+} from "@/logic/ai_move/deathwish_abilities/give_shields"
+import { deathwish_heal_all } from "@/logic/ai_move/deathwish_abilities/heal"
+import { deathwish_incr_dmg_to_all_hand } from "@/logic/ai_move/deathwish_abilities/incr_dmg_to_all_hand"
+import {
+  set_hp,
+  set_weakest_hp_as_highest,
+} from "@/logic/ai_move/deathwish_abilities/set_hp"
 import {
   spawn_self,
   spawn_self_at_deck,
@@ -7,17 +18,6 @@ import {
   spawn_tokens,
   spawn_tokens_at_deck,
 } from "@/logic/ai_move/deathwish_abilities/spawn_tokens"
-import { deathwish_incr_dmg_to_all_hand } from "@/logic/ai_move/deathwish_abilities/incr_dmg_to_all_hand"
-import { deathwish_heal_all } from "@/logic/ai_move/deathwish_abilities/heal"
-import { destroy_player_card_in_deck } from "@/logic/ai_move/deathwish_abilities/destroy_player_card"
-import {
-  set_hp,
-  set_weakest_hp_as_highest,
-} from "@/logic/ai_move/deathwish_abilities/set_hp"
-import {
-  give_shield_to_all_deck,
-  give_shields_to_all,
-} from "@/logic/ai_move/deathwish_abilities/give_shields"
 import {
   spawn_faction_unit,
   spawn_faction_unit_at_deck,

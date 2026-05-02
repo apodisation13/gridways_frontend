@@ -1,38 +1,38 @@
-import store from "@/store"
-import { CardAbility } from "@/types"
-import type { Card, Leader, Enemy, EnemyLeader, GameObj } from "@/types"
-import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
-import { heal } from "@/logic/player_move/abilities/ability_heal"
-import { damage_one } from "@/logic/player_move/abilities/ability_damage_one"
+import { add_armor } from "@/logic/player_move/abilities/ability_armor"
 import { damage_all } from "@/logic/player_move/abilities/ability_damage_all"
-import { spread_damage } from "@/logic/player_move/abilities/ability_spread_damage"
-import { damage_row } from "@/logic/player_move/abilities/ability_damage_row"
 import { damage_column } from "@/logic/player_move/abilities/ability_damage_column"
-import { destroy_highest_hp } from "@/logic/player_move/abilities/ability_destroy_highest_hp"
-import { destroy_highest_damage } from "@/logic/player_move/abilities/ability_destroy_highest_damage"
-import { destroy_random } from "@/logic/player_move/abilities/ability_destroy_random"
+import { damage_one } from "@/logic/player_move/abilities/ability_damage_one"
+import { damage_row } from "@/logic/player_move/abilities/ability_damage_row"
 import { destroy_all_same_hp } from "@/logic/player_move/abilities/ability_destroy_all_same_hp"
+import { destroy_highest_damage } from "@/logic/player_move/abilities/ability_destroy_highest_damage"
+import { destroy_highest_hp } from "@/logic/player_move/abilities/ability_destroy_highest_hp"
+import { destroy_random } from "@/logic/player_move/abilities/ability_destroy_random"
+import { destroy_random_enemy_in_deck } from "@/logic/player_move/abilities/ability_destroy_random_enemy_in_deck"
+import { give_charges_to_all } from "@/logic/player_move/abilities/ability_give_charges_to_all"
+import { heal } from "@/logic/player_move/abilities/ability_heal"
+import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_grave"
+import { incr_dmg_to_all_hand } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_hand"
 import { lock_enemy } from "@/logic/player_move/abilities/ability_lock"
 import { move_enemy } from "@/logic/player_move/abilities/ability_move_enemy"
-import { check_win } from "@/logic/player_move/service/check_win"
-import { player_passive_abilities_upon_playing_a_card } from "@/logic/player_move/player_passive_abilities_upon_playing_a_card"
-import { set_enemy_as_token } from "@/logic/player_move/abilities/ability_set_enemy_as_token"
-import { spawn_self_at_deck } from "@/logic/player_move/abilities/ability_spawn_self_at_deck"
-import { spawn_self_at_grave } from "@/logic/player_move/abilities/ability_spawn_self_at_grave"
-import { destroy_random_enemy_in_deck } from "@/logic/player_move/abilities/ability_destroy_random_enemy_in_deck"
 import { place_self_in_field } from "@/logic/player_move/abilities/ability_place_self_in_field"
-import { set_lowest_dmg_to_as_highest } from "@/logic/player_move/abilities/ability_set_lowest_dmg_to_as_highest"
-import { spawn_tokens_at_enemy_deck } from "@/logic/player_move/abilities/ability_spawn_tokens_at_enemy_deck"
-import { incr_dmg_to_all_hand } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_hand"
-import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_grave"
-import { change_card_charges } from "@/logic/player_move/service/service_for_player_move"
 import {
   poison_all_enemies,
   poison_one_enemy,
 } from "@/logic/player_move/abilities/ability_poison"
-import { add_armor } from "@/logic/player_move/abilities/ability_armor"
 import { purify } from "@/logic/player_move/abilities/ability_purify"
-import { give_charges_to_all } from "@/logic/player_move/abilities/ability_give_charges_to_all"
+import { set_enemy_as_token } from "@/logic/player_move/abilities/ability_set_enemy_as_token"
+import { set_lowest_dmg_to_as_highest } from "@/logic/player_move/abilities/ability_set_lowest_dmg_to_as_highest"
+import { spawn_self_at_deck } from "@/logic/player_move/abilities/ability_spawn_self_at_deck"
+import { spawn_self_at_grave } from "@/logic/player_move/abilities/ability_spawn_self_at_grave"
+import { spawn_tokens_at_enemy_deck } from "@/logic/player_move/abilities/ability_spawn_tokens_at_enemy_deck"
+import { spread_damage } from "@/logic/player_move/abilities/ability_spread_damage"
+import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
+import { player_passive_abilities_upon_playing_a_card } from "@/logic/player_move/player_passive_abilities_upon_playing_a_card"
+import { check_win } from "@/logic/player_move/service/check_win"
+import { change_card_charges } from "@/logic/player_move/service/service_for_player_move"
+import store from "@/store"
+import type { Card, Enemy, EnemyLeader, GameObj, Leader } from "@/types"
+import { CardAbility } from "@/types"
 
 // Сюда заходим если там есть враг
 // card - карта, которую мы играем (или из руки, или лидер).
@@ -111,7 +111,8 @@ export function damage_ai_card(
     poison_all_enemies(gameObj, timeout)
   } else if (ability === CardAbility.AddArmor) {
     damage_one(enemy, card, gameObj, timeout)
-    add_armor((card as Card).data.armor, timeout)
+    const armor_value = (card as Card).data?.armor || 0
+    add_armor(armor_value, timeout)
   } else if (ability === CardAbility.Purify) {
     purify(enemy)
     damage_one(enemy, card, gameObj, timeout)

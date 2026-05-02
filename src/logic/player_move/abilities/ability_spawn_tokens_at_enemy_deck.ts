@@ -8,6 +8,9 @@ export function spawn_tokens_at_enemy_deck(
 ): void {
   if (!(enemy as Enemy).color) return // лидера врагов нельзя так насоздавать
 
+  const token_numbers_count = card.data?.tokens_number
+  if (!token_numbers_count) return
+
   const { enemies } = gameObj
 
   // создали токена врага, у него прописали его deathwish из абилки карты
@@ -23,7 +26,7 @@ export function spawn_tokens_at_enemy_deck(
   }
 
   // card.data.tokens_number раз положили этот токен врага в его колоду
-  for (let i = 0; i < card.data.tokens_number; i++) {
+  for (let i = 0; i < token_numbers_count; i++) {
     enemies.push(copyObj(token))
   }
 }

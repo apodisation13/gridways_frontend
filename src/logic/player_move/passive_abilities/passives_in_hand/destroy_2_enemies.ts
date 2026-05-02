@@ -1,10 +1,10 @@
+import { choice_pop } from "@/lib/utils"
+import { sound_destroy_enemy } from "@/logic/play_sounds"
+import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
 import {
   get_all_enemies,
   remove_dead_card,
 } from "@/logic/player_move/service/service_for_player_move"
-import { sound_destroy_enemy } from "@/logic/play_sounds"
-import { choice_pop } from "@/lib/utils"
-import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
 import type { Card, GameObj } from "@/types"
 
 export function destroy_2_enemies(
