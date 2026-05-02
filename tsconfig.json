@@ -12,7 +12,8 @@
     "baseUrl": ".",
     "ignoreDeprecations": "6.0",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "vuex": ["./node_modules/vuex/types/index.d.ts"]
     },
     "lib": ["esnext", "dom", "dom.iterable"],
     "types": ["node"]

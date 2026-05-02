@@ -28,7 +28,9 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-async-to-generator": "^7.25.9",
+    "@types/lodash": "^4.17.24",
     "@types/node": "^25.6.0",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.58.2",
     "@typescript-eslint/parser": "^8.58.2",
     "@vue/cli-plugin-babel": "~5.0.8",
