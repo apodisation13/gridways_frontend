@@ -12,7 +12,7 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 export default defineComponent({
-  name: "modal-window",
+  name: "ModalWindow",
 })
 </script>
 

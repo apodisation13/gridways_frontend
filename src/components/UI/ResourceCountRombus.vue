@@ -9,7 +9,7 @@
 import { defineComponent } from "vue"
 
 export default defineComponent({
-  name: "resource-count-rombus",
+  name: "ResourceCountRombus",
   props: {
     isZero: {
       type: Boolean,

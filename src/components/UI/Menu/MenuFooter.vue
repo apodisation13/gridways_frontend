@@ -1,5 +1,5 @@
 <template>
-  <div class="footer" v-if="menuNeeded">
+  <div v-if="menuNeeded" class="footer">
     <button class="levels footer__btn" @click="$router.push('/levelselect')">
       <span class="global_text footer__text">Режимы</span>
     </button>
@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 
 export default defineComponent({

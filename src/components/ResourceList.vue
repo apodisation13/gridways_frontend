@@ -11,11 +11,12 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import ResourceItem from "@/components/UI/ResourceItem.vue"
 
 export default defineComponent({
+  name: "ResourceComp",
   components: { ResourceItem },
-  name: "resource-comp",
   props: {
     resources: {
       type: Object as PropType<Record<string, number>>,

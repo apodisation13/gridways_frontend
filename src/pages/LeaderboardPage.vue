@@ -63,6 +63,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon.vue"
 import LeaderboardFilters from "@/components/Pages/LeaderboardPage/LeaderboardFilters.vue"
 import LeaderboardTable from "@/components/Pages/LeaderboardPage/LeaderboardTable.vue"

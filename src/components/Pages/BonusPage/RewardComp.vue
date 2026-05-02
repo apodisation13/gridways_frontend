@@ -15,8 +15,8 @@
     <div class="reward-content">
       <!-- Если не ключ, то отображается этот компонент -->
       <card-list-component
-        class="reward-card-list"
         v-if="!show_key_content"
+        class="reward-card-list"
         :cards="reward"
         :deckbuilder="true"
         :bonus="true"
@@ -26,10 +26,10 @@
       <!-- Иначе. для ключа отображается этот компонент -->
       <div v-if="show_key_content" class="reward-resources">
         <div
-          class="reward-resources__wrapper"
-          @dblclick="accept_random_reward(resource)"
           v-for="(resource, index) in key_reward"
           :key="index"
+          class="reward-resources__wrapper"
+          @dblclick="accept_random_reward(resource)"
         >
           <img
             :src="require(`@/assets/icons/resources/${resource.resource}.svg`)"
@@ -47,25 +47,28 @@
 </template>
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import ResourceCountRombus from "@/components/UI/ResourceCountRombus.vue"
 import type { CardEntry, KeyRewardResult } from "@/types"
 
 export default defineComponent({
+  name: "RewardComp",
   components: { CardListComponent, ResourceCountRombus },
-  name: "reward-comp",
   props: {
     name: { type: String, required: true },
-    reward: { type: Array as PropType<CardEntry[]>, required: false },
+    reward: {
+      type: Array as PropType<CardEntry[]>,
+      required: false,
+      default: () => [],
+    },
     key_reward: {
       type: Array as PropType<KeyRewardResult[]>,
       required: false,
       default: null,
     },
   },
-  created() {
-    this.accept_chest_reward()
-  },
+  emits: ["clear_reward", "accept_key_reward"],
   data() {
     return {
       show_key_content: !!this.key_reward, //Если не передается награда за ключ, значит это либо бочки, либо сундук
@@ -100,6 +103,9 @@ export default defineComponent({
       )
     },
   },
+  created() {
+    this.accept_chest_reward()
+  },
   methods: {
     get_message(name: string): string {
       if (name === "kegs" || name === "big_kegs") return "Выбрать можно 1 карту"
@@ -129,7 +135,6 @@ export default defineComponent({
       if (this.name === "chests") this.$emit("clear_reward")
     },
   },
-  emits: ["clear_reward", "accept_key_reward"],
 })
 </script>
 <style scoped>

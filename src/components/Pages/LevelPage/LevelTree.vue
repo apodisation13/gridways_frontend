@@ -11,50 +11,50 @@
       <v-stage :config="configKonva">
         <v-layer :config="layerCfg">
           <!--для каждого уровня из списка уровней текущего сезона-->
-          <div v-for="(level, index) in levs" :key="level.id">
+          <div v-for="(lev, index) in levs" :key="lev.id">
             <!--рисуем звезды сложности, 1,2 или 3-->
-            <v-star :config="starConfig(level, 0)"></v-star>
+            <v-star :config="starConfig(lev, 0)"></v-star>
             <v-star
-              :config="starConfig(level, w / 2)"
               v-if="
-                level.level.difficulty === 'normal' ||
-                level.level.difficulty === 'hard'
+                lev.level.difficulty === 'normal' ||
+                lev.level.difficulty === 'hard'
               "
+              :config="starConfig(lev, w / 2)"
             ></v-star>
             <v-star
-              :config="starConfig(level, w)"
-              v-if="level.level.difficulty === 'hard'"
+              v-if="lev.level.difficulty === 'hard'"
+              :config="starConfig(lev, w)"
             ></v-star>
             <!--Прямоугольник уровня, пройден\открыт\закрыт, свечение по фракции-->
             <v-rect
-              :config="squareConfig(level)"
-              @dblclick="setLevel(level)"
-              @dbltap="setLevel(level)"
+              :config="squareConfig(lev)"
+              @dblclick="setLevel(lev)"
+              @dbltap="setLevel(lev)"
               @pointerup="end"
-              @pointerdown="start(level)"
+              @pointerdown="start(lev)"
             ></v-rect>
             <!--Текст внутри прямоугольника, или id или значок замка (закрыт)-->
             <v-text
-              v-if="level.unlocked || !userSeasonUnlocked"
-              :config="textConfig(level)"
-              @dblclick="setLevel(level)"
-              @dbltap="setLevel(level)"
+              v-if="lev.unlocked || !userSeasonUnlocked"
+              :config="textConfig(lev)"
+              @dblclick="setLevel(lev)"
+              @dbltap="setLevel(lev)"
               @pointerup="end"
-              @pointerdown="start(level)"
+              @pointerdown="start(lev)"
             ></v-text>
             <!--Значок замка-->
             <v-image
               v-else
-              :config="imageConfig(level)"
+              :config="imageConfig(lev)"
               @dblclick="setLevel(index)"
               @dbltap="setLevel(index)"
               @pointerup="end"
-              @pointerdown="start(level)"
+              @pointerdown="start(lev)"
             ></v-image>
             <!--Линии связей-->
             <!--Для каждой линии из линии связей-->
             <v-line
-              v-for="line in level.level.lines"
+              v-for="line in lev.level.lines"
               :key="line"
               :config="lineConfig(line)"
             ></v-line>
@@ -73,8 +73,9 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
 import { useToast } from "vue-toastification"
+
 import LevelModal from "@/components/ModalWindows/LevelModal.vue"
-import type { MappedUserLevel, LevelRelatedLevel } from "@/types"
+import type { LevelRelatedLevel, MappedUserLevel } from "@/types"
 
 export default defineComponent({
   name: "LevelTree",
@@ -87,14 +88,6 @@ export default defineComponent({
   setup() {
     const toast = useToast()
     return { toast }
-  },
-  watch: {
-    levels(oldVal, newVal) {
-      if (oldVal !== newVal) this.init()
-    },
-  },
-  created() {
-    this.init()
   },
   data() {
     return {
@@ -109,6 +102,14 @@ export default defineComponent({
       panStart: { x: 0, y: 0 },
       panLayerStart: { x: 0, y: 0 },
     }
+  },
+  watch: {
+    levels(oldVal, newVal) {
+      if (oldVal !== newVal) this.init()
+    },
+  },
+  created() {
+    this.init()
   },
   methods: {
     init(): void {

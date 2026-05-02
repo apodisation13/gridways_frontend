@@ -1,14 +1,14 @@
 <template>
   <div class="pass">
     <button
+      v-if="$store.state.game.player_turn"
       class="pass-btn"
       :disabled="!$store.state.game.player_turn"
       :style="themedStyle"
-      v-if="$store.state.game.player_turn"
     >
       ХОД 🔄
     </button>
-    <button class="pass-btn" :disabled="!$store.state.game.player_turn" v-else>
+    <button v-else class="pass-btn" :disabled="!$store.state.game.player_turn">
       ХОД 🔄
     </button>
   </div>
@@ -16,10 +16,11 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import { styleWrapper } from "@/logic/border_styles"
 
 export default defineComponent({
-  name: "pass-comp",
+  name: "PassComp",
   computed: {
     themedStyle(): Record<string, string> | undefined {
       return styleWrapper(this.$store.getters["selectedTheme"])

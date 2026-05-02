@@ -4,9 +4,9 @@
     <div class="levels">
       <div v-if="!gameMod">
         <div
-          class="game_modes"
           v-for="mode in game_types"
           :key="mode.name"
+          class="game_modes"
           @click="selectGameMode(mode)"
         >
           <div class="global_text mode">{{ mode.name_ru }}</div>
@@ -39,10 +39,10 @@
         <div v-if="gameMod.name === 'random'">
           <div class="levels-row">
             <div
-              class="level"
-              :class="{ 'level-selected': level === selectedRandomLevel }"
               v-for="(level, index) in random_levels_easy"
               :key="level.level.id"
+              class="level"
+              :class="{ 'level-selected': level === selectedRandomLevel }"
               @dblclick="set_random_level(index, 'easy')"
             >
               <level-preview-comp :level="level" />
@@ -50,10 +50,10 @@
           </div>
           <div class="levels-row">
             <div
-              class="level"
-              :class="{ 'level-selected': level === selectedRandomLevel }"
               v-for="(level, index) in random_levels_normal"
               :key="level.level.id"
+              class="level"
+              :class="{ 'level-selected': level === selectedRandomLevel }"
               @dblclick="set_random_level(index, 'normal')"
             >
               <level-preview-comp :level="level" />
@@ -61,10 +61,10 @@
           </div>
           <div class="levels-row">
             <div
-              class="level"
-              :class="{ 'level-selected': level === selectedRandomLevel }"
               v-for="(level, index) in random_levels_hard"
               :key="level.level.id"
+              class="level"
+              :class="{ 'level-selected': level === selectedRandomLevel }"
               @dblclick="set_random_level(index, 'hard')"
             >
               <level-preview-comp :level="level" />
@@ -94,8 +94,8 @@
             <!-- Кнопка генерации -->
             <button
               class="generate-btn"
-              @click="generateRandomLevel"
               :disabled="!isValid"
+              @click="generateRandomLevel"
             >
               Генерировать
             </button>
@@ -116,12 +116,13 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import { useToast } from "vue-toastification"
+
 import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
+import SeasonTree from "@/components/Pages/LevelPage/SeasonTree.vue"
 import {
   random_level_generator,
   random_level_generator_by_number,
 } from "@/logic/random_level"
-import SeasonTree from "@/components/Pages/LevelPage/SeasonTree.vue"
 import type { MappedUserLevel, SeasonEntry } from "@/types"
 
 interface GameType {
@@ -137,9 +138,6 @@ export default defineComponent({
   setup() {
     const toast = useToast()
     return { toast }
-  },
-  async created() {
-    this.random_levels = random_level_generator()
   },
   data() {
     return {
@@ -208,6 +206,9 @@ export default defineComponent({
       }
       return ""
     },
+  },
+  async created() {
+    this.random_levels = random_level_generator()
   },
   methods: {
     selectGameMode(mode: GameType): void {

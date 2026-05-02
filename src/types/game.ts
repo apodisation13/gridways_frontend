@@ -1,12 +1,12 @@
-import type { Card, Leader, Enemy, EnemyLeader } from "./database"
+import type { Card, Enemy, EnemyLeader, Leader } from "./database"
 
 export interface GameObj {
   deck: Card[]
   hand: Card[]
-  leader: Leader | null
+  leader: Leader
   grave: Card[]
   field: (Enemy | "")[]
-  enemy_leader: EnemyLeader | null
+  enemy_leader: EnemyLeader
   enemies: Enemy[]
   enemies_grave: Enemy[]
 }

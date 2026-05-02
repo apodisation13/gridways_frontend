@@ -12,14 +12,15 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
-import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
+
 import EnemyLeader from "@/components/Cards/EnemyLeader.vue"
 import EnemyList from "@/components/Cards/EnemyList.vue"
+import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
+import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import type { Enemy, MappedLevel } from "@/types"
 
 export default defineComponent({
-  name: "level-modal",
+  name: "LevelModal",
   components: { EnemyList, EnemyLeader, ButtonClose, ModalWindow },
   props: {
     level: {
@@ -27,6 +28,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["close_level_modal"],
   computed: {
     filteredEnemies(): Enemy[] {
       return this.level.enemies.filter((e): e is Enemy => e !== undefined)
@@ -37,7 +39,6 @@ export default defineComponent({
       this.$emit("close_level_modal")
     },
   },
-  emits: ["close_level_modal"],
 })
 </script>
 

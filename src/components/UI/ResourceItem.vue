@@ -15,7 +15,7 @@
 import { defineComponent } from "vue"
 
 export default defineComponent({
-  name: "resource-item",
+  name: "ResourceItem",
   props: {
     name: {
       type: String,
@@ -23,7 +23,7 @@ export default defineComponent({
     },
     count: {
       type: Number,
-      // default: 0,
+      default: 0,
     },
   },
 })

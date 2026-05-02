@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="not_logged_in" v-if="!isLoggedIn">
+    <div v-if="!isLoggedIn" class="not_logged_in">
       <div class="global_text not_logged_in__text">
         Воспользуйтесь ссылками:
         <router-link :to="{ path: '/login', query: { registration: 'true' } }">
@@ -12,7 +12,7 @@
         </router-link>
       </div>
     </div>
-    <div class="not_logged_in" v-if="isLoggedIn">
+    <div v-if="isLoggedIn" class="not_logged_in">
       <div class="global_text not_logged_in__text">
         Добро пожаловать, {{ username }}
       </div>
@@ -24,8 +24,9 @@
 </template>
 
 <script lang="ts">
-import NewsList from "@/components/Pages/MainPage/NewsList.vue"
 import { defineComponent } from "vue"
+
+import NewsList from "@/components/Pages/MainPage/NewsList.vue"
 
 export default defineComponent({
   components: {

@@ -60,6 +60,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue"
+
 import CardItem from "@/components/Cards/CardItem.vue"
 import FactionItem from "@/components/Pages/DeckbuildPage/FactionItem.vue"
 import type { LeaderboardEntry } from "@/types"
@@ -81,10 +82,6 @@ export default defineComponent({
       default: null,
     },
   },
-  async created() {
-    if (this.is_world) await this.$store.dispatch("getWorldLeaderboard")
-    else await this.$store.dispatch("getUserLeaderboard")
-  },
   computed: {
     username(): string {
       return this.$store.state.login.user.username
@@ -105,6 +102,10 @@ export default defineComponent({
         return !(this.selectedMode && e.mode !== this.selectedMode)
       })
     },
+  },
+  async created() {
+    if (this.is_world) await this.$store.dispatch("getWorldLeaderboard")
+    else await this.$store.dispatch("getUserLeaderboard")
   },
   methods: {
     findLeader(leaderId: number) {

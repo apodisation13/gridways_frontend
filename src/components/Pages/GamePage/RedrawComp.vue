@@ -1,5 +1,5 @@
 <template>
-  <modal-window class="redraw-modal-window" v-if="visible">
+  <modal-window v-if="visible" class="redraw-modal-window">
     <button-close @close_self="close_self" />
 
     <h3 class="text">Это ваша рука</h3>
@@ -18,14 +18,15 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
+import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import { choice } from "@/lib/utils"
-import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import type { Card, CardEntry, GameObj } from "@/types"
 
 export default defineComponent({
-  name: "redraw-comp",
+  name: "RedrawComp",
   components: { CardListComponent, ButtonClose, ModalWindow },
   props: {
     gameObj: {
@@ -37,6 +38,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["redraw_finished"],
   data() {
     return {
       visible: true,
@@ -46,9 +48,6 @@ export default defineComponent({
       redraw_array: [] as Card[],
     }
   },
-  created() {
-    if (!this.gameObj.deck.length) this.close_self()
-  },
   computed: {
     handEntries(): CardEntry[] {
       return this.hand.map((card: Card) => ({ card, count: 1, id: null }))
@@ -56,6 +55,9 @@ export default defineComponent({
     deckEntries(): CardEntry[] {
       return this.deck.map((card: Card) => ({ card, count: 1, id: null }))
     },
+  },
+  created() {
+    if (!this.gameObj.deck.length) this.close_self()
   },
   methods: {
     close_self(): void {
