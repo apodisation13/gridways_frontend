@@ -36,7 +36,7 @@
       :visible="show_reward_page"
       :name="reward_name"
       :reward="random_cards"
-      :key_reward="random_reward_choice"
+      :key_reward="random_reward_choice ?? undefined"
       @clear_reward="clear_reward"
       @accept_key_reward="accept_random_reward"
     />

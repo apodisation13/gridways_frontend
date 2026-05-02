@@ -2,7 +2,7 @@
   <transition-group name="flip-list" tag="div" class="assembling-pool-list">
     <card-item
       v-for="(full_card, index) in deck_is_progress"
-      :key="full_card.card.id"
+      :key="full_card.card?.id ?? index"
       class="pool-item"
       :card="full_card.card ? full_card.card : (full_card as any)"
       :user_card="full_card.card ? (full_card as any) : null"

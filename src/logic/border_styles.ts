@@ -130,11 +130,12 @@ function background_color_leader(factionColor: string): string {
 }
 
 function background_color_deck(deck: {
-  leader: { faction: string }
+  leader?: { faction: string } | null
 }): Record<string, string> {
-  if (deck.leader.faction === "Soldiers") return { backgroundColor: "blue" }
-  else if (deck.leader.faction === "Monsters") return { backgroundColor: "red" }
-  else if (deck.leader.faction === "Animals")
+  if (deck.leader?.faction === "Soldiers") return { backgroundColor: "blue" }
+  else if (deck.leader?.faction === "Monsters")
+    return { backgroundColor: "red" }
+  else if (deck.leader?.faction === "Animals")
     return { backgroundColor: "green" }
   else return {}
 }

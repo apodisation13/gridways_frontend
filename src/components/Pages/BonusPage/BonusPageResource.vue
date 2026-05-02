@@ -58,7 +58,7 @@
       v-if="active_action"
       :resource_name="resource_name"
       :action="active_action"
-      :options="actions[active_action]"
+      :options="actions[active_action] ?? []"
       :step="step"
       @confirm="handleConfirm"
       @cancel="active_action = null"

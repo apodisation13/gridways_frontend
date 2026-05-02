@@ -29,7 +29,7 @@
             <div class="damage-icon-wrap">
               <div class="damage-icon"></div>
               <span class="damage-icon-text">
-                {{ -card.data.passive.value }}
+                {{ -(card.data.passive?.value ?? 0) }}
               </span>
             </div>
           </div>
@@ -43,7 +43,9 @@
           >
             <div class="heal-icon-wrap">
               <span class="heal-icon">💚</span>
-              <span class="heal-icon-text">+{{ card.data.passive.value }}</span>
+              <span class="heal-icon-text">
+                +{{ card.data.passive?.value ?? 0 }}
+              </span>
             </div>
           </div>
         </transition>

@@ -269,7 +269,7 @@ export default defineComponent({
       // а если надо, то сбросим ПОСЛЕ того как закроем окно с выбором карты, чтобы анимации увидеть тут
       if (!this.show_pick_a_card_selection) {
         remove_dead_card(
-          this.selected_card,
+          this.selected_card!,
           this.gameObj.grave,
           this.gameObj.hand,
           this.gameObj.deck
@@ -294,7 +294,7 @@ export default defineComponent({
     damageEnemyByCard(): void {
       if (!this.targetEnemyByCard) return
 
-      damage_ai_card(this.selected_card, this.selected_enemy, this.gameObj)
+      damage_ai_card(this.selected_card!, this.selected_enemy!, this.gameObj)
 
       // снимаем флаг активности карт игрока, ОДНА КАРТА ЗА ХОД! станет ТРУ только после окончания хода компа!
       // если мы играли первый раз картой из руки, то всё равно заблокируем руку, так как sca ЕЩЁ не было на тот момент
@@ -306,7 +306,7 @@ export default defineComponent({
     damageEnemyByLeader(): void {
       if (!this.targetEnemyByLeader) return
 
-      damage_ai_card(this.gameObj.leader, this.selected_enemy, this.gameObj)
+      damage_ai_card(this.gameObj.leader!, this.selected_enemy!, this.gameObj)
       this.afterDamage()
       this.isActive.player_leader = false // лидер снова неактивен, чтобы ходить им снова - надо опять на него тыкать
     },
@@ -323,8 +323,8 @@ export default defineComponent({
       if (!this.targetEnemyLeaderByCard) return
 
       damage_ai_card(
-        this.selected_card,
-        this.gameObj.enemy_leader,
+        this.selected_card!,
+        this.gameObj.enemy_leader!,
         this.gameObj
       )
       if (!this.sca) this.isActive.player_cards = false
@@ -335,8 +335,8 @@ export default defineComponent({
       if (!this.targetEnemyLeaderByLeader) return
 
       damage_ai_card(
-        this.gameObj.leader,
-        this.gameObj.enemy_leader,
+        this.gameObj.leader!,
+        this.gameObj.enemy_leader!,
         this.gameObj
       )
       this.afterDamage()

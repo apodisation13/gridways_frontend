@@ -28,7 +28,7 @@
       </div>
     </div>
     <deck-modal
-      v-if="show_deck"
+      v-if="show_deck && deck.deck.leader"
       :deck="deck.deck.cards"
       :leader="deck.deck.leader"
       @close_deck_modal="show_deck = false"

@@ -49,7 +49,7 @@
         <enemy-status v-if="enemy.data.status" :enemy="enemy" />
         <heart-icon
           :health="enemy.data.hp"
-          :hp_delta="enemy.hp_delta"
+          :hp_delta="enemy.hp_delta ?? undefined"
           :bgColor="background_color_hp(enemyColor)"
         />
       </div>

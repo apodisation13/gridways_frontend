@@ -30,13 +30,13 @@ export default defineComponent({
       // в этой функции мы подготавливаем cards_pool - список карт, которые будут в открывшемся окне
       // ещё мы запоминаем способность (ability) и если есть то значение (speical_case_value)
       // сам выбор карты - в следующей функции
-      const ability = this.selected_card.ability.name
+      const ability = this.selected_card!.ability.name
 
       if (ability === CardAbility.Resurrect) {
         // берем из кладбища только юнитов (кроме себя, потому что сама она тоже ушла в кладбище уже)
         this.cards_pool = this.gameObj.grave.filter(
           (card: Card) =>
-            card.type === CardType.Unit && card.id !== this.selected_card.id
+            card.type === CardType.Unit && card.id !== this.selected_card!.id
         )
       } else if (ability === CardAbility.DrawTwoCards) {
         this.draw_one_card()
@@ -44,13 +44,15 @@ export default defineComponent({
         // прибавляем 1 заряд бронзовой карте в руке
         this.cards_pool = this.gameObj.hand.filter(
           (card: Card) =>
-            card.color === CardColor.Bronze && card.id !== this.selected_card.id
+            card.color === CardColor.Bronze &&
+            card.id !== this.selected_card!.id
         )
       } else if (ability === CardAbility.PlayFromDeck) {
         // играем бронзовую карту из колоды
         this.cards_pool = this.gameObj.deck.filter(
           (card: Card) =>
-            card.color === CardColor.Bronze && card.id !== this.selected_card.id
+            card.color === CardColor.Bronze &&
+            card.id !== this.selected_card!.id
         )
       } else if (ability === CardAbility.PlayFromGrave) {
         // играем из кладбища бронзовую или серебряную карту
@@ -59,12 +61,12 @@ export default defineComponent({
             (card.color === CardColor.Bronze ||
               card.color === CardColor.Silver) &&
             card.type === CardType.Unit &&
-            card.id !== this.selected_card.id
+            card.id !== this.selected_card!.id
         )
       } else if (ability === CardAbility.DiscardDraw2) {
         // тут мы 1 карту сбросим, 2 возьмем
         this.cards_pool = this.gameObj.hand.filter(
-          (card: Card) => card.id !== this.selected_card.id
+          (card: Card) => card.id !== this.selected_card!.id
         )
       } else if (ability === CardAbility.PlayBronzeSilverFromDeck) {
         // играем бронзовую или серебряную карту из колоды
@@ -74,9 +76,9 @@ export default defineComponent({
         )
       } else if (ability === CardAbility.IncrDmgToHandBySelfDmg) {
         // выбираем карту из руки, увеличиваем её урон на значение урона той карты, которую мы играли
-        this.special_case_value = this.selected_card.data.damage // сохранили значение урона
+        this.special_case_value = this.selected_card!.data.damage // сохранили значение урона
         this.cards_pool = this.gameObj.hand.filter(
-          (card: Card) => card.id !== this.selected_card.id
+          (card: Card) => card.id !== this.selected_card!.id
         )
       } else if (ability === CardAbility.PlayEnemyFromGrave) {
         // играем бронзового ВРАГА из их кладбища (+костыль на врагов)
@@ -101,14 +103,15 @@ export default defineComponent({
         this.enemyView = true
       } else if (ability === CardAbility.DecrDmgToHandIncrToRandomHand) {
         // выбираем карту, уменьшаем ее урон на value, прибавляем value урона рандомной карте в руке
-        this.special_case_value = this.selected_card.data.value // сохранили значение урона
+        this.special_case_value =
+          (this.selected_card! as Card).data.value ?? null // сохранили значение урона
         this.cards_pool = this.gameObj.hand.filter(
-          (card: Card) => card.id !== this.selected_card.id
+          (card: Card) => card.id !== this.selected_card!.id
         )
       } else if (ability === CardAbility.IncrDmgByNCharges) {
         // увеличиваем урон карты в руке на количество зарядов у той
         this.cards_pool = this.gameObj.hand.filter(
-          (card: Card) => card.id !== this.selected_card.id
+          (card: Card) => card.id !== this.selected_card!.id
         )
       } else if (ability === CardAbility.CreateSpecial) {
         // вот это сложно... выбираем 3 случайные бронзовые спец карты НЕ из фракции
@@ -146,10 +149,10 @@ export default defineComponent({
         // берем из колоды ЛЮБУЮ КАРТУ!
         if (this.calc_can_draw()) this.cards_pool = this.gameObj.deck
       }
-      this.ability = this.selected_card.ability.name
+      this.ability = this.selected_card!.ability.name
       if (this.cards_pool.length) {
         this.selectedCardAbilityDescription =
-          this.selected_card.ability.description
+          this.selected_card!.ability.description
         this.sca = true
         this.show_pick_a_card_selection = true
         this.dead_card = this.selected_card // раз мы пришли сюда, нужно открыть окно, запоминаем ИСХОДНУЮ карту
@@ -166,8 +169,8 @@ export default defineComponent({
       } else if (this.ability === CardAbility.GiveChargesToCardInHand1) {
         change_card_charges(card as Card, 1)
       } else if (this.ability === CardAbility.DiscardDraw2) {
-        this.gameObj.grave.push(card)
-        this.gameObj.hand.splice(this.gameObj.hand.indexOf(card), 1)
+        this.gameObj.grave.push(card as Card)
+        this.gameObj.hand.splice(this.gameObj.hand.indexOf(card as Card), 1)
         this.draw_one_card()
       } else if (
         this.ability === CardAbility.PlayFromDeck ||
@@ -189,13 +192,13 @@ export default defineComponent({
 
         // Показать эту выбранную для игры карту. А снимаем этот ФЛАГ уже в самом GamePage!
         this.show_picked_card = true
-        this.selected_card = card // ВОТ ЗДЕСЬ МЫ ЗАПОМНИЛИ ЭТУ КАРТУ НА КОТОРУЮ ТКНУЛИ ИЗ ОКНА
+        this.selected_card = card as Card | Leader // ВОТ ЗДЕСЬ МЫ ЗАПОМНИЛИ ЭТУ КАРТУ НА КОТОРУЮ ТКНУЛИ ИЗ ОКНА
         // this.isActive.player_cards = true // ТЕПЕРЬ РУКУ здесь не активируем, работаем через sca
         this.isActive.player_leader = false // а лидер теперь неактивен
         this.setActive() // поле и лидер врагов теперь активны
       } else if (this.ability === CardAbility.IncrDmgToHandBySelfDmg) {
-        card.data.damage += this.special_case_value
-        this.incrDmg(card, this.special_case_value)
+        card.data.damage += this.special_case_value!
+        this.incrDmg(card as Card, this.special_case_value!)
       } else if (this.ability === CardAbility.MoveEnemyFromDeckToGrave) {
         const enemy = card as Enemy
         const cd = this.gameObj.enemies.findIndex(
@@ -205,25 +208,25 @@ export default defineComponent({
         enemy.data.hp = enemy.data.base.base_hp
         this.gameObj.enemies_grave.push(enemy)
       } else if (this.ability === CardAbility.DecrDmgToHandIncrToRandomHand) {
-        card.data.damage -= this.special_case_value
+        card.data.damage -= this.special_case_value!
         if (card.data.damage < 0) card.data.damage = 0
         const random_card = choice_element(this.gameObj.hand) as Card
-        random_card.data.damage += this.special_case_value
-        this.incrDmg(random_card, this.special_case_value)
+        random_card.data.damage += this.special_case_value!
+        this.incrDmg(random_card, this.special_case_value!)
       } else if (this.ability === CardAbility.IncrDmgByNCharges) {
         const c = card as Card
         c.data.damage += c.data.charges
         this.incrDmg(c, c.data.charges)
       } else if (this.ability === CardAbility.CreateAndPutToDeck) {
-        this.gameObj.deck.push(card)
+        this.gameObj.deck.push(card as Card)
       } else if (this.ability === CardAbility.DrawExact) {
-        this.gameObj.deck.splice(card, 1)
-        this.gameObj.hand.push(card)
+        this.gameObj.deck.splice(this.gameObj.deck.indexOf(card as Card), 1)
+        this.gameObj.hand.push(card as Card)
       }
 
       // сбрасываем ИСХОДНУЮ карту, которой 1й раз играли
       remove_dead_card(
-        this.dead_card,
+        this.dead_card!,
         this.gameObj.grave,
         this.gameObj.hand,
         this.gameObj.deck

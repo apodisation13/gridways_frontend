@@ -83,13 +83,14 @@ export default defineComponent({
     },
   },
   mounted() {
-    const carouselEl = this.$refs.carousel?.$el
+    const carousel = this.$refs.carousel as InstanceType<typeof Carousel>
+    const carouselEl = carousel?.$el as HTMLElement | undefined
 
     if (carouselEl) {
       carouselEl.addEventListener(
         "touchmove",
-        e => {
-          e.preventDefault() // Важно!
+        (e: Event) => {
+          e.preventDefault()
         },
         { passive: false }
       )
@@ -97,10 +98,10 @@ export default defineComponent({
   },
   methods: {
     next() {
-      this.$refs.carousel.next()
+      ;(this.$refs.carousel as unknown as { next(): void }).next()
     },
     prev() {
-      this.$refs.carousel.prev()
+      ;(this.$refs.carousel as unknown as { prev(): void }).prev()
     },
     setDay(data: string, option: "month" | "day"): string {
       const date = new Date(data)

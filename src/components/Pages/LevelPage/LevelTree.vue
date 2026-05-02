@@ -63,7 +63,7 @@
       </v-stage>
     </div>
     <level-modal
-      v-if="show_level_modal"
+      v-if="show_level_modal && level"
       :level="level.level"
       @close_level_modal="show_level_modal = false"
     />

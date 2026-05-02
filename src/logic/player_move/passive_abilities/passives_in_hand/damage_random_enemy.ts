@@ -16,7 +16,7 @@ export function damage_random_enemy(
 
   hit_one_enemy(
     target,
-    { data: { damage: card.data.passive.value } },
+    { data: { damage: card.data.passive?.value ?? 0 } },
     gameObj,
     timeout * 0.5
   )

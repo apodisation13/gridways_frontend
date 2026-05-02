@@ -242,7 +242,7 @@ export default defineComponent({
         return
       }
       if (this.can_add_card(card)) {
-        this.deck.deck_is_progress.push(card)
+        this.deck.deck_is_progress.push(card as unknown as DeckCardEntry)
         this.deck.deck_body.push(card.card.id)
         this.deck.health += card.card.data.hp
         this.init() // это нужно, так как при добавлении карты, мы хотим убрать ее из пула (для удобства)
@@ -290,14 +290,17 @@ export default defineComponent({
 
     async save_deck(): Promise<void> {
       if (!this.deck.leader) {
-        return this.toast.warning("Необходимо выбрать лидера")
+        this.toast.warning("Необходимо выбрать лидера")
+        return
       }
       // карт ровно 12 и лидер выбран
       if (this.cant_save_deck) {
-        return this.toast.warning("Соберите колоду из 12 карт")
+        this.toast.warning("Соберите колоду из 12 карт")
+        return
       }
       if (this.deck.deck_name.trim() === "") {
-        return this.toast.warning("Введите имя колоды")
+        this.toast.warning("Введите имя колоды")
+        return
       }
       await this.send_data_to_store("createUserDeck", {
         deck_name: this.deck.deck_name,

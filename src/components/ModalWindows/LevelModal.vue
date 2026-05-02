@@ -2,7 +2,7 @@
   <modal-window>
     <button-close @close_self="close_self" />
     <h3 class="text">{{ level.name }} - {{ level.difficulty }} <br /></h3>
-    <div class="enemy_leader">
+    <div v-if="level.enemy_leader" class="enemy_leader">
       <enemy-leader :enemy_leader="level.enemy_leader" />
     </div>
     <h4 class="text">Врагов - {{ level.enemies.length }} <br /></h4>

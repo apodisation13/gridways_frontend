@@ -1,20 +1,16 @@
 import { randInt } from "@/lib/utils"
 import store from "@/store"
-import { CardColor } from "@/types"
+import { CardColor, type Enemy } from "@/types"
 
-interface RewardConfig {
-  type: "simple" | "diapason"
-  value?: number
-  min?: number
-  max?: number
-  probability?: number
-}
+type RewardConfig =
+  | { type: "simple"; value: number; probability?: number }
+  | { type: "diapason"; min: number; max: number; probability?: number }
 
 type RewardsConfig = Record<string, RewardConfig>
 
 function getValue(cfg: RewardConfig): number {
   if (cfg.type === "simple") return cfg.value
-  if (cfg.type === "diapason") return randInt(cfg.min, cfg.max)
+  return randInt(cfg.min, cfg.max)
 }
 
 export function getRandomReward(rewards_config: RewardsConfig): {
@@ -23,11 +19,14 @@ export function getRandomReward(rewards_config: RewardsConfig): {
 } {
   // расчет награды за открытый ключ
   const entries = Object.entries(rewards_config)
-  const totalWeight = entries.reduce((sum, [, cfg]) => sum + cfg.probability, 0)
+  const totalWeight = entries.reduce(
+    (sum, [, cfg]) => sum + (cfg.probability ?? 0),
+    0
+  )
 
   let rand = Math.random() * totalWeight
   for (const [resource, cfg] of entries) {
-    rand -= cfg.probability
+    rand -= cfg.probability ?? 0
     if (rand <= 0) {
       return { resource, value: getValue(cfg) }
     }
@@ -44,13 +43,13 @@ function getRewardsForEnemiesGrave(
   const enemies_grave = store.getters["enemies_grave"]
 
   const bronze_enemies = enemies_grave.filter(
-    e => e.color === CardColor.Bronze && !e.token
+    (e: Enemy) => e.color === CardColor.Bronze && !e.token
   )
   const silver_enemies = enemies_grave.filter(
-    e => e.color === CardColor.Silver && !e.token
+    (e: Enemy) => e.color === CardColor.Silver && !e.token
   )
   const gold_enemies = enemies_grave.filter(
-    e => e.color === CardColor.Gold && !e.token
+    (e: Enemy) => e.color === CardColor.Gold && !e.token
   )
 
   if (bronze_enemies.length > 0) rewards["raw_bronze"] = bronze_enemies.length

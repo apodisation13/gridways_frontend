@@ -21,7 +21,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from "vue"
+import {
+  type ComponentPublicInstance,
+  defineComponent,
+  type PropType,
+} from "vue"
 
 import EnemyUi from "@/components/Cards/EnemyUi.vue"
 import CardModal from "@/components/ModalWindows/CardModal.vue"
@@ -85,8 +89,8 @@ export default defineComponent({
     make_id(enemy: Enemy, index: number | undefined): string {
       return `${enemy.name}_${index}`
     },
-    setEnemyRef(el: HTMLElement | null): void {
-      this.enemyElement = el
+    setEnemyRef(el: Element | ComponentPublicInstance | null): void {
+      this.enemyElement = el as HTMLElement | null
     },
     startAnimation(): void {
       if (this.isAnimating) return

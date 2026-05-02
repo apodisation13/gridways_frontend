@@ -58,7 +58,9 @@ export default defineComponent({
   },
   computed: {
     cardBorder(): Record<string, string> {
-      const bg = background_color_leader(this.level.level.enemy_leader?.faction)
+      const bg = background_color_leader(
+        this.level.level.enemy_leader?.faction ?? ""
+      )
       const color = bg || "#888"
       return {
         borderColor: color,

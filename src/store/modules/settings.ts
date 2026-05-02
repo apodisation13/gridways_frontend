@@ -6,7 +6,7 @@ import { ActionContext, UserPreferencesResponse } from "@/types"
 
 const toast = useToast()
 
-interface SettingsState {
+export interface SettingsState {
   theme: number
   avatar: string
   soundOn: boolean

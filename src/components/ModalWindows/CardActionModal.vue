@@ -121,7 +121,7 @@ export default defineComponent({
       return this.$store.getters["resource"]
     },
     res(): Record<string, number> {
-      const r = this.resources as Record<string, number>
+      const r = this.resources as unknown as Record<string, number>
       if ((this.card as any).color === CardColor.Bronze) {
         return {
           scraps: r.scraps,
@@ -171,7 +171,7 @@ export default defineComponent({
       )
     },
     is_affordable(recipe: Recipe): boolean {
-      const r = this.resources as Record<string, number>
+      const r = this.resources as unknown as Record<string, number>
       if (this.action === "craft") {
         return Object.entries(recipe).every(
           ([res, amt]) => (r[res] || 0) >= Math.abs(amt)
@@ -182,7 +182,7 @@ export default defineComponent({
         .every(([res, amt]) => (r[res] || 0) >= Math.abs(amt))
     },
     is_short(recipe: Recipe, res: string): boolean {
-      const r = this.resources as Record<string, number>
+      const r = this.resources as unknown as Record<string, number>
       if (this.action === "craft") {
         return (r[res] || 0) < Math.abs(recipe[res])
       }

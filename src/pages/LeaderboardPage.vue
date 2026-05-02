@@ -37,8 +37,8 @@
     <leaderboard-filters
       v-if="showFilters"
       :factions="availableFactions"
-      :selected-faction="selectedFaction"
-      :selected-mode="selectedMode"
+      :selected-faction="selectedFaction ?? undefined"
+      :selected-mode="selectedMode ?? undefined"
       @close-modal="showFilters = false"
       @reset-filters="resetFilters"
       @set-faction="setFaction"
