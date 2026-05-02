@@ -1,16 +1,16 @@
 <template>
-  <div class="btn_close_img" v-on:click="close"></div>
+  <div class="btn_close_img" @click="close"></div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue"
 export default defineComponent({
+  emits: ["handle_close"],
   methods: {
     close(): void {
       this.$emit("handle_close")
     },
   },
-  emits: ["handle_close"],
 })
 </script>
 

@@ -27,25 +27,25 @@
           <template v-if="action === 'mill'">
             <div class="mill-label">Получить:</div>
             <template
-              v-for="[res, amount] in sortedRecipe(recipe)"
-              :key="'g-' + res"
+              v-for="[resource_key, amount] in sortedRecipe(recipe)"
+              :key="'g-' + resource_key"
             >
               <div v-if="amount > 0" class="recipe-row">
-                <img :src="getIcon(res)" class="option-icon" alt="" />
+                <img :src="getIcon(resource_key)" class="option-icon" alt="" />
                 <span class="option-total">{{ amount }}</span>
               </div>
             </template>
 
             <div class="mill-label">Заплатить:</div>
             <template
-              v-for="[res, amount] in sortedRecipe(recipe)"
-              :key="'p-' + res"
+              v-for="[resource_key, amount] in sortedRecipe(recipe)"
+              :key="'p-' + resource_key"
             >
               <div v-if="amount < 0" class="recipe-row">
-                <img :src="getIcon(res)" class="option-icon" alt="" />
+                <img :src="getIcon(resource_key)" class="option-icon" alt="" />
                 <span
                   class="option-total"
-                  :class="{ insufficient: is_short(recipe, res) }"
+                  :class="{ insufficient: is_short(recipe, resource_key) }"
                 >
                   {{ Math.abs(amount) }}
                 </span>
@@ -55,14 +55,14 @@
           <!-- Craft: всё это затраты -->
           <template v-else>
             <div
-              v-for="[res, amount] in sortedRecipe(recipe)"
-              :key="res"
+              v-for="[resource_key, amount] in sortedRecipe(recipe)"
+              :key="resource_key"
               class="recipe-row"
             >
-              <img :src="getIcon(res)" class="option-icon" alt="" />
+              <img :src="getIcon(resource_key)" class="option-icon" alt="" />
               <span
                 class="option-total"
-                :class="{ insufficient: is_short(recipe, res) }"
+                :class="{ insufficient: is_short(recipe, resource_key) }"
               >
                 {{ Math.abs(amount) }}
               </span>
@@ -73,8 +73,8 @@
       <div class="modal-btns">
         <button
           class="btn-ok"
-          @click="confirm"
           :disabled="selected === null || !is_affordable(options[selected])"
+          @click="confirm"
         >
           Подтвердить
         </button>
@@ -86,19 +86,21 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import ResourceList from "@/components/ResourceList.vue"
-import { CardColor, type Card, type Leader, type UserResources } from "@/types"
+import { type Card, CardColor, type Leader, type UserResources } from "@/types"
 
 type Recipe = Record<string, number>
 
 export default defineComponent({
-  name: "card-action-modal",
+  name: "CardActionModal",
   components: { ResourceList },
   props: {
     action: { type: String as PropType<"craft" | "mill">, required: true },
     options: { type: Array as PropType<Recipe[]>, required: true },
     card: { type: Object as PropType<Card | Leader>, required: true },
   },
+  emits: ["confirm", "cancel"],
   data() {
     return {
       selected: 0,
@@ -194,7 +196,6 @@ export default defineComponent({
       this.$emit("confirm", this.options[this.selected])
     },
   },
-  emits: ["confirm", "cancel"],
 })
 </script>
 

@@ -21,33 +21,33 @@
     <div class="action-grid">
       <button
         v-if="actions.buy"
-        @click="openModal('buy')"
         class="action-btn btn--buy"
         title="Купить"
+        @click="openModal('buy')"
       >
         +
       </button>
       <button
         v-if="actions.sell"
-        @click="openModal('sell')"
         class="action-btn btn--sell"
         title="Продать"
+        @click="openModal('sell')"
       >
         ↩
       </button>
       <button
         v-if="actions.craft"
-        @click="openModal('craft')"
         class="action-btn btn--craft"
         title="Создать"
+        @click="openModal('craft')"
       >
         ⚒
       </button>
       <button
         v-if="actions.mill"
-        @click="openModal('mill')"
         class="action-btn btn--mill"
         title="Переработать"
+        @click="openModal('mill')"
       >
         ✕
       </button>
@@ -76,13 +76,14 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
+import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
 import ResourcesActionModal from "@/components/Pages/BonusPage/ResourcesActionModal.vue"
 import ResourceCountRombus from "@/components/UI/ResourceCountRombus.vue"
-import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
 import type { ResourceActions } from "@/types"
 
 export default defineComponent({
-  name: "bonus-page-resource",
+  name: "BonusPageResource",
   components: { YesnoModal, ResourceCountRombus, ResourcesActionModal },
   props: {
     resource_name: { type: String, required: true },
@@ -90,6 +91,7 @@ export default defineComponent({
     actions: { type: Object as PropType<ResourceActions>, default: () => ({}) },
     step: { type: Number, default: 1 },
   },
+  emits: ["action", "open-resource-confirm"],
   data() {
     return {
       active_action: null as "buy" | "sell" | "craft" | "mill" | null,
@@ -122,7 +124,6 @@ export default defineComponent({
       this.open_item_visible = false
     },
   },
-  emits: ["action", "open-resource-confirm"],
 })
 </script>
 

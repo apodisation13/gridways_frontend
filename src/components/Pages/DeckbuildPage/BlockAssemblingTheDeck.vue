@@ -11,7 +11,7 @@
             :is_leader="true"
             :hp_needed="true"
           />
-          <div class="leader-empty" v-else></div>
+          <div v-else class="leader-empty"></div>
         </div>
         <span class="leader-block-info">
           Лидер: {{ !!deck.leader ? deck.leader.name : "не выбран" }}
@@ -43,14 +43,14 @@
         {{ charges }}
       </div>
       <create-button
-        name="Создать"
         v-if="!patch"
+        name="Создать"
         :disabled="cant_save_deck"
         @click="save_deck"
       />
       <create-button
-        name="Изменить"
         v-if="patch"
+        name="Изменить"
         :disabled="cant_save_deck"
         @click="patch_deck"
       />
@@ -60,10 +60,11 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import AssemblingPoolList from "@/components/Pages/DeckbuildPage/AssemblingPoolList.vue"
-import InputNameForDeck from "@/components/Pages/DeckbuildPage/InputNameForDeck.vue"
-import CreateButton from "@/components/Pages/DeckbuildPage/Buttons/CreateButton.vue"
+
 import CardItem from "@/components/Cards/CardItem.vue"
+import AssemblingPoolList from "@/components/Pages/DeckbuildPage/AssemblingPoolList.vue"
+import CreateButton from "@/components/Pages/DeckbuildPage/Buttons/CreateButton.vue"
+import InputNameForDeck from "@/components/Pages/DeckbuildPage/InputNameForDeck.vue"
 import type { DeckCardEntry, Leader } from "@/types"
 
 interface ActiveDeck {
@@ -95,20 +96,13 @@ export default defineComponent({
       type: Boolean,
     },
   },
-  methods: {
-    delete_card_from_deck(emit: DeckCardEntry): void {
-      this.$emit("delete_card", emit)
-    },
-    change_order_deck(emit: number): void {
-      this.$emit("change_order_deck", emit)
-    },
-    save_deck(): void {
-      this.$emit("save_deck")
-    },
-    patch_deck(): void {
-      this.$emit("patch_deck")
-    },
-  },
+  emits: [
+    "delete_card",
+    "save_deck",
+    "patch_deck",
+    "change_name_deck",
+    "change_order_deck",
+  ],
   computed: {
     charges(): number {
       const leader_charges = this.deck.leader
@@ -123,13 +117,20 @@ export default defineComponent({
       )
     },
   },
-  emits: [
-    "delete_card",
-    "save_deck",
-    "patch_deck",
-    "change_name_deck",
-    "change_order_deck",
-  ],
+  methods: {
+    delete_card_from_deck(emit: DeckCardEntry): void {
+      this.$emit("delete_card", emit)
+    },
+    change_order_deck(emit: number): void {
+      this.$emit("change_order_deck", emit)
+    },
+    save_deck(): void {
+      this.$emit("save_deck")
+    },
+    patch_deck(): void {
+      this.$emit("patch_deck")
+    },
+  },
 })
 </script>
 

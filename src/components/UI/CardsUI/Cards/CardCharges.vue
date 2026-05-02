@@ -16,9 +16,11 @@ export default defineComponent({
   props: {
     charge: {
       type: Number,
+      default: 0,
     },
     bgColor: {
       type: String,
+      default: "",
     },
   },
 })

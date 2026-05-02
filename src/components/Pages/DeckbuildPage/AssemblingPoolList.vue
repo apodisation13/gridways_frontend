@@ -1,9 +1,9 @@
 <template>
   <transition-group name="flip-list" tag="div" class="assembling-pool-list">
     <card-item
-      class="pool-item"
       v-for="(full_card, index) in deck_is_progress"
       :key="full_card.card.id"
+      class="pool-item"
       :card="full_card.card ? full_card.card : (full_card as any)"
       :user_card="full_card.card ? (full_card as any) : null"
       :is_previev="index + 1 !== deck_is_progress.length"
@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import CardItem from "@/components/Cards/CardItem.vue"
 import type { DeckCardEntry } from "@/types"
 export default defineComponent({
@@ -30,6 +31,7 @@ export default defineComponent({
       },
     },
   },
+  emits: ["delete_card_from_deck", "change_order_deck"],
   methods: {
     delete_card_from_deck(card: DeckCardEntry): void {
       this.$emit("delete_card_from_deck", card)
@@ -41,7 +43,6 @@ export default defineComponent({
       this.$emit("change_order_deck", index)
     },
   },
-  emits: ["delete_card_from_deck", "change_order_deck"],
 })
 </script>
 

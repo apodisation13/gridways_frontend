@@ -1,7 +1,7 @@
 <template>
   <div
-    class="ability-circle-enemy"
     v-if="!!enemy.move.name"
+    class="ability-circle-enemy"
     :style="{
       'background-image':
         'url(' +
@@ -13,6 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import type { Enemy } from "@/types"
 
 export default defineComponent({

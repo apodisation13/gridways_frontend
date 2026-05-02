@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
 import BaseTitleText from "@/components/UI/BaseTitleText.vue"
 import ButtonToFullscreen from "@/components/UI/Buttons/ButtonToFullscreen.vue"
@@ -35,6 +36,20 @@ export default defineComponent({
       return this.$store.state.fullscreen.isStarted
     },
   },
+
+  created() {
+    // прослушиваетель на изменение размеров экрана, вызывает функцию пересчета css переменной --vh
+    window.addEventListener("resize", this.appHeight)
+    // прослушиваетель изменения полноэкранного режима, в полноэкранном режиме устанавливается ориентрация экрана "portrait"
+    window.addEventListener("fullscreenchange", this.setOrientation)
+    this.appHeight()
+  },
+  unmounted() {
+    // удаление прослушателей при демонтрировании компонента
+    window.removeEventListener("resize", this.appHeight)
+    window.removeEventListener("fullscreenchange", this.setOrientation)
+  },
+
   methods: {
     toggle(): void {
       this.fullscreen = true
@@ -69,20 +84,6 @@ export default defineComponent({
 
       this.appHeight()
     },
-  },
-
-  created() {
-    // прослушиваетель на изменение размеров экрана, вызывает функцию пересчета css переменной --vh
-    window.addEventListener("resize", this.appHeight)
-    // прослушиваетель изменения полноэкранного режима, в полноэкранном режиме устанавливается ориентрация экрана "portrait"
-    window.addEventListener("fullscreenchange", this.setOrientation)
-    this.appHeight()
-  },
-
-  unmounted() {
-    // удаление прослушателей при демонтрировании компонента
-    window.removeEventListener("resize", this.appHeight)
-    window.removeEventListener("fullscreenchange", this.setOrientation)
   },
 })
 </script>
