@@ -12,13 +12,13 @@
           <template #actions>
             <div
               v-if="deckbuilder && deck.deck.id !== 1"
-              @click.stop="change_deck(index)"
               class="icon change"
+              @click.stop="change_deck(index)"
             ></div>
             <div
               v-if="deckbuilder && deck.deck.id !== 1"
-              @click.stop="delete_deck(deck.deck)"
               class="icon delete"
+              @click.stop="delete_deck(deck.deck)"
             ></div>
           </template>
         </deck-preview-comp>
@@ -35,11 +35,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import DeckPreviewComp from "@/components/DeckPreviewComp.vue"
 import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
 import type { DeckEntry, MappedDeck } from "@/types"
 export default defineComponent({
-  name: "deck-selection",
+  name: "DeckSelection",
   components: { YesnoModal, DeckPreviewComp },
   props: {
     deckbuilder: {
@@ -48,11 +49,19 @@ export default defineComponent({
       type: Boolean,
     },
   },
+
+  emits: ["emit_state_deck_index"],
   data() {
     return {
       show_yesno: false as boolean, // показать да\нет по кнопке удалить деку
       deck_id: undefined as number | undefined, // id деки, которую надо удалить
     }
+  },
+
+  computed: {
+    decks(): DeckEntry[] {
+      return this.$store.getters["all_decks"]
+    },
   },
   methods: {
     // осуществить выбор деки для игры, дважды ЛКМ, только на странице игры и не на странице колод
@@ -84,14 +93,6 @@ export default defineComponent({
       this.$emit("emit_state_deck_index", index)
     },
   },
-
-  computed: {
-    decks(): DeckEntry[] {
-      return this.$store.getters["all_decks"]
-    },
-  },
-
-  emits: ["emit_state_deck_index"],
 })
 </script>
 

@@ -12,13 +12,14 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
+import CardItem from "@/components/Cards/CardItem.vue"
+import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
-import CardListComponent from "@/components/Cards/CardListComponent.vue"
-import CardItem from "@/components/Cards/CardItem.vue"
 import type { CardEntry, DeckCardEntry, Leader } from "@/types"
 export default defineComponent({
-  name: "deck-modal",
+  name: "DeckModal",
   components: {
     CardItem,
     CardListComponent,
@@ -35,6 +36,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["close_deck_modal"],
   computed: {
     deckEntries(): CardEntry[] {
       return this.deck
@@ -53,7 +55,6 @@ export default defineComponent({
       this.$emit("close_deck_modal")
     },
   },
-  emits: ["close_deck_modal"],
 })
 </script>
 

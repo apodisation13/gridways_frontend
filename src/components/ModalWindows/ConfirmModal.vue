@@ -16,11 +16,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
+
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
+import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 
 export default defineComponent({
   components: { BaseModal, BaseButton },
+  emits: ["close", "confirm"],
   methods: {
     closeModal(): void {
       this.$emit("close")
@@ -29,7 +31,6 @@ export default defineComponent({
       this.$emit("confirm")
     },
   },
-  emits: ["close", "confirm"],
 })
 </script>
 

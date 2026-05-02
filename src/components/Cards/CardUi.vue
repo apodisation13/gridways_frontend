@@ -94,15 +94,15 @@
           {{ card.charges_delta > 0 ? "+" : "" }}{{ card.charges_delta }}
         </span>
       </div>
-      <div class="card-item-information" v-if="!is_previev">
-        <special-type-of-card :color="c.color" v-if="c.type === 'Special'" />
+      <div v-if="!is_previev" class="card-item-information">
+        <special-type-of-card v-if="c.type === 'Special'" :color="c.color" />
         <card-damage-icon
           v-if="'damage' in card.data"
           :style="background_color(card)"
           :damage="card.data.damage"
         />
-        <card-ability-circle :card="card" v-if="card.ability" />
-        <card-passive :card="card" v-if="card.passive_ability?.name" />
+        <card-ability-circle v-if="card.ability" :card="card" />
+        <card-passive v-if="card.passive_ability?.name" :card="card" />
         <card-charges
           v-if="'charges' in card.data"
           :charge="card.data.charges"
@@ -125,18 +125,19 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle.vue"
-import CardCharges from "@/components/UI/CardsUI/Cards/CardCharges.vue"
+
+import CardDamageIcon from "@/components/UI/CardsUI/CardDamageIcon.vue"
 import CardPassive from "@/components/UI/CardsUI/CardPassive.vue"
 import CardAbilityCircle from "@/components/UI/CardsUI/Cards/AbilityCircleCard.vue"
-import CardDamageIcon from "@/components/UI/CardsUI/CardDamageIcon.vue"
-import HeartIcon from "@/components/UI/CardsUI/HeartIcon.vue"
+import CardCharges from "@/components/UI/CardsUI/Cards/CardCharges.vue"
+import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle.vue"
 import SpecialTypeOfCard from "@/components/UI/CardsUI/Cards/SpecialTypeOfCard.vue"
+import HeartIcon from "@/components/UI/CardsUI/HeartIcon.vue"
 import {
   background_color,
   background_color_charges,
-  background_color_leader,
   background_color_hp,
+  background_color_leader,
   card_margin,
 } from "@/logic/border_styles"
 import type { Card, Leader } from "@/types"
@@ -182,6 +183,7 @@ export default defineComponent({
     // сколько у юзера этой карты
     count: {
       type: Number,
+      default: 0,
     },
     // FIXME: че это
     is_previev: {

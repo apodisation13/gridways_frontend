@@ -7,17 +7,17 @@
 
     <!--Карта игрока, или карта лидера врагов!-->
     <div
+      v-if="!forEnemy && !forEnemyLeader"
       class="card-ui"
       :style="[border(card)]"
-      v-if="!forEnemy && !forEnemyLeader"
     >
       <card-ui v-bind="$props" :card="playerCard" />
     </div>
     <!--А это соответственно карта врага, у неё есть card.move-->
     <div
+      v-if="forEnemy || forEnemyLeader"
       class="card-ui"
       :style="[border(card)]"
-      v-if="forEnemy || forEnemyLeader"
     >
       <enemy-ui :enemy="card" />
     </div>
@@ -26,8 +26,8 @@
 
     <!--Блок кнопок милл, крафт (ТОЛЬКО ДЛЯ ДЕКБИЛДЕРА!!!-->
     <template #footer>
-      <div class="mill_craft_block" v-if="deckbuilder">
-        <div class="divb" v-if="!bonus">
+      <div v-if="deckbuilder" class="mill_craft_block">
+        <div v-if="!bonus" class="divb">
           <button class="global_text btn btn-mill" @click="mill">
             Уничтожить ✕
           </button>
@@ -39,7 +39,7 @@
             Создать ⚒
           </button>
         </div>
-        <div class="divb" v-if="bonus">
+        <div v-if="bonus" class="divb">
           <button class="bonus_count">У вас {{ count }}</button>
         </div>
       </div>
@@ -65,32 +65,33 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import {
-  border_for_card,
-  border_leader,
-  background_color_leader,
-  background_color_hp,
-} from "@/logic/border_styles"
-import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle.vue"
-import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
-import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
-import CardUi from "@/components/Cards/CardUi.vue"
-import EnemyUi from "@/components/Cards/EnemyUi.vue"
-import CardDescriptions from "@/components/Cards/CardDescriptions.vue"
-import {
-  CraftMillCardActionSubtype,
-  type Card,
-  type Leader,
-  type Enemy,
-  type EnemyLeader,
-  type CardEntry,
-  type LeaderEntry,
-} from "@/types"
-import CardActionModal from "@/components/ModalWindows/CardActionModal.vue"
 import { useToast } from "vue-toastification"
 
+import CardDescriptions from "@/components/Cards/CardDescriptions.vue"
+import CardUi from "@/components/Cards/CardUi.vue"
+import EnemyUi from "@/components/Cards/EnemyUi.vue"
+import CardActionModal from "@/components/ModalWindows/CardActionModal.vue"
+import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
+import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
+import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle.vue"
+import {
+  background_color_hp,
+  background_color_leader,
+  border_for_card,
+  border_leader,
+} from "@/logic/border_styles"
+import {
+  type Card,
+  type CardEntry,
+  CraftMillCardActionSubtype,
+  type Enemy,
+  type EnemyLeader,
+  type Leader,
+  type LeaderEntry,
+} from "@/types"
+
 export default defineComponent({
-  name: "card-modal",
+  name: "CardModal",
   components: {
     CardActionModal,
     CardCountTriangle,
@@ -99,10 +100,6 @@ export default defineComponent({
     CardUi,
     ModalWindow,
     ButtonClose,
-  },
-  setup() {
-    const toast = useToast()
-    return { toast }
   },
   props: {
     is_leader: {
@@ -121,6 +118,7 @@ export default defineComponent({
     },
     count: {
       type: Number,
+      default: 0,
     },
     hp_needed: {
       // hp только для декбилдера, для игры не нужно оно
@@ -149,6 +147,11 @@ export default defineComponent({
       required: false,
       default: false,
     },
+  },
+  emits: ["close_card_modal"],
+  setup() {
+    const toast = useToast()
+    return { toast }
   },
   data() {
     return {
@@ -230,7 +233,6 @@ export default defineComponent({
       await this.$store.dispatch("processCraftMillCard", data)
     },
   },
-  emits: ["close_card_modal"],
 })
 </script>
 
