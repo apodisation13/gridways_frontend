@@ -1,13 +1,15 @@
-import { createApp } from "vue"
-import App from "@/App.vue"
 import "@/assets/css/main.css"
+import "vue-toastification/dist/index.css"
+
+import { createApp } from "vue"
+import VueFullscreen from "vue-fullscreen"
+import VueKonva from "vue-konva"
+import Toast from "vue-toastification"
+import Vue3TouchEvents from "vue3-touch-events"
+
+import App from "@/App.vue"
 import router from "@/router/router"
 import store from "@/store"
-import Toast from "vue-toastification"
-import "vue-toastification/dist/index.css"
-import Vue3TouchEvents from "vue3-touch-events"
-import VueKonva from "vue-konva"
-import VueFullscreen from "vue-fullscreen"
 
 const app = createApp(App)
 

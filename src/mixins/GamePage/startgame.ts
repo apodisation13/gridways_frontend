@@ -1,7 +1,8 @@
 import { defineComponent } from "vue"
-import { place_enemies } from "@/logic/game_logic/place_enemies"
+
 import { enemy_leader_ai_move_once } from "@/logic/ai_move/ai_move"
 import { draw_hand } from "@/logic/game_logic/draw_hand"
+import { place_enemies } from "@/logic/game_logic/place_enemies"
 import type { Card } from "@/types"
 
 export default defineComponent({

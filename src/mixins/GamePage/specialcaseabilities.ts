@@ -1,13 +1,14 @@
+import { defineComponent } from "vue"
+
 import { choice_element, copyObj } from "@/lib/utils"
-import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
-import { CardAbility, CardColor, CardType } from "@/types"
-import type { Card, CardEntry, Enemy, Leader } from "@/types"
+import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import {
   change_card_charges,
   remove_dead_card,
 } from "@/logic/player_move/service/service_for_player_move"
-import { defineComponent } from "vue"
+import type { Card, CardEntry, Enemy, Leader } from "@/types"
+import { CardAbility, CardColor, CardType } from "@/types"
 
 export default defineComponent({
   data() {

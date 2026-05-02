@@ -5,14 +5,14 @@ import {
   WORLD_LEADERBOARD,
 } from "@/store/const/api_urls"
 import {
-  FactionStats,
-  CollectionStats,
-  ProgressStats,
-  LeaderboardEntry,
-  UserStatistics,
-  GameStatsRecordType,
-  LeaderboardGameMode,
   ActionContext,
+  CollectionStats,
+  FactionStats,
+  GameStatsRecordType,
+  LeaderboardEntry,
+  LeaderboardGameMode,
+  ProgressStats,
+  UserStatistics,
 } from "@/types"
 
 interface StatisticsState {

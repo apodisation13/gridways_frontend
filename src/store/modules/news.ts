@@ -1,6 +1,6 @@
-import { LIST_NEWS } from "@/store/const/api_urls"
 import { callApi, HttpMethod } from "@/lib/api/api"
-import { NewsItem, ActionContext } from "@/types"
+import { LIST_NEWS } from "@/store/const/api_urls"
+import { ActionContext, NewsItem } from "@/types"
 
 interface NewsState {
   news: NewsItem[] | null
