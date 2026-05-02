@@ -4,6 +4,10 @@ import {
 } from "@/logic/game_logic/timers"
 import { heal_random } from "@/logic/ai_move/passive_abilities/passives_in_field/heal"
 import type { Enemy, GameObj } from "@/types"
+import {
+  incr_random_dmg,
+  incr_self_dmg,
+} from "@/logic/ai_move/passive_abilities/passives_in_field/increase_damage"
 
 export function grave_passives(
   enemy: Enemy,
@@ -16,13 +20,18 @@ export function grave_passives(
 
   const pea = enemy.passive_ability?.name
 
+  timeoutAnimationFlag(
+    enemies_grave[0],
+    "trigger_grave_passive",
+    null,
+    timeout * 0.5
+  )
+
   if (pea === "heal-random") {
     heal_random(enemy, field, enemy_leader, timeout)
-    timeoutAnimationFlag(
-      enemies_grave[0],
-      "trigger_grave_passive",
-      null,
-      timeout * 0.5
-    )
+  } else if (pea === "incr-self-dmg") {
+    incr_self_dmg(enemy, timeout)
+  } else if (pea === "incr-random-dmg") {
+    incr_random_dmg(enemy, field, timeout)
   }
 }

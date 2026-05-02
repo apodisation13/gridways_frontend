@@ -1,59 +1,67 @@
 <template>
   <div>
     <div>{{ seasonName }}</div>
-    <v-stage :config="configKonva">
-      <v-layer>
-        <!--для каждого уровня из списка уровней текущего сезона-->
-        <div v-for="(level, index) in levs" :key="level.id">
-          <!--рисуем звезды сложности, 1,2 или 3-->
-          <v-star :config="starConfig(level, 0)"></v-star>
-          <v-star
-            :config="starConfig(level, w / 2)"
-            v-if="
-              level.level.difficulty === 'normal' ||
-              level.level.difficulty === 'hard'
-            "
-          ></v-star>
-          <v-star
-            :config="starConfig(level, w)"
-            v-if="level.level.difficulty === 'hard'"
-          ></v-star>
-          <!--Прямоугольник уровня, пройден\открыт\закрыт, свечение по фракции-->
-          <v-rect
-            :config="squareConfig(level)"
-            @dblclick="setLevel(level)"
-            @dbltap="setLevel(level)"
-            @pointerup="end"
-            @pointerdown="start(level)"
-          ></v-rect>
-          <!--Текст внутри прямоугольника, или id или значок замка (закрыт)-->
-          <v-text
-            v-if="level.unlocked || !userSeasonUnlocked"
-            :config="textConfig(level)"
-            @dblclick="setLevel(level)"
-            @dbltap="setLevel(level)"
-            @pointerup="end"
-            @pointerdown="start(level)"
-          ></v-text>
-          <!--Значок замка-->
-          <v-image
-            v-else
-            :config="imageConfig(level)"
-            @dblclick="setLevel(index)"
-            @dbltap="setLevel(index)"
-            @pointerup="end"
-            @pointerdown="start(level)"
-          ></v-image>
-          <!--Линии связей-->
-          <!--Для каждой линии из линии связей-->
-          <v-line
-            v-for="line in level.level.lines"
-            :key="line"
-            :config="lineConfig(line)"
-          ></v-line>
-        </div>
-      </v-layer>
-    </v-stage>
+    <div
+      :style="{ cursor: isPanning ? 'grabbing' : 'grab', userSelect: 'none' }"
+      @mousedown="startPan"
+      @mousemove="doPan"
+      @mouseup="endPan"
+      @mouseleave="endPan"
+    >
+      <v-stage :config="configKonva">
+        <v-layer :config="layerCfg">
+          <!--для каждого уровня из списка уровней текущего сезона-->
+          <div v-for="(level, index) in levs" :key="level.id">
+            <!--рисуем звезды сложности, 1,2 или 3-->
+            <v-star :config="starConfig(level, 0)"></v-star>
+            <v-star
+              :config="starConfig(level, w / 2)"
+              v-if="
+                level.level.difficulty === 'normal' ||
+                level.level.difficulty === 'hard'
+              "
+            ></v-star>
+            <v-star
+              :config="starConfig(level, w)"
+              v-if="level.level.difficulty === 'hard'"
+            ></v-star>
+            <!--Прямоугольник уровня, пройден\открыт\закрыт, свечение по фракции-->
+            <v-rect
+              :config="squareConfig(level)"
+              @dblclick="setLevel(level)"
+              @dbltap="setLevel(level)"
+              @pointerup="end"
+              @pointerdown="start(level)"
+            ></v-rect>
+            <!--Текст внутри прямоугольника, или id или значок замка (закрыт)-->
+            <v-text
+              v-if="level.unlocked || !userSeasonUnlocked"
+              :config="textConfig(level)"
+              @dblclick="setLevel(level)"
+              @dbltap="setLevel(level)"
+              @pointerup="end"
+              @pointerdown="start(level)"
+            ></v-text>
+            <!--Значок замка-->
+            <v-image
+              v-else
+              :config="imageConfig(level)"
+              @dblclick="setLevel(index)"
+              @dbltap="setLevel(index)"
+              @pointerup="end"
+              @pointerdown="start(level)"
+            ></v-image>
+            <!--Линии связей-->
+            <!--Для каждой линии из линии связей-->
+            <v-line
+              v-for="line in level.level.lines"
+              :key="line"
+              :config="lineConfig(line)"
+            ></v-line>
+          </div>
+        </v-layer>
+      </v-stage>
+    </div>
     <level-modal
       v-if="show_level_modal"
       :level="level.level"
@@ -92,14 +100,19 @@ export default defineComponent({
     return {
       w: 28,
       configKonva: { width: 1000, height: 1000 },
+      layerCfg: { x: 0, y: 0 },
       levs: [] as any[],
       timer: 0 as ReturnType<typeof setTimeout> | 0,
       level: null as MappedUserLevel | null,
       show_level_modal: false,
+      isPanning: false,
+      panStart: { x: 0, y: 0 },
+      panLayerStart: { x: 0, y: 0 },
     }
   },
   methods: {
     init(): void {
+      this.layerCfg = { x: 0, y: 0 }
       this.levs = [...this.levels]
       this.levs.forEach((level: any) => {
         level.level.lines = [] // добавляем такой ключ, чтобы потом положить туда линии
@@ -295,6 +308,25 @@ export default defineComponent({
     longTap(level: MappedUserLevel): void {
       this.level = level
       this.show_level_modal = true
+    },
+    startPan(e: MouseEvent): void {
+      if (e.button !== 0) return
+      this.isPanning = true
+      this.panStart = { x: e.clientX, y: e.clientY }
+      this.panLayerStart = { x: this.layerCfg.x, y: this.layerCfg.y }
+    },
+    doPan(e: MouseEvent): void {
+      if (!this.isPanning) return
+      const dx = e.clientX - this.panStart.x
+      const dy = e.clientY - this.panStart.y
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+        this.end()
+      }
+      this.layerCfg.x = this.panLayerStart.x + dx
+      this.layerCfg.y = this.panLayerStart.y + dy
+    },
+    endPan(): void {
+      this.isPanning = false
     },
   },
 })

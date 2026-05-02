@@ -73,12 +73,12 @@ export default defineComponent({
       default: false,
     },
     selectedFaction: {
-      type: String as PropType<string | null>,
-      required: true,
+      type: [String, null] as unknown as PropType<string | null>,
+      default: null,
     },
     selectedMode: {
-      type: String as PropType<string | null>,
-      required: true,
+      type: [String, null] as unknown as PropType<string | null>,
+      default: null,
     },
   },
   async created() {

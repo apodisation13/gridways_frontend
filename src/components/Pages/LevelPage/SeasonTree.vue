@@ -1,23 +1,32 @@
 <template>
   <div class="stage-container">
-    <v-stage :config="configKonva" v-if="!showSeasonLevelsTree">
-      <v-layer>
-        <!--для каждого сезона из списка всех сезонов-->
-        <div v-for="season in seasonTree" :key="season.season.id">
-          <!--Прямоугольник сезона, пройден\открыт\закрыт-->
-          <v-rect
-            :config="squareConfig(season)"
-            @dblclick="setSeason(season)"
-            @dbltap="setSeason(season)"
-          ></v-rect>
-          <v-line
-            v-for="line in season.season.lines"
-            :key="line"
-            :config="lineConfig(line)"
-          ></v-line>
-        </div>
-      </v-layer>
-    </v-stage>
+    <div
+      v-if="!showSeasonLevelsTree"
+      :style="{ cursor: isPanning ? 'grabbing' : 'grab', userSelect: 'none' }"
+      @mousedown="startPan"
+      @mousemove="doPan"
+      @mouseup="endPan"
+      @mouseleave="endPan"
+    >
+      <v-stage :config="configKonva">
+        <v-layer :config="layerCfg">
+          <!--для каждого сезона из списка всех сезонов-->
+          <div v-for="season in seasonTree" :key="season.season.id">
+            <!--Прямоугольник сезона, пройден\открыт\закрыт-->
+            <v-rect
+              :config="squareConfig(season)"
+              @dblclick="setSeason(season)"
+              @dbltap="setSeason(season)"
+            ></v-rect>
+            <v-line
+              v-for="line in season.season.lines"
+              :key="line"
+              :config="lineConfig(line)"
+            ></v-line>
+          </div>
+        </v-layer>
+      </v-stage>
+    </div>
     <LevelTree
       :seasonName="seasonName"
       :levels="seasonLevels"
@@ -25,7 +34,11 @@
       v-if="showSeasonLevelsTree && seasonLevels"
     />
     <!-- HTML слой поверх canvas -->
-    <div class="html-overlay" v-if="!showSeasonLevelsTree">
+    <div
+      class="html-overlay"
+      v-if="!showSeasonLevelsTree"
+      :style="{ transform: `translate(${layerCfg.x}px, ${layerCfg.y}px)` }"
+    >
       <div
         v-for="season in seasonTree"
         :key="'label-' + season.season.id"
@@ -228,6 +241,10 @@ export default defineComponent({
     return {
       w: 100,
       configKonva: { width: 1000, height: 1000 },
+      layerCfg: { x: 0, y: 0 },
+      isPanning: false,
+      panStart: { x: 0, y: 0 },
+      panLayerStart: { x: 0, y: 0 },
       seasonTree: [] as any[],
       seasonName: "",
       seasonLevels: [] as MappedUserLevel[],
@@ -241,6 +258,7 @@ export default defineComponent({
   },
   methods: {
     init(): void {
+      this.layerCfg = { x: 0, y: 0 }
       this.seasonTree = [...this.seasons]
       this.seasonTree.forEach((season: any) => {
         season.season.lines = [] // добавляем такой ключ, чтобы потом положить туда линии
@@ -409,6 +427,20 @@ export default defineComponent({
     },
     closeStats(): void {
       this.activeStats = null
+    },
+    startPan(e: MouseEvent): void {
+      if (e.button !== 0) return
+      this.isPanning = true
+      this.panStart = { x: e.clientX, y: e.clientY }
+      this.panLayerStart = { x: this.layerCfg.x, y: this.layerCfg.y }
+    },
+    doPan(e: MouseEvent): void {
+      if (!this.isPanning) return
+      this.layerCfg.x = this.panLayerStart.x + (e.clientX - this.panStart.x)
+      this.layerCfg.y = this.panLayerStart.y + (e.clientY - this.panStart.y)
+    },
+    endPan(): void {
+      this.isPanning = false
     },
   },
   emits: ["level_selected"],

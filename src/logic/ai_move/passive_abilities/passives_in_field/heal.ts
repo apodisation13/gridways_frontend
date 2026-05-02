@@ -79,11 +79,11 @@ export function heal_self_by_highest_hp(
   all_enemies.sort((a, b) => b.data.hp - a.data.hp)
   const target = all_enemies[0] as Enemy
 
-  enemy.hp_delta = target.data.passive.value
+  enemy.hp_delta = target.data.hp
   setTimeout(() => {
     enemy.hp_delta = null
   }, timeout)
-  enemy.data.hp += target.data.passive.value
+  enemy.data.hp += target.data.hp
   timeoutAnimationFlag(enemy, "healing", sound_heal, timeout * 0.5)
 }
 
