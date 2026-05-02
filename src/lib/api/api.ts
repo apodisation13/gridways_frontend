@@ -1,9 +1,10 @@
 import axios, { AxiosError } from "axios"
 import { v4 as uuidv4 } from "uuid"
-import { REFRESH_TOKEN } from "@/store/const/api_urls"
-import store from "@/store"
-import router from "@/router/router"
 import { useToast } from "vue-toastification"
+
+import router from "@/router/router"
+import store from "@/store"
+import { REFRESH_TOKEN } from "@/store/const/api_urls"
 
 export enum HttpMethod {
   GET = "GET",
