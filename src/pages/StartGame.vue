@@ -15,9 +15,9 @@
         <div class="battle-side">
           <span class="global_text battle-label">Колода</span>
           <deck-preview-comp
-            @dblclick="trigger_decks_list_modal(true)"
             :deck="selectedDeck"
             :deckbuilder="true"
+            @dblclick="trigger_decks_list_modal(true)"
           />
         </div>
       </div>
@@ -49,7 +49,7 @@
           />
         </div>
 
-        <button @click="start_game" :disabled="loading" class="btn-start">
+        <button :disabled="loading" class="btn-start" @click="start_game">
           <themed-button title="НАЧАТЬ" />
         </button>
       </div>
@@ -67,13 +67,14 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
-import { GameStatsRecordType, PayResourcesSubtype } from "@/types"
-import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
-import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
-import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
+
 import DeckPreviewComp from "@/components/DeckPreviewComp.vue"
+import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
+import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
+import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
+import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { GameStatsRecordType, PayResourcesSubtype } from "@/types"
 
 export default defineComponent({
   name: "StartGame",
@@ -84,9 +85,6 @@ export default defineComponent({
     DecksListModal,
     ThemedButton,
     ButtonDecks,
-  },
-  created() {
-    this.$store.dispatch("re_set_deck", 100)
   },
   data() {
     return {
@@ -128,6 +126,9 @@ export default defineComponent({
     selectedDeck(): any {
       return this.$store.state.game.whole_deck
     },
+  },
+  created() {
+    this.$store.dispatch("re_set_deck", 100)
   },
   methods: {
     async start_game(): Promise<void> {

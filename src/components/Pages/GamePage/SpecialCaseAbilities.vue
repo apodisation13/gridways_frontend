@@ -19,8 +19,8 @@
 
     <!--а тут только 1 выбранная карта, при абилках играть play_from-->
     <div
-      class="chosen_card_from_deck"
       v-if="show_picked_card"
+      class="chosen_card_from_deck"
       @mousedown="handleCardMouseDown($event)"
       @touchstart="handleCardTouchStart($event)"
     >
@@ -32,23 +32,17 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
-import CardListComponent from "@/components/Cards/CardListComponent.vue"
+
 import CardItem from "@/components/Cards/CardItem.vue"
-import EnemyList from "@/components/Cards/EnemyList.vue"
+import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import EnemyComp from "@/components/Cards/EnemyComp.vue"
+import EnemyList from "@/components/Cards/EnemyList.vue"
+import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import { arrowMixin } from "@/mixins/GamePage/arrow_draw"
 import { Card, CardEntry, CardType, Enemy } from "@/types"
 
 export default defineComponent({
-  name: "special-case-abilities",
-  mixins: [arrowMixin],
-  mounted() {
-    ;(this as any).initArrowCanvas(999)
-  },
-  beforeUnmount() {
-    ;(this as any).removeArrowCanvas()
-  },
+  name: "SpecialCaseAbilities",
   components: {
     EnemyList,
     CardItem,
@@ -56,6 +50,7 @@ export default defineComponent({
     CardListComponent,
     ModalWindow,
   },
+  mixins: [arrowMixin],
   props: {
     cards_pool: {
       required: true,
@@ -83,6 +78,13 @@ export default defineComponent({
       type: Array as PropType<(Enemy | "")[]>,
     },
   },
+  emits: [
+    "confirm_selection",
+    "target_enemy",
+    "target_enemy_leader",
+    "enemy_leader_in_cross",
+    "enemy_in_cross",
+  ],
 
   data() {
     return {
@@ -101,6 +103,12 @@ export default defineComponent({
     enemyPool(): Enemy[] {
       return this.cards_pool as Enemy[]
     },
+  },
+  mounted() {
+    ;(this as any).initArrowCanvas(999)
+  },
+  beforeUnmount() {
+    ;(this as any).removeArrowCanvas()
   },
 
   methods: {
@@ -148,13 +156,6 @@ export default defineComponent({
       ;(enemy as any)["type"] = CardType.Unit
     },
   },
-  emits: [
-    "confirm_selection",
-    "target_enemy",
-    "target_enemy_leader",
-    "enemy_leader_in_cross",
-    "enemy_in_cross",
-  ],
 })
 </script>
 
