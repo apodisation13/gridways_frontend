@@ -185,7 +185,7 @@ export default defineComponent({
     // сколько у юзера этой карты
     count: {
       type: Number,
-      default: 0,
+      default: undefined,
     },
     // FIXME: че это
     is_previev: {
