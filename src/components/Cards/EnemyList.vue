@@ -1,6 +1,6 @@
 <template>
   <div class="enemies">
-    <div class="enemy" v-for="enemy in enemies" :key="enemy.id">
+    <div v-for="enemy in enemies" :key="enemy.id" class="enemy">
       <enemy-comp :enemy="enemy" @dblclick="choseEnemy(enemy)" />
     </div>
   </div>
@@ -8,6 +8,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import EnemyComp from "@/components/Cards/EnemyComp.vue"
 import type { Enemy } from "@/types"
 
@@ -20,12 +21,12 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["chose-enemy"],
   methods: {
     choseEnemy(enemy: Enemy): void {
       this.$emit("chose-enemy", enemy)
     },
   },
-  emits: ["chose-enemy"],
 })
 </script>
 

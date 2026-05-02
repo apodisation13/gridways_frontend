@@ -1,7 +1,7 @@
 <template>
   <div class="emblem_page">
     <div class="logo"></div>
-    <button class="start" @click="toggleApi" :disabled="authInProcess">
+    <button class="start" :disabled="authInProcess" @click="toggleApi">
       НАЧАТЬ
     </button>
   </div>
@@ -9,6 +9,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import { getEnv } from "@/store/const/const"
 
 export default defineComponent({

@@ -1,20 +1,20 @@
 <template>
   <div>
     <div
-      class="card-enemy-component"
+      :id="make_id(enemy, index)"
       :ref="setEnemyRef"
+      v-touch:longtap="show_modal"
+      class="card-enemy-component"
+      :style="border(enemy)"
       @contextmenu.prevent
       @click.right="show_modal"
-      v-touch:longtap="show_modal"
-      :id="make_id(enemy, index)"
-      :style="border(enemy)"
     >
       <enemy-ui :enemy="enemy" />
     </div>
     <card-modal
+      v-if="show_enemy_modal"
       :card="enemy"
       :for-enemy="true"
-      v-if="show_enemy_modal"
       @close_card_modal="show_enemy_modal = false"
     />
   </div>
@@ -22,13 +22,14 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import { border_for_card } from "@/logic/border_styles"
+
 import EnemyUi from "@/components/Cards/EnemyUi.vue"
 import CardModal from "@/components/ModalWindows/CardModal.vue"
+import { border_for_card } from "@/logic/border_styles"
 import type { Enemy } from "@/types"
 
 export default defineComponent({
-  name: "enemy-comp",
+  name: "EnemyComp",
   components: {
     CardModal,
     EnemyUi,
@@ -40,6 +41,7 @@ export default defineComponent({
     },
     index: {
       type: Number,
+      default: undefined,
     },
     in_cross: {
       type: Boolean,

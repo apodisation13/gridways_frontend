@@ -1,9 +1,9 @@
 <template>
   <div>
     <button
-      @click="flag = true"
       class="grave-btn"
       :style="{ backgroundColor: trigger_passive ? 'red' : '' }"
+      @click="flag = true"
     >
       <svg
         class="grave-svg"
@@ -162,13 +162,14 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
+import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
-import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import type { Card, CardEntry, Leader } from "@/types"
 
 export default defineComponent({
-  name: "grave-comp",
+  name: "GraveComp",
   components: { CardListComponent, ButtonClose, ModalWindow },
   props: {
     grave: {

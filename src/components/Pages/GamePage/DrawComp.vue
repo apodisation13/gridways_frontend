@@ -39,10 +39,11 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import { styleWrapper } from "@/logic/border_styles"
 
 export default defineComponent({
-  name: "draw-comp",
+  name: "DrawComp",
   computed: {
     themedStyle(): Record<string, string> | undefined {
       return styleWrapper(this.$store.getters["selectedTheme"])

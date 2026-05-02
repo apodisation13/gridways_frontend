@@ -1,8 +1,9 @@
 import { defineComponent } from "vue"
-import { player_passive_abilities_end_turn } from "@/logic/player_move/player_passive_abilities"
+
 import { ai_move } from "@/logic/ai_move/ai_move"
 import { enemy_passive_abilities_end_turn } from "@/logic/ai_move/ai_passive_abilties"
 import { appear_new_enemy } from "@/logic/game_logic/place_enemies"
+import { player_passive_abilities_end_turn } from "@/logic/player_move/player_passive_abilities"
 import store from "@/store"
 
 export default defineComponent({

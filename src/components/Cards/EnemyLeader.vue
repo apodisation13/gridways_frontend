@@ -1,23 +1,23 @@
 <template>
   <div>
     <div
-      class="enemy-leader"
+      :id="`enemy_leader_${enemy_leader.name}`"
       ref="leaderRef"
+      v-touch:longtap="open_card_modal"
+      class="enemy-leader"
       :style="border(enemy_leader)"
       @contextmenu.prevent
       @click.right="open_card_modal"
-      v-touch:longtap="open_card_modal"
       @dblclick="exec_enemy_leader"
-      :id="`enemy_leader_${enemy_leader.name}`"
     >
       <enemy-ui :enemy="enemy_leader" />
     </div>
     <card-modal
+      v-if="show_enemy_leader_modal"
       :card="enemy_leader"
       :for-enemy-leader="true"
       hp_needed
       :is_leader="true"
-      v-if="show_enemy_leader_modal"
       @close_card_modal="show_enemy_leader_modal = false"
     />
   </div>
@@ -25,13 +25,14 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import { border_leader } from "@/logic/border_styles"
-import CardModal from "@/components/ModalWindows/CardModal.vue"
+
 import EnemyUi from "@/components/Cards/EnemyUi.vue"
+import CardModal from "@/components/ModalWindows/CardModal.vue"
+import { border_leader } from "@/logic/border_styles"
 import type { EnemyLeader as EnemyLeaderType } from "@/types"
 
 export default defineComponent({
-  name: "enemy-leader",
+  name: "EnemyLeader",
   components: {
     EnemyUi,
     CardModal,
@@ -47,6 +48,15 @@ export default defineComponent({
       type: Boolean,
     },
   },
+  emits: ["exec_enemy_leader"],
+  data() {
+    return {
+      show_enemy_leader_modal: false,
+      animationId: null as number | null,
+      animationStartTime: null as number | null,
+      isAnimating: false,
+    }
+  },
   watch: {
     in_cross: {
       immediate: true,
@@ -61,14 +71,6 @@ export default defineComponent({
   },
   beforeUnmount() {
     this.stopAnimation()
-  },
-  data() {
-    return {
-      show_enemy_leader_modal: false,
-      animationId: null as number | null,
-      animationStartTime: null as number | null,
-      isAnimating: false,
-    }
   },
   methods: {
     open_card_modal(): void {
@@ -131,7 +133,6 @@ export default defineComponent({
       this.animationId = requestAnimationFrame(() => this.animate())
     },
   },
-  emits: ["exec_enemy_leader"],
 })
 </script>
 

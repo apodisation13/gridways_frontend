@@ -43,7 +43,7 @@ interface Delta {
 }
 
 export default defineComponent({
-  name: "health-comp",
+  name: "HealthComp",
   data() {
     return {
       delta: null as Delta | null,

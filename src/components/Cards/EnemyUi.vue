@@ -24,7 +24,7 @@
       </div>
       <div class="card-enemy-information">
         <!--Иконка хода для всех врагов, а лидеру врагов не надо, отсюда и условие-->
-        <ability-circle-enemy :enemy="enemy as Enemy" v-if="e.move" />
+        <ability-circle-enemy v-if="e.move" :enemy="enemy as Enemy" />
         <!--Иконка урона, для всех врагов или если у лидера врага есть урон-->
         <card-damage-icon
           v-if="e.data.damage"
@@ -59,19 +59,20 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
+import CardDamageIcon from "@/components/UI/CardsUI/CardDamageIcon.vue"
+import CardPassive from "@/components/UI/CardsUI/CardPassive.vue"
+import AbilityCircleEnemy from "@/components/UI/CardsUI/Enemies/AbilityCircleEnemy.vue"
+import DeathwishAbility from "@/components/UI/CardsUI/Enemies/DeathwishAbility.vue"
+import EnemyLocked from "@/components/UI/CardsUI/Enemies/EnemyLocked.vue"
+import EnemyShield from "@/components/UI/CardsUI/Enemies/EnemyShield.vue"
+import EnemyStatus from "@/components/UI/CardsUI/Enemies/EnemyStatus.vue"
+import HeartIcon from "@/components/UI/CardsUI/HeartIcon.vue"
 import {
   background_color,
   background_color_hp,
   card_margin,
 } from "@/logic/border_styles"
-import DeathwishAbility from "@/components/UI/CardsUI/Enemies/DeathwishAbility.vue"
-import HeartIcon from "@/components/UI/CardsUI/HeartIcon.vue"
-import CardDamageIcon from "@/components/UI/CardsUI/CardDamageIcon.vue"
-import EnemyLocked from "@/components/UI/CardsUI/Enemies/EnemyLocked.vue"
-import AbilityCircleEnemy from "@/components/UI/CardsUI/Enemies/AbilityCircleEnemy.vue"
-import EnemyShield from "@/components/UI/CardsUI/Enemies/EnemyShield.vue"
-import CardPassive from "@/components/UI/CardsUI/CardPassive.vue"
-import EnemyStatus from "@/components/UI/CardsUI/Enemies/EnemyStatus.vue"
 import type { Enemy, EnemyLeader } from "@/types"
 
 export default defineComponent({

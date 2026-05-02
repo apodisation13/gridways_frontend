@@ -10,7 +10,8 @@ export default defineComponent({
   props: {
     heal: {
       type: Number,
-      require: true,
+      required: true,
+      default: 0,
     },
   },
 })

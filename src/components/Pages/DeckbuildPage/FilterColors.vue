@@ -3,7 +3,7 @@
     <div class="global_text filter_title" @click="reset_filter_colors">
       Цвет
     </div>
-    <div class="colors" v-for="color in colors" :key="color[0]">
+    <div v-for="color in colors" :key="color[0]" class="colors">
       <button
         class="color"
         :style="{ backgroundColor: color[1] }"
@@ -18,7 +18,8 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 export default defineComponent({
-  name: "filter-colors",
+  name: "FilterColors",
+  emits: ["set-filter", "reset-filter-colors"],
   data() {
     return {
       colors: [
@@ -36,7 +37,6 @@ export default defineComponent({
       this.$emit("reset-filter-colors")
     },
   },
-  emits: ["set-filter", "reset-filter-colors"],
 })
 </script>
 

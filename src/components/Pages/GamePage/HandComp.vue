@@ -17,12 +17,13 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import CardItem from "@/components/Cards/CardItem.vue"
 import { arrowMixin } from "@/mixins/GamePage/arrow_draw"
 import type { Card, Enemy, EnemyLeader } from "@/types"
 
 export default defineComponent({
-  name: "hand-comp",
+  name: "HandComp",
   components: { CardItem },
   mixins: [arrowMixin],
   props: {
@@ -51,6 +52,13 @@ export default defineComponent({
       default: Infinity,
     },
   },
+  emits: [
+    "chose_player_card",
+    "target_enemy",
+    "target_enemy_leader",
+    "enemy_leader_in_cross",
+    "enemy_in_cross",
+  ],
   data() {
     return {
       effectiveInitialSize: 0,
@@ -113,13 +121,6 @@ export default defineComponent({
       )
     },
   },
-  emits: [
-    "chose_player_card",
-    "target_enemy",
-    "target_enemy_leader",
-    "enemy_leader_in_cross",
-    "enemy_in_cross",
-  ],
 })
 </script>
 

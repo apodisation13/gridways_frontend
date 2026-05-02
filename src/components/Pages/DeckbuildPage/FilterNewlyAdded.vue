@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="global_text filter_title">Добавлено недавно</div>
-    <div class="passives" v-for="passive in passives" :key="String(passive)">
+    <div v-for="passive in passives" :key="String(passive)" class="passives">
       <button class="passive" @click="filtering(passive)">
         {{ passive }}
       </button>
@@ -12,7 +12,8 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 export default defineComponent({
-  name: "filter-newlyadded",
+  name: "FilterNewlyadded",
+  emits: ["set-filter"],
   data() {
     return {
       passives: [true, false] as boolean[],
@@ -23,7 +24,6 @@ export default defineComponent({
       this.$emit("set-filter", "newly_added", passive)
     },
   },
-  emits: ["set-filter"],
 })
 </script>
 

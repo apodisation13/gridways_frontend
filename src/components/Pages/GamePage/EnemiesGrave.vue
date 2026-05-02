@@ -2,8 +2,8 @@
   <div>
     <button
       class="enemies_grave_btn"
-      @click="visible = true"
       :style="{ backgroundColor: trigger_passive ? 'red' : '' }"
+      @click="visible = true"
     >
       <svg
         class="enemies_grave-svg"
@@ -162,13 +162,14 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import EnemyList from "@/components/Cards/EnemyList.vue"
-import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
+import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import type { Enemy, EnemyLeader } from "@/types"
 
 export default defineComponent({
-  name: "enemies-grave",
+  name: "EnemiesGrave",
   components: { EnemyList, ButtonClose, ModalWindow },
   props: {
     enemies_grave: {

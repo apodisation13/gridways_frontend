@@ -128,9 +128,10 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
+import EnemyList from "@/components/Cards/EnemyList.vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
-import EnemyList from "@/components/Cards/EnemyList.vue"
 import type { Enemy, EnemyLeader } from "@/types"
 
 interface FactionColors {
@@ -139,7 +140,7 @@ interface FactionColors {
 }
 
 export default defineComponent({
-  name: "remaining-enemies",
+  name: "RemainingEnemies",
   components: { EnemyList, ButtonClose, ModalWindow },
   props: {
     enemies: {
