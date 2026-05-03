@@ -1,9 +1,9 @@
 <template>
   <div
+    v-touch:longtap="open_deck_view"
     class="deck-stack"
     :class="{ 'deck-selected': isSelected }"
     @click.right="open_deck_view"
-    v-touch:longtap="open_deck_view"
     @contextmenu.prevent
   >
     <!-- Нижние карты стопки (видна только грань) -->
@@ -28,7 +28,7 @@
       </div>
     </div>
     <deck-modal
-      v-if="show_deck"
+      v-if="show_deck && deck.deck.leader"
       :deck="deck.deck.cards"
       :leader="deck.deck.leader"
       @close_deck_modal="show_deck = false"
@@ -38,12 +38,13 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import DeckModal from "@/components/ModalWindows/DeckModal.vue"
 import { background_color_deck } from "@/logic/border_styles"
 import type { DeckEntry } from "@/types"
 
 export default defineComponent({
-  name: "deck-preview-comp",
+  name: "DeckPreviewComp",
   components: { DeckModal },
   props: {
     deck: {

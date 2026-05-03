@@ -1,6 +1,6 @@
+import { choice_element } from "@/lib/utils"
 import { sound_enemy_regain_shield } from "@/logic/play_sounds"
 import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
-import { choice_element } from "@/lib/utils"
 import type { Enemy, EnemyLeader } from "@/types"
 
 export function regain_shield(enemy: Enemy): void {

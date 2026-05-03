@@ -1,7 +1,7 @@
 <template>
   <div class="filter_types">
     <div class="global_text filter_title" @click="reset_filter_types">Тип</div>
-    <div class="types" v-for="type in types" :key="type">
+    <div v-for="type in types" :key="type" class="types">
       <button class="type" @click="filtering(type)">
         {{ type[0] }}
       </button>
@@ -11,10 +11,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import { CardType } from "@/types"
 
 export default defineComponent({
-  name: "filter-types",
+  name: "FilterTypes",
+  emits: ["set-filter", "reset-filter-types"],
   data() {
     return {
       types: [CardType.Unit, CardType.Special] as CardType[],
@@ -28,7 +30,6 @@ export default defineComponent({
       this.$emit("reset-filter-types")
     },
   },
-  emits: ["set-filter", "reset-filter-types"],
 })
 </script>
 

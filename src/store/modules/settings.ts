@@ -1,11 +1,12 @@
+import { useToast } from "vue-toastification"
+
 import { callApi, HttpMethod } from "@/lib/api/api"
 import { USER_PREFERENCES } from "@/store/const/api_urls"
-import { useToast } from "vue-toastification"
-import { UserPreferencesResponse, ActionContext } from "@/types"
+import { ActionContext, UserPreferencesResponse } from "@/types"
 
 const toast = useToast()
 
-interface SettingsState {
+export interface SettingsState {
   theme: number
   avatar: string
   soundOn: boolean

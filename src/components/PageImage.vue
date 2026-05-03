@@ -1,6 +1,6 @@
 <template>
   <div class="page-img-wrapper" :class="{ 'page-img-gradient': withGradient }">
-    <img class="page_img" :src="path" alt="#" v-if="path" />
+    <img v-if="path" class="page_img" :src="path" alt="#" />
   </div>
 </template>
 
@@ -17,25 +17,6 @@ export default defineComponent({
       isWorking: true,
       defaultImg: null as string | null,
     }
-  },
-
-  created() {
-    this.updateTime()
-    this.intervalId = setInterval(() => {
-      this.updateTime()
-    }, 1000)
-  },
-
-  beforeUnmount() {
-    clearInterval(this.intervalId ?? undefined)
-  },
-
-  methods: {
-    updateTime(): void {
-      if (this.isWorking) {
-        this.time = new Date().getHours()
-      }
-    },
   },
 
   computed: {
@@ -65,6 +46,25 @@ export default defineComponent({
     },
     withGradient(): boolean {
       return this.$router.currentRoute.value.meta.withGradient as boolean
+    },
+  },
+
+  created() {
+    this.updateTime()
+    this.intervalId = setInterval(() => {
+      this.updateTime()
+    }, 1000)
+  },
+
+  beforeUnmount() {
+    clearInterval(this.intervalId ?? undefined)
+  },
+
+  methods: {
+    updateTime(): void {
+      if (this.isWorking) {
+        this.time = new Date().getHours()
+      }
     },
   },
 })

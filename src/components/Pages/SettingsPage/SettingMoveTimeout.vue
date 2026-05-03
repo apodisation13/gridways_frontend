@@ -17,7 +17,7 @@
     </div>
 
     <!-- Кнопка генерации -->
-    <base-button @click="setMoveTimeout" :disabled="!isValid">
+    <base-button :disabled="!isValid" @click="setMoveTimeout">
       Сохранить
     </base-button>
   </div>
@@ -25,13 +25,16 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 
 export default defineComponent({
   name: "SettingMoveTimeout",
   components: { BaseButton },
-  created() {
-    this.moveTimeOutValue = this.moveTimeOut
+  data() {
+    return {
+      moveTimeOutValue: 1000 as number | null | "",
+    }
   },
   computed: {
     moveTimeOut(): number {
@@ -58,10 +61,8 @@ export default defineComponent({
       return ""
     },
   },
-  data() {
-    return {
-      moveTimeOutValue: 1000 as number | null | "",
-    }
+  created() {
+    this.moveTimeOutValue = this.moveTimeOut
   },
   methods: {
     setMoveTimeout(): void {

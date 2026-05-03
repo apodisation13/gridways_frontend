@@ -28,15 +28,15 @@
       </v-stage>
     </div>
     <LevelTree
+      v-if="showSeasonLevelsTree && seasonLevels"
       :seasonName="seasonName"
       :levels="seasonLevels"
       :userSeasonUnlocked="userSeasonUnlocked"
-      v-if="showSeasonLevelsTree && seasonLevels"
     />
     <!-- HTML слой поверх canvas -->
     <div
-      class="html-overlay"
       v-if="!showSeasonLevelsTree"
+      class="html-overlay"
       :style="{ transform: `translate(${layerCfg.x}px, ${layerCfg.y}px)` }"
     >
       <div
@@ -53,13 +53,13 @@
         @touchend="handleDoubleTap($event, season)"
       >
         <div class="season-content">
-          <div class="lock-icon" v-if="isLocked(season)">🔒</div>
-          <div class="lock-icon" v-if="isFinished(season)">✅</div>
+          <div v-if="isLocked(season)" class="lock-icon">🔒</div>
+          <div v-if="isFinished(season)" class="lock-icon">✅</div>
           <span class="season-name">{{ season.season.name }}</span>
 
           <div
-            class="season-progress"
             v-if="!isLocked(season) && season.stats?.total_levels"
+            class="season-progress"
           >
             <div class="progress-bar">
               <div
@@ -76,15 +76,15 @@
           <div class="season-actions">
             <button
               class="action-btn"
-              @click.stop="openDescription(season)"
               title="Описание"
+              @click.stop="openDescription(season)"
             >
               ℹ️
             </button>
             <button
               class="action-btn"
-              @click.stop="openStats(season)"
               title="Статистика"
+              @click.stop="openStats(season)"
             >
               📊
             </button>
@@ -202,10 +202,11 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
 import { useToast } from "vue-toastification"
+
 import LevelTree from "@/components/Pages/LevelPage/LevelTree.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import { styleWrapper } from "@/logic/border_styles"
-import type { SeasonEntry, MappedUserLevel, SeasonRelatedSeason } from "@/types"
+import type { MappedUserLevel, SeasonEntry, SeasonRelatedSeason } from "@/types"
 
 export default defineComponent({
   name: "SeasonTree",
@@ -214,28 +215,10 @@ export default defineComponent({
     seasons: { type: Array as PropType<SeasonEntry[]>, required: true },
     seasonLevelsTreeOpened: { type: Boolean, required: true },
   },
+  emits: ["level_selected"],
   setup() {
     const toast = useToast()
     return { toast }
-  },
-  watch: {
-    seasons(oldVal, newVal) {
-      if (oldVal !== newVal) this.init()
-    },
-    seasonLevelsTreeOpened(oldVal, newVal) {
-      if (oldVal !== newVal) {
-        this.showSeasonLevelsTree = this.seasonLevelsTreeOpened
-      }
-    },
-  },
-  created() {
-    this.init()
-    this.showSeasonLevelsTree = this.seasonLevelsTreeOpened
-  },
-  computed: {
-    styleWrapper(): Record<string, string> | undefined {
-      return styleWrapper(this.$store.getters["selectedTheme"])
-    },
   },
   data() {
     return {
@@ -255,6 +238,25 @@ export default defineComponent({
       activeDescription: null as SeasonEntry | null, // хранит сезон с открытым описанием
       activeStats: null as SeasonEntry | null, // хранит статистику сезона для попапа
     }
+  },
+  computed: {
+    styleWrapper(): Record<string, string> | undefined {
+      return styleWrapper(this.$store.getters["selectedTheme"])
+    },
+  },
+  watch: {
+    seasons(oldVal, newVal) {
+      if (oldVal !== newVal) this.init()
+    },
+    seasonLevelsTreeOpened(oldVal, newVal) {
+      if (oldVal !== newVal) {
+        this.showSeasonLevelsTree = this.seasonLevelsTreeOpened
+      }
+    },
+  },
+  created() {
+    this.init()
+    this.showSeasonLevelsTree = this.seasonLevelsTreeOpened
   },
   methods: {
     init(): void {
@@ -443,7 +445,6 @@ export default defineComponent({
       this.isPanning = false
     },
   },
-  emits: ["level_selected"],
 })
 </script>
 <style scoped>

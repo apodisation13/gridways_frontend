@@ -1,5 +1,5 @@
 import { change_card_charges } from "@/logic/player_move/service/service_for_player_move"
-import type { Card, Leader, GameObj } from "@/types"
+import type { Card, GameObj, Leader } from "@/types"
 
 export function give_charges_to_all(
   card: Card,
@@ -14,6 +14,6 @@ export function give_charges_to_all(
   if (grave.length > 0) targets = targets.concat(grave)
 
   targets.forEach(target => {
-    change_card_charges(target, card.data.value, timeout)
+    change_card_charges(target, card.data?.value || 0, timeout)
   })
 }

@@ -1,6 +1,6 @@
-import { sound_passive_increase_damage } from "@/logic/play_sounds"
-import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { choice } from "@/lib/utils"
+import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import type { Card, GameObj } from "@/types"
 
 export function incr_self_dmg(
@@ -14,11 +14,11 @@ export function incr_self_dmg(
     deck_or_grave ? null : sound_passive_increase_damage,
     timeout * 0.5
   )
-  card.p_dmg_delta = card.data.passive.value
+  card.p_dmg_delta = card.data.passive?.value ?? 0
   setTimeout(() => {
     card.p_dmg_delta = null
   }, timeout * 0.5)
-  card.data.damage += card.data.passive.value
+  card.data.damage += card.data.passive?.value ?? 0
 }
 
 export function incr_dmg_to_random(
@@ -29,7 +29,7 @@ export function incr_dmg_to_random(
   timeout = 1000
 ): void {
   const { hand, deck, grave } = gameObj
-  let target
+  let target: Card | undefined
   if (to === "hand") {
     if (!hand.length) return
     let random = choice(hand)
@@ -44,17 +44,19 @@ export function incr_dmg_to_random(
     target = grave[random]
   }
 
+  if (!target) return
+
   timeoutAnimationFlag(
     target,
     "incr_dmg",
     deck_or_grave ? null : sound_passive_increase_damage,
     timeout * 0.5
   )
-  target.p_dmg_delta = card.data.passive.value
+  target.p_dmg_delta = card.data.passive?.value ?? 0
   setTimeout(() => {
     target.p_dmg_delta = null
   }, timeout * 0.5)
-  target.data.damage += card.data.passive.value
+  target.data.damage += card.data.passive?.value ?? 0
 }
 
 export function inc_dmg_by_len_grave(

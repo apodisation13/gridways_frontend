@@ -6,17 +6,18 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 
 export default defineComponent({
-  name: "button-close",
+  name: "ButtonClose",
   components: { ThemedButton },
+  emits: ["close_self"],
   methods: {
     close(): void {
       this.$emit("close_self")
     },
   },
-  emits: ["close_self"],
 })
 </script>
 

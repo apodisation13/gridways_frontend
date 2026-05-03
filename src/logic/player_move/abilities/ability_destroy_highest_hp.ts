@@ -1,6 +1,6 @@
-import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
 import { sound_destroy_enemy } from "@/logic/play_sounds"
 import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
+import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
 import type { GameObj } from "@/types"
 
 export function destroy_highest_hp(gameObj: GameObj, timeout = 1000): void {

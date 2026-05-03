@@ -15,6 +15,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 
 export default defineComponent({
@@ -26,12 +27,12 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["select-setting"],
   methods: {
     selectSetting(index: number): void {
       this.$emit("select-setting", index)
     },
   },
-  emits: ["select-setting"],
 })
 </script>
 

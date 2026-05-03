@@ -16,6 +16,7 @@ export default defineComponent({
       type: Number,
     },
     cardColor: {
+      type: String,
       required: true,
       default: "",
     },

@@ -20,6 +20,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import { styleOuter, styleWrapper } from "@/logic/border_styles"
 
 export default defineComponent({

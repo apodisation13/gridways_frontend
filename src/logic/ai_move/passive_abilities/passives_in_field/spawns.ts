@@ -1,12 +1,12 @@
-import store from "@/store"
 import { choice, choice_element, copyObj } from "@/lib/utils"
-import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
-import { get_empty_field_indexes } from "@/logic/player_move/service/service_for_player_move"
 import {
   create_token,
   create_token_with_passive,
 } from "@/logic/ai_move/service/service_for_ai_move"
+import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { sound_appear_new_enemy } from "@/logic/play_sounds"
+import { get_empty_field_indexes } from "@/logic/player_move/service/service_for_player_move"
+import store from "@/store"
 import type { Enemy, GameObj } from "@/types"
 
 // создает свою копию без пассивной способности в колоде врагов
@@ -28,9 +28,11 @@ export function spawn_tokens_in_deck(
   gameObj: GameObj,
   timeout = 1000
 ): void {
+  const spawn_tokens_number = enemy.data?.passive?.value
+  if (!spawn_tokens_number) return
   const { enemies } = gameObj
   const token = create_token(enemy)
-  for (let i = 0; i < enemy.data.passive.value; i++) {
+  for (let i = 0; i < spawn_tokens_number; i++) {
     enemies.push(copyObj(token))
   }
   timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)

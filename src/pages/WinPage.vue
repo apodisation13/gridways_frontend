@@ -75,8 +75,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import { getRewardForLevel } from "@/logic/random_rewards"
+
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { getRewardForLevel } from "@/logic/random_rewards"
 import {
   GameStatsRecordType,
   LeaderboardGameMode,
@@ -85,7 +86,7 @@ import {
 } from "@/types"
 
 export default defineComponent({
-  name: "win-page",
+  name: "WinPage",
   components: { ResourceItem },
   data() {
     return {

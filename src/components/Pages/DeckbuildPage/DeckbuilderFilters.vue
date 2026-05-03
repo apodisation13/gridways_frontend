@@ -2,7 +2,7 @@
   <base-modal @close-modal="closeModal">
     <div class="deck_builder_filters">
       <button-close-img @click="closeModal" />
-      <filter-factions @set-filter="setFilter" v-if="!deckBuilding" />
+      <filter-factions v-if="!deckBuilding" @set-filter="setFilter" />
       <filter-types @set-filter="setFilter" />
       <filter-colors @set-filter="setFilter" />
       <filter-passives @set-filter="setFilter" />
@@ -15,14 +15,15 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions.vue"
-import FilterTypes from "@/components/Pages/DeckbuildPage/FilterTypes.vue"
-import FilterColors from "@/components/Pages/DeckbuildPage/FilterColors.vue"
-import FilterPassives from "@/components/Pages/DeckbuildPage/FilterPassives.vue"
-import FilterUnlocked from "@/components/Pages/DeckbuildPage/FilterUnlocked.vue"
+
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
-import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
+import FilterColors from "@/components/Pages/DeckbuildPage/FilterColors.vue"
+import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions.vue"
 import FilterNewlyadded from "@/components/Pages/DeckbuildPage/FilterNewlyAdded.vue"
+import FilterPassives from "@/components/Pages/DeckbuildPage/FilterPassives.vue"
+import FilterTypes from "@/components/Pages/DeckbuildPage/FilterTypes.vue"
+import FilterUnlocked from "@/components/Pages/DeckbuildPage/FilterUnlocked.vue"
+import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 
 export default defineComponent({
   components: {
@@ -40,6 +41,7 @@ export default defineComponent({
       type: Boolean,
     },
   },
+  emits: ["close-modal", "reset-filters", "set-filter"],
   methods: {
     closeModal(): void {
       this.$emit("close-modal")
@@ -51,7 +53,6 @@ export default defineComponent({
       this.$emit("set-filter", prop, value)
     },
   },
-  emits: ["close-modal", "reset-filters", "set-filter"],
 })
 </script>
 

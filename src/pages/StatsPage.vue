@@ -78,9 +78,10 @@
 </template>
 
 <script lang="ts">
-import FactionItem from "@/components/Pages/DeckbuildPage/FactionItem.vue"
 import { defineComponent } from "vue"
-import type { FactionStats, CollectionStats, ProgressStats } from "@/types"
+
+import FactionItem from "@/components/Pages/DeckbuildPage/FactionItem.vue"
+import type { CollectionStats, FactionStats, ProgressStats } from "@/types"
 
 export default defineComponent({
   name: "StatsPage",

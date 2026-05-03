@@ -104,32 +104,33 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import { damage_ai_card } from "@/logic/player_move/player_move"
-import draw from "@/mixins/GamePage/draw"
-import specialcaseabilities from "@/mixins/GamePage/specialcaseabilities"
-import execaimove from "@/mixins/GamePage/execaimove"
-import startgame from "@/mixins/GamePage/startgame"
-import FieldComp from "@/components/Pages/GamePage/FieldComp.vue"
+
 import EnemyLeader from "@/components/Cards/EnemyLeader.vue"
-import RemainingEnemies from "@/components/Pages/GamePage/EnemiesRemaining.vue"
-import EnemiesGrave from "@/components/Pages/GamePage/EnemiesGrave.vue"
-import DrawComp from "@/components/Pages/GamePage/DrawComp.vue"
-import PassComp from "@/components/Pages/GamePage/PassComp.vue"
-import GraveComp from "@/components/Pages/GamePage/GraveComp.vue"
 import DeckComp from "@/components/Pages/GamePage/DeckComp.vue"
-import LeaderComp from "@/components/Pages/GamePage/LeaderComp.vue"
-import HealthComp from "@/components/Pages/GamePage/HealthComp.vue"
+import DrawComp from "@/components/Pages/GamePage/DrawComp.vue"
+import EnemiesGrave from "@/components/Pages/GamePage/EnemiesGrave.vue"
+import RemainingEnemies from "@/components/Pages/GamePage/EnemiesRemaining.vue"
+import FieldComp from "@/components/Pages/GamePage/FieldComp.vue"
+import GraveComp from "@/components/Pages/GamePage/GraveComp.vue"
 import HandComp from "@/components/Pages/GamePage/HandComp.vue"
-import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities.vue"
+import HealthComp from "@/components/Pages/GamePage/HealthComp.vue"
+import LeaderComp from "@/components/Pages/GamePage/LeaderComp.vue"
+import PassComp from "@/components/Pages/GamePage/PassComp.vue"
 import RedrawComp from "@/components/Pages/GamePage/RedrawComp.vue"
+import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities.vue"
+import { damage_ai_card } from "@/logic/player_move/player_move"
 import { remove_dead_card } from "@/logic/player_move/service/service_for_player_move"
+import draw from "@/mixins/GamePage/draw"
+import execaimove from "@/mixins/GamePage/execaimove"
+import specialcaseabilities from "@/mixins/GamePage/specialcaseabilities"
+import startgame from "@/mixins/GamePage/startgame"
 import type {
   Card,
-  Leader,
   Enemy,
   EnemyLeader as EnemyLeaderType,
   GameObj,
   IsActive,
+  Leader,
 } from "@/types"
 
 export default defineComponent({
@@ -149,15 +150,6 @@ export default defineComponent({
     SpecialCaseAbilities,
   },
   mixins: [draw, specialcaseabilities, execaimove, startgame],
-
-  async created(): Promise<void> {
-    // если мы перешли на эту страницу НЕ со страницы начала игры, где стоит этот флаг, нас отсюда перекинет
-    if (!this.$store.state.game.start_game_redirect) {
-      this.$router.push("/start_game")
-    }
-    this.$store.commit("set_start_game_redirect", false)
-    this.start_game() // в МИКСИНЕ теперь
-  },
 
   data() {
     return {
@@ -190,6 +182,56 @@ export default defineComponent({
       inCrossEnemyIndex: null as number | null,
     }
   },
+  computed: {
+    // можем ли мы сыграть КАРТОЙ в ПОЛЕ: карты активны, лидер неактивен ИЛИ мы играем карту из sca
+    targetEnemyByCard(): boolean {
+      return !!(
+        (this.isActive.player_cards &&
+          !this.isActive.player_leader &&
+          this.isActive.enemy_cards &&
+          this.selected_enemy) ||
+        this.sca
+      )
+    },
+    // можем ли мы сыграть ЛИДЕРОМ в ПОЛЕ: лидер активен, у него больше нуля зарядов
+    targetEnemyByLeader(): boolean {
+      return !!(
+        this.isActive.player_leader &&
+        this.gameObj.leader.data.charges > 0 &&
+        this.isActive.enemy_cards &&
+        this.selected_enemy
+      )
+    },
+    // можем ли мы сыграть КАРТОЙ в ЛИДЕРА ВРАГОВ: карты активны, лидер неактивен ИЛИ мы играем карту из sca
+    targetEnemyLeaderByCard(): boolean {
+      return (
+        (this.isActive.player_cards &&
+          !this.isActive.player_leader &&
+          this.isActive.enemy_leader &&
+          this.gameObj.enemy_leader.data.hp > 0) ||
+        this.sca
+      )
+    },
+    // можем ли мы сыграть ЛИДЕРОМ в ЛИДЕРА ВРАГОВ: лидеры активны, у них больше нуля зарядов и нуля жизней
+    targetEnemyLeaderByLeader(): boolean {
+      return (
+        this.isActive.player_leader &&
+        this.gameObj.leader.data.charges > 0 &&
+        this.isActive.enemy_leader &&
+        this.gameObj.enemy_leader.data.hp > 0
+      )
+    },
+  },
+
+  async created(): Promise<void> {
+    // если мы перешли на эту страницу НЕ со страницы начала игры, где стоит этот флаг, нас отсюда перекинет
+    if (!this.$store.state.game.start_game_redirect) {
+      this.$router.push("/start_game")
+    }
+    this.$store.commit("set_start_game_redirect", false)
+    this.start_game() // в МИКСИНЕ теперь
+  },
+
   methods: {
     // по нажатию на карту игрока, из hand-comp, card - вся карта целиком
     chose_player_card(card: Card): void {
@@ -227,7 +269,7 @@ export default defineComponent({
       // а если надо, то сбросим ПОСЛЕ того как закроем окно с выбором карты, чтобы анимации увидеть тут
       if (!this.show_pick_a_card_selection) {
         remove_dead_card(
-          this.selected_card,
+          this.selected_card!,
           this.gameObj.grave,
           this.gameObj.hand,
           this.gameObj.deck
@@ -252,7 +294,7 @@ export default defineComponent({
     damageEnemyByCard(): void {
       if (!this.targetEnemyByCard) return
 
-      damage_ai_card(this.selected_card, this.selected_enemy, this.gameObj)
+      damage_ai_card(this.selected_card!, this.selected_enemy!, this.gameObj)
 
       // снимаем флаг активности карт игрока, ОДНА КАРТА ЗА ХОД! станет ТРУ только после окончания хода компа!
       // если мы играли первый раз картой из руки, то всё равно заблокируем руку, так как sca ЕЩЁ не было на тот момент
@@ -264,7 +306,7 @@ export default defineComponent({
     damageEnemyByLeader(): void {
       if (!this.targetEnemyByLeader) return
 
-      damage_ai_card(this.gameObj.leader, this.selected_enemy, this.gameObj)
+      damage_ai_card(this.gameObj.leader!, this.selected_enemy!, this.gameObj)
       this.afterDamage()
       this.isActive.player_leader = false // лидер снова неактивен, чтобы ходить им снова - надо опять на него тыкать
     },
@@ -281,8 +323,8 @@ export default defineComponent({
       if (!this.targetEnemyLeaderByCard) return
 
       damage_ai_card(
-        this.selected_card,
-        this.gameObj.enemy_leader,
+        this.selected_card!,
+        this.gameObj.enemy_leader!,
         this.gameObj
       )
       if (!this.sca) this.isActive.player_cards = false
@@ -293,8 +335,8 @@ export default defineComponent({
       if (!this.targetEnemyLeaderByLeader) return
 
       damage_ai_card(
-        this.gameObj.leader,
-        this.gameObj.enemy_leader,
+        this.gameObj.leader!,
+        this.gameObj.enemy_leader!,
         this.gameObj
       )
       this.afterDamage()
@@ -309,46 +351,6 @@ export default defineComponent({
       // index - это или null если мы ушли мышкой с клетки поля, или индекс поля врага
       this.inCrossEnemyLeader = false
       this.inCrossEnemyIndex = index
-    },
-  },
-  computed: {
-    // можем ли мы сыграть КАРТОЙ в ПОЛЕ: карты активны, лидер неактивен ИЛИ мы играем карту из sca
-    targetEnemyByCard(): boolean {
-      return !!(
-        (this.isActive.player_cards &&
-          !this.isActive.player_leader &&
-          this.isActive.enemy_cards &&
-          this.selected_enemy) ||
-        this.sca
-      )
-    },
-    // можем ли мы сыграть ЛИДЕРОМ в ПОЛЕ: лидер активен, у него больше нуля зарядов
-    targetEnemyByLeader(): boolean {
-      return !!(
-        this.isActive.player_leader &&
-        this.gameObj.leader.data.charges > 0 &&
-        this.isActive.enemy_cards &&
-        this.selected_enemy
-      )
-    },
-    // можем ли мы сыграть КАРТОЙ в ЛИДЕРА ВРАГОВ: карты активны, лидер неактивен ИЛИ мы играем карту из sca
-    targetEnemyLeaderByCard(): boolean {
-      return !!(
-        (this.isActive.player_cards &&
-          !this.isActive.player_leader &&
-          this.isActive.enemy_leader &&
-          this.gameObj.enemy_leader.data.hp > 0) ||
-        this.sca
-      )
-    },
-    // можем ли мы сыграть ЛИДЕРОМ в ЛИДЕРА ВРАГОВ: лидеры активны, у них больше нуля зарядов и нуля жизней
-    targetEnemyLeaderByLeader(): boolean {
-      return !!(
-        this.isActive.player_leader &&
-        this.gameObj.leader.data.charges > 0 &&
-        this.isActive.enemy_leader &&
-        this.gameObj.enemy_leader.data.hp > 0
-      )
     },
   },
 })

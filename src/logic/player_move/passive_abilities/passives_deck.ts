@@ -1,8 +1,8 @@
-import { destroy_2_enemies } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_2_enemies"
 import {
   allowActionTimer,
   timeoutAnimationFlag,
 } from "@/logic/game_logic/timers"
+import { destroy_2_enemies } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_2_enemies"
 import {
   incr_dmg_to_random,
   incr_self_dmg,

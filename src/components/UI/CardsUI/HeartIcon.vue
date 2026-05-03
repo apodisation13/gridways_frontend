@@ -24,9 +24,11 @@ export default defineComponent({
   props: {
     health: {
       type: [Number, String],
+      default: 0,
     },
     bgColor: {
       type: String,
+      default: "",
     },
     hp_delta: {
       type: Number,

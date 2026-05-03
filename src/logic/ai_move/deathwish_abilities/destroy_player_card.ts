@@ -1,5 +1,5 @@
-import { sound_deathwish } from "@/logic/play_sounds"
 import { choice_pop } from "@/lib/utils"
+import { sound_deathwish } from "@/logic/play_sounds"
 import type { GameObj } from "@/types"
 
 // уничтожает случайную карту игрока из его колоды

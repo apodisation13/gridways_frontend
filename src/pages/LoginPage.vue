@@ -1,20 +1,20 @@
 <template>
   <div class="container">
     <!-- HEADER -->
-    <div class="header" v-if="error">
+    <div v-if="error" class="header">
       <div class="global_text header__welcome">Введены некорректные данные</div>
       <div class="header__login">
         {{ error }}
       </div>
     </div>
-    <div class="header" v-else-if="formLogin">
+    <div v-else-if="formLogin" class="header">
       <div class="global_text header__welcome">Добрый день!</div>
       <div class="header__login">
         Войдите в систему ниже<br />
         или <a @click.prevent="choseFormRegister">создайте учетную запись</a>
       </div>
     </div>
-    <div class="header" v-else-if="!formLogin">
+    <div v-else-if="!formLogin" class="header">
       <div class="global_text header__welcome">Создать аккаунт</div>
       <div class="header__login">
         Создайте учетную запись ниже<br />или
@@ -23,29 +23,29 @@
     </div>
 
     <!-- Форма, включая поле с дополнительными функциями -->
-    <form v-on:submit.prevent class="form">
+    <form class="form" @submit.prevent>
       <div class="form__content">
         <div class="inputs">
           <div class="form__auth">
             <label for="email" class="form__label">Почта</label>
             <input
+              id="email"
+              v-model="email"
               :class="email_valid ? '' : 'form__data_error'"
               class="form__data"
-              v-model="email"
-              id="email"
               autocomplete="off"
               @focus="input_enabled = true"
               @blur="input_enabled = false"
             />
           </div>
-          <div class="form__auth" v-if="!formLogin">
+          <div v-if="!formLogin" class="form__auth">
             <label class="form__label" for="username"
               >Введите имя пользователя</label
             >
             <input
-              class="form__data"
-              v-model="username"
               id="username"
+              v-model="username"
+              class="form__data"
               autocomplete="off"
               @focus="input_enabled = true"
               @blur="input_enabled = false"
@@ -54,13 +54,13 @@
           <div class="form__auth form__auth_pass">
             <label class="form__label" for="password">Пароль</label>
             <input
+              id="password"
+              v-model="password"
               :class="password_valid ? '' : 'form__data_error'"
               class="form__data"
-              v-model="password"
-              id="password"
               type="password"
               autocomplete="off"
-              v-on:keyup.enter="login"
+              @keyup.enter="login"
               @focus="input_enabled = true"
               @blur="input_enabled = false"
             />
@@ -68,18 +68,18 @@
               <div class="eye__apple"></div>
             </div>
           </div>
-          <div class="form__auth form__auth_pass" v-if="!formLogin">
+          <div v-if="!formLogin" class="form__auth form__auth_pass">
             <label class="form__label" for="confirm-password">
               Подтверждение пароля
             </label>
             <input
+              id="confirm-password"
+              v-model="confirm_password"
               :class="confirm_password_valid ? '' : 'form__data_error'"
               class="form__data"
-              v-model="confirm_password"
-              id="confirm-password"
               type="password"
               autocomplete="off"
-              v-on:keyup.enter="userRegister"
+              @keyup.enter="userRegister"
               @focus="input_enabled = true"
               @blur="input_enabled = false"
             />
@@ -90,7 +90,7 @@
         </div>
 
         <!-- Поле с дополнительными функциями -->
-        <div class="form__additional" v-if="formLogin && !input_enabled">
+        <div v-if="formLogin && !input_enabled" class="form__additional">
           <div class="form__login-with">
             <a
               class="login-with__btn login-with__google"
@@ -109,13 +109,13 @@
             <a class="forgot__text">Забыли пароль?</a>
           </div>
         </div>
-        <div class="form__additional" v-else-if="!formLogin && !input_enabled">
+        <div v-else-if="!formLogin && !input_enabled" class="form__additional">
           <div class="form__agree">
             <div class="agree__user">
               <div
                 class="checkbox"
-                @click="is_user_agree = !is_user_agree"
                 :style="bgImage(is_user_agree)"
+                @click="is_user_agree = !is_user_agree"
               ></div>
               <p>
                 Я ознакомился с
@@ -144,18 +144,18 @@
       <!-- Кнопки входа и регистрации -->
       <div class="form__btn">
         <button
-          class="btn__login"
           v-if="formLogin"
-          @click="login"
+          class="btn__login"
           :disabled="!(email && password)"
+          @click="login"
         >
           <span>Войти</span>
         </button>
         <button
-          class="btn__login"
           v-else
-          @click="userRegister"
+          class="btn__login"
           :disabled="userRegisterDisabled"
+          @click="userRegister"
         >
           <span>Регистрация</span>
         </button>
@@ -177,6 +177,7 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import { useToast } from "vue-toastification"
+
 import AgreementModal from "@/components/ModalWindows/AgreementModal.vue"
 import PolicyModal from "@/components/ModalWindows/PolicyModal.vue"
 
@@ -185,9 +186,6 @@ export default defineComponent({
   setup() {
     const toast = useToast()
     return { toast }
-  },
-  created() {
-    this.formLogin = this.isRegistration !== "true"
   },
   data() {
     return {
@@ -225,6 +223,9 @@ export default defineComponent({
     normalizedEmail(): string {
       return this.email.trim().toLowerCase()
     },
+  },
+  created() {
+    this.formLogin = this.isRegistration !== "true"
   },
   methods: {
     async login(): Promise<void> {

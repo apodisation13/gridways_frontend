@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint --max-warnings 0"
+    "lint": "vue-cli-service lint --max-warnings 0",
+    "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",
@@ -27,7 +28,9 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-async-to-generator": "^7.25.9",
+    "@types/lodash": "^4.17.24",
     "@types/node": "^25.6.0",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.58.2",
     "@typescript-eslint/parser": "^8.58.2",
     "@vue/cli-plugin-babel": "~5.0.8",
@@ -40,14 +43,12 @@
     "@vue/eslint-config-prettier": "^9.0.0",
     "css-loader": "^6.11.0",
     "eslint": "^8.57.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-promise": "^6.6.0",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
     "eslint-plugin-vue": "^9.31.0",
     "prettier": "^3.4.1",
-    "typescript": "^6.0.2"
+    "typescript": "^6.0.2",
+    "vue-tsc": "^3.2.7"
   },
   "browserslist": [
     "> 1%",

@@ -7,11 +7,14 @@ export function if_in_grave_spawn_self_in_enemy_grave(
   gameObj: GameObj,
   timeout = 1000
 ): void {
+  const value = card.data?.passive?.value
+  if (!value) return
+
   const { enemies_grave } = gameObj
 
   const self = copyObj(card)
-  self.data.hp = card.data.passive.value
-  self.data.base.base_hp = card.data.passive.value
+  self.data.hp = value
+  self.data.base.base_hp = value
   ;(self as any).move = {
     name: "down",
     description:

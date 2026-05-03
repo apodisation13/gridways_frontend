@@ -1,10 +1,10 @@
 <template>
   <div class="passive" :class="{ 'passive-inline': inline }">
     <div
-      class="passive-clock"
       v-if="!card || card.data?.passive?.timer === 0"
+      class="passive-clock"
     ></div>
-    <div class="passive-timer" v-else>
+    <div v-else class="passive-timer">
       <span class="passive-timer-value">{{ card.data.passive?.timer }}</span>
     </div>
   </div>
@@ -12,7 +12,8 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import type { Card, Leader, Enemy } from "@/types"
+
+import type { Card, Enemy, Leader } from "@/types"
 export default defineComponent({
   props: {
     card: {

@@ -12,7 +12,8 @@ export default defineComponent({
   props: {
     damage: {
       type: Number,
-      require: true,
+      required: true,
+      default: 0,
     },
   },
 })

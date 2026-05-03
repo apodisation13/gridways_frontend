@@ -1,13 +1,13 @@
-import {
-  allowActionTimer,
-  timeoutAnimationFlag,
-} from "@/logic/game_logic/timers"
 import { heal_random } from "@/logic/ai_move/passive_abilities/passives_in_field/heal"
-import type { Enemy, GameObj } from "@/types"
 import {
   incr_random_dmg,
   incr_self_dmg,
 } from "@/logic/ai_move/passive_abilities/passives_in_field/increase_damage"
+import {
+  allowActionTimer,
+  timeoutAnimationFlag,
+} from "@/logic/game_logic/timers"
+import type { Enemy, GameObj } from "@/types"
 
 export function grave_passives(
   enemy: Enemy,

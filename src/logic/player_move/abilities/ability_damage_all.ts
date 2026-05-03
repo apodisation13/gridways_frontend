@@ -1,6 +1,6 @@
 import { sound_damage_all } from "@/logic/play_sounds"
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
-import type { Card, Enemy, Leader, GameObj } from "@/types"
+import type { Card, Enemy, GameObj, Leader } from "@/types"
 
 export function damage_all(
   field: (Enemy | "")[],

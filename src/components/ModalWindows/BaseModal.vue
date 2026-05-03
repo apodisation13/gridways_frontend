@@ -1,7 +1,7 @@
 <template>
   <div class="background_layout_modal" @click.stop="hideModal">
     <div class="wrapper_modal">
-      <div @click.stop class="modal">
+      <div class="modal" @click.stop>
         <slot></slot>
       </div>
     </div>
@@ -11,12 +11,12 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 export default defineComponent({
+  emits: ["close-modal"],
   methods: {
     hideModal(): void {
       this.$emit("close-modal")
     },
   },
-  emits: ["close-modal"],
 })
 </script>
 

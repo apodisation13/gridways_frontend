@@ -1,7 +1,7 @@
-import store from "@/store"
-import { sound_enemy_damage_player, sound_hit_armor } from "@/logic/play_sounds"
 import { check_lose } from "@/logic/ai_move/service/check_lose"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import { sound_enemy_damage_player, sound_hit_armor } from "@/logic/play_sounds"
+import store from "@/store"
 import type { Enemy } from "@/types"
 
 export function damage_player(

@@ -18,7 +18,7 @@
 import { defineComponent } from "vue"
 export default defineComponent({
   props: {
-    deck_name: String,
+    deck_name: { type: String, default: "" },
   },
   emits: ["change_name_deck"],
 })

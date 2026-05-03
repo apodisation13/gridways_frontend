@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper_modal" @click.stop="hideModal">
-    <div @click.stop class="modal">
+    <div class="modal" @click.stop>
       <img
         class="close-btn"
         src="@/assets/icons/buttons/x-circle.svg"
@@ -600,14 +600,15 @@ export default defineComponent({
     text: {
       type: String,
       required: false,
+      default: "",
     },
   },
+  emits: ["close-modal"],
   methods: {
     hideModal(): void {
       this.$emit("close-modal")
     },
   },
-  emits: ["close-modal"],
 })
 </script>
 

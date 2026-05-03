@@ -1,9 +1,10 @@
 import store from "@/store"
-import { CardColor } from "@/types"
 import type { Enemy, EnemyLeader } from "@/types"
+import { CardColor } from "@/types"
 
 function getRandomLevelConst() {
-  const stateInfo = store.state.game.random_level_enemies_count
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const stateInfo = store.state.game.random_level_enemies_count as any
   const easy = {
     Bronzes: stateInfo?.easy?.bronzes || [5, 6, 7],
     Silvers: stateInfo?.easy?.silvers || [2, 3],

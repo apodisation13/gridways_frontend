@@ -4,30 +4,30 @@
       <button-icon
         class="filter_btn"
         :class="{ 'is-cancel': isCansel }"
-        @click="clickAddButton"
         :image_name="'add_icon.svg'"
+        @click="clickAddButton"
       />
       <button-toggle-card-list
-        @click="showList('leaders')"
         :isActive="showingList === 'leaders'"
+        @click="showList('leaders')"
         >Лидеры</button-toggle-card-list
       >
       <button-toggle-card-list
-        @click="showList('pool')"
         :isActive="showingList === 'pool'"
+        @click="showList('pool')"
         >Основные</button-toggle-card-list
       >
       <button-icon
         class="filter_btn"
-        @click="$emit('open-filters')"
         :image_name="'open_filters.svg'"
         :class="[empty_filters ? '' : 'set-filter']"
+        @click="$emit('open-filters')"
       />
       <button-icon
         v-if="!empty_filters"
         class="filter_btn_cancel"
-        @click="cancelFilters"
         :image_name="'add_icon.svg'"
+        @click="cancelFilters"
       />
     </div>
     <base-modal
@@ -41,10 +41,11 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions.vue"
-import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon.vue"
+
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
+import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon.vue"
 import ButtonToggleCardList from "@/components/Pages/DeckbuildPage/Buttons/ButtonToggleCardList.vue"
+import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions.vue"
 
 export default defineComponent({
   components: {
@@ -63,14 +64,27 @@ export default defineComponent({
     },
     showingList: {
       type: String,
+      default: "",
     },
   },
+  emits: [
+    "open-filters",
+    "select_faction",
+    "trigger_show_list",
+    "reset",
+    "reset-filters",
+  ],
   data() {
     return {
       disable_start_animation: true as boolean, // флаг выключения первичной анимации
       showNewDeckFactionSelect: false as boolean,
       showFilters: false as boolean,
     }
+  },
+  computed: {
+    isCansel(): boolean {
+      return this.showNewDeckFactionSelect || this.deckBuilding
+    },
   },
   methods: {
     setFilter(prop: string, value: unknown): void {
@@ -93,18 +107,6 @@ export default defineComponent({
       this.$emit("reset-filters")
     },
   },
-  computed: {
-    isCansel(): boolean {
-      return this.showNewDeckFactionSelect || this.deckBuilding
-    },
-  },
-  emits: [
-    "open-filters",
-    "select_faction",
-    "trigger_show_list",
-    "reset",
-    "reset-filters",
-  ],
 })
 </script>
 

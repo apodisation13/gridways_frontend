@@ -15,6 +15,7 @@ export default defineComponent({
   props: {
     color: {
       type: String,
+      default: "",
     },
   },
 })

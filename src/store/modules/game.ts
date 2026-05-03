@@ -1,16 +1,16 @@
 import type {
-  Leader,
+  ActionContext,
+  DeckCardEntry,
+  DeckEntry,
   Enemy,
   EnemyLeader,
-  DeckEntry,
-  DeckCardEntry,
+  Leader,
   MappedLevel,
-  MappedUserLevel,
   MappedSeason,
-  ActionContext,
+  MappedUserLevel,
 } from "@/types"
 
-interface GameState {
+export interface GameState {
   cards_in_deck: number | undefined
   hand_size: number | undefined
 
@@ -168,12 +168,14 @@ const actions = {
   ) {
     let index: number | undefined = undefined
     if (deck) {
-      index = getters["all_decks"].findIndex((d: DeckEntry) => d.id === deck.id)
-    }
-    if (!deck) {
+      index = getters["all_decks"].findIndex(
+        (d: DeckEntry) => d.id === deck!.id
+      )
+    } else {
       deck = getters["all_decks"].at(-1)
       index = getters["all_decks"].length - 1
     }
+    if (!deck) return
     commit("set_current_deck", deck.deck.cards)
     commit("set_current_deck_index", index)
     commit("set_current_deck_id", deck.id)

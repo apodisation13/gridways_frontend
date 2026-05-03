@@ -12,11 +12,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import DeckSelection from "@/components/DeckSelection.vue"
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
 import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 export default defineComponent({
-  name: "decks-list-modal",
+  name: "DecksListModal",
   components: { ButtonCloseImg, BaseModal, DeckSelection },
   props: {
     deckbuilder: {
@@ -24,6 +25,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["close_decks_list_modal", "change_deck"],
   methods: {
     close_self(): void {
       this.$emit("close_decks_list_modal")
@@ -33,7 +35,6 @@ export default defineComponent({
       this.close_self()
     },
   },
-  emits: ["close_decks_list_modal", "change_deck"],
 })
 </script>
 

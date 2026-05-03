@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="news" v-if="news && showNews">
+    <div v-if="news && showNews" class="news">
       <button class="news__prev" @click="prev">
         <img :src="require('@/assets/icons/' + 'arrow.svg')" alt="" />
       </button>
@@ -9,12 +9,12 @@
       </button>
       <div class="news__content">
         <carousel
+          v-if="news"
           ref="carousel"
           :items-to-show="1.4"
           :wrap-around="true"
           :touchDrag="true"
           :mouseDrag="true"
-          v-if="news"
         >
           <slide v-for="element in news" :key="element.id">
             <div class="news__item">
@@ -52,36 +52,24 @@
         </carousel>
       </div>
     </div>
-    <div class="show-hide-news" v-if="!showNews" @click="hideNews">
+    <div v-if="!showNews" class="show-hide-news" @click="hideNews">
       <img src="@/assets/icons/buttons/hide_news.svg" alt="" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue"
 import "vue3-carousel/dist/carousel.css"
+
+import { defineComponent } from "vue"
 import { Carousel, Slide } from "vue3-carousel"
+
 import type { NewsItem } from "@/types"
 export default defineComponent({
-  name: "news-list",
-  mounted() {
-    const carouselEl = this.$refs.carousel?.$el
-
-    if (carouselEl) {
-      carouselEl.addEventListener(
-        "touchmove",
-        e => {
-          e.preventDefault() // Важно!
-        },
-        { passive: false }
-      )
-    }
-  },
-  computed: {
-    news(): NewsItem[] | null {
-      return this.$store.getters["allNews"]
-    },
+  name: "NewsList",
+  components: {
+    Carousel,
+    Slide,
   },
   data() {
     return {
@@ -89,12 +77,31 @@ export default defineComponent({
       showNews: true,
     }
   },
+  computed: {
+    news(): NewsItem[] | null {
+      return this.$store.getters["allNews"]
+    },
+  },
+  mounted() {
+    const carousel = this.$refs.carousel as InstanceType<typeof Carousel>
+    const carouselEl = carousel?.$el as HTMLElement | undefined
+
+    if (carouselEl) {
+      carouselEl.addEventListener(
+        "touchmove",
+        (e: Event) => {
+          e.preventDefault()
+        },
+        { passive: false }
+      )
+    }
+  },
   methods: {
     next() {
-      this.$refs.carousel.next()
+      ;(this.$refs.carousel as unknown as { next(): void }).next()
     },
     prev() {
-      this.$refs.carousel.prev()
+      ;(this.$refs.carousel as unknown as { prev(): void }).prev()
     },
     setDay(data: string, option: "month" | "day"): string {
       const date = new Date(data)
@@ -111,10 +118,6 @@ export default defineComponent({
     hideNews() {
       this.showNews = !this.showNews
     },
-  },
-  components: {
-    Carousel,
-    Slide,
   },
 })
 </script>

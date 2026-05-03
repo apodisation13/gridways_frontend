@@ -37,8 +37,8 @@
     <leaderboard-filters
       v-if="showFilters"
       :factions="availableFactions"
-      :selected-faction="selectedFaction"
-      :selected-mode="selectedMode"
+      :selected-faction="selectedFaction ?? undefined"
+      :selected-mode="selectedMode ?? undefined"
       @close-modal="showFilters = false"
       @reset-filters="resetFilters"
       @set-faction="setFaction"
@@ -63,6 +63,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon.vue"
 import LeaderboardFilters from "@/components/Pages/LeaderboardPage/LeaderboardFilters.vue"
 import LeaderboardTable from "@/components/Pages/LeaderboardPage/LeaderboardTable.vue"

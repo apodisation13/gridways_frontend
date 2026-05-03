@@ -1,13 +1,14 @@
 import { useToast } from "vue-toastification"
-import { USER_LOGIN, USER_REGISTER } from "@/store/const/api_urls"
+
 import { callApi, HttpMethod } from "@/lib/api/api"
+import { USER_LOGIN, USER_REGISTER } from "@/store/const/api_urls"
 import {
+  ActionContext,
   LoginCredentials,
   RegisterCredentials,
   StoredUser,
   UserLoginResponse,
   UserRegisterResponse,
-  ActionContext,
 } from "@/types"
 
 const toast = useToast()

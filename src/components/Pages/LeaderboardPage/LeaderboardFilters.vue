@@ -4,8 +4,8 @@
       <button-close-img @click="$emit('close-modal')" />
 
       <filter-factions
-        @set-filter="filterFaction"
         :selected-faction="selectedFaction"
+        @set-filter="filterFaction"
       />
 
       <div class="lb-filters__section">
@@ -32,14 +32,15 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
-import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions.vue"
+import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 
 export default defineComponent({
   components: { FilterFactions, BaseModal, ButtonCloseImg },
   props: {
-    factions: { type: Array as PropType<string[]> },
+    factions: { type: Array as PropType<string[]>, default: () => [] },
     selectedFaction: { type: String, default: null },
     selectedMode: { type: String, default: null },
   },

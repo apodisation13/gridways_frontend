@@ -5,7 +5,6 @@
     <card-item
       v-for="user_card in cards"
       :key="user_card.card.id"
-      @dblclick="chose_player_card(user_card)"
       :count="user_card.count"
       :card="user_card.card"
       :user_card="user_card"
@@ -13,12 +12,14 @@
       :deckbuilder="deckbuilder"
       :bonus="bonus"
       :is_leader="is_leader"
+      @dblclick="chose_player_card(user_card)"
     />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import CardItem from "@/components/Cards/CardItem.vue"
 import type { CardEntry, LeaderEntry } from "@/types"
 export default defineComponent({
@@ -53,12 +54,12 @@ export default defineComponent({
       required: false,
     },
   },
+  emits: ["chose_player_card"],
   methods: {
     chose_player_card(card: CardEntry | LeaderEntry): void {
       this.$emit("chose_player_card", card) // передаем наверх ВСЮ выбранную карту!
     },
   },
-  emits: ["chose_player_card"],
 })
 </script>
 

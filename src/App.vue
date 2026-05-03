@@ -20,10 +20,11 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import MenuFooter from "@/components/UI/Menu/MenuFooter.vue"
-import MenuHeader from "@/components/UI/Menu/MenuHeader.vue"
+
 import PageImage from "@/components/PageImage.vue"
 import AppWrapperFullscreen from "@/components/Pages/AppWrapperFullscreen/AppWrapperFullscreen.vue"
+import MenuFooter from "@/components/UI/Menu/MenuFooter.vue"
+import MenuHeader from "@/components/UI/Menu/MenuHeader.vue"
 
 export default defineComponent({
   components: {
@@ -31,6 +32,12 @@ export default defineComponent({
     MenuHeader,
     MenuFooter,
     AppWrapperFullscreen,
+  },
+
+  computed: {
+    isLoggedIn(): boolean {
+      return this.$store.getters["isLoggedIn"]
+    },
   },
 
   async created() {
@@ -47,12 +54,6 @@ export default defineComponent({
       console.log(err)
       throw err
     }
-  },
-
-  computed: {
-    isLoggedIn(): boolean {
-      return this.$store.getters["isLoggedIn"]
-    },
   },
 })
 </script>

@@ -46,8 +46,8 @@
         </div>
         <!-- Зона сбора колоды -->
         <block-assembling-the-deck
-          class="assembling-deck"
           v-show="deckBuilding"
+          class="assembling-deck"
           :patch="patch"
           :deck="deck"
           :cant_save_deck="cant_save_deck"
@@ -67,27 +67,28 @@
       />
       <deckbuilder-filters
         v-if="showFilters"
+        :deckBuilding="deckBuilding"
         @close-modal="showFilters = false"
         @reset-filters="resetFilters"
         @set-filter="setFilter"
-        :deckBuilding="deckBuilding"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue"
 import _ from "lodash"
-import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
-import DeckbuilderTopButtonsBlock from "@/components/Pages/DeckbuildPage/DeckbuilderTopButtonsBlock.vue"
-import BlockAssemblingTheDeck from "@/components/Pages/DeckbuildPage/BlockAssemblingTheDeck.vue"
-import DeckbuilderFilters from "@/components/Pages/DeckbuildPage/DeckbuilderFilters.vue"
-import CardListComponent from "@/components/Cards/CardListComponent.vue"
-import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
+import { defineComponent } from "vue"
 import { useToast } from "vue-toastification"
+
+import CardListComponent from "@/components/Cards/CardListComponent.vue"
+import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
+import BlockAssemblingTheDeck from "@/components/Pages/DeckbuildPage/BlockAssemblingTheDeck.vue"
+import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
+import DeckbuilderFilters from "@/components/Pages/DeckbuildPage/DeckbuilderFilters.vue"
+import DeckbuilderTopButtonsBlock from "@/components/Pages/DeckbuildPage/DeckbuilderTopButtonsBlock.vue"
 import { copyObj } from "@/lib/utils"
-import type { CardEntry, LeaderEntry, DeckCardEntry, Leader } from "@/types"
+import type { CardEntry, DeckCardEntry, Leader, LeaderEntry } from "@/types"
 
 interface Query {
   faction: string
@@ -147,8 +148,24 @@ export default defineComponent({
       cardsPool: [] as CardEntry[],
     }
   },
-  created() {
-    this.init()
+
+  computed: {
+    pool(): CardEntry[] {
+      return this.$store.getters.filtered_cards(this.query, this.query.count)
+    },
+    leaders(): LeaderEntry[] {
+      return this.$store.getters.filtered_leaders(this.query.faction)
+    },
+    cant_save_deck(): boolean {
+      const required_count_person = this.$store.state.game.cards_in_deck
+      return (
+        this.deck.deck_is_progress.length !== required_count_person ||
+        !this.deck.leader
+      )
+    },
+    empty_filters(): boolean {
+      return _.isEqual(this.default_query_param(), this.query)
+    },
   },
   watch: {
     // при изменении параметра query (фильтры для карт), будем всегда выполнять
@@ -160,6 +177,9 @@ export default defineComponent({
     pool() {
       this.init()
     },
+  },
+  created() {
+    this.init()
   },
   methods: {
     init(): void {
@@ -222,7 +242,7 @@ export default defineComponent({
         return
       }
       if (this.can_add_card(card)) {
-        this.deck.deck_is_progress.push(card)
+        this.deck.deck_is_progress.push(card as unknown as DeckCardEntry)
         this.deck.deck_body.push(card.card.id)
         this.deck.health += card.card.data.hp
         this.init() // это нужно, так как при добавлении карты, мы хотим убрать ее из пула (для удобства)
@@ -270,14 +290,17 @@ export default defineComponent({
 
     async save_deck(): Promise<void> {
       if (!this.deck.leader) {
-        return this.toast.warning("Необходимо выбрать лидера")
+        this.toast.warning("Необходимо выбрать лидера")
+        return
       }
       // карт ровно 12 и лидер выбран
       if (this.cant_save_deck) {
-        return this.toast.warning("Соберите колоду из 12 карт")
+        this.toast.warning("Соберите колоду из 12 карт")
+        return
       }
       if (this.deck.deck_name.trim() === "") {
-        return this.toast.warning("Введите имя колоды")
+        this.toast.warning("Введите имя колоды")
+        return
       }
       await this.send_data_to_store("createUserDeck", {
         deck_name: this.deck.deck_name,
@@ -366,25 +389,6 @@ export default defineComponent({
 
     trigger_show_list(value: string): void {
       this.showingList = value
-    },
-  },
-
-  computed: {
-    pool(): CardEntry[] {
-      return this.$store.getters.filtered_cards(this.query, this.query.count)
-    },
-    leaders(): LeaderEntry[] {
-      return this.$store.getters.filtered_leaders(this.query.faction)
-    },
-    cant_save_deck(): boolean {
-      const required_count_person = this.$store.state.game.cards_in_deck
-      return (
-        this.deck.deck_is_progress.length !== required_count_person ||
-        !this.deck.leader
-      )
-    },
-    empty_filters(): boolean {
-      return _.isEqual(this.default_query_param(), this.query)
     },
   },
 })

@@ -3,7 +3,7 @@
     <div class="global_text filter_title" @click="reset_filter_types">
       Наличие
     </div>
-    <div class="types" v-for="count in [1, 2, 0]" :key="count">
+    <div v-for="count in [1, 2, 0]" :key="count" class="types">
       <button class="type" @click="filtering(count)">
         {{ count }}
       </button>
@@ -14,7 +14,8 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 export default defineComponent({
-  name: "filter-unlocked",
+  name: "FilterUnlocked",
+  emits: ["set-filter", "reset-filter-unlocked"],
   methods: {
     filtering(count: number): void {
       this.$emit("set-filter", "count", count)
@@ -23,7 +24,6 @@ export default defineComponent({
       this.$emit("reset-filter-unlocked")
     },
   },
-  emits: ["set-filter", "reset-filter-unlocked"],
 })
 </script>
 

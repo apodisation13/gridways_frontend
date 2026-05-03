@@ -1,6 +1,6 @@
-import store from "@/store"
 import { choice_element, copyObj } from "@/lib/utils"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import store from "@/store"
 import type { Card, CardEntry, GameObj } from "@/types"
 
 export function spawn_random_in_hand(
@@ -9,7 +9,7 @@ export function spawn_random_in_hand(
   timeout = 1000
 ): void {
   const { hand, leader } = gameObj
-  if (hand.length >= store.state.game.hand_size) return
+  if (hand.length >= (store.state.game.hand_size ?? 0)) return
 
   const pool = (store.getters["all_cards"] as CardEntry[]).filter(
     c => c.card.faction === leader.faction

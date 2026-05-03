@@ -1,9 +1,9 @@
 <template>
   <div>
     <button
-      @click="flag = true"
       class="deck-btn"
       :style="{ backgroundColor: trigger_passive ? 'yellow' : '' }"
+      @click="flag = true"
     >
       <svg
         class="deck-svg"
@@ -100,9 +100,10 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
+import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
-import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import type { Card, CardEntry, Leader } from "@/types"
 
 interface FactionColors {
@@ -111,7 +112,7 @@ interface FactionColors {
 }
 
 export default defineComponent({
-  name: "deck-comp",
+  name: "DeckComp",
   components: { CardListComponent, ButtonClose, ModalWindow },
   props: {
     deck: {

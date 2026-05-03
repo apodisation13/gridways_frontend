@@ -29,11 +29,12 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import EnemyComp from "@/components/Cards/EnemyComp.vue"
 import type { Enemy } from "@/types"
 
 export default defineComponent({
-  name: "field-comp",
+  name: "FieldComp",
   components: { EnemyComp },
   props: {
     field: {
@@ -46,14 +47,11 @@ export default defineComponent({
       type: Number as unknown as PropType<number | null>,
     },
   },
+  emits: ["exec_damage_ai_card"],
   data() {
     return {
       movingIndices: [] as number[],
     }
-  },
-
-  created() {
-    ;(this as any)._prevField = [...this.field]
   },
 
   watch: {
@@ -89,6 +87,10 @@ export default defineComponent({
     },
   },
 
+  created() {
+    ;(this as any)._prevField = [...this.field]
+  },
+
   methods: {
     get_index(i: number, j: number): number {
       return (i - 1) * 3 + (j - 1)
@@ -97,7 +99,6 @@ export default defineComponent({
       this.$emit("exec_damage_ai_card", this.field[i])
     },
   },
-  emits: ["exec_damage_ai_card"],
 })
 </script>
 

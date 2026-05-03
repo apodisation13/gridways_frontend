@@ -2,8 +2,8 @@
   <div class="settings-page">
     <!-- Верхняя панель с иконками -->
     <div
-      class="icons-panel"
       ref="scrollContainer"
+      class="icons-panel"
       @wheel="handleWheel"
       @touchstart="handleTouchStart"
       @touchmove="handleTouchMove"
@@ -38,7 +38,7 @@
       <setting-logout v-if="activeTab === 'logout'" />
     </div>
 
-    <button class="base-button" @click="updateSettings" :disabled="isLoading">
+    <button class="base-button" :disabled="isLoading" @click="updateSettings">
       <span class="global_text base-button-text">Запомнить мои настройки!</span>
     </button>
   </div>
@@ -46,12 +46,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import SettingSound from "@/components/Pages/SettingsPage/SettingSound.vue"
+
 import SettingAnimation from "@/components/Pages/SettingsPage/SettingAnimation.vue"
-import SettingLogout from "@/components/Pages/SettingsPage/SettingLogout.vue"
-import SettingChooseTheme from "@/components/Pages/SettingsPage/SettingChooseTheme.vue"
 import SettingAvatar from "@/components/Pages/SettingsPage/SettingAvatar.vue"
+import SettingChooseTheme from "@/components/Pages/SettingsPage/SettingChooseTheme.vue"
+import SettingLogout from "@/components/Pages/SettingsPage/SettingLogout.vue"
 import SettingMoveTimeout from "@/components/Pages/SettingsPage/SettingMoveTimeout.vue"
+import SettingSound from "@/components/Pages/SettingsPage/SettingSound.vue"
 
 export default defineComponent({
   name: "SettingsPage",
@@ -108,6 +109,18 @@ export default defineComponent({
       ] as { id: string; label: string; icon: string }[],
     }
   },
+  mounted() {
+    const container = this.$refs.scrollContainer as HTMLElement | undefined
+    if (container) {
+      container.addEventListener("touchend", this.handleTouchEnd)
+    }
+  },
+  beforeUnmount() {
+    const container = this.$refs.scrollContainer as HTMLElement | undefined
+    if (container) {
+      container.removeEventListener("touchend", this.handleTouchEnd)
+    }
+  },
   methods: {
     handleWheel(e: WheelEvent): void {
       const container = this.$refs.scrollContainer as HTMLElement | undefined
@@ -137,18 +150,6 @@ export default defineComponent({
       await this.$store.dispatch("updateUserPreferences")
       this.isLoading = false
     },
-  },
-  mounted() {
-    const container = this.$refs.scrollContainer as HTMLElement | undefined
-    if (container) {
-      container.addEventListener("touchend", this.handleTouchEnd)
-    }
-  },
-  beforeUnmount() {
-    const container = this.$refs.scrollContainer as HTMLElement | undefined
-    if (container) {
-      container.removeEventListener("touchend", this.handleTouchEnd)
-    }
   },
 })
 </script>

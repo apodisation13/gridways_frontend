@@ -1,12 +1,12 @@
 <template>
   <div class="card-item-wrapper">
     <div
+      :id="make_id(card, index)"
+      v-touch:longtap="show_modal"
       class="card-item-component"
+      :style="[border(card)]"
       @contextmenu.prevent
       @click.right="show_modal"
-      v-touch:longtap="show_modal"
-      :id="make_id(card, index)"
-      :style="[border(card)]"
     >
       <card-ui v-bind="$props" />
     </div>
@@ -23,9 +23,10 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import { border_for_card, border_leader } from "@/logic/border_styles"
-import CardModal from "@/components/ModalWindows/CardModal.vue"
+
 import CardUi from "@/components/Cards/CardUi.vue"
+import CardModal from "@/components/ModalWindows/CardModal.vue"
+import { border_for_card, border_leader } from "@/logic/border_styles"
 import type { Card, CardEntry, Leader, LeaderEntry } from "@/types"
 export default defineComponent({
   components: {
@@ -69,6 +70,7 @@ export default defineComponent({
     // сколько у юзера этой карты
     count: {
       type: Number,
+      default: undefined,
     },
     // FIXME: че это
     is_previev: {
@@ -79,8 +81,10 @@ export default defineComponent({
     // ПРИХОДИТ ИЗ HAND_COMP!
     index: {
       type: Number,
+      default: undefined,
     },
   },
+  emits: ["open_card_modal"],
   data() {
     return {
       show_card_modal: false as boolean,
@@ -100,7 +104,6 @@ export default defineComponent({
         : border_for_card(card as Card)
     },
   },
-  emits: ["open_card_modal"],
 })
 </script>
 

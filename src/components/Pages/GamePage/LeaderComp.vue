@@ -16,9 +16,10 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import CardItem from "@/components/Cards/CardItem.vue"
 import { arrowMixin } from "@/mixins/GamePage/arrow_draw"
-import type { Leader, Enemy } from "@/types"
+import type { Enemy, Leader } from "@/types"
 
 export default defineComponent({
   components: {
@@ -33,8 +34,17 @@ export default defineComponent({
     field: {
       required: false,
       type: Array as PropType<(Enemy | "")[]>,
+      default: () => [],
     },
   },
+
+  emits: [
+    "exec_leader",
+    "target_enemy",
+    "target_enemy_leader",
+    "enemy_leader_in_cross",
+    "enemy_in_cross",
+  ],
   mounted() {
     ;(this as any).initArrowCanvas(9998)
     window.addEventListener("resize", (this as any).handleResize)
@@ -74,14 +84,6 @@ export default defineComponent({
       )
     },
   },
-
-  emits: [
-    "exec_leader",
-    "target_enemy",
-    "target_enemy_leader",
-    "enemy_leader_in_cross",
-    "enemy_in_cross",
-  ],
 })
 </script>
 

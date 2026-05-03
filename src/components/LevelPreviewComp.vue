@@ -1,8 +1,8 @@
 <template>
   <div
+    v-touch:longtap="open_level_modal"
     class="level-stack"
     @click.right="open_level_modal"
-    v-touch:longtap="open_level_modal"
     @contextmenu.prevent
   >
     <div class="card card-4" :style="cardBorder"></div>
@@ -37,12 +37,13 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+
 import LevelModal from "@/components/ModalWindows/LevelModal.vue"
 import { background_color_leader } from "@/logic/border_styles"
 import type { MappedUserLevel } from "@/types"
 
 export default defineComponent({
-  name: "level-preview-comp",
+  name: "LevelPreviewComp",
   components: { LevelModal },
   props: {
     level: {
@@ -57,7 +58,9 @@ export default defineComponent({
   },
   computed: {
     cardBorder(): Record<string, string> {
-      const bg = background_color_leader(this.level.level.enemy_leader?.faction)
+      const bg = background_color_leader(
+        this.level.level.enemy_leader?.faction ?? ""
+      )
       const color = bg || "#888"
       return {
         borderColor: color,

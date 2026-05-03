@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="bonus-page" v-if="!show_reward_page">
+    <div v-if="!show_reward_page" class="bonus-page">
       <div class="title">
         <h1>Страница бонусов</h1>
       </div>
@@ -36,7 +36,7 @@
       :visible="show_reward_page"
       :name="reward_name"
       :reward="random_cards"
-      :key_reward="random_reward_choice"
+      :key_reward="random_reward_choice ?? undefined"
       @clear_reward="clear_reward"
       @accept_key_reward="accept_random_reward"
     />
@@ -45,23 +45,16 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import BonusPageResource from "@/components/Pages/BonusPage/BonusPageResource.vue"
 import RewardComp from "@/components/Pages/BonusPage/RewardComp.vue"
-import { PayResourcesSubtype } from "@/types"
-import type { CardEntry, KeyRewardResult, ResourceActions } from "@/types"
 import { choice } from "@/lib/utils"
 import { getRandomReward } from "@/logic/random_rewards"
+import type { CardEntry, KeyRewardResult, ResourceActions } from "@/types"
+import { PayResourcesSubtype } from "@/types"
 
 export default defineComponent({
   components: { BonusPageResource, RewardComp },
-  created() {
-    this.init()
-  },
-  watch: {
-    cards() {
-      this.init()
-    },
-  },
   data() {
     return {
       pool: [] as CardEntry[],
@@ -115,6 +108,14 @@ export default defineComponent({
           {} as Record<string, ResourceActions>
         )
     },
+  },
+  watch: {
+    cards() {
+      this.init()
+    },
+  },
+  created() {
+    this.init()
   },
   methods: {
     init(): void {

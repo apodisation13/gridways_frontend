@@ -3,14 +3,14 @@
     <!--Цвет окна настраивается в зависимости от выбранной настройки благодаря styleWrapper-->
     <div class="yes_no_modal" :style="styleWrapper">
       <!--По дефолту если мы не передали item_price, покажем просто вы уверены, да\нет-->
-      <div class="global_text text text-confirm" v-if="!item_price && !bonus">
+      <div v-if="!item_price && !bonus" class="global_text text text-confirm">
         <span>Вы уверены?</span>
       </div>
 
       <!--Вот это показывает нам кнопки +- для режима бонуса, для покупки ресурсов!-->
       <div
-        class="global_text text text-purchase"
         v-else-if="bonus && is_purchase"
+        class="global_text text text-purchase"
       >
         <resource-item name="wood" :count="item_price * quantity" />
         <div class="quantity">
@@ -22,13 +22,13 @@
       </div>
 
       <!--Вот это показывает нам открытие ресурса из бонусов, но без покупок, само открытие-->
-      <div class="global_text text text-zero" v-else-if="bonus && !is_purchase">
+      <div v-else-if="bonus && !is_purchase" class="global_text text text-zero">
         <span class="price">Открытие <resource-item :name="name" /></span>
         <span>Вы уверены?</span>
       </div>
 
       <!--Крафт карты-->
-      <div class="global_text text" v-else-if="!bonus && is_craft">
+      <div v-else-if="!bonus && is_craft" class="global_text text">
         <div class="price">
           <span>Стоимость - </span>
           <resource-item name="scraps" :count="item_price * -1" class="price" />
@@ -37,7 +37,7 @@
       </div>
 
       <!--Милл карты-->
-      <div class="global_text text" v-else-if="!bonus && !is_craft">
+      <div v-else-if="!bonus && !is_craft" class="global_text text">
         <div class="price">
           <span>Вы получите - </span>
           <resource-item name="scraps" :count="item_price" class="price" />
@@ -55,11 +55,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import ResourceItem from "@/components/UI/ResourceItem.vue"
 import { styleWrapper } from "@/logic/border_styles"
 
 export default defineComponent({
-  name: "yesno-modal",
+  name: "YesnoModal",
   components: { ResourceItem },
   props: {
     // для бонусной страницы мы будем показывать в окне ещё кнопки +-
@@ -78,6 +79,7 @@ export default defineComponent({
     item_price: {
       type: Number,
       required: false,
+      default: 0,
     },
     // крафтим ли карту (тру) или нет (милл, фолс)
     is_craft: {
@@ -89,8 +91,10 @@ export default defineComponent({
     name: {
       type: String,
       required: false,
+      default: "",
     },
   },
+  emits: ["confirm", "cancel"],
   data() {
     return {
       quantity: 1 as number,
@@ -125,7 +129,6 @@ export default defineComponent({
       this.$emit("cancel")
     },
   },
-  emits: ["confirm", "cancel"],
 })
 </script>
 

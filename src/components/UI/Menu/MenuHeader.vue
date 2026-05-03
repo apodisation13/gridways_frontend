@@ -1,5 +1,5 @@
 <template>
-  <div class="header" v-if="menuNeeded">
+  <div v-if="menuNeeded" class="header">
     <img
       class="header__border"
       :src="require('@/assets/icons/VectorDown.svg')"
@@ -7,24 +7,24 @@
     />
     <div class="wrapper__avatar-resources">
       <button
+        v-touch:swipe.bottom="showExpandedMenu"
         class="avatar"
         @click="showExpandedMenu"
-        v-touch:swipe.bottom="showExpandedMenu"
       >
         <img
+          v-if="!path_to_icon"
           class="avatar__btn"
           :src="require('@/assets/icons/' + 'Avatar.svg')"
           alt=""
-          v-if="!path_to_icon"
         />
         <img
+          v-else
           :src="require(`@/assets/icons/resources/${path_to_icon}.svg`)"
           alt=""
           class="avatar__btn"
-          v-else
         />
       </button>
-      <div @click="showRightMenu" class="resources-clickable" v-if="isLoggedIn">
+      <div v-if="isLoggedIn" class="resources-clickable" @click="showRightMenu">
         <resource-item
           v-for="(count, name) in resources_list"
           :key="name"
@@ -39,9 +39,9 @@
       alt=""
     />
     <div
-      class="expand-menu"
       v-if="expanded"
       v-touch:swipe.top="showExpandedMenu"
+      class="expand-menu"
       @click.self="showExpandedMenu"
     >
       <div class="expand-menu__wrapper">
@@ -54,14 +54,14 @@
               @click="push(button.path)"
             >
               <span
-                class="global_text menu-btn__text"
                 v-if="!button.requireAuth"
+                class="global_text menu-btn__text"
               >
                 {{ button.title }}
               </span>
               <span
-                class="global_text menu-btn__text"
                 v-if="button.requireAuth && isLoggedIn"
+                class="global_text menu-btn__text"
                 >{{ button.title }}</span
               >
             </button>
@@ -76,9 +76,9 @@
     </div>
     <!-- ПРАВОЕ МЕНЮ - замени старые классы на эти -->
     <div
-      class="expand-menu-right"
       v-if="expandedRight"
       v-touch:swipe.top="showRightMenu"
+      class="expand-menu-right"
       @click.self="showRightMenu"
     >
       <div class="expand-menu-right__wrapper">
@@ -133,6 +133,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import ResourceItem from "@/components/UI/ResourceItem.vue"
 import type { UserResources } from "@/types"
 
@@ -140,6 +141,20 @@ export default defineComponent({
   name: "MenuHeader",
   components: {
     ResourceItem,
+  },
+  data() {
+    return {
+      routes: [
+        { title: "Главная", path: "/main" },
+        { title: "Правила", path: "/rules" },
+        { title: "О нас", path: "/about" },
+        { title: "Статистика", path: "/stats", requireAuth: true },
+        { title: "Доска лидеров", path: "/leaderboard", requireAuth: true },
+        { title: "Настройки", path: "/settings", requireAuth: true },
+      ] as { title: string; path: string; requireAuth?: boolean }[],
+      expanded: false,
+      expandedRight: false, // для правого меню
+    }
   },
   computed: {
     // меню не нужны, если в роутере есть notRequireMenu (страницы загрузки, игры)
@@ -196,20 +211,6 @@ export default defineComponent({
       }
       return { keys: this.resources.keys, money: this.resources.money }
     },
-  },
-  data() {
-    return {
-      routes: [
-        { title: "Главная", path: "/main" },
-        { title: "Правила", path: "/rules" },
-        { title: "О нас", path: "/about" },
-        { title: "Статистика", path: "/stats", requireAuth: true },
-        { title: "Доска лидеров", path: "/leaderboard", requireAuth: true },
-        { title: "Настройки", path: "/settings", requireAuth: true },
-      ] as { title: string; path: string; requireAuth?: boolean }[],
-      expanded: false,
-      expandedRight: false, // для правого меню
-    }
   },
   methods: {
     showRightMenu(): void {

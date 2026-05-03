@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper_modal" @click.stop="hideModal">
-    <div @click.stop class="modal">
+    <div class="modal" @click.stop>
       {{ text }}
     </div>
   </div>
@@ -16,12 +16,12 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["close-modal"],
   methods: {
     hideModal(): void {
       this.$emit("close-modal")
     },
   },
-  emits: ["close-modal"],
 })
 </script>
 

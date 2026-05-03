@@ -17,16 +17,17 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+
 import FactionItem from "@/components/Pages/DeckbuildPage/FactionItem.vue"
 import BaseTitleText from "@/components/UI/BaseTitleText.vue"
 import type { Faction } from "@/types"
 
 export default defineComponent({
+  name: "FilterFactions",
   components: {
     FactionItem,
     BaseTitleText,
   },
-  name: "filter-factions",
   props: {
     // покажем или Фракции, или "Выберите фракцию" для новой колоды
     title: {
@@ -39,6 +40,7 @@ export default defineComponent({
       default: null,
     },
   },
+  emits: ["set-filter"],
   computed: {
     factions(): Faction[] {
       return this.$store.getters["all_factions"]
@@ -51,7 +53,6 @@ export default defineComponent({
       // this.$emit("filter-factions", [[faction.name, "Neutral"], true])
     },
   },
-  emits: ["set-filter"],
 })
 </script>
 

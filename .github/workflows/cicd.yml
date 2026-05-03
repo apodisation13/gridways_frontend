@@ -33,6 +33,9 @@ jobs:
       - name: Lint check
         run: npm run lint -- --no-fix
 
+      - name: Type check
+        run: npm run type-check
+
   # ============================================
   # BUILD & DEPLOY - только при мердже (push)
   # ============================================

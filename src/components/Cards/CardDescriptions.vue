@@ -4,15 +4,14 @@
       <!--Описание абилки - для карты игрока и лидера врагов тоже-->
       <div
         v-if="!forEnemy && c.ability"
-        @click="showMainAbility"
         class="inlines"
         :style="{ 'background-image': icon }"
+        @click="showMainAbility"
       ></div>
 
       <!--Описание абилки хода - для карт врагов-->
       <div
         v-if="forEnemy"
-        @click="showMainAbility"
         class="inlines"
         :style="{
           'background-image':
@@ -20,6 +19,7 @@
             require(`@/assets/icons/enemy/enemy_move_${c.move.name}.svg`) +
             ')',
         }"
+        @click="showMainAbility"
       ></div>
 
       <!--Описание пассивной абилки-->
@@ -33,26 +33,26 @@
       <!--Описание абилки deathwish - для карт врагов-->
       <div
         v-if="forEnemy && c.deathwish?.name"
-        @click="showDeathwishAbility"
         class="inlines"
         :style="{
           'background-image':
             'url(' + require(`@/assets/icons/enemy/deathwish.svg`) + ')',
         }"
+        @click="showDeathwishAbility"
       ></div>
     </div>
 
     <!--А дальше сами описания!!!-->
     <!--Описание абилки для карты игрока и для лидера врагов у которого она есть вообще-->
-    <div class="text" v-if="show_ability && !forEnemy && c?.ability?.name">
+    <div v-if="show_ability && !forEnemy && c?.ability?.name" class="text">
       {{ formatCardAbility(c) }} <br />
     </div>
     <!--Описание абилки для карты врага-->
-    <div class="text" v-if="show_ability && forEnemy">
+    <div v-if="show_ability && forEnemy" class="text">
       {{ formatEnemyMove(c) }} <br />
     </div>
     <!--Описание пассивной абилки, разделение для карты или для лидера врагов-->
-    <div class="text" v-if="show_passive && card.passive_ability?.name">
+    <div v-if="show_passive && card.passive_ability?.name" class="text">
       {{ formatCardPassiveAbility(c) }} <br />
       <br />
       <span v-if="c.data.passive?.has_passive_in_field">
@@ -78,7 +78,7 @@
       </span>
     </div>
     <!--Описание абилки deathwish, только для врага-->
-    <div class="text" v-if="show_deathwish && forEnemy && c?.deathwish?.name">
+    <div v-if="show_deathwish && forEnemy && c?.deathwish?.name" class="text">
       {{ formatEnemyDeathwish(c) }} <br />
     </div>
   </div>
@@ -86,9 +86,10 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import { ability_icon } from "@/logic/border_styles"
+
 import CardPassive from "@/components/UI/CardsUI/CardPassive.vue"
-import type { Card, Leader, Enemy, EnemyLeader } from "@/types"
+import { ability_icon } from "@/logic/border_styles"
+import type { Card, Enemy, EnemyLeader, Leader } from "@/types"
 
 export default defineComponent({
   name: "CardDescriptions",
@@ -105,13 +106,6 @@ export default defineComponent({
       default: false,
     },
   },
-  created() {
-    const c = this.card as any
-    if (!c.ability && !c.move) {
-      this.show_ability = false
-      this.show_passive = true
-    }
-  },
   data() {
     return {
       show_ability: true,
@@ -127,6 +121,13 @@ export default defineComponent({
     icon(): string {
       return ability_icon((this.card as any)?.ability?.name)
     },
+  },
+  created() {
+    const c = this.card as any
+    if (!c.ability && !c.move) {
+      this.show_ability = false
+      this.show_passive = true
+    }
   },
   methods: {
     formatCardAbility(card: any): string {
