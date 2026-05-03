@@ -1,29 +1,26 @@
 <template>
   <div class="field">
-    <table class="table">
-      <tr v-for="i in 4" :key="i">
-        <td
-          v-for="j in 3"
-          :key="j"
-          @dblclick="exec_damage_ai_card(get_index(i, j))"
-          @contextmenu.prevent
+    <div class="grid">
+      <div
+        v-for="idx in 12"
+        :key="idx - 1"
+        class="cell"
+        @dblclick="exec_damage_ai_card(idx - 1)"
+        @contextmenu.prevent
+      >
+        <transition
+          :name="movingIndices.includes(idx - 1) ? 'enemy-move' : 'enemy'"
         >
-          <transition
-            :name="
-              movingIndices.includes(get_index(i, j)) ? 'enemy-move' : 'enemy'
-            "
-          >
-            <enemy-comp
-              v-if="field[get_index(i, j)]"
-              :key="(field[get_index(i, j)] as Enemy)?.id || get_index(i, j)"
-              :enemy="field[get_index(i, j)] as Enemy"
-              :index="get_index(i, j)"
-              :in_cross="in_cross_enemy_index === get_index(i, j)"
-            />
-          </transition>
-        </td>
-      </tr>
-    </table>
+          <enemy-comp
+            v-if="field[idx - 1]"
+            :key="(field[idx - 1] as Enemy)?.id || idx - 1"
+            :enemy="field[idx - 1] as Enemy"
+            :index="idx - 1"
+            :in_cross="in_cross_enemy_index === idx - 1"
+          />
+        </transition>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -92,9 +89,6 @@ export default defineComponent({
   },
 
   methods: {
-    get_index(i: number, j: number): number {
-      return (i - 1) * 3 + (j - 1)
-    },
     exec_damage_ai_card(i: number): void {
       this.$emit("exec_damage_ai_card", this.field[i])
     },
@@ -105,19 +99,26 @@ export default defineComponent({
 <style scoped>
 .field {
   width: 73%;
-  overflow: hidden;
+  height: 100%;
+  margin-top: 1%;
 }
 
-.table {
-  table-layout: fixed;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 1fr);
   width: 100%;
+  height: 100%;
 }
 
-table tr,
-td {
-  height: 20vh;
+.cell {
   overflow: hidden;
   padding: 3px;
+}
+
+.cell :deep(.card-enemy-component) {
+  width: min(100%, calc(var(--vh, 1vh) * 11.5));
+  margin: 0 auto;
 }
 
 /*

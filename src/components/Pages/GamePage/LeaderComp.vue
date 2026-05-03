@@ -87,6 +87,14 @@ export default defineComponent({
 })
 </script>
 
+<style scoped>
+.leader-comp {
+  width: 100%;
+  max-width: calc(var(--vh, 1vh) * 12);
+  margin: 0 auto;
+}
+</style>
+
 <style>
 /* добавляем псевдоэлемент к семантичному селектору card-item-component*/
 .not-charges > div.card-item-component::after {

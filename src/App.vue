@@ -67,6 +67,7 @@ export default defineComponent({
   padding: 0;
   box-sizing: border-box;
   user-select: none;
+  touch-action: manipulation;
   font-family: "Roboto", "Inter", "Philosopher", sans-serif;
   /* font-family: Arial, Helvetica, sans-serif; единый на всё */
   -ms-overflow-style: none;
@@ -102,7 +103,7 @@ body {
   z-index: -2;
   background: #fff;
   width: 100%;
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
 }
 
 .wrapper__bg {
