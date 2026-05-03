@@ -45,7 +45,35 @@ export default defineComponent({
     tg.ready()
     tg.expand()
 
-    // вот здесь мы просто добавим setTimeOut и переход дальше через 2сек
+    // touch-action: manipulation removes the 300ms delay but also stops iOS WKWebView
+    // from synthesising dblclick events. This polyfill restores them.
+    if ("ontouchstart" in window) {
+      let lastTapTime = 0
+      let lastTapTarget: EventTarget | null = null
+      document.addEventListener(
+        "touchend",
+        (e: TouchEvent) => {
+          const now = Date.now()
+          const target = e.target
+          if (target === lastTapTarget && now - lastTapTime < 300) {
+            target!.dispatchEvent(
+              new MouseEvent("dblclick", {
+                bubbles: true,
+                cancelable: true,
+                view: window,
+              })
+            )
+            lastTapTime = 0
+            lastTapTarget = null
+          } else {
+            lastTapTime = now
+            lastTapTarget = target
+          }
+        },
+        { passive: true }
+      )
+    }
+
     await this.$store.dispatch("fetchNews")
     await this.$router.push("/")
     try {
