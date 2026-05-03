@@ -36,6 +36,7 @@ export default defineComponent({
   display: flex;
   text-align: center;
   bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .footer__btn {
