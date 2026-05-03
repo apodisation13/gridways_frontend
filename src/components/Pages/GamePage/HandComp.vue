@@ -128,6 +128,7 @@ export default defineComponent({
 .hand {
   width: 99%;
   margin-top: 2%;
+  margin-bottom: 2%;
 }
 
 .hand-list {
@@ -141,7 +142,7 @@ export default defineComponent({
 
 .card_wrap {
   z-index: var(--z);
-  width: 26%;
+  width: calc(var(--vh, 1vh) * 11.5);
   margin-left: -10%;
   margin-right: -10%;
   transform: rotate(var(--rot)) translateY(var(--arc));

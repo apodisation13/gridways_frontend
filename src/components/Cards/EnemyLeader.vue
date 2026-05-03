@@ -139,8 +139,11 @@ export default defineComponent({
 <style scoped>
 .enemy-leader {
   position: relative;
-  margin-top: 21px;
+  margin-top: min(21px, calc(var(--vh, 1vh) * 2.5));
   width: 100%;
+  max-width: calc(var(--vh, 1vh) * 12);
+  margin-left: auto;
+  margin-right: auto;
   box-shadow: -4px 0 4px rgb(0 0 0 / 50%);
 }
 

@@ -118,7 +118,7 @@ export default defineComponent({
     },
     count: {
       type: Number,
-      default: 0,
+      default: 1,
     },
     hp_needed: {
       // hp только для декбилдера, для игры не нужно оно

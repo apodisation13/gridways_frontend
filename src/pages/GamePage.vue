@@ -361,10 +361,13 @@ export default defineComponent({
 .game-page {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  height: calc(var(--vh, 1vh) * 100);
+  overflow: hidden;
 }
 
 .game-block {
+  flex: 1;
+  min-height: 0;
   display: flex;
   justify-content: center;
 }
@@ -375,7 +378,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   justify-content: center; /* или flex-start */
-  gap: 8px; /* фиксированный отступ между элементами */
+  gap: min(8px, calc(var(--vh, 1vh) * 1));
 }
 
 .div-two-buttons {
