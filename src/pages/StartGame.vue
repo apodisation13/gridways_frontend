@@ -168,7 +168,7 @@ export default defineComponent({
 .start-game__page {
   display: flex;
   flex-direction: column;
-  padding-bottom: 57px;
+  padding-bottom: calc(57px + env(safe-area-inset-bottom, 0px));
   height: calc(var(--vh, 1vh) * 100 - 100px);
   color: white;
 }
