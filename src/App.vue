@@ -45,6 +45,40 @@ export default defineComponent({
     tg.ready()
     tg.expand()
 
+    // iOS WKWebView suppresses dblclick when touch-action: manipulation is active.
+    // Polyfill: detect double-tap via pointerup and dispatch synthetic dblclick.
+    const isIOS =
+      /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+    if (isIOS) {
+      let lastTapTime = 0
+      let lastTapTarget: EventTarget | null = null
+      document.addEventListener(
+        "pointerup",
+        (e: PointerEvent) => {
+          if (e.pointerType !== "touch") return
+          const now = Date.now()
+          const target = e.target!
+          const elapsed = now - lastTapTime
+          if (target === lastTapTarget && elapsed > 50 && elapsed < 300) {
+            target.dispatchEvent(
+              new MouseEvent("dblclick", {
+                bubbles: true,
+                cancelable: true,
+                view: window,
+              })
+            )
+            lastTapTime = 0
+            lastTapTarget = null
+          } else {
+            lastTapTime = now
+            lastTapTarget = target
+          }
+        },
+        { passive: true }
+      )
+    }
+
     await this.$store.dispatch("fetchNews")
     await this.$router.push("/")
     try {
