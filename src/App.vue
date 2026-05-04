@@ -77,6 +77,20 @@ export default defineComponent({
         },
         { passive: true }
       )
+
+      let lastTouchEnd = 0
+      document.addEventListener(
+        "touchend",
+        (e: TouchEvent) => {
+          const now = Date.now()
+          const elapsed = now - lastTouchEnd
+          if (elapsed > 0 && elapsed < 300) {
+            e.preventDefault()
+          }
+          lastTouchEnd = now
+        },
+        { passive: false }
+      )
     }
 
     await this.$store.dispatch("fetchNews")
