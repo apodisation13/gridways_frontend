@@ -363,6 +363,7 @@ export default defineComponent({
   flex-direction: column;
   height: calc(var(--vh, 1vh) * 100);
   overflow: hidden;
+  touch-action: manipulation;
 }
 
 .game-block {

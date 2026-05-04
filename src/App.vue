@@ -56,8 +56,9 @@ export default defineComponent({
         "pointerup",
         (e: PointerEvent) => {
           if (e.pointerType !== "touch") return
+          const target = e.target as Element | null
+          if (!target?.closest(".game-page")) return
           const now = Date.now()
-          const target = e.target!
           const elapsed = now - lastTapTime
           if (target === lastTapTarget && elapsed > 50 && elapsed < 300) {
             target.dispatchEvent(
@@ -99,7 +100,6 @@ export default defineComponent({
   padding: 0;
   box-sizing: border-box;
   user-select: none;
-  touch-action: manipulation;
   font-family: "Roboto", "Inter", "Philosopher", sans-serif;
   /* font-family: Arial, Helvetica, sans-serif; единый на всё */
   -ms-overflow-style: none;
