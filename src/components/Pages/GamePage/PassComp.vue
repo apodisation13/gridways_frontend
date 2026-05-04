@@ -50,5 +50,6 @@ export default defineComponent({
   position: relative;
   font-size: 25px;
   color: white;
+  touch-action: manipulation;
 }
 </style>
