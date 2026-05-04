@@ -42,7 +42,11 @@ export default defineComponent({
       const elapsed = now - this.lastTapTime
       if (elapsed > 50 && elapsed < 300) {
         ;(e.currentTarget as Element).dispatchEvent(
-          new MouseEvent("dblclick", { bubbles: true, cancelable: true, view: window })
+          new MouseEvent("dblclick", {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          })
         )
         this.lastTapTime = 0
       } else {
