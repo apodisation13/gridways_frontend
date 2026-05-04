@@ -45,18 +45,22 @@ export default defineComponent({
     tg.ready()
     tg.expand()
 
-    // touch-action: manipulation removes the 300ms delay but also stops iOS WKWebView
-    // from synthesising dblclick events. This polyfill restores them.
-    if ("ontouchstart" in window) {
+    // touch-action: manipulation removes the 300ms delay but stops iOS WKWebView from
+    // synthesising dblclick. pointerup fires exactly once per lifted finger on both
+    // iOS and Android, unlike touchend which can fire spuriously on Android Chrome.
+    // The 50ms minimum filters sub-tap noise; 300ms maximum matches browser dblclick.
+    if ("PointerEvent" in window) {
       let lastTapTime = 0
       let lastTapTarget: EventTarget | null = null
       document.addEventListener(
-        "touchend",
-        (e: TouchEvent) => {
+        "pointerup",
+        (e: PointerEvent) => {
+          if (e.pointerType !== "touch") return
           const now = Date.now()
-          const target = e.target
-          if (target === lastTapTarget && now - lastTapTime < 300) {
-            target!.dispatchEvent(
+          const target = e.target!
+          const elapsed = now - lastTapTime
+          if (target === lastTapTarget && elapsed > 50 && elapsed < 300) {
+            target.dispatchEvent(
               new MouseEvent("dblclick", {
                 bubbles: true,
                 cancelable: true,

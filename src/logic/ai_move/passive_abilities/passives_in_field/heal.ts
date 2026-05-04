@@ -63,6 +63,7 @@ export function heal_random(
 ): void {
   let all_enemies = get_all_enemies(field, enemy_leader)
   const random_enemy = choice_element(all_enemies)
+  if (!random_enemy) return
 
   const hp_delta = enemy.data?.passive?.value
   if (!hp_delta) return
