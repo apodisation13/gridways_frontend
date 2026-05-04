@@ -45,40 +45,6 @@ export default defineComponent({
     tg.ready()
     tg.expand()
 
-    // touch-action: manipulation removes the 300ms delay but stops iOS WKWebView from
-    // synthesising dblclick. pointerup fires exactly once per lifted finger on both
-    // iOS and Android, unlike touchend which can fire spuriously on Android Chrome.
-    // The 50ms minimum filters sub-tap noise; 300ms maximum matches browser dblclick.
-    if ("PointerEvent" in window) {
-      let lastTapTime = 0
-      let lastTapTarget: EventTarget | null = null
-      document.addEventListener(
-        "pointerup",
-        (e: PointerEvent) => {
-          if (e.pointerType !== "touch") return
-          const target = e.target as Element | null
-          if (!target?.closest(".game-page")) return
-          const now = Date.now()
-          const elapsed = now - lastTapTime
-          if (target === lastTapTarget && elapsed > 50 && elapsed < 300) {
-            target.dispatchEvent(
-              new MouseEvent("dblclick", {
-                bubbles: true,
-                cancelable: true,
-                view: window,
-              })
-            )
-            lastTapTime = 0
-            lastTapTarget = null
-          } else {
-            lastTapTime = now
-            lastTapTarget = target
-          }
-        },
-        { passive: true }
-      )
-    }
-
     await this.$store.dispatch("fetchNews")
     await this.$router.push("/")
     try {
@@ -136,6 +102,7 @@ body {
   background: #fff;
   width: 100%;
   height: calc(var(--vh, 1vh) * 100);
+  touch-action: manipulation;
 }
 
 .wrapper__bg {
