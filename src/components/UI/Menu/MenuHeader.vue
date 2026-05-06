@@ -146,6 +146,7 @@ export default defineComponent({
     return {
       routes: [
         { title: "Главная", path: "/main" },
+        { title: "Магазин", path: "/shop", requireAuth: true },
         { title: "Правила", path: "/rules" },
         { title: "О нас", path: "/about" },
         { title: "Статистика", path: "/stats", requireAuth: true },

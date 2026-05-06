@@ -13,6 +13,7 @@ import LosePage from "@/pages/LosePage"
 import MainPage from "@/pages/MainPage"
 import RulesPage from "@/pages/RulesPage"
 import SettingsPage from "@/pages/SettingsPage"
+import ShopPage from "@/pages/ShopPage"
 import StartGame from "@/pages/StartGame"
 import StatsPage from "@/pages/StatsPage.vue"
 import WinPage from "@/pages/WinPage"
@@ -71,6 +72,14 @@ const routes = [
       requireAuth: true,
       notRequireMenu: true,
       image: images.field,
+    },
+  },
+  {
+    path: "/shop",
+    component: ShopPage,
+    meta: {
+      requireAuth: true,
+      image: images.bonus,
     },
   },
   {

@@ -30,6 +30,8 @@
           @open-resource-confirm="openResource"
         />
       </div>
+
+      <button class="shop-btn" @click="$router.push('/shop')">В магазин</button>
     </div>
     <reward-comp
       v-else
@@ -319,5 +321,20 @@ div {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   padding: 8px;
+}
+
+.shop-btn {
+  display: block;
+  width: calc(100% - 16px);
+  margin: 12px 8px 8px;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary-gold-gradient);
+  font-family: "Philosopher", serif;
+  font-size: 18px;
+  font-weight: bold;
+  color: #1a1208;
+  cursor: pointer;
 }
 </style>
