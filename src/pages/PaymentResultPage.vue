@@ -7,7 +7,11 @@
 
     <div v-else-if="status === 'success'" class="state">
       <div class="state__icon state__icon--success">✓</div>
-      <p class="state__text global_text">Ресурсы зачислены!</p>
+      <p class="state__text global_text">
+        Ресурсы зачислены!
+        <br />
+        Они уже доступны в вашем профиле
+      </p>
       <button class="state__btn" @click="$router.push('/main')">
         На главную
       </button>
