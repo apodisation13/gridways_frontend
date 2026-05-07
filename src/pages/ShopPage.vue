@@ -7,9 +7,9 @@
     <div class="shop-list">
       <div v-for="item in shopItems" :key="item.id" class="shop-item">
         <span class="shop-item__title global_text">{{ item.title }}</span>
-        <div class="shop-item__resources">
+        <div v-if="item.data.resources" class="shop-item__resources">
           <resource-item
-            v-for="[name, count] in Object.entries(item.data)"
+            v-for="[name, count] in Object.entries(item.data.resources!)"
             :key="name"
             :name="name"
             :count="count"
@@ -38,58 +38,6 @@ import ShopConfirmModal from "@/components/ModalWindows/ShopConfirmModal.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
 import type { ShopItem } from "@/types"
 
-const SHOP_ITEMS: ShopItem[] = [
-  { id: 1, title: "Малый набор", price: 59, data: { kegs: 2, money: 100 } },
-  {
-    id: 2,
-    title: "Средний набор",
-    price: 149,
-    data: { big_kegs: 1, kegs: 3, keys: 1 },
-  },
-  {
-    id: 3,
-    title: "Большой набор",
-    price: 349,
-    data: { chests: 1, big_kegs: 2, keys: 2 },
-  },
-  {
-    id: 4,
-    title: "Большой набор",
-    price: 349,
-    data: { chests: 1, big_kegs: 2, keys: 2 },
-  },
-  {
-    id: 5,
-    title: "Большой набор",
-    price: 349,
-    data: { chests: 1, big_kegs: 2, keys: 2 },
-  },
-  {
-    id: 6,
-    title: "Большой набор",
-    price: 349,
-    data: { chests: 1, big_kegs: 2, keys: 2 },
-  },
-  {
-    id: 7,
-    title: "Большой набор",
-    price: 349,
-    data: { chests: 1, big_kegs: 2, keys: 2 },
-  },
-  {
-    id: 8,
-    title: "Большой набор",
-    price: 349,
-    data: { chests: 1, big_kegs: 2, keys: 2 },
-  },
-  {
-    id: 9,
-    title: "Вот это будет какая-то очень длинная фраза, которая говорит что-то нам",
-    price: 99,
-    data: { crops: 50, wood: 50, silk: 20, scraps: 20,  chests: 20,  bronze_ingots: 10, silver_ingots: 10, money: 10000 },
-  },
-]
-
 export default defineComponent({
   name: "ShopPage",
   components: { ResourceItem, ShopConfirmModal },
@@ -99,14 +47,21 @@ export default defineComponent({
   },
   data() {
     return {
-      shopItems: SHOP_ITEMS,
       selectedItem: null as ShopItem | null,
     }
   },
+  computed: {
+    shopItems(): ShopItem[] | null {
+      return this.$store.getters["allProducts"]
+    },
+  },
+  async created() {
+    await this.$store.dispatch("fetchProducts")
+  },
   methods: {
     handleConfirm(): void {
-      this.toast.info("Скоро!")
       this.selectedItem = null
+      this.$router.push("/payment/result?payment_id=test_123")
     },
   },
 })

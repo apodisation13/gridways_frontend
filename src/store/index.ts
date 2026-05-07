@@ -6,6 +6,7 @@ import type { GameState } from "@/store/modules/game"
 import game from "@/store/modules/game"
 import login from "@/store/modules/login"
 import news from "@/store/modules/news"
+import purchases from "@/store/modules/purchases"
 import type { SettingsState } from "@/store/modules/settings"
 import settings from "@/store/modules/settings"
 import statistics from "@/store/modules/statistics"
@@ -28,6 +29,7 @@ const store = createStore({
     game,
     user_actions,
     news,
+    purchases,
     settings,
     fullscreen,
     statistics,

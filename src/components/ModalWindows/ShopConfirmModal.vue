@@ -4,7 +4,7 @@
       <h2 class="shop-confirm__title global_text">{{ item.title }}</h2>
       <div class="shop-confirm__resources">
         <resource-item
-          v-for="[name, count] in Object.entries(item.data)"
+          v-for="[name, count] in Object.entries(item.data.resources!)"
           :key="name"
           :name="name"
           :count="count"
