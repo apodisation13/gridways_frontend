@@ -10,8 +10,14 @@
           :count="count"
         />
       </div>
-      <button class="shop-confirm__btn" @click="$emit('confirm')">
-        Подтвердить покупку за {{ item.price }} ₽
+      <button
+        class="shop-confirm__btn"
+        :disabled="loading"
+        @click="confirm(item.id)"
+      >
+        {{
+          loading ? "Подождите..." : `Подтвердить покупку за ${item.price} ₽`
+        }}
       </button>
     </div>
   </base-modal>
@@ -31,8 +37,17 @@ export default defineComponent({
       type: Object as PropType<ShopItem>,
       required: true,
     },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ["close", "confirm"],
+  methods: {
+    confirm(productId: number) {
+      this.$emit("confirm", productId)
+    },
+  },
 })
 </script>
 
@@ -72,5 +87,11 @@ export default defineComponent({
   font-weight: bold;
   color: #1a1208;
   cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.shop-confirm__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>

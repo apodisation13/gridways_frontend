@@ -6,3 +6,12 @@ export interface ShopItem {
     resources?: Record<string, number>
   }
 }
+
+export interface PurchaseProductResponse {
+  purchase_id: number
+  confirmation_url: string | null
+}
+
+export interface PurchaseStatusResponse {
+  status: "pending" | "succeeded" | "failed"
+}

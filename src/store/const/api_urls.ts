@@ -44,3 +44,5 @@ export const WORLD_LEADERBOARD = `${getDomain()}/statistics/{userId}/leaderboard
 
 // products and purchases
 export const PRODUCTS = `${getDomain()}/products`
+export const PURCHASE_PRODUCT = `${getDomain()}/user/{userId}/purchase-product/{productId}`
+export const PURCHASE_STATUS = `${getDomain()}/user/{userId}/purchase-status/{purchaseId}`

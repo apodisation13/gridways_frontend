@@ -24,6 +24,7 @@
     <shop-confirm-modal
       v-if="selectedItem"
       :item="selectedItem"
+      :loading="purchasing"
       @close="selectedItem = null"
       @confirm="handleConfirm"
     />
@@ -36,7 +37,7 @@ import { useToast } from "vue-toastification"
 
 import ShopConfirmModal from "@/components/ModalWindows/ShopConfirmModal.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
-import type { ShopItem } from "@/types"
+import type { PurchaseProductResponse, ShopItem } from "@/types"
 
 export default defineComponent({
   name: "ShopPage",
@@ -48,6 +49,7 @@ export default defineComponent({
   data() {
     return {
       selectedItem: null as ShopItem | null,
+      purchasing: false,
     }
   },
   computed: {
@@ -59,9 +61,24 @@ export default defineComponent({
     await this.$store.dispatch("fetchProducts")
   },
   methods: {
-    handleConfirm(): void {
-      this.selectedItem = null
-      this.$router.push("/payment/result?payment_id=test_123")
+    async handleConfirm(productId: number): Promise<void> {
+      this.purchasing = true
+      try {
+        const result: PurchaseProductResponse = await this.$store.dispatch(
+          "purchaseProduct",
+          productId
+        )
+        this.selectedItem = null
+        if (result.confirmation_url) {
+          window.location.href = result.confirmation_url
+        } else {
+          this.$router.push(`/payment/result?payment_id=${result.purchase_id}`)
+        }
+      } catch {
+        this.toast.error("Ошибка при создании платежа")
+      } finally {
+        this.purchasing = false
+      }
     },
   },
 })

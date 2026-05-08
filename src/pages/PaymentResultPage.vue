@@ -47,8 +47,8 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 
-const POLL_INTERVAL_MS = 2000
-const MAX_POLLS = 15 // 30 секунд
+const POLL_INTERVAL_MS = 5000
+const MAX_POLLS = 12 // 60 секунд
 
 type PaymentStatus = "pending" | "success" | "failed" | "timeout"
 
@@ -88,7 +88,6 @@ export default defineComponent({
 
   methods: {
     async poll(paymentId: string): Promise<void> {
-      console.log(paymentId)
       this.pollCount++
 
       if (this.pollCount >= MAX_POLLS) {
@@ -98,10 +97,17 @@ export default defineComponent({
       }
 
       try {
-        // TODO: заменить на реальный вызов когда бэк будет готов
-        // const { data } = await api.get(`/shop/payment-status?payment_id=${paymentId}`)
-        // if (data.status === 'succeeded') { this.status = 'success'; this.stopPolling() }
-        // if (data.status === 'failed')    { this.status = 'failed';  this.stopPolling() }
+        const data = await this.$store.dispatch(
+          "checkPurchaseStatus",
+          paymentId
+        )
+        if (data.status === "succeeded") {
+          this.status = "success"
+          this.stopPolling()
+        } else if (data.status === "failed") {
+          this.status = "failed"
+          this.stopPolling()
+        }
       } catch {
         // сетевая ошибка — продолжаем поллить
       }

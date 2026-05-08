@@ -1,6 +1,15 @@
 import { callApi, HttpMethod } from "@/lib/api/api"
-import { PRODUCTS } from "@/store/const/api_urls"
-import { ActionContext, ShopItem } from "@/types"
+import {
+  PRODUCTS,
+  PURCHASE_PRODUCT,
+  PURCHASE_STATUS,
+} from "@/store/const/api_urls"
+import {
+  ActionContext,
+  PurchaseProductResponse,
+  PurchaseStatusResponse,
+  ShopItem,
+} from "@/types"
 
 interface ShopState {
   products: ShopItem[] | null
@@ -33,6 +42,46 @@ const actions = {
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Ошибка при загрузке продуктов")
+    }
+  },
+
+  async purchaseProduct(
+    { dispatch, getters }: ActionContext,
+    productId: number
+  ) {
+    const userId = getters["getUser"].user_id
+    try {
+      const response = await callApi<PurchaseProductResponse>({
+        method: HttpMethod.POST,
+        url: PURCHASE_PRODUCT.replace("{userId}", userId).replace(
+          "{productId}",
+          productId.toString()
+        ),
+      })
+      return response.data
+    } catch (err) {
+      dispatch("error_action", err)
+      throw new Error("Ошибка при загрузке продуктов")
+    }
+  },
+
+  async checkPurchaseStatus(
+    { dispatch, getters }: ActionContext,
+    purchaseId: string
+  ): Promise<PurchaseStatusResponse> {
+    const userId = getters["getUser"].user_id
+    try {
+      const response = await callApi<PurchaseStatusResponse>({
+        method: HttpMethod.GET,
+        url: PURCHASE_STATUS.replace("{userId}", userId).replace(
+          "{purchaseId}",
+          purchaseId
+        ),
+      })
+      return response.data
+    } catch (err) {
+      dispatch("error_action", err)
+      throw err
     }
   },
 }
