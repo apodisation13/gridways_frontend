@@ -8,6 +8,10 @@ services:
       args:
         - VUE_APP_CUSTOM_ENV=${VUE_APP_CUSTOM_ENV}
         - VUE_APP_DOMAIN=${VUE_APP_DOMAIN}
+        - VUE_APP_TG=${VUE_APP_TG}
+        - VUE_APP_EMAIL=${VUE_APP_EMAIL}
+        - VUE_APP_INN=${VUE_APP_INN}
+        - VUE_APP_PHONE=${VUE_APP_PHONE}
     networks:
       - app-network
     ports:
