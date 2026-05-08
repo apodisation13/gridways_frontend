@@ -4,10 +4,18 @@ FROM node:20-alpine AS build-stage
 # Принимаем аргументы сборки
 ARG VUE_APP_CUSTOM_ENV
 ARG VUE_APP_DOMAIN
+ARG VUE_APP_TG
+ARG VUE_APP_EMAIL
+ARG VUE_APP_INN
+ARG VUE_APP_PHONE
 
 # Превращаем их в переменные окружения для npm run build
 ENV VUE_APP_CUSTOM_ENV=$VUE_APP_CUSTOM_ENV
 ENV VUE_APP_DOMAIN=$VUE_APP_DOMAIN
+ENV VUE_APP_TG=$VUE_APP_TG
+ENV VUE_APP_EMAIL=$VUE_APP_EMAIL
+ENV VUE_APP_INN=$VUE_APP_INN
+ENV VUE_APP_PHONE=$VUE_APP_PHONE
 
 
 # делаем каталог 'app' текущим рабочим каталогом

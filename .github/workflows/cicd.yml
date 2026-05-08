@@ -77,6 +77,10 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
           build-args: |
             VUE_APP_DOMAIN=${{ secrets.VUE_APP_DOMAIN }}
+            VUE_APP_TG=${{ secrets.VUE_APP_TG }}
+            VUE_APP_EMAIL=${{ secrets.VUE_APP_EMAIL }}
+            VUE_APP_INN=${{ secrets.VUE_APP_INN }}
+            VUE_APP_PHONE=${{ secrets.VUE_APP_PHONE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

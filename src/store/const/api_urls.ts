@@ -41,3 +41,8 @@ export const OPEN_RELATED_LEVELS = `${getDomain()}/user-progress/{userId}/open-r
 export const USER_STATS = `${getDomain()}/statistics/{userId}/stats`
 export const USER_LEADERBOARD = `${getDomain()}/statistics/{userId}/leaderboard`
 export const WORLD_LEADERBOARD = `${getDomain()}/statistics/{userId}/leaderboard-world`
+
+// products and purchases
+export const PRODUCTS = `${getDomain()}/products`
+export const PURCHASE_PRODUCT = `${getDomain()}/user/{userId}/purchase-product/{productId}`
+export const PURCHASE_STATUS = `${getDomain()}/user/{userId}/purchase-status/{purchaseId}`
