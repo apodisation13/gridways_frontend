@@ -47,6 +47,9 @@
     <div v-if="show_ability && !forEnemy && c?.ability?.name" class="text">
       {{ formatCardAbility(c) }} <br />
     </div>
+    <div v-if="!forEnemy && c.data?.multi" class="text">
+      Карта бьет по {{ c.data.multi.value }} целям <br />
+    </div>
     <!--Описание абилки для карты врага-->
     <div v-if="show_ability && forEnemy" class="text">
       {{ formatEnemyMove(c) }} <br />

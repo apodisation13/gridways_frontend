@@ -21,6 +21,9 @@ export interface CardData {
     reset_timer?: boolean
     each_tick?: boolean
   }
+  multi?: {
+    value: number
+  }
 }
 
 export interface LeaderData {
@@ -39,6 +42,9 @@ export interface LeaderData {
     default_timer?: number
     reset_timer?: boolean
     each_tick?: boolean
+  }
+  multi?: {
+    value: number
   }
 }
 

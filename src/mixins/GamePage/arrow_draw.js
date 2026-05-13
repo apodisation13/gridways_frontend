@@ -15,6 +15,10 @@ export const arrowMixin = {
       _handleMouseUp: null,
       _handleTouchMove: null,
       _handleTouchEnd: null,
+      // multi-target state
+      multiMode: false,
+      multiCount: 0,
+      multiLockedTargets: [], // { isLeader: bool, fieldValue: Enemy|null }
     }
   },
 
@@ -51,7 +55,8 @@ export const arrowMixin = {
     },
 
     // Единая точка входа — каждый компонент передаёт свой DOM-элемент и фракцию
-    beginArrowDrawing(startElement, clientX, clientY, faction) {
+    // multiCount > 1 включает режим мульти-целей
+    beginArrowDrawing(startElement, clientX, clientY, faction, multiCount = 0) {
       const rect = startElement.getBoundingClientRect()
       this.arrowStartX = rect.left + rect.width / 2
       this.arrowStartY = rect.top + rect.height / 2
@@ -59,6 +64,9 @@ export const arrowMixin = {
       this.arrowCurrentY = clientY
       this.arrowFaction = faction
       this.isDrawingArrow = true
+      this.multiMode = multiCount > 1
+      this.multiCount = multiCount
+      this.multiLockedTargets = []
       this.addArrowEventListeners()
       this.drawArrow()
     },
@@ -193,8 +201,55 @@ export const arrowMixin = {
       if (this.ctx && this.canvas) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
       }
+
       const elems = document.elementsFromPoint(clientX, clientY)
-      this.get_target(elems, true) // компонент реализует get_target сам
+
+      if (this.multiMode) {
+        const targetInfo = this._getTargetInfo(elems)
+        // Финальный выстрел: все предыдущие цели залочены, эта — последняя
+        if (
+          targetInfo &&
+          this.multiLockedTargets.length === this.multiCount - 1
+        ) {
+          const finalTarget = targetInfo.isLeader
+            ? { isLeader: true, fieldValue: null }
+            : { isLeader: false, fieldValue: this.field[targetInfo.index] }
+          const allTargets = [...this.multiLockedTargets, finalTarget]
+          this.$emit("enemy_in_cross", null)
+          this.$emit("enemy_leader_in_cross", false)
+          this.$emit("enemy_in_cross_locked", null)
+          this.$emit("target_enemy_multi", allTargets)
+        } else {
+          // Отмена: отпустили мимо цели или не набрали нужное число залоченных
+          this.$emit("enemy_in_cross", null)
+          this.$emit("enemy_leader_in_cross", false)
+          this.$emit("enemy_in_cross_locked", null)
+        }
+        this.multiLockedTargets = []
+        this.multiMode = false
+        this.multiCount = 0
+      } else {
+        this.get_target(elems, true)
+      }
+    },
+
+    // Возвращает информацию о цели под курсором без эмитов (только для stopArrowDrawing)
+    _getTargetInfo(elems) {
+      let elem = null
+      elems.forEach(el => {
+        if (
+          el.className === "card-enemy-component" ||
+          el.className === "enemy-leader"
+        ) {
+          elem = el
+        }
+      })
+      if (!elem) return null
+      const id = elem.id
+      if (!id) return null
+      if (id.includes("enemy_leader")) return { isLeader: true, index: null }
+      const index = parseInt(id.slice(id.indexOf("_") + 1))
+      return { isLeader: false, index }
     },
 
     addArrowEventListeners() {
@@ -279,11 +334,28 @@ export const arrowMixin = {
       if (id.includes("enemy_leader")) {
         console.log("ЭТО ЛИДЕР ВРАГА")
         if (fire) {
+          // fire=true вызывается только в не-multi режиме
           this.$emit("enemy_leader_in_cross", false)
           this.$emit("target_enemy_leader")
           return false
         } else {
           if (this.$store.getters["animationOn"]) {
+            // В multi режиме: лочим лидера врагов, если ещё не залочен и лимит не набран
+            if (
+              this.multiMode &&
+              this.multiLockedTargets.length < this.multiCount - 1
+            ) {
+              const alreadyLocked = this.multiLockedTargets.some(
+                t => t.isLeader
+              )
+              if (!alreadyLocked) {
+                this.multiLockedTargets.push({
+                  isLeader: true,
+                  fieldValue: null,
+                })
+                this.$emit("enemy_in_cross_locked", "leader")
+              }
+            }
             this.$emit("enemy_leader_in_cross", true)
             return true
           }
@@ -293,11 +365,28 @@ export const arrowMixin = {
       const index = parseInt(id.slice(id.indexOf("_") + 1))
       console.log("ИНДЕКС КЛЕТКИ ПОЛЯ ВРАГА", index)
       if (fire) {
+        // fire=true вызывается только в не-multi режиме
         this.$emit("enemy_in_cross", null)
         this.$emit("target_enemy", this.field[index])
         return false
       } else {
         if (this.$store.getters["animationOn"]) {
+          // В multi режиме: лочим этого врага, если ещё не залочен и лимит не набран
+          if (
+            this.multiMode &&
+            this.multiLockedTargets.length < this.multiCount - 1
+          ) {
+            const alreadyLocked = this.multiLockedTargets.some(
+              t => !t.isLeader && t.fieldValue === this.field[index]
+            )
+            if (!alreadyLocked) {
+              this.multiLockedTargets.push({
+                isLeader: false,
+                fieldValue: this.field[index],
+              })
+              this.$emit("enemy_in_cross_locked", index)
+            }
+          }
           this.$emit("enemy_in_cross", index)
           return true
         }

@@ -19,7 +19,7 @@ import { defineComponent, type PropType } from "vue"
 
 import CardItem from "@/components/Cards/CardItem.vue"
 import { arrowMixin } from "@/mixins/GamePage/arrow_draw"
-import type { Enemy, Leader } from "@/types"
+import type { Enemy, EnemyLeader, Leader } from "@/types"
 
 export default defineComponent({
   components: {
@@ -36,6 +36,11 @@ export default defineComponent({
       type: Array as PropType<(Enemy | "")[]>,
       default: () => [],
     },
+    enemy_leader: {
+      required: false,
+      default: null,
+      type: Object as PropType<EnemyLeader | null>,
+    },
   },
 
   emits: [
@@ -44,6 +49,8 @@ export default defineComponent({
     "target_enemy_leader",
     "enemy_leader_in_cross",
     "enemy_in_cross",
+    "enemy_in_cross_locked",
+    "target_enemy_multi",
   ],
   mounted() {
     ;(this as any).initArrowCanvas(9998)
@@ -54,6 +61,12 @@ export default defineComponent({
     ;(this as any).removeArrowCanvas()
   },
   methods: {
+    effectiveMultiCount(rawCount: number): number {
+      if (rawCount <= 1) return rawCount
+      const fieldCount = (this.field || []).filter(f => f !== "").length
+      const leaderCount = (this.enemy_leader?.data?.hp ?? 0) > 0 ? 1 : 0
+      return Math.min(rawCount, fieldCount + leaderCount)
+    },
     handleCardMouseDown(e: MouseEvent): void {
       e.preventDefault()
       e.stopPropagation()
@@ -61,11 +74,15 @@ export default defineComponent({
       const el = document.querySelector(".leader-comp")
       if (!el) return
       this.$emit("exec_leader")
+      const multiCount = this.effectiveMultiCount(
+        this.leader.data?.multi?.value ?? 0
+      )
       ;(this as any).beginArrowDrawing(
         el,
         e.clientX,
         e.clientY,
-        this.leader.faction
+        this.leader.faction,
+        multiCount
       )
     },
     handleCardTouchStart(e: TouchEvent): void {
@@ -76,11 +93,15 @@ export default defineComponent({
       if (!el) return
       const touch = e.touches[0]
       this.$emit("exec_leader")
+      const multiCount = this.effectiveMultiCount(
+        this.leader.data?.multi?.value ?? 0
+      )
       ;(this as any).beginArrowDrawing(
         el,
         touch.clientX,
         touch.clientY,
-        this.leader.faction
+        this.leader.faction,
+        multiCount
       )
     },
   },

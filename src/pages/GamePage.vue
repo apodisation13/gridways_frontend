@@ -5,6 +5,7 @@
       <field-comp
         :field="gameObj.field"
         :in_cross_enemy_index="inCrossEnemyIndex"
+        :multi_locked_indices="multiLockedIndices"
         @exec_damage_ai_card="exec_damage_enemy_card"
       />
 
@@ -56,6 +57,8 @@
           @target_enemy_leader="exec_damage_enemy_leader"
           @enemy_leader_in_cross="switch_enemy_leader_in_cross"
           @enemy_in_cross="switch_enemy_in_cross"
+          @enemy_in_cross_locked="switch_enemy_in_cross_locked"
+          @target_enemy_multi="exec_damage_enemy_card_multi"
         />
 
         <!-- Просто полоска с жизнями (пока что) -->
@@ -75,6 +78,8 @@
       @target_enemy_leader="exec_damage_enemy_leader"
       @enemy_leader_in_cross="switch_enemy_leader_in_cross"
       @enemy_in_cross="switch_enemy_in_cross"
+      @enemy_in_cross_locked="switch_enemy_in_cross_locked"
+      @target_enemy_multi="exec_damage_enemy_card_multi"
     />
 
     <special-case-abilities
@@ -84,11 +89,14 @@
       :enemyView="enemyView"
       :card_ability="selectedCardAbilityDescription"
       :field="gameObj.field"
+      :enemy_leader="gameObj.enemy_leader"
       @confirm_selection="confirm_selection"
       @target_enemy="exec_damage_enemy_card"
       @target_enemy_leader="exec_damage_enemy_leader"
       @enemy_leader_in_cross="switch_enemy_leader_in_cross"
       @enemy_in_cross="switch_enemy_in_cross"
+      @enemy_in_cross_locked="switch_enemy_in_cross_locked"
+      @target_enemy_multi="exec_damage_enemy_card_multi"
     />
 
     <transition name="modal" appear>
@@ -118,7 +126,10 @@ import LeaderComp from "@/components/Pages/GamePage/LeaderComp.vue"
 import PassComp from "@/components/Pages/GamePage/PassComp.vue"
 import RedrawComp from "@/components/Pages/GamePage/RedrawComp.vue"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities.vue"
-import { damage_ai_card } from "@/logic/player_move/player_move"
+import {
+  damage_ai_card,
+  damage_ai_card_multi,
+} from "@/logic/player_move/player_move"
 import { remove_dead_card } from "@/logic/player_move/service/service_for_player_move"
 import draw from "@/mixins/GamePage/draw"
 import execaimove from "@/mixins/GamePage/execaimove"
@@ -180,6 +191,8 @@ export default defineComponent({
       // если лидер врагов или враг под прицелом, у него будет анимация свечения
       inCrossEnemyLeader: false,
       inCrossEnemyIndex: null as number | null,
+      // залоченные цели в режиме multi — остаются мигать до выстрела или отмены
+      multiLockedIndices: [] as number[],
     }
   },
   computed: {
@@ -351,6 +364,36 @@ export default defineComponent({
       // index - это или null если мы ушли мышкой с клетки поля, или индекс поля врага
       this.inCrossEnemyLeader = false
       this.inCrossEnemyIndex = index
+    },
+
+    // multi: залочить цель (index) или сбросить все залоченные (null)
+    switch_enemy_in_cross_locked(indexOrNull: number | "leader" | null): void {
+      if (indexOrNull === null) {
+        this.multiLockedIndices = []
+      } else if (typeof indexOrNull === "number") {
+        if (!this.multiLockedIndices.includes(indexOrNull)) {
+          this.multiLockedIndices.push(indexOrNull)
+        }
+      }
+      // "leader" — лидер врагов залочен как первая цель; его анимация управляется inCrossEnemyLeader
+    },
+
+    // multi: выстрел по нескольким целям одновременно
+    exec_damage_enemy_card_multi(
+      targets: Array<{ isLeader: boolean; fieldValue: Enemy | null }>
+    ): void {
+      this.can_draw = false
+      this.multiLockedIndices = []
+      damage_ai_card_multi(this.selected_card!, this.gameObj, targets)
+      if (this.isActive.player_leader) {
+        // ходили лидером: рука остаётся активной, лидер деактивируется (как в damageEnemyByLeader)
+        this.afterDamage()
+        this.isActive.player_leader = false
+      } else {
+        // ходили картой из руки: блокируем руку (как в damageEnemyByCard)
+        if (!this.sca) this.isActive.player_cards = false
+        this.afterDamage()
+      }
     },
   },
 })
