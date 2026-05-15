@@ -180,31 +180,26 @@
 import { defineComponent } from "vue"
 
 import ResourceList from "@/components/ResourceList.vue"
+import {
+  ModalState,
+  UpgradeCategory,
+  UpgradeItem,
+  UpgradesConfig,
+  UserUpgrades,
+} from "@/types/upgrades"
 
-type UpgradeLevel = {
-  value: number | boolean
-  next: Record<string, number> | null
-}
-
-type UpgradeItem = {
-  ordering: number
-  title: string
-  upgrades: Record<number, UpgradeLevel>
-}
-
-type UpgradeCategory = {
-  ordering: number
-  title: string
-  upgrades: Record<string, UpgradeItem>
-}
-
-type UpgradesConfig = Record<string, UpgradeCategory>
-type UserUpgrades = Record<string, Record<string, number | boolean>>
-
-type ModalState = {
-  category: string
-  key: string
-  item: UpgradeItem
+const RESOURCE_ORDER: Record<string, number> = {
+  scraps: 0,
+  raw_bronze: 1,
+  raw_silver: 2,
+  raw_gold: 3,
+  crops: 4,
+  wood: 5,
+  silk: 6,
+  bronze_ingots: 7,
+  silver_ingots: 8,
+  gold_ingots: 9,
+  money: Infinity,
 }
 
 const FAKE_UPGRADES_CONFIG: UpgradesConfig = {
@@ -530,7 +525,7 @@ const FAKE_UPGRADES_CONFIG: UpgradesConfig = {
     upgrades: {
       money: {
         ordering: 0,
-        title: "Доход монет",
+        title: "Запас монет",
         upgrades: {
           0: {
             value: 5000,
@@ -635,7 +630,7 @@ const FAKE_UPGRADES_CONFIG: UpgradesConfig = {
       },
       scraps: {
         ordering: 4,
-        title: "scraps",
+        title: "Запас тряпок",
         upgrades: {
           0: { value: 2000, next: { money: -1000, crops: -500 } },
           1: { value: 3000, next: { money: -1000, crops: -500, wood: -200 } },
@@ -700,7 +695,7 @@ const FAKE_UPGRADES_CONFIG: UpgradesConfig = {
       },
       kegs: {
         ordering: 1,
-        title: "kegs/big kegs/chests",
+        title: "Запас бочек/коробок",
         upgrades: {
           0: { value: 0, next: { money: -1000, wood: -300 } },
           1: { value: 1, next: { money: -1000, wood: -500 } },
@@ -773,7 +768,7 @@ const FAKE_UPGRADES_CONFIG: UpgradesConfig = {
       },
       silk: {
         ordering: 6,
-        title: "silk",
+        title: "Запас золотого шёлка",
         upgrades: {
           0: { value: 0, next: { money: -1000, raw_gold: -5 } },
           1: { value: 3, next: { money: -1000, raw_gold: -8 } },
@@ -810,7 +805,7 @@ const FAKE_UPGRADES_CONFIG: UpgradesConfig = {
       },
       rare_gems: {
         ordering: 7,
-        title: "rare_gems",
+        title: "Запас редких камней",
         upgrades: {
           0: { value: 0, next: { money: -2000 } },
           1: { value: 1, next: { money: -3000 } },
@@ -822,7 +817,7 @@ const FAKE_UPGRADES_CONFIG: UpgradesConfig = {
       },
       wood: {
         ordering: 5,
-        title: "wood",
+        title: "Запас соломы/дерева",
         upgrades: {
           0: { value: 3000, next: { money: -1000, crops: -500, wood: -200 } },
           1: { value: 5000, next: { money: -1500, crops: -700, wood: -400 } },
@@ -863,7 +858,7 @@ const FAKE_UPGRADES_CONFIG: UpgradesConfig = {
       },
       ingots: {
         ordering: 3,
-        title: "ingots",
+        title: "Запас слитков",
         upgrades: {
           0: { value: 0, next: { money: -1000, crops: -1000 } },
           1: { value: 5, next: { money: -1500, raw_bronze: -30 } },
@@ -926,7 +921,7 @@ const FAKE_UPGRADES_CONFIG: UpgradesConfig = {
       },
       raw: {
         ordering: 2,
-        title: "raw",
+        title: "Запас чистых камней",
         upgrades: {
           0: { value: 50, next: { money: -1000, crops: -500 } },
           1: { value: 75, next: { money: -1500, crops: -700, wood: -400 } },
@@ -981,11 +976,11 @@ const FAKE_UPGRADES_CONFIG: UpgradesConfig = {
   },
 }
 
-const FAKE_USER_UPGRADES: UserUpgrades = {
-  game: { max_cards_in_deck: 2, hand_size: 0 },
-  settings: { avatar: 1, theme: 0 },
-  resources: { money: 1, scraps: 0 },
-}
+// const FAKE_USER_UPGRADES: UserUpgrades = {
+//   game: { max_cards_in_deck: 2, hand_size: 0 },
+//   settings: { avatar: 1, theme: 0 },
+//   resources: { money: 1, scraps: 0 },
+// }
 
 export default defineComponent({
   name: "UpgradesPage",
@@ -996,10 +991,12 @@ export default defineComponent({
       modal: null as ModalState | null,
       showRoadmap: false,
       upgradesConfig: FAKE_UPGRADES_CONFIG as UpgradesConfig,
-      userUpgrades: FAKE_USER_UPGRADES as UserUpgrades,
     }
   },
   computed: {
+    userUpgrades(): UserUpgrades {
+      return this.$store.getters["userUpgrades"]
+    },
     sortedCategoryEntries(): Array<{ key: string; data: UpgradeCategory }> {
       return Object.entries(this.upgradesConfig)
         .map(([key, data]) => ({ key, data }))
@@ -1025,6 +1022,9 @@ export default defineComponent({
         width: `${100 / this.categoryKeys.length}%`,
       }
     },
+  },
+  async created() {
+    await this.$store.dispatch("getUserUpgrades")
   },
   methods: {
     userLevel(category: string, key: string): number {
@@ -1061,14 +1061,22 @@ export default defineComponent({
       const level = this.userLevel(category, key)
       const raw = item.upgrades[level]?.next ?? null
       if (!raw) return {}
-      return Object.fromEntries(
-        Object.entries(raw).map(([k, v]) => [k, Math.abs(v)])
+      const entries = Object.entries(raw).map(
+        ([k, v]) => [k, Math.abs(v)] as [string, number]
       )
+      entries.sort(
+        (a, b) => (RESOURCE_ORDER[a[0]] ?? 99) - (RESOURCE_ORDER[b[0]] ?? 99)
+      )
+      return Object.fromEntries(entries)
     },
     positiveCost(next: Record<string, number>): Record<string, number> {
-      return Object.fromEntries(
-        Object.entries(next).map(([k, v]) => [k, Math.abs(v)])
+      const entries = Object.entries(next).map(
+        ([k, v]) => [k, Math.abs(v)] as [string, number]
       )
+      entries.sort(
+        (a, b) => (RESOURCE_ORDER[a[0]] ?? 99) - (RESOURCE_ORDER[b[0]] ?? 99)
+      )
+      return Object.fromEntries(entries)
     },
     maxLevelNum(item: UpgradeItem): number {
       return Math.max(...Object.keys(item.upgrades).map(Number))

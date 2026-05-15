@@ -10,6 +10,7 @@ import purchases from "@/store/modules/purchases"
 import type { SettingsState } from "@/store/modules/settings"
 import settings from "@/store/modules/settings"
 import statistics from "@/store/modules/statistics"
+import upgrades from "@/store/modules/upgrades"
 import user_actions from "@/store/modules/user_actions"
 
 export interface RootState {
@@ -33,6 +34,7 @@ const store = createStore({
     settings,
     fullscreen,
     statistics,
+    upgrades,
   },
   state: {},
   getters: {},
