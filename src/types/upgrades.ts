@@ -1,5 +1,7 @@
+import { UserResources } from "@/types/database"
+
 type UpgradeLevel = {
-  value: number | boolean
+  value: number
   next: Record<string, number> | null
 }
 
@@ -16,11 +18,11 @@ export type UpgradeCategory = {
 }
 
 export type UpgradesConfig = Record<string, UpgradeCategory>
-export type UserUpgrades = Record<string, Record<string, number | boolean>>
+export type UserUpgrades = Record<string, Record<string, number>>
 
 export type ModalState = {
-  category: string
-  key: string
+  category: UpgradeType
+  key: UpgradeSubtype
   item: UpgradeItem
 }
 
@@ -48,4 +50,21 @@ export enum UpgradeSubtype {
   WOOD = "wood",
   INGOTS = "ingots",
   RAW = "raw",
+}
+
+export interface UpgradesResponse {
+  upgrades: UserUpgrades
+  resources: UserResources
+}
+
+export function get_value_from_upgrades(
+  upgrades: UpgradesConfig,
+  userUpgrades: UserUpgrades,
+  upgradeType: UpgradeType,
+  upgradeSubtype: UpgradeSubtype
+) {
+  const userLevel = userUpgrades[upgradeType][upgradeSubtype]
+  if (userLevel === undefined || userLevel === null) return 0
+  return upgrades[upgradeType].upgrades[upgradeSubtype].upgrades[userLevel]
+    .value
 }

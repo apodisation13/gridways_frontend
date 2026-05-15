@@ -4,6 +4,7 @@ import { callApi, HttpMethod } from "@/lib/api/api"
 import {
   CARDS_DATABASE,
   GAME_CONST,
+  UPGRADES,
   USER_DATABASE,
 } from "@/store/const/api_urls"
 import {
@@ -24,6 +25,7 @@ import {
   UserResources,
   UserSeason,
 } from "@/types"
+import { UserUpgrades } from "@/types/upgrades"
 
 const toast = useToast()
 
@@ -242,6 +244,12 @@ const actions = {
       })
       commit("set_cardsdb", cards_response.data)
 
+      const upgrades = await callApi<UserUpgrades>({
+        method: HttpMethod.GET,
+        url: UPGRADES.replace("{userId}", userId),
+      })
+      commit("setUserUpgrades", upgrades.data)
+
       const user_database = await callApi<UserProgressResponse>({
         method: HttpMethod.GET,
         url: USER_DATABASE.replace("{userId}", userId),
@@ -272,12 +280,18 @@ const actions = {
         url: GAME_CONST,
       })
       const game_const = game_const_response.data
-      commit("set_game_const", game_const) // рука, карт в колоде, распределение рандомных врагов
+      commit("setUpgrades", game_const.upgrades) // все данные об апгрейдах
+      commit("set_game_const", {
+        random_level_enemies_count: game_const.random_level_enemies_count,
+        max_random_n_enemies: game_const.max_random_n_enemies,
+      }) // распределение рандомных врагов
       commit("set_resources_transitions", game_const.resources_transitions) // покупка/продажа ресурсов
       commit("set_keys_rewards", game_const.keys_rewards) // награды за открытие ключей
       commit("set_win_level_rewards", game_const.win_level_rewards) // награды за прохождение уровня
       commit("set_start_level_prices", game_const.start_level_prices) // стоимость игры в уровни
       commit("set_cards_resources_prices", game_const.cards_resources_prices) // крафт/милл карт и лидеров
+
+      dispatch("syncGameUpgrades")
 
       toast.success("Успешно загрузили всю вашу базу данных")
     } catch (err) {

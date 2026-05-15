@@ -32,7 +32,8 @@ const mutations = {
 const actions = {
   async fetchProducts({ dispatch, commit, getters }: ActionContext) {
     const allProducts = getters.allProducts
-    if (!allProducts) return
+    if (allProducts.length > 0) return
+
     try {
       const response = await callApi<ShopItem[]>({
         method: HttpMethod.GET,

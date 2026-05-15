@@ -2,7 +2,9 @@ import { callApi, HttpMethod } from "@/lib/api/api"
 import { UPGRADES } from "@/store/const/api_urls"
 import { ActionContext } from "@/types"
 import {
+  get_value_from_upgrades,
   UpgradesConfig,
+  UpgradesResponse,
   UpgradeSubtype,
   UpgradeType,
   UserUpgrades,
@@ -34,7 +36,11 @@ const mutations = {
 
 const actions = {
   async getUserUpgrades({ commit, getters }: ActionContext) {
+    const userUpgrades: UserUpgrades = getters["userUpgrades"]
+    if (Object.keys(userUpgrades).length > 0) return
+
     const userId = getters["getUser"].user_id
+
     try {
       const upgrades = await callApi<UserUpgrades>({
         method: HttpMethod.GET,
@@ -47,7 +53,7 @@ const actions = {
   },
 
   async postUserUpgrade(
-    { getters }: ActionContext,
+    { commit, getters }: ActionContext,
     {
       upgradeType,
       upgradeSubtype,
@@ -55,14 +61,37 @@ const actions = {
   ) {
     const userId = getters["getUser"].user_id
     try {
-      await callApi({
+      const response = await callApi<UpgradesResponse>({
         method: HttpMethod.POST,
         url: UPGRADES.replace("{userId}", userId),
         data: { upgradeType, upgradeSubtype },
       })
+      console.log(63, response.data)
+      commit("setUserUpgrades", response.data.upgrades)
+      commit("set_resource", response.data.resources)
     } catch (err) {
       console.log(err)
+      throw err
     }
+  },
+
+  syncGameUpgrades({ commit, getters }: ActionContext) {
+    const upgradesConfig: UpgradesConfig = getters["upgradesConfig"]
+    const userUpgrades: UserUpgrades = getters["userUpgrades"]
+    commit("set_game_const", {
+      hand_size: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.HAND_SIZE
+      ),
+      number_of_cards_in_deck: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.MAX_CARDS_IN_DECK
+      ),
+    })
   },
 }
 

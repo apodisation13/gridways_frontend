@@ -86,16 +86,18 @@ const mutations = {
   set_game_const(
     state: GameState,
     payload: {
-      hand_size: number
-      number_of_cards_in_deck: number
-      random_level_enemies_count: Record<string, unknown>
+      hand_size?: number
+      number_of_cards_in_deck?: number
+      random_level_enemies_count?: Record<string, unknown>
       max_random_n_enemies?: number
     }
   ) {
-    state.hand_size = payload.hand_size
-    state.cards_in_deck = payload.number_of_cards_in_deck
-    state.random_level_enemies_count = payload.random_level_enemies_count
-    state.max_random_n_enemies = payload.max_random_n_enemies ?? 55
+    state.hand_size = payload.hand_size ?? state.hand_size
+    state.cards_in_deck = payload.number_of_cards_in_deck ?? state.cards_in_deck
+    state.random_level_enemies_count =
+      payload.random_level_enemies_count ?? state.random_level_enemies_count
+    state.max_random_n_enemies =
+      payload.max_random_n_enemies ?? state.max_random_n_enemies ?? 55
   },
   set_whole_deck(state: GameState, deck: DeckEntry) {
     state.whole_deck = deck
