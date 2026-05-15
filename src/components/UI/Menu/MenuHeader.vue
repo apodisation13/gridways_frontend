@@ -146,11 +146,12 @@ export default defineComponent({
     return {
       routes: [
         { title: "Главная", path: "/main" },
-        { title: "Магазин", path: "/shop", requireAuth: true },
         { title: "Правила", path: "/rules" },
-        { title: "О нас", path: "/about" },
+        { title: "Магазин", path: "/shop", requireAuth: true },
+        { title: "Прокачка", path: "/upgrades", requireAuth: true },
         { title: "Статистика", path: "/stats", requireAuth: true },
         { title: "Доска лидеров", path: "/leaderboard", requireAuth: true },
+        { title: "О нас", path: "/about" },
         { title: "Настройки", path: "/settings", requireAuth: true },
       ] as { title: string; path: string; requireAuth?: boolean }[],
       expanded: false,
