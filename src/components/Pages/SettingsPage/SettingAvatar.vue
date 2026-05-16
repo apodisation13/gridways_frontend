@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="changeAvatarsOpened">
     <div v-for="(el, index) in avatars" :key="index" class="inlines">
       <div class="inlines">
         <img
@@ -14,12 +14,16 @@
       Сбросить аватар
     </base-button>
   </div>
+  <div v-else class="avatar-locked">
+    Изменение аватара закрыто! Измените это в разделе Прокачка
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue"
 
 import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
+import { UpgradeSubtype, UpgradeType } from "@/types/upgrades"
 
 export default defineComponent({
   name: "SettingAvatar",
@@ -30,6 +34,15 @@ export default defineComponent({
         link: string
       }[],
     }
+  },
+  computed: {
+    changeAvatarsOpened(): boolean {
+      return (
+        this.$store.getters["userUpgrades"][UpgradeType.SETTINGS][
+          UpgradeSubtype.AVATAR
+        ] == 1
+      )
+    },
   },
   methods: {
     setAvatar(path: string): void {

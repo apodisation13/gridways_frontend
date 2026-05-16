@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="changeThemeOpened">
     <div
       v-for="el in themes"
       :key="el"
@@ -16,12 +16,16 @@
       </button>
     </div>
   </div>
+  <div v-else class="themes-locked">
+    Изменение темы закрыто! Измените это в разделе Прокачка
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue"
 
 import { styleOuter, styleWrapper } from "@/logic/border_styles"
+import { UpgradeSubtype, UpgradeType } from "@/types/upgrades"
 
 export default defineComponent({
   name: "SettingChooseTheme",
@@ -29,6 +33,15 @@ export default defineComponent({
     return {
       themes: [1, 2, 3, 4],
     }
+  },
+  computed: {
+    changeThemeOpened(): boolean {
+      return (
+        this.$store.getters["userUpgrades"][UpgradeType.SETTINGS][
+          UpgradeSubtype.THEME
+        ] == 1
+      )
+    },
   },
   methods: {
     styleOuter(el: number): Record<string, string> | undefined {
