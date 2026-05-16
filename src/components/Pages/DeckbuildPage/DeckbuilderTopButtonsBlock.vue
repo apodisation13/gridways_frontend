@@ -41,11 +41,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+import { useToast } from "vue-toastification"
 
 import BaseModal from "@/components/ModalWindows/BaseModal.vue"
 import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon.vue"
 import ButtonToggleCardList from "@/components/Pages/DeckbuildPage/Buttons/ButtonToggleCardList.vue"
 import FilterFactions from "@/components/Pages/DeckbuildPage/FilterFactions.vue"
+import { DeckEntry } from "@/types"
 
 export default defineComponent({
   components: {
@@ -74,6 +76,10 @@ export default defineComponent({
     "reset",
     "reset-filters",
   ],
+  setup() {
+    const toast = useToast()
+    return { toast }
+  },
   data() {
     return {
       disable_start_animation: true as boolean, // флаг выключения первичной анимации
@@ -96,6 +102,16 @@ export default defineComponent({
       this.$emit("trigger_show_list", value)
     },
     clickAddButton(): void {
+      // проверка - можно ли создать колоду, теперь управляется через апгрейды
+      const currentDecks: DeckEntry[] = this.$store.getters["all_decks"]
+      const upgradeMaxDecksCount: number = this.$store.getters["maxDecks"]
+      if (currentDecks.length >= upgradeMaxDecksCount) {
+        this.toast.warning(
+          "Нельзя создать больше колод, прокачайте свой уровень в разделе Прокачка"
+        )
+        return
+      }
+
       if (!this.showNewDeckFactionSelect && !this.deckBuilding) {
         this.showNewDeckFactionSelect = true
         return

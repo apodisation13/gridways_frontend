@@ -53,7 +53,7 @@ const actions = {
   },
 
   async postUserUpgrade(
-    { commit, getters }: ActionContext,
+    { commit, getters, dispatch }: ActionContext,
     {
       upgradeType,
       upgradeSubtype,
@@ -64,11 +64,11 @@ const actions = {
       const response = await callApi<UpgradesResponse>({
         method: HttpMethod.POST,
         url: UPGRADES.replace("{userId}", userId),
-        data: { upgradeType, upgradeSubtype },
+        data: { upgrade_type: upgradeType, upgrade_subtype: upgradeSubtype },
       })
-      console.log(63, response.data)
       commit("setUserUpgrades", response.data.upgrades)
       commit("set_resource", response.data.resources)
+      dispatch("syncGameUpgrades")
     } catch (err) {
       console.log(err)
       throw err
@@ -78,7 +78,7 @@ const actions = {
   syncGameUpgrades({ commit, getters }: ActionContext) {
     const upgradesConfig: UpgradesConfig = getters["upgradesConfig"]
     const userUpgrades: UserUpgrades = getters["userUpgrades"]
-    commit("set_game_const", {
+    commit("setUpgradesConst", {
       hand_size: get_value_from_upgrades(
         upgradesConfig,
         userUpgrades,
@@ -90,6 +90,24 @@ const actions = {
         userUpgrades,
         UpgradeType.GAME,
         UpgradeSubtype.MAX_CARDS_IN_DECK
+      ),
+      max_decks: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.MAX_DECKS
+      ),
+      max_hp: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.MAX_HP
+      ),
+      max_armor: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.MAX_ARMOR
       ),
     })
   },
