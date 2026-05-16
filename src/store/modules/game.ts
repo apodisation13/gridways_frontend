@@ -1,3 +1,5 @@
+import { useToast } from "vue-toastification"
+
 import type {
   ActionContext,
   DeckCardEntry,
@@ -9,6 +11,8 @@ import type {
   MappedSeason,
   MappedUserLevel,
 } from "@/types"
+
+const toast = useToast()
 
 export interface GameState {
   // параметры из UpgradesConfig[UpgradeType.GAME]
@@ -139,6 +143,13 @@ const mutations = {
     state.current_deck_id = id
   },
   set_health(state: GameState, param: number) {
+    // максимальные жизни колоды теперь ограничены апгрейдом
+    if (param > state.max_hp) {
+      toast.info(
+        "Максимальный уровень здоровья достигнут. Увеличьте его в разделе Прокачка"
+      )
+      param = state.max_hp
+    }
     state.health = param
   },
   set_leader(state: GameState, leader: Leader | undefined) {
@@ -158,11 +169,32 @@ const mutations = {
 
   change_health(state: GameState, param: number) {
     state.health += param
+    // максимальные жизни колоды теперь ограничены апгрейдом
+    if (state.health > state.max_hp) {
+      toast.info(
+        "Максимальный уровень здоровья достигнут. Увеличьте его в разделе Прокачка"
+      )
+      state.health = state.max_hp
+    }
   },
   change_armor(state: GameState, armor_delta: number) {
     state.armor += armor_delta
+    // максимальные броня теперь ограничена апгрейдом
+    if (state.armor > state.max_armor) {
+      toast.info(
+        "Максимальный уровень брони достигнут. Увеличьте его в разделе Прокачка"
+      )
+      state.armor = state.max_armor
+    }
   },
   set_armor(state: GameState, armor_value: number) {
+    // максимальные броня теперь ограничена апгрейдом
+    if (armor_value > state.max_armor) {
+      toast.info(
+        "Максимальный уровень брони достигнут. Увеличьте его в разделе Прокачка"
+      )
+      armor_value = state.max_armor
+    }
     state.armor = armor_value
   },
   set_armor_delta(state: GameState, armor_delta: number | null) {
