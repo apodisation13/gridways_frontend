@@ -78,6 +78,7 @@ const actions = {
   syncGameUpgrades({ commit, getters }: ActionContext) {
     const upgradesConfig: UpgradesConfig = getters["upgradesConfig"]
     const userUpgrades: UserUpgrades = getters["userUpgrades"]
+
     commit("setUpgradesConst", {
       hand_size: get_value_from_upgrades(
         upgradesConfig,
@@ -110,6 +111,101 @@ const actions = {
         UpgradeSubtype.MAX_ARMOR
       ),
     })
+
+    // Создаем новый объект с теми же ключами
+    const upgrades = {} as Record<string, any>
+
+    upgrades["money"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.MONEY
+    )
+    upgrades["scraps"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.SCRAPS
+    )
+    upgrades["silk"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.SILK
+    )
+    upgrades["rare_gems"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.RARE_GEMS
+    )
+    upgrades["kegs"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.KEGS
+    )
+    upgrades["big_kegs"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.KEGS
+    )
+    upgrades["chests"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.KEGS
+    )
+    upgrades["wood"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.WOOD
+    )
+    upgrades["crops"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.WOOD
+    )
+    upgrades["bronze_ingots"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.INGOTS
+    )
+    upgrades["silver_ingots"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.INGOTS
+    )
+    upgrades["gold_ingots"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.INGOTS
+    )
+    upgrades["raw_bronze"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.RAW
+    )
+    upgrades["raw_silver"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.RAW
+    )
+    upgrades["raw_gold"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.RAW
+    )
+    commit("setMaxResourcesValues", upgrades)
   },
 }
 

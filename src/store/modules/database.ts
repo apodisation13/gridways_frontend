@@ -45,6 +45,7 @@ interface DatabaseState {
   decks: DeckEntry[]
   seasons: SeasonEntry[]
   resource: UserResources | Record<string, never>
+  maxResourcesValue: UserResources | Record<string, never>
 
   enemies: Enemy[]
   enemy_leaders: EnemyLeader[]
@@ -67,6 +68,7 @@ const state: DatabaseState = {
   decks: [],
   seasons: [],
   resource: {},
+  maxResourcesValue: {},
 
   enemies: [],
   enemy_leaders: [],
@@ -83,7 +85,9 @@ const getters = {
   all_cards: (state: DatabaseState) => state.cards,
   all_decks: (state: DatabaseState) => state.decks,
   all_seasons: (state: DatabaseState) => state.seasons,
+
   resource: (state: DatabaseState) => state.resource,
+  maxResourcesValue: (state: DatabaseState) => state.maxResourcesValue,
 
   // TODO: has_passive фильтр — баг, типизация query временно any
   filtered_cards: (state: DatabaseState) => (query: any) => {
@@ -152,6 +156,9 @@ const getters = {
 const mutations = {
   set_resource(state: DatabaseState, result: UserResources) {
     state.resource = result
+  },
+  setMaxResourcesValues(state: DatabaseState, payload: UserResources) {
+    state.maxResourcesValue = payload
   },
 
   set_cardsdb(state: DatabaseState, result: CardsResponse) {

@@ -7,7 +7,15 @@
         class="resource-image"
       />
     </div>
-    <div class="resource-count">{{ count }}</div>
+    <div
+      class="resource-count"
+      :class="{
+        'resource-count--empty': count === 0,
+        'resource-count--max': count === maxResourcesValue[name] && count !== 0,
+      }"
+    >
+      {{ count }}
+    </div>
   </div>
 </template>
 
@@ -24,6 +32,11 @@ export default defineComponent({
     count: {
       type: Number,
       default: 0,
+    },
+  },
+  computed: {
+    maxResourcesValue() {
+      return this.$store.getters["maxResourcesValue"]
     },
   },
 })
@@ -54,6 +67,20 @@ export default defineComponent({
   font-size: 12px;
   line-height: 120%;
   background: var(--primary-gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.resource-count--empty {
+  background: linear-gradient(135deg, #ff4444, #cc0000);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.resource-count--max {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
