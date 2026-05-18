@@ -20,6 +20,10 @@
           <span class="about-page__label">Телеграм</span>
           <span class="about-page__value">{{ tg }}</span>
         </div>
+        <div class="about-page__row">
+          <span class="about-page__label">Адрес</span>
+          <span class="about-page__value">{{ address }}</span>
+        </div>
       </div>
 
       <div class="about-page__footer">
@@ -38,6 +42,7 @@ export default {
     return {
       phone: process.env.VUE_APP_PHONE || "",
       email: process.env.VUE_APP_EMAIL || "",
+      address: process.env.VUE_APP_ADDRESS || "",
       tg: process.env.VUE_APP_TG || "",
       inn: process.env.VUE_APP_INN || "",
     }
@@ -93,7 +98,8 @@ export default {
 .about-page__row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start; /* меняем с center на flex-start для высоких строк */
+  gap: 12px; /* добавляем отступ между колонками */
   padding: 10px 14px;
   background: rgba(255, 255, 255, 0.04);
   border-radius: 10px;
@@ -104,6 +110,8 @@ export default {
   font-family: "Philosopher", serif;
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0; /* label не сжимается */
+  min-width: 100px; /* фиксируем минимальную ширину для label */
 }
 
 .about-page__value {
@@ -114,6 +122,10 @@ export default {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 700;
+  text-align: right; /* выравнивание текста вправо */
+  word-break: break-word; /* перенос длинных слов */
+  overflow-wrap: break-word;
+  flex: 1; /* занимает оставшееся место */
 }
 
 .about-page__footer {
