@@ -8,6 +8,7 @@
       />
     </div>
     <div
+      v-if="!show_count"
       class="resource-count"
       :class="{
         'resource-count--empty': count === 0,
@@ -15,6 +16,16 @@
       }"
     >
       {{ count }}
+    </div>
+    <div
+      v-else
+      class="resource-count"
+      :class="{
+        'resource-count--empty': count === 0,
+        'resource-count--max': count === maxResourcesValue[name] && count !== 0,
+      }"
+    >
+      {{ count }} / {{ maxResourcesValue[name] }}
     </div>
   </div>
 </template>
@@ -32,6 +43,10 @@ export default defineComponent({
     count: {
       type: Number,
       default: 0,
+    },
+    show_count: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

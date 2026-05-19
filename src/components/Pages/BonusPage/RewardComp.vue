@@ -31,12 +31,12 @@
           class="reward-resources__wrapper"
           @dblclick="accept_random_reward(resource)"
         >
-          <img
-            :src="require(`@/assets/icons/resources/${resource.resource}.svg`)"
-            alt=""
-            class="reward-resources__item"
+          <resource-item
+            :name="resource.resource"
+            :count="resources[resource.resource]"
+            show_count
+            class="reward-resource-item"
           />
-          <span class="resource-count">{{ resources[resource.resource] }}</span>
           <resource-count-rombus>
             {{ resource.value }}
           </resource-count-rombus>
@@ -50,11 +50,12 @@ import { defineComponent, type PropType } from "vue"
 
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import ResourceCountRombus from "@/components/UI/ResourceCountRombus.vue"
+import ResourceItem from "@/components/UI/ResourceItem.vue"
 import type { CardEntry, KeyRewardResult } from "@/types"
 
 export default defineComponent({
   name: "RewardComp",
-  components: { CardListComponent, ResourceCountRombus },
+  components: { CardListComponent, ResourceCountRombus, ResourceItem },
   props: {
     name: { type: String, required: true },
     reward: {
@@ -176,14 +177,6 @@ export default defineComponent({
   align-items: center;
 }
 
-.resource-count {
-  font-family: "Philosopher", serif;
-  font-size: 1.1rem;
-  color: #ffd700;
-  text-align: center;
-  margin-top: 2px;
-}
-
 .reward-resources {
   display: flex;
   flex-wrap: wrap;
@@ -192,9 +185,12 @@ export default defineComponent({
   margin-top: 10%;
 }
 
-.reward-resources__item {
+.reward-resource-item :deep(.resource-image) {
   width: 100px;
-  height: 80px;
-  object-fit: contain;
+  max-height: 80px;
+}
+
+.reward-resource-item :deep(.resource-count) {
+  font-size: 1.1rem;
 }
 </style>
