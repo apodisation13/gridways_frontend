@@ -17,6 +17,7 @@ import SettingsPage from "@/pages/SettingsPage"
 import ShopPage from "@/pages/ShopPage"
 import StartGame from "@/pages/StartGame"
 import StatsPage from "@/pages/StatsPage.vue"
+import UpgradesPage from "@/pages/UpgradesPage"
 import WinPage from "@/pages/WinPage"
 import { images } from "@/router/const/images"
 import store from "@/store"
@@ -147,6 +148,14 @@ const routes = [
   {
     path: "/bonus",
     component: BonusPage,
+    meta: {
+      requireAuth: true,
+      image: images.bonus,
+    },
+  },
+  {
+    path: "/upgrades",
+    component: UpgradesPage,
     meta: {
       requireAuth: true,
       image: images.bonus,

@@ -1,3 +1,5 @@
+import Upgrades from "@/store/modules/upgrades"
+
 export interface CardData {
   damage: number
   charges: number
@@ -21,6 +23,9 @@ export interface CardData {
     reset_timer?: boolean
     each_tick?: boolean
   }
+  multi?: {
+    value: number
+  }
 }
 
 export interface LeaderData {
@@ -39,6 +44,9 @@ export interface LeaderData {
     default_timer?: number
     reset_timer?: boolean
     each_tick?: boolean
+  }
+  multi?: {
+    value: number
   }
 }
 
@@ -332,6 +340,7 @@ export interface GameConst {
   win_level_rewards: Record<string, unknown>
   start_level_prices: Record<string, unknown>
   cards_resources_prices: Record<string, unknown>
+  upgrades: typeof Upgrades
 }
 
 export interface Faction {

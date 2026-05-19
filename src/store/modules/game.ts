@@ -1,3 +1,5 @@
+import { useToast } from "vue-toastification"
+
 import type {
   ActionContext,
   DeckCardEntry,
@@ -10,9 +12,15 @@ import type {
   MappedUserLevel,
 } from "@/types"
 
+const toast = useToast()
+
 export interface GameState {
-  cards_in_deck: number | undefined
-  hand_size: number | undefined
+  // параметры из UpgradesConfig[UpgradeType.GAME]
+  cards_in_deck: number
+  hand_size: number
+  max_decks: number
+  max_hp: number
+  max_armor: number
 
   random_level_enemies_count: Record<string, unknown>
   max_random_n_enemies: number
@@ -46,8 +54,11 @@ interface GameActionContext extends ActionContext {
 }
 
 const state: GameState = {
-  cards_in_deck: undefined,
-  hand_size: undefined,
+  cards_in_deck: 10,
+  hand_size: 5,
+  max_decks: 2,
+  max_hp: 100,
+  max_armor: 0,
 
   random_level_enemies_count: {},
   max_random_n_enemies: 0,
@@ -77,25 +88,47 @@ const state: GameState = {
 }
 
 const getters = {
+  // параметры для игры, которые берутся из апгрейдов
+  maxCardsInDeck: (state: GameState) => state.cards_in_deck,
+  handSize: (state: GameState) => state.hand_size,
+  maxDecks: (state: GameState) => state.max_decks,
+  maxHp: (state: GameState) => state.max_hp,
+  maxArmor: (state: GameState) => state.max_armor,
+
   get_season: (state: GameState) => state.season,
   currentLevel: (state: GameState) => state.level,
   enemies_grave: (state: GameState) => state.enemies_grave,
 }
 
 const mutations = {
+  setUpgradesConst(
+    state: GameState,
+    payload: {
+      hand_size?: number
+      number_of_cards_in_deck?: number
+      max_decks?: number
+      max_hp?: number
+      max_armor?: number
+    }
+  ) {
+    state.hand_size = payload.hand_size ?? state.hand_size
+    state.cards_in_deck = payload.number_of_cards_in_deck ?? state.cards_in_deck
+    state.max_decks = payload.max_decks ?? state.max_decks
+    state.max_hp = payload.max_hp ?? state.max_hp
+    state.max_armor = payload.max_armor ?? state.max_armor
+  },
+
   set_game_const(
     state: GameState,
     payload: {
-      hand_size: number
-      number_of_cards_in_deck: number
-      random_level_enemies_count: Record<string, unknown>
+      random_level_enemies_count?: Record<string, unknown>
       max_random_n_enemies?: number
     }
   ) {
-    state.hand_size = payload.hand_size
-    state.cards_in_deck = payload.number_of_cards_in_deck
-    state.random_level_enemies_count = payload.random_level_enemies_count
-    state.max_random_n_enemies = payload.max_random_n_enemies ?? 55
+    state.random_level_enemies_count =
+      payload.random_level_enemies_count ?? state.random_level_enemies_count
+    state.max_random_n_enemies =
+      payload.max_random_n_enemies ?? state.max_random_n_enemies ?? 55
   },
   set_whole_deck(state: GameState, deck: DeckEntry) {
     state.whole_deck = deck
@@ -110,6 +143,13 @@ const mutations = {
     state.current_deck_id = id
   },
   set_health(state: GameState, param: number) {
+    // максимальные жизни колоды теперь ограничены апгрейдом
+    if (param > state.max_hp) {
+      toast.info(
+        "Максимальный уровень здоровья достигнут. Увеличьте его в разделе Прокачка"
+      )
+      param = state.max_hp
+    }
     state.health = param
   },
   set_leader(state: GameState, leader: Leader | undefined) {
@@ -129,11 +169,32 @@ const mutations = {
 
   change_health(state: GameState, param: number) {
     state.health += param
+    // максимальные жизни колоды теперь ограничены апгрейдом
+    if (state.health > state.max_hp) {
+      toast.info(
+        "Максимальный уровень здоровья достигнут. Увеличьте его в разделе Прокачка"
+      )
+      state.health = state.max_hp
+    }
   },
   change_armor(state: GameState, armor_delta: number) {
     state.armor += armor_delta
+    // максимальные броня теперь ограничена апгрейдом
+    if (state.armor > state.max_armor) {
+      toast.info(
+        "Максимальный уровень брони достигнут. Увеличьте его в разделе Прокачка"
+      )
+      state.armor = state.max_armor
+    }
   },
   set_armor(state: GameState, armor_value: number) {
+    // максимальные броня теперь ограничена апгрейдом
+    if (armor_value > state.max_armor) {
+      toast.info(
+        "Максимальный уровень брони достигнут. Увеличьте его в разделе Прокачка"
+      )
+      armor_value = state.max_armor
+    }
     state.armor = armor_value
   },
   set_armor_delta(state: GameState, armor_delta: number | null) {

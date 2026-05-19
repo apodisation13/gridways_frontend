@@ -39,7 +39,7 @@ import EnemyComp from "@/components/Cards/EnemyComp.vue"
 import EnemyList from "@/components/Cards/EnemyList.vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import { arrowMixin } from "@/mixins/GamePage/arrow_draw"
-import { Card, CardEntry, CardType, Enemy } from "@/types"
+import { Card, CardEntry, CardType, Enemy, EnemyLeader } from "@/types"
 
 export default defineComponent({
   name: "SpecialCaseAbilities",
@@ -77,6 +77,11 @@ export default defineComponent({
       required: true,
       type: Array as PropType<(Enemy | "")[]>,
     },
+    enemy_leader: {
+      required: false,
+      default: null,
+      type: Object as PropType<EnemyLeader | null>,
+    },
   },
   emits: [
     "confirm_selection",
@@ -84,6 +89,8 @@ export default defineComponent({
     "target_enemy_leader",
     "enemy_leader_in_cross",
     "enemy_in_cross",
+    "enemy_in_cross_locked",
+    "target_enemy_multi",
   ],
 
   data() {
@@ -112,15 +119,27 @@ export default defineComponent({
   },
 
   methods: {
+    effectiveMultiCount(rawCount: number): number {
+      if (rawCount <= 1) return rawCount
+      const fieldCount = (this.field || []).filter(
+        (f: Enemy | "") => f !== ""
+      ).length
+      const leaderCount = (this.enemy_leader?.data?.hp ?? 0) > 0 ? 1 : 0
+      return Math.min(rawCount, fieldCount + leaderCount)
+    },
     handleCardMouseDown(e: MouseEvent): void {
       e.preventDefault()
       e.stopPropagation()
       const faction = (this.pickedCard ?? this.pickedEnemy)?.faction
+      const multiCount = this.effectiveMultiCount(
+        this.pickedCard?.data?.multi?.value ?? 0
+      )
       ;(this as any).beginArrowDrawing(
         e.currentTarget,
         e.clientX,
         e.clientY,
-        faction
+        faction,
+        multiCount
       )
     },
     handleCardTouchStart(e: TouchEvent): void {
@@ -128,11 +147,15 @@ export default defineComponent({
       e.stopPropagation()
       const touch = e.touches[0]
       const faction = (this.pickedCard ?? this.pickedEnemy)?.faction
+      const multiCount = this.effectiveMultiCount(
+        this.pickedCard?.data?.multi?.value ?? 0
+      )
       ;(this as any).beginArrowDrawing(
         e.currentTarget,
         touch.clientX,
         touch.clientY,
-        faction
+        faction,
+        multiCount
       )
     },
 

@@ -4,6 +4,7 @@ import { callApi, HttpMethod } from "@/lib/api/api"
 import {
   CARDS_DATABASE,
   GAME_CONST,
+  UPGRADES,
   USER_DATABASE,
 } from "@/store/const/api_urls"
 import {
@@ -24,6 +25,7 @@ import {
   UserResources,
   UserSeason,
 } from "@/types"
+import { UserUpgrades } from "@/types/upgrades"
 
 const toast = useToast()
 
@@ -43,6 +45,7 @@ interface DatabaseState {
   decks: DeckEntry[]
   seasons: SeasonEntry[]
   resource: UserResources | Record<string, never>
+  maxResourcesValue: UserResources | Record<string, never>
 
   enemies: Enemy[]
   enemy_leaders: EnemyLeader[]
@@ -65,6 +68,7 @@ const state: DatabaseState = {
   decks: [],
   seasons: [],
   resource: {},
+  maxResourcesValue: {},
 
   enemies: [],
   enemy_leaders: [],
@@ -81,7 +85,9 @@ const getters = {
   all_cards: (state: DatabaseState) => state.cards,
   all_decks: (state: DatabaseState) => state.decks,
   all_seasons: (state: DatabaseState) => state.seasons,
+
   resource: (state: DatabaseState) => state.resource,
+  maxResourcesValue: (state: DatabaseState) => state.maxResourcesValue,
 
   // TODO: has_passive фильтр — баг, типизация query временно any
   filtered_cards: (state: DatabaseState) => (query: any) => {
@@ -150,6 +156,9 @@ const getters = {
 const mutations = {
   set_resource(state: DatabaseState, result: UserResources) {
     state.resource = result
+  },
+  setMaxResourcesValues(state: DatabaseState, payload: UserResources) {
+    state.maxResourcesValue = payload
   },
 
   set_cardsdb(state: DatabaseState, result: CardsResponse) {
@@ -242,6 +251,12 @@ const actions = {
       })
       commit("set_cardsdb", cards_response.data)
 
+      const upgrades = await callApi<UserUpgrades>({
+        method: HttpMethod.GET,
+        url: UPGRADES.replace("{userId}", userId),
+      })
+      commit("setUserUpgrades", upgrades.data)
+
       const user_database = await callApi<UserProgressResponse>({
         method: HttpMethod.GET,
         url: USER_DATABASE.replace("{userId}", userId),
@@ -272,12 +287,18 @@ const actions = {
         url: GAME_CONST,
       })
       const game_const = game_const_response.data
-      commit("set_game_const", game_const) // рука, карт в колоде, распределение рандомных врагов
+      commit("setUpgrades", game_const.upgrades) // все данные об апгрейдах
+      commit("set_game_const", {
+        random_level_enemies_count: game_const.random_level_enemies_count,
+        max_random_n_enemies: game_const.max_random_n_enemies,
+      }) // распределение рандомных врагов
       commit("set_resources_transitions", game_const.resources_transitions) // покупка/продажа ресурсов
       commit("set_keys_rewards", game_const.keys_rewards) // награды за открытие ключей
       commit("set_win_level_rewards", game_const.win_level_rewards) // награды за прохождение уровня
       commit("set_start_level_prices", game_const.start_level_prices) // стоимость игры в уровни
       commit("set_cards_resources_prices", game_const.cards_resources_prices) // крафт/милл карт и лидеров
+
+      dispatch("syncGameUpgrades")
 
       toast.success("Успешно загрузили всю вашу базу данных")
     } catch (err) {

@@ -37,7 +37,7 @@ export interface UserStatistics {
 export interface LeaderboardEntry {
   user_id: number
   username: string
-  user_avatar: string
+  user_avatar: string | null
   faction_name: string
   leader_id: number
   max_kills: number

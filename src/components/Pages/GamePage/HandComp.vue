@@ -58,6 +58,8 @@ export default defineComponent({
     "target_enemy_leader",
     "enemy_leader_in_cross",
     "enemy_in_cross",
+    "enemy_in_cross_locked",
+    "target_enemy_multi",
   ],
   data() {
     return {
@@ -91,6 +93,12 @@ export default defineComponent({
       }
     },
 
+    effectiveMultiCount(rawCount: number): number {
+      if (rawCount <= 1) return rawCount
+      const fieldCount = (this.field || []).filter(f => f !== "").length
+      const leaderCount = (this.enemy_leader?.data?.hp ?? 0) > 0 ? 1 : 0
+      return Math.min(rawCount, fieldCount + leaderCount)
+    },
     handleCardMouseDown(e: MouseEvent, index: number): void {
       e.preventDefault()
       e.stopPropagation()
@@ -98,11 +106,15 @@ export default defineComponent({
       const el = document.querySelectorAll(".card_in_hand")[index]
       if (!el) return
       this.$emit("chose_player_card", this.hand[index])
+      const multiCount = this.effectiveMultiCount(
+        this.hand[index].data?.multi?.value ?? 0
+      )
       ;(this as any).beginArrowDrawing(
         el,
         e.clientX,
         e.clientY,
-        this.hand[index].faction
+        this.hand[index].faction,
+        multiCount
       )
     },
     handleCardTouchStart(e: TouchEvent, index: number): void {
@@ -113,11 +125,15 @@ export default defineComponent({
       if (!el) return
       const touch = e.touches[0]
       this.$emit("chose_player_card", this.hand[index])
+      const multiCount = this.effectiveMultiCount(
+        this.hand[index].data?.multi?.value ?? 0
+      )
       ;(this as any).beginArrowDrawing(
         el,
         touch.clientX,
         touch.clientY,
-        this.hand[index].faction
+        this.hand[index].faction,
+        multiCount
       )
     },
   },

@@ -18,7 +18,7 @@
         </span>
         <span class="leader-block-info">
           Размер: {{ deck.deck_is_progress.length }}/{{
-            $store.state.game.cards_in_deck
+            $store.getters["maxCardsInDeck"]
           }}
         </span>
       </div>

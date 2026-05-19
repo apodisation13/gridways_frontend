@@ -129,3 +129,33 @@ export function damage_ai_card(
   // пассивные абилки от хода
   player_passive_abilities_upon_playing_a_card(card, leader, enemy)
 }
+
+export function damage_ai_card_multi(
+  card: Card | Leader,
+  gameObj: GameObj,
+  targets: Array<{ isLeader: boolean; fieldValue: Enemy | null }>
+): void {
+  const ability = card?.ability?.name
+  const timeout = store.getters["selectedMoveTimeout"]
+
+  for (const target of targets) {
+    const enemy: Enemy | EnemyLeader | null = target.isLeader
+      ? (gameObj.enemy_leader ?? null)
+      : target.fieldValue
+    if (!enemy) continue
+    if (ability === CardAbility.Lock) lock_enemy(enemy)
+    damage_one(enemy, card, gameObj, timeout)
+  }
+
+  // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда
+  // чтобы анимация сброса корректно игралась, сброс карты происходит теперь не здесь,
+  // а в special-case-abilities там где закрываем окно и в afterDamage (если не вызывалась sca)
+  change_card_charges(card, -1, timeout)
+
+  // пассивные абилки от хода - а тут костыль))
+  player_passive_abilities_upon_playing_a_card(
+    card,
+    gameObj.leader,
+    gameObj.enemy_leader
+  )
+}

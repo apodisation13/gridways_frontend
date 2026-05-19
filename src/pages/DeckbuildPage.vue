@@ -157,7 +157,7 @@ export default defineComponent({
       return this.$store.getters.filtered_leaders(this.query.faction)
     },
     cant_save_deck(): boolean {
-      const required_count_person = this.$store.state.game.cards_in_deck
+      const required_count_person = this.$store.getters["maxCardsInDeck"]
       return (
         this.deck.deck_is_progress.length !== required_count_person ||
         !this.deck.leader
@@ -318,7 +318,7 @@ export default defineComponent({
       }
       if (
         this.deck.deck_is_progress.length >=
-        this.$store.state.game.cards_in_deck
+        this.$store.getters["maxCardsInDeck"]
       ) {
         return false
       }

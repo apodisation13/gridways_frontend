@@ -16,7 +16,10 @@
             :key="(field[idx - 1] as Enemy)?.id || idx - 1"
             :enemy="field[idx - 1] as Enemy"
             :index="idx - 1"
-            :in_cross="in_cross_enemy_index === idx - 1"
+            :in_cross="
+              in_cross_enemy_index === idx - 1 ||
+              multi_locked_indices.includes(idx - 1)
+            "
           />
         </transition>
       </div>
@@ -42,6 +45,11 @@ export default defineComponent({
       required: false,
       default: null,
       type: Number as unknown as PropType<number | null>,
+    },
+    multi_locked_indices: {
+      required: false,
+      default: () => [],
+      type: Array as PropType<number[]>,
     },
   },
   emits: ["exec_damage_ai_card"],

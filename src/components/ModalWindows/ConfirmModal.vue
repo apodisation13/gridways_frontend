@@ -35,6 +35,13 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.confirm-modal {
+  padding: 24px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .confirm-modal-title-block {
   display: flex;
   flex-direction: column;
@@ -44,8 +51,8 @@ export default defineComponent({
 .confirm-modal-buttons {
   display: flex;
   justify-content: space-around;
-  margin: 0;
 }
+
 .confirm-btn {
   max-width: 120px;
 }

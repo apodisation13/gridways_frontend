@@ -49,7 +49,11 @@
           />
         </div>
 
-        <button :disabled="loading" class="btn-start" @click="start_game">
+        <button
+          :disabled="loading || insufficientResources"
+          class="btn-start"
+          @click="start_game"
+        >
           <themed-button title="НАЧАТЬ" />
         </button>
       </div>
@@ -125,6 +129,12 @@ export default defineComponent({
     },
     selectedDeck(): any {
       return this.$store.state.game.whole_deck
+    },
+    insufficientResources(): boolean {
+      const userResources = this.$store.getters["resource"]
+      return Object.entries(this.play_price).some(
+        ([key, cost]) => (userResources[key] ?? 0) < cost
+      )
     },
   },
   created() {
@@ -255,5 +265,10 @@ export default defineComponent({
   width: 200px;
   height: 60px;
   margin: 18px;
+}
+
+.btn-start:disabled {
+  filter: grayscale(1) brightness(0.55);
+  cursor: not-allowed;
 }
 </style>
