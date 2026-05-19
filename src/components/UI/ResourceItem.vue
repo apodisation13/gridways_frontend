@@ -7,8 +7,9 @@
         class="resource-image"
       />
     </div>
+    <!--Подсвечиваем что достигли предела/нуля и не показываем max value-->
     <div
-      v-if="!show_count"
+      v-if="!show_max_count && highlight_max_count"
       class="resource-count"
       :class="{
         'resource-count--empty': count === 0,
@@ -17,8 +18,9 @@
     >
       {{ count }}
     </div>
+    <!--Подсвечиваем что достигли предела/нуля и показываем max value, в бонусах когда ключ открыли-->
     <div
-      v-else
+      v-else-if="show_max_count && highlight_max_count"
       class="resource-count"
       :class="{
         'resource-count--empty': count === 0,
@@ -26,6 +28,10 @@
       }"
     >
       {{ count }} / {{ maxResourcesValue[name] }}
+    </div>
+    <!--Не подсвечиваем что достигли предела/нуля и не показываем max value, в прокачках где просто ресурсы-->
+    <div v-else class="resource-count">
+      {{ count }}
     </div>
   </div>
 </template>
@@ -44,9 +50,13 @@ export default defineComponent({
       type: Number,
       default: 0,
     },
-    show_count: {
+    show_max_count: {
       type: Boolean,
       default: false,
+    },
+    highlight_max_count: {
+      type: Boolean,
+      default: true,
     },
   },
   computed: {
@@ -102,12 +112,7 @@ export default defineComponent({
 }
 
 @media (max-width: 640px) {
-  .wrapper__resource-image {
-    /* width: 25px; */
-    max-height: 25px;
-  }
   .resource-image {
-    /* max-width: 25px; */
     max-height: 25px;
   }
 }

@@ -9,7 +9,7 @@
         <span class="shop-item__title global_text">{{ item.title }}</span>
         <div v-if="item.data.resources" class="shop-item__resources">
           <resource-item
-            v-for="[name, count] in Object.entries(item.data.resources!)"
+            v-for="[name, count] in sortedResources(item.data.resources!)"
             :key="name"
             :name="name"
             :count="count"
@@ -39,6 +39,20 @@ import ShopConfirmModal from "@/components/ModalWindows/ShopConfirmModal.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
 import type { PurchaseProductResponse, ShopItem } from "@/types"
 
+const RESOURCE_ORDER: Record<string, number> = {
+  scraps: 0,
+  raw_bronze: 1,
+  raw_silver: 2,
+  raw_gold: 3,
+  crops: 4,
+  wood: 5,
+  silk: 6,
+  bronze_ingots: 7,
+  silver_ingots: 8,
+  gold_ingots: 9,
+  money: Infinity,
+}
+
 export default defineComponent({
   name: "ShopPage",
   components: { ResourceItem, ShopConfirmModal },
@@ -61,6 +75,11 @@ export default defineComponent({
     await this.$store.dispatch("fetchProducts")
   },
   methods: {
+    sortedResources(resources: Record<string, number>): [string, number][] {
+      return Object.entries(resources).sort(
+        (a, b) => (RESOURCE_ORDER[a[0]] ?? 99) - (RESOURCE_ORDER[b[0]] ?? 99)
+      )
+    },
     async handleConfirm(productId: number): Promise<void> {
       this.purchasing = true
       try {

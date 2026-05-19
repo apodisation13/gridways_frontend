@@ -34,7 +34,7 @@
           <resource-item
             :name="resource.resource"
             :count="resources[resource.resource]"
-            show_count
+            show_max_count
             class="reward-resource-item"
           />
           <resource-count-rombus>

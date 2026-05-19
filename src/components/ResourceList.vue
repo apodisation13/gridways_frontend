@@ -5,6 +5,8 @@
       :key="name"
       :name="name"
       :count="count"
+      :highlight_max_count="highlight_max_count"
+      :show_max_count="show_max_count"
     />
   </div>
 </template>
@@ -21,6 +23,14 @@ export default defineComponent({
     resources: {
       type: Object as PropType<Record<string, number>>,
       required: true,
+    },
+    show_max_count: {
+      type: Boolean,
+      default: false,
+    },
+    highlight_max_count: {
+      type: Boolean,
+      default: true,
     },
   },
 })

@@ -110,10 +110,15 @@
                 <resource-item
                   :name="String(name)"
                   :count="resource[String(name)] || 0"
+                  :highlight_max_count="false"
                 />
                 <span class="cost-row__arrow">→</span>
                 <div class="cost-row__need">
-                  <resource-item :name="String(name)" :count="cost" />
+                  <resource-item
+                    :name="String(name)"
+                    :count="cost"
+                    :highlight_max_count="false"
+                  />
                 </div>
               </div>
             </div>
@@ -197,7 +202,10 @@
                   >
                 </div>
                 <div v-if="lvlData.next" class="roadmap-row__cost">
-                  <resource-list :resources="positiveCost(lvlData.next)" />
+                  <resource-list
+                    :resources="positiveCost(lvlData.next)"
+                    :highlight_max_count="false"
+                  />
                 </div>
               </div>
             </div>
