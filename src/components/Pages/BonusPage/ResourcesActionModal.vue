@@ -158,6 +158,9 @@ export default defineComponent({
     resources(): Record<string, number> {
       return this.$store.getters["resource"]
     },
+    maxResourcesValue(): Record<string, number> {
+      return this.$store.getters["maxResourcesValue"]
+    },
     res(): Record<string, number> {
       const RESOURCE_ORDER: Record<string, number> = {
         scraps: 0,
@@ -185,6 +188,29 @@ export default defineComponent({
   },
   methods: {
     increase(): void {
+      if (this.action === "buy" || this.action === "craft") {
+        const max = this.maxResourcesValue[this.resource_name]
+        if (max !== undefined) {
+          const current = this.resources[this.resource_name] || 0
+          const maxQuantity = Math.floor((max - current) / this.step)
+          if (this.quantity >= maxQuantity) return
+        }
+      }
+      if (
+        (this.action === "sell" || this.action === "mill") &&
+        this.selected !== null
+      ) {
+        const recipe = this.options[this.selected]
+        const wouldExceed = Object.entries(recipe).some(([res, amount]) => {
+          if (amount <= 0) return false
+          const max = this.maxResourcesValue[res]
+          return (
+            max !== undefined &&
+            (this.resources[res] || 0) + amount * (this.quantity + 1) > max
+          )
+        })
+        if (wouldExceed) return
+      }
       this.quantity++
     },
     decrease(): void {
@@ -217,26 +243,48 @@ export default defineComponent({
     },
     is_affordable(recipe: Recipe): boolean {
       if (this.action === "buy" || this.action === "craft") {
-        return Object.entries(recipe).every(
+        const canAffordCost = Object.entries(recipe).every(
           ([res, amount]) =>
             (this.resources[res] || 0) >= Math.abs(amount) * this.quantity
         )
+        const max = this.maxResourcesValue[this.resource_name]
+        const wouldExceedCap =
+          max !== undefined &&
+          (this.resources[this.resource_name] || 0) +
+            this.quantity * this.step >
+            max
+        return canAffordCost && !wouldExceedCap
       } else if (this.action === "sell") {
-        return (
+        const canSell =
           (this.resources[this.resource_name] || 0) >= this.quantity * this.step
-        )
+        const noCapExceeded = Object.entries(recipe).every(([res, amount]) => {
+          if (amount <= 0) return true
+          const max = this.maxResourcesValue[res]
+          return (
+            max === undefined ||
+            (this.resources[res] || 0) + amount * this.quantity <= max
+          )
+        })
+        return canSell && noCapExceeded
       } else {
         // mill: хватает ли самого ресурса + хватает ли отрицательных (costs)
         const hasMain =
           (this.resources[this.resource_name] || 0) >= this.quantity * this.step
         const hasCosts = Object.entries(recipe)
-          // eslint-disable-next-line no-unused-vars
           .filter(([, amt]) => amt < 0)
           .every(
             ([res, amt]) =>
               (this.resources[res] || 0) >= Math.abs(amt) * this.quantity
           )
-        return hasMain && hasCosts
+        const noCapExceeded = Object.entries(recipe).every(([res, amount]) => {
+          if (amount <= 0) return true
+          const max = this.maxResourcesValue[res]
+          return (
+            max === undefined ||
+            (this.resources[res] || 0) + amount * this.quantity <= max
+          )
+        })
+        return hasMain && hasCosts && noCapExceeded
       }
     },
     is_short(recipe: Recipe, res: string): boolean {

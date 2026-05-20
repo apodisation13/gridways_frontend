@@ -133,7 +133,7 @@ const actions = {
       UpgradeType.RESOURCES,
       UpgradeSubtype.SILK
     )
-    upgrades["rare_gems"] = get_value_from_upgrades(
+    upgrades["rare_gem"] = get_value_from_upgrades(
       upgradesConfig,
       userUpgrades,
       UpgradeType.RESOURCES,

@@ -29,7 +29,8 @@
           v-for="(resource, index) in key_reward"
           :key="index"
           class="reward-resources__wrapper"
-          @dblclick="accept_random_reward(resource)"
+          :class="{ 'reward-resources__wrapper--capped': is_capped(resource) }"
+          @dblclick="!is_capped(resource) && accept_random_reward(resource)"
         >
           <resource-item
             :name="resource.resource"
@@ -80,6 +81,9 @@ export default defineComponent({
     resources(): Record<string, number> {
       return this.$store.getters["resource"]
     },
+    maxResourcesValue(): Record<string, number> {
+      return this.$store.getters["maxResourcesValue"]
+    },
     res(): Record<string, number> {
       const RESOURCE_ORDER: Record<string, number> = {
         scraps: 0,
@@ -122,6 +126,11 @@ export default defineComponent({
       await this.$store.dispatch("processCraftBonusCard", [card.card.id])
       this.$emit("clear_reward")
       this.isLoading = false
+    },
+    is_capped(resource: KeyRewardResult): boolean {
+      const max = this.maxResourcesValue[resource.resource]
+      if (max === undefined) return false
+      return (this.resources[resource.resource] || 0) >= max
     },
     async accept_random_reward(res: KeyRewardResult): Promise<void> {
       this.$emit("accept_key_reward", res)
@@ -192,5 +201,11 @@ export default defineComponent({
 
 .reward-resource-item :deep(.resource-count) {
   font-size: 1.1rem;
+}
+
+.reward-resources__wrapper--capped {
+  opacity: 0.9;
+  cursor: not-allowed;
+  filter: grayscale(1) brightness(0.6);
 }
 </style>
