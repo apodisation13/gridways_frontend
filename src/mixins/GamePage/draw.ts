@@ -17,7 +17,7 @@ export default defineComponent({
     calc_can_draw(): boolean {
       return (
         // this.player_cards_active &&
-        this.gameObj.hand.length < this.$store.state.game.hand_size &&
+        this.gameObj.hand.length < this.$store.getters["handSize"] &&
         this.gameObj.deck.length !== 0
       )
     },

@@ -331,10 +331,8 @@ export interface OpenRelatedLevelsResponse {
 }
 
 export interface GameConst {
-  hand_size: number
-  number_of_cards_in_deck: number
-  random_level_enemies_count: Record<string, unknown>
   max_random_n_enemies: number
+  random_level_enemies_count: Record<string, unknown>
   resources_transitions: Record<string, unknown>
   keys_rewards: Record<string, unknown>
   win_level_rewards: Record<string, unknown>

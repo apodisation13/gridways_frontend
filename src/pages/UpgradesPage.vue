@@ -41,6 +41,9 @@
             :class="{
               'upgrade-item__segment--active':
                 lvl <= userLevel(activeCategoryKey, upgrade.key),
+              'upgrade-item__segment--affordable':
+                lvl === userLevel(activeCategoryKey, upgrade.key) + 1 &&
+                canAffordUpgrade(activeCategoryKey, upgrade.key, upgrade.item),
             }"
           />
         </div>
@@ -340,6 +343,17 @@ export default defineComponent({
       if (value === false) return "Закрыто"
       return String(value)
     },
+    canAffordUpgrade(
+      category: UpgradeType,
+      key: UpgradeSubtype,
+      item: UpgradeItem
+    ): boolean {
+      const cost = this.upgradeCost(category, key, item)
+      if (Object.keys(cost).length === 0) return false
+      return Object.entries(cost).every(
+        ([name, amount]) => (this.resource[name] || 0) >= amount
+      )
+    },
     canUpgrade(
       category: UpgradeType,
       key: UpgradeSubtype,
@@ -585,6 +599,16 @@ div {
 
 .upgrade-item__segment--active {
   background: var(--primary-gold-gradient, #c49000);
+}
+
+.upgrade-item__segment--affordable {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(100, 220, 100, 0.55) 0px,
+    rgba(100, 220, 100, 0.55) 2px,
+    rgba(100, 220, 100, 0.15) 2px,
+    rgba(100, 220, 100, 0.15) 5px
+  );
 }
 
 /* Modal */

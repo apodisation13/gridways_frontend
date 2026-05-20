@@ -214,6 +214,20 @@ export const arrowMixin = {
           const finalTarget = targetInfo.isLeader
             ? { isLeader: true, fieldValue: null }
             : { isLeader: false, fieldValue: this.field[targetInfo.index] }
+          const alreadyLocked = targetInfo.isLeader
+            ? this.multiLockedTargets.some(t => t.isLeader)
+            : this.multiLockedTargets.some(
+                t => !t.isLeader && t.fieldValue === finalTarget.fieldValue
+              )
+          if (alreadyLocked) {
+            this.$emit("enemy_in_cross", null)
+            this.$emit("enemy_leader_in_cross", false)
+            this.$emit("enemy_in_cross_locked", null)
+            this.multiLockedTargets = []
+            this.multiMode = false
+            this.multiCount = 0
+            return
+          }
           const allTargets = [...this.multiLockedTargets, finalTarget]
           this.$emit("enemy_in_cross", null)
           this.$emit("enemy_leader_in_cross", false)

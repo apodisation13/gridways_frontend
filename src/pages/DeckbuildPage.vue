@@ -156,10 +156,13 @@ export default defineComponent({
     leaders(): LeaderEntry[] {
       return this.$store.getters.filtered_leaders(this.query.faction)
     },
+    maxCardsInDeck(): number {
+      return this.$store.getters["maxCardsInDeck"]
+    },
     cant_save_deck(): boolean {
-      const required_count_person = this.$store.getters["maxCardsInDeck"]
       return (
-        this.deck.deck_is_progress.length !== required_count_person ||
+        this.deck.deck_is_progress.length > this.maxCardsInDeck ||
+        this.deck.deck_is_progress.length < 10 ||
         !this.deck.leader
       )
     },
@@ -295,7 +298,13 @@ export default defineComponent({
       }
       // карт ровно 12 и лидер выбран
       if (this.cant_save_deck) {
-        this.toast.warning("Соберите колоду из 12 карт")
+        if (this.maxCardsInDeck == 10) {
+          this.toast.warning("Соберите колоду из 10 карт")
+        } else {
+          this.toast.warning(
+            `Соберите колоду из 10-${this.maxCardsInDeck} карт`
+          )
+        }
         return
       }
       if (this.deck.deck_name.trim() === "") {
