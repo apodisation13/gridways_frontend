@@ -11,6 +11,7 @@ import LoadingPage from "@/pages/LoadingPage"
 import LoginPage from "@/pages/LoginPage"
 import LosePage from "@/pages/LosePage"
 import MainPage from "@/pages/MainPage"
+import PaymentFailPage from "@/pages/PaymentFailPage"
 import PaymentResultPage from "@/pages/PaymentResultPage"
 import RulesPage from "@/pages/RulesPage"
 import SettingsPage from "@/pages/SettingsPage"
@@ -91,6 +92,14 @@ const routes = [
       requireAuth: true,
       notRequireMenu: true,
       image: images.bonus,
+    },
+  },
+  {
+    path: "/payment/fail",
+    component: PaymentFailPage,
+    meta: {
+      requireAuth: false,
+      notRequireMenu: true,
     },
   },
   {

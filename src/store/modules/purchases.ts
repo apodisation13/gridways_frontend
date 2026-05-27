@@ -13,19 +13,25 @@ import {
 
 interface ShopState {
   products: ShopItem[] | null
+  pendingPurchaseId: number | null
 }
 
 const state: ShopState = {
   products: [],
+  pendingPurchaseId: null,
 }
 
 const getters = {
   allProducts: (state: ShopState) => state.products,
+  pendingPurchaseId: (state: ShopState) => state.pendingPurchaseId,
 }
 
 const mutations = {
   setProducts(state: ShopState, products: ShopItem[]) {
     state.products = products
+  },
+  setPendingPurchaseId(state: ShopState, id: number | null) {
+    state.pendingPurchaseId = id
   },
 }
 
@@ -46,18 +52,11 @@ const actions = {
     }
   },
 
-  async purchaseProduct(
-    { dispatch, getters }: ActionContext,
-    productId: number
-  ) {
-    const userId = getters["getUser"].user_id
+  async purchaseProduct({ dispatch }: ActionContext, productId: number) {
     try {
       const response = await callApi<PurchaseProductResponse>({
         method: HttpMethod.POST,
-        url: PURCHASE_PRODUCT.replace("{userId}", userId).replace(
-          "{productId}",
-          productId.toString()
-        ),
+        url: PURCHASE_PRODUCT.replace("{productId}", productId.toString()),
       })
       return response.data
     } catch (err) {
@@ -67,17 +66,13 @@ const actions = {
   },
 
   async checkPurchaseStatus(
-    { dispatch, getters }: ActionContext,
+    { dispatch }: ActionContext,
     purchaseId: string
   ): Promise<PurchaseStatusResponse> {
-    const userId = getters["getUser"].user_id
     try {
       const response = await callApi<PurchaseStatusResponse>({
         method: HttpMethod.GET,
-        url: PURCHASE_STATUS.replace("{userId}", userId).replace(
-          "{purchaseId}",
-          purchaseId
-        ),
+        url: PURCHASE_STATUS.replace("{purchaseId}", purchaseId),
       })
       return response.data
     } catch (err) {

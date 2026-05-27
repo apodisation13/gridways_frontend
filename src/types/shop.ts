@@ -9,9 +9,17 @@ export interface ShopItem {
 
 export interface PurchaseProductResponse {
   purchase_id: number
-  confirmation_url: string | null
+  payment_url: string | null
+  transaction_id: string
+}
+
+export enum PurchaseStatus {
+  PENDING = "pending",
+  SUCCESS = "success",
+  FAILED = "failed",
+  ABANDONED = "abandoned",
 }
 
 export interface PurchaseStatusResponse {
-  status: "pending" | "succeeded" | "failed"
+  status: PurchaseStatus
 }

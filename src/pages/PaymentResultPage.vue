@@ -1,11 +1,11 @@
 <template>
   <div class="payment-result-page">
-    <div v-if="status === 'pending'" class="state">
+    <div v-if="status === PageStatus.PENDING" class="state">
       <div class="spinner" />
       <p class="state__text global_text">Проверяем оплату...</p>
     </div>
 
-    <div v-else-if="status === 'success'" class="state">
+    <div v-else-if="status === PageStatus.SUCCESS" class="state">
       <div class="state__icon state__icon--success">✓</div>
       <p class="state__text global_text">
         Ресурсы зачислены!
@@ -23,7 +23,7 @@
       </button>
     </div>
 
-    <div v-else-if="status === 'failed'" class="state">
+    <div v-else-if="status === PageStatus.FAILED" class="state">
       <div class="state__icon state__icon--failed">✗</div>
       <p class="state__text global_text">Оплата не прошла</p>
       <button class="state__btn" @click="$router.push('/shop')">
@@ -31,7 +31,7 @@
       </button>
     </div>
 
-    <div v-else-if="status === 'timeout'" class="state">
+    <div v-else-if="status === PageStatus.TIMEOUT" class="state">
       <div class="state__icon">⏳</div>
       <p class="state__text global_text">Оплата обрабатывается</p>
       <p class="state__subtext global_text">
@@ -47,39 +47,42 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 
+import { PurchaseStatus } from "@/types"
+
 const POLL_INTERVAL_MS = 5000
 const MAX_POLLS = 12 // 60 секунд
 
-type PaymentStatus = "pending" | "success" | "failed" | "timeout"
+const PageStatus = {
+  PENDING: "pending",
+  SUCCESS: "success",
+  FAILED: "failed",
+  TIMEOUT: "timeout",
+} as const
+
+type PageStatusValue = (typeof PageStatus)[keyof typeof PageStatus]
 
 export default defineComponent({
   name: "PaymentResultPage",
 
+  setup() {
+    return { PageStatus }
+  },
+
   data() {
     return {
-      status: "pending" as PaymentStatus,
+      status: PageStatus.PENDING as PageStatusValue,
       pollCount: 0,
       intervalId: null as ReturnType<typeof setInterval> | null,
     }
   },
 
   created() {
-    const paymentId = this.$route.query.payment_id as string | undefined
-    if (!paymentId) {
+    const purchaseId = this.$store.getters["pendingPurchaseId"] as number | null
+    if (!purchaseId) {
       this.$router.push("/shop")
       return
     }
-
-    if (paymentId.startsWith("test_")) {
-      // тестовый режим: эмулируем успех через 3 секунды
-      setTimeout(() => {
-        this.status = "success"
-      }, 3000)
-      return
-    }
-
-    // реальный поллинг
-    this.intervalId = setInterval(() => this.poll(paymentId), POLL_INTERVAL_MS)
+    this.startPolling(purchaseId.toString())
   },
 
   beforeUnmount() {
@@ -87,11 +90,18 @@ export default defineComponent({
   },
 
   methods: {
+    startPolling(purchaseIdStr: string): void {
+      this.intervalId = setInterval(
+        () => this.poll(purchaseIdStr),
+        POLL_INTERVAL_MS
+      )
+    },
+
     async poll(paymentId: string): Promise<void> {
       this.pollCount++
 
       if (this.pollCount >= MAX_POLLS) {
-        this.status = "timeout"
+        this.status = PageStatus.TIMEOUT
         this.stopPolling()
         return
       }
@@ -101,11 +111,14 @@ export default defineComponent({
           "checkPurchaseStatus",
           paymentId
         )
-        if (data.status === "succeeded") {
-          this.status = "success"
+        if (data.status === PurchaseStatus.SUCCESS) {
+          this.status = PageStatus.SUCCESS
           this.stopPolling()
-        } else if (data.status === "failed") {
-          this.status = "failed"
+        } else if (data.status === PurchaseStatus.FAILED) {
+          this.status = PageStatus.FAILED
+          this.stopPolling()
+        } else if (data.status === PurchaseStatus.ABANDONED) {
+          this.status = PageStatus.FAILED
           this.stopPolling()
         }
       } catch {
@@ -118,6 +131,7 @@ export default defineComponent({
         clearInterval(this.intervalId)
         this.intervalId = null
       }
+      this.$store.commit("setPendingPurchaseId", null)
     },
   },
 })
@@ -145,6 +159,7 @@ export default defineComponent({
   text-align: center;
   background: var(--primary-gold-gradient);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
