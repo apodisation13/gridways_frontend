@@ -28,6 +28,14 @@
       @close="selectedItem = null"
       @confirm="handleConfirm"
     />
+
+    <payment-iframe-modal
+      v-if="paymentUrl"
+      :payment-url="paymentUrl"
+      @success="handlePaymentSuccess"
+      @fail="handlePaymentFail"
+      @close="handlePaymentClose"
+    />
   </div>
 </template>
 
@@ -35,6 +43,7 @@
 import { defineComponent } from "vue"
 import { useToast } from "vue-toastification"
 
+import PaymentIframeModal from "@/components/ModalWindows/PaymentIframeModal.vue"
 import ShopConfirmModal from "@/components/ModalWindows/ShopConfirmModal.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
 import type { PurchaseProductResponse, ShopItem } from "@/types"
@@ -55,7 +64,7 @@ const RESOURCE_ORDER: Record<string, number> = {
 
 export default defineComponent({
   name: "ShopPage",
-  components: { ResourceItem, ShopConfirmModal },
+  components: { ResourceItem, ShopConfirmModal, PaymentIframeModal },
   setup() {
     const toast = useToast()
     return { toast }
@@ -64,6 +73,7 @@ export default defineComponent({
     return {
       selectedItem: null as ShopItem | null,
       purchasing: false,
+      paymentUrl: null as string | null,
     }
   },
   computed: {
@@ -88,16 +98,30 @@ export default defineComponent({
           productId
         )
         this.selectedItem = null
-        if (result.confirmation_url) {
-          window.location.href = result.confirmation_url
+        this.$store.commit("setPendingPurchaseId", result.purchase_id)
+        if (result.payment_url) {
+          this.paymentUrl = result.payment_url
         } else {
-          this.$router.push(`/payment/result?payment_id=${result.purchase_id}`)
+          this.$router.push("/payment/result")
         }
       } catch {
         this.toast.error("Ошибка при создании платежа")
       } finally {
         this.purchasing = false
       }
+    },
+    handlePaymentSuccess() {
+      this.paymentUrl = null
+      this.$router.push("/payment/result")
+    },
+    handlePaymentFail() {
+      this.paymentUrl = null
+      this.$store.commit("setPendingPurchaseId", null)
+      this.toast.error("Оплата не прошла. Попробуйте ещё раз.")
+    },
+    handlePaymentClose() {
+      this.paymentUrl = null
+      this.$store.commit("setPendingPurchaseId", null)
     },
   },
 })

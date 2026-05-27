@@ -40,6 +40,12 @@
         :count="pay_data.wood"
         style="transform: scale(2)"
       />
+      <resource-item
+        v-if="pay_data.silk"
+        name="silk"
+        :count="pay_data.silk"
+        style="transform: scale(2)"
+      />
     </div>
     <div class="play-price">
       <resource-item
