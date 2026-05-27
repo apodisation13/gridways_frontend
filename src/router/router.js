@@ -89,7 +89,7 @@ const routes = [
     path: "/payment/result",
     component: PaymentResultPage,
     meta: {
-      requireAuth: true,
+      requireAuth: false,
       notRequireMenu: true,
       image: images.bonus,
     },

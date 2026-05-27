@@ -78,10 +78,7 @@ export default defineComponent({
 
   created() {
     const purchaseId = this.$store.getters["pendingPurchaseId"] as number | null
-    if (!purchaseId) {
-      this.$router.push("/shop")
-      return
-    }
+    if (!purchaseId) return
     this.startPolling(purchaseId.toString())
   },
 
