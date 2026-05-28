@@ -110,13 +110,13 @@ export default defineComponent({
         )
         if (data === PurchaseStatus.SUCCESS) {
           this.status = PageStatus.SUCCESS
-          this.stopPolling()
+          await this.stopPolling()
         } else if (data === PurchaseStatus.FAILED) {
           this.status = PageStatus.FAILED
-          this.stopPolling()
+          await this.stopPolling()
         } else if (data === PurchaseStatus.ABANDONED) {
           this.status = PageStatus.FAILED
-          this.stopPolling()
+          await this.stopPolling()
         }
       } catch {
         // сетевая ошибка — продолжаем поллить
