@@ -99,10 +99,11 @@ export default defineComponent({
         )
         this.selectedItem = null
         this.$store.commit("setPendingPurchaseId", result.purchase_id)
-        if (result.payment_url) {
+        if (result.payment_url?.startsWith("https://")) {
           this.paymentUrl = result.payment_url
         } else {
-          this.$router.push("/payment/result")
+          this.$store.commit("setPendingPurchaseId", null)
+          this.toast.error("Ошибка при создании платежа")
         }
       } catch {
         this.toast.error("Ошибка при создании платежа")
