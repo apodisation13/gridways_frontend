@@ -53,10 +53,18 @@ import { defineComponent } from "vue"
 
 import BasicsGeneral from "@/components/Pages/RulesPage/BasicsGeneral.vue"
 import BasicsRoadmap from "@/components/Pages/RulesPage/BasicsRoadmap.vue"
-import CardsDeck from "@/components/Pages/RulesPage/CardsDeck.vue"
-import CardsFactions from "@/components/Pages/RulesPage/CardsFactions.vue"
-import CardsGeneral from "@/components/Pages/RulesPage/CardsGeneral.vue"
-import CardsStorage from "@/components/Pages/RulesPage/CardsStorage.vue"
+import CardsEnemyCards from "@/components/Pages/RulesPage/CardsEnemyCards.vue"
+import CardsPlayerCards from "@/components/Pages/RulesPage/CardsPlayerCards.vue"
+import ModesGeneral from "@/components/Pages/RulesPage/ModesGeneral.vue"
+import ModesRandom from "@/components/Pages/RulesPage/ModesRandom.vue"
+import ModesSeasons from "@/components/Pages/RulesPage/ModesSeasons.vue"
+import ModesStartGame from "@/components/Pages/RulesPage/ModesStartGame.vue"
+import StorageDeck from "@/components/Pages/RulesPage/StorageDeck.vue"
+import StorageDeckEdit from "@/components/Pages/RulesPage/StorageDeckEdit.vue"
+import StorageFactions from "@/components/Pages/RulesPage/StorageFactions.vue"
+import StorageFiltersTypes from "@/components/Pages/RulesPage/StorageFiltersTypes.vue"
+import StorageGeneral from "@/components/Pages/RulesPage/StorageGeneral.vue"
+import StorageStorage from "@/components/Pages/RulesPage/StorageStorage.vue"
 
 interface SubCategory {
   id: string
@@ -85,34 +93,87 @@ const RULES: RulesCategory[] = [
     ],
   },
   {
+    id: "storage",
+    label: "Склад",
+    subs: [
+      { id: "storage-general", label: "Общее", component: StorageGeneral },
+      {
+        id: "storage-storage",
+        label: "Склад",
+        component: StorageStorage,
+      },
+      {
+        id: "storage-factions",
+        label: "Фракции",
+        component: StorageFactions,
+      },
+      {
+        id: "storage-deck",
+        label: "Сбор колоды",
+        component: StorageDeck,
+      },
+      {
+        id: "storage-deck_edit",
+        label: "Изменение колод",
+        component: StorageDeckEdit,
+      },
+      {
+        id: "storage-filters",
+        label: "Фильтры (типы карт)",
+        component: StorageFiltersTypes,
+      },
+    ],
+  },
+  {
     id: "cards",
     label: "Карты",
     subs: [
-      { id: "cards-general", label: "Общее", component: CardsGeneral },
       {
-        id: "cards-storage",
-        label: "Склад",
-        component: CardsStorage,
+        id: "cards-player-cards",
+        label: "Параметры карт игрока",
+        component: CardsPlayerCards,
       },
       {
-        id: "cards-factions",
-        label: "Фракции",
-        component: CardsFactions,
+        id: "cards-enemy-cards",
+        label: "Параметры карт врагов",
+        component: CardsEnemyCards,
+      },
+    ],
+  },
+  {
+    id: "modes",
+    label: "Режимы/Начало игры",
+    subs: [
+      {
+        id: "modes-general",
+        label: "Общее",
+        component: ModesGeneral,
       },
       {
-        id: "cards-deck",
-        label: "Сбор колоды",
-        component: CardsDeck,
+        id: "modes-seasons",
+        label: "Сезоны",
+        component: ModesSeasons,
       },
       {
-        id: "cards-cards",
-        label: "Карты/Лидеры",
-        content: "Раздел в разработке.",
+        id: "modes-random",
+        label: "Рандом",
+        component: ModesRandom,
       },
       {
-        id: "cards-types",
-        label: "Типы карт",
-        content: "Раздел в разработке.",
+        id: "modes-random-n",
+        label: "Рандом по количеству",
+        content:
+          "А тут просто выберете число от 5 до 200 и нажмите генерировать, а потом подвердите выбор уровня двойным кликом по нему",
+      },
+      {
+        id: "modes-arena",
+        label: "Арена",
+        content: "Арена пока не реализована, обновим правила позже",
+      },
+      {
+        id: "modes-start-game",
+        label: "Начало игры",
+        component: ModesStartGame,
       },
     ],
   },
