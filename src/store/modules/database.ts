@@ -6,6 +6,7 @@ import {
   GAME_CONST,
   UPGRADES,
   USER_DATABASE,
+  USER_RESOURCE,
 } from "@/store/const/api_urls"
 import {
   ActionContext,
@@ -38,6 +39,11 @@ interface ApiError {
       }
 }
 
+interface ResourceDelta {
+  amount: number
+  ts: number
+}
+
 interface DatabaseState {
   factions: Faction[]
   leaders: LeaderEntry[]
@@ -46,6 +52,7 @@ interface DatabaseState {
   seasons: SeasonEntry[]
   resource: UserResources | Record<string, never>
   maxResourcesValue: UserResources | Record<string, never>
+  resourceDeltas: Record<string, ResourceDelta>
 
   enemies: Enemy[]
   enemy_leaders: EnemyLeader[]
@@ -68,6 +75,7 @@ const state: DatabaseState = {
   decks: [],
   seasons: [],
   resource: {},
+  resourceDeltas: {},
   maxResourcesValue: {},
 
   enemies: [],
@@ -88,6 +96,7 @@ const getters = {
 
   resource: (state: DatabaseState) => state.resource,
   maxResourcesValue: (state: DatabaseState) => state.maxResourcesValue,
+  resourceDeltas: (state: DatabaseState) => state.resourceDeltas,
 
   // TODO: has_passive фильтр — баг, типизация query временно any
   filtered_cards: (state: DatabaseState) => (query: any) => {
@@ -155,6 +164,17 @@ const getters = {
 
 const mutations = {
   set_resource(state: DatabaseState, result: UserResources) {
+    const isInitialLoad = Object.keys(state.resource).length === 0
+    if (!isInitialLoad) {
+      const ts = Date.now()
+      const newDeltas: Record<string, ResourceDelta> = {}
+      for (const key of Object.keys(result) as (keyof UserResources)[]) {
+        const diff =
+          (result[key] ?? 0) - ((state.resource as UserResources)[key] ?? 0)
+        if (diff !== 0) newDeltas[key as string] = { amount: diff, ts }
+      }
+      state.resourceDeltas = { ...state.resourceDeltas, ...newDeltas }
+    }
     state.resource = result
   },
   setMaxResourcesValues(state: DatabaseState, payload: UserResources) {
@@ -301,6 +321,21 @@ const actions = {
       dispatch("syncGameUpgrades")
 
       toast.success("Успешно загрузили всю вашу базу данных")
+    } catch (err) {
+      dispatch("error_action", err)
+      throw new Error("Ошибка загрузки базы данных!")
+    }
+  },
+
+  async getUserResources({ commit, getters, dispatch }: ActionContext) {
+    const userId = getters["getUser"].user_id
+
+    try {
+      const userResources = await callApi<UserResources>({
+        method: HttpMethod.GET,
+        url: USER_RESOURCE.replace("{userId}", userId),
+      })
+      commit("set_resource", userResources.data)
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Ошибка загрузки базы данных!")

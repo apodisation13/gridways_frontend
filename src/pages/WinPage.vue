@@ -6,18 +6,21 @@
         v-if="pay_data.raw_bronze"
         name="raw_bronze"
         :count="pay_data.raw_bronze"
+        show_delta
         style="transform: scale(2)"
       />
       <resource-item
         v-if="pay_data.raw_silver"
         name="raw_silver"
         :count="pay_data.raw_silver"
+        show_delta
         style="transform: scale(2)"
       />
       <resource-item
         v-if="pay_data.raw_gold"
         name="raw_gold"
         :count="pay_data.raw_gold"
+        show_delta
         style="transform: scale(2)"
       />
     </div>
@@ -26,24 +29,28 @@
         v-if="pay_data.scraps"
         name="scraps"
         :count="pay_data.scraps"
+        show_delta
         style="transform: scale(2)"
       />
       <resource-item
         v-if="pay_data.crops"
         name="crops"
         :count="pay_data.crops"
+        show_delta
         style="transform: scale(2)"
       />
       <resource-item
         v-if="pay_data.wood"
         name="wood"
         :count="pay_data.wood"
+        show_delta
         style="transform: scale(2)"
       />
       <resource-item
         v-if="pay_data.silk"
         name="silk"
         :count="pay_data.silk"
+        show_delta
         style="transform: scale(2)"
       />
     </div>
@@ -52,12 +59,14 @@
         v-if="pay_data.kegs"
         name="kegs"
         :count="pay_data.kegs"
+        show_delta
         style="transform: scale(2)"
       />
       <resource-item
         v-if="pay_data.big_kegs"
         name="big_kegs"
         :count="pay_data.big_kegs"
+        show_delta
         style="transform: scale(2)"
       />
     </div>
@@ -65,6 +74,7 @@
       <resource-item
         name="keys"
         :count="pay_data.keys"
+        show_delta
         style="transform: scale(2)"
       />
     </div>
@@ -73,6 +83,7 @@
         v-if="pay_data.money"
         name="money"
         :count="pay_data.money"
+        show_delta
         style="transform: scale(2)"
       />
     </div>

@@ -102,17 +102,16 @@ export default defineComponent({
       this.$emit("trigger_show_list", value)
     },
     clickAddButton(): void {
-      // проверка - можно ли создать колоду, теперь управляется через апгрейды
-      const currentDecks: DeckEntry[] = this.$store.getters["all_decks"]
-      const upgradeMaxDecksCount: number = this.$store.getters["maxDecks"]
-      if (currentDecks.length >= upgradeMaxDecksCount) {
-        this.toast.warning(
-          "Нельзя создать больше колод, прокачайте свой уровень в разделе Прокачка"
-        )
-        return
-      }
-
       if (!this.showNewDeckFactionSelect && !this.deckBuilding) {
+        // проверка - можно ли создать колоду, теперь управляется через апгрейды
+        const currentDecks: DeckEntry[] = this.$store.getters["all_decks"]
+        const upgradeMaxDecksCount: number = this.$store.getters["maxDecks"]
+        if (currentDecks.length >= upgradeMaxDecksCount) {
+          this.toast.warning(
+            "Нельзя создать больше колод, прокачайте свой уровень в разделе Прокачка"
+          )
+          return
+        }
         this.showNewDeckFactionSelect = true
         return
       }

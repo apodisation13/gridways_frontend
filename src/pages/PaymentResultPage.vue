@@ -110,25 +110,26 @@ export default defineComponent({
         )
         if (data === PurchaseStatus.SUCCESS) {
           this.status = PageStatus.SUCCESS
-          this.stopPolling()
+          await this.stopPolling()
         } else if (data === PurchaseStatus.FAILED) {
           this.status = PageStatus.FAILED
-          this.stopPolling()
+          await this.stopPolling()
         } else if (data === PurchaseStatus.ABANDONED) {
           this.status = PageStatus.FAILED
-          this.stopPolling()
+          await this.stopPolling()
         }
       } catch {
         // сетевая ошибка — продолжаем поллить
       }
     },
 
-    stopPolling(): void {
+    async stopPolling(): Promise<void> {
       if (this.intervalId !== null) {
         clearInterval(this.intervalId)
         this.intervalId = null
       }
       this.$store.commit("setPendingPurchaseId", null)
+      await this.$store.dispatch("getUserResources")
     },
   },
 })

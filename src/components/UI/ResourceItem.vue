@@ -6,6 +6,14 @@
         :alt="name"
         class="resource-image"
       />
+      <span
+        v-if="delta !== null && show_delta"
+        class="resource-delta"
+        :class="
+          delta > 0 ? 'resource-delta--positive' : 'resource-delta--negative'
+        "
+        >{{ delta > 0 ? "+" : "" }}{{ delta }}</span
+      >
     </div>
     <!--Подсвечиваем что достигли предела/нуля и не показываем max value-->
     <div
@@ -58,11 +66,59 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    show_delta: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      delta: null as number | null,
+      deltaTimeout: null as ReturnType<typeof setTimeout> | null,
+      lastShownTs: 0,
+    }
   },
   computed: {
     maxResourcesValue() {
       return this.$store.getters["maxResourcesValue"]
     },
+    resourceDeltas() {
+      return this.$store.getters["resourceDeltas"]
+    },
+  },
+  watch: {
+    resourceDeltas: {
+      handler(deltas: Record<string, { amount: number; ts: number }>) {
+        const entry = deltas[this.name]
+        if (!entry || entry.ts <= this.lastShownTs) return
+        this.lastShownTs = entry.ts
+        this.delta = entry.amount
+        if (this.deltaTimeout !== null) clearTimeout(this.deltaTimeout)
+        this.deltaTimeout = setTimeout(() => {
+          this.delta = null
+          this.deltaTimeout = null
+        }, 5000)
+      },
+      deep: true,
+    },
+  },
+  mounted() {
+    const entry = this.resourceDeltas[this.name]
+    if (!entry) return
+    const age = Date.now() - entry.ts
+    if (age >= 5000) {
+      this.lastShownTs = entry.ts
+      return
+    }
+    this.lastShownTs = entry.ts
+    this.delta = entry.amount
+    this.deltaTimeout = setTimeout(() => {
+      this.delta = null
+      this.deltaTimeout = null
+    }, 5000 - age)
+  },
+  beforeUnmount() {
+    if (this.deltaTimeout !== null) clearTimeout(this.deltaTimeout)
   },
 })
 </script>
@@ -74,9 +130,78 @@ export default defineComponent({
 }
 
 .wrapper__resource-image {
+  position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: center;
+}
+
+.resource-delta {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-family: "Philosopher", serif;
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+  animation: deltaPulse 5s ease-out forwards;
+}
+
+.resource-delta--positive {
+  color: #6dff72;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000,
+    0 0 8px rgba(109, 255, 114, 0.9);
+}
+
+.resource-delta--negative {
+  color: #ff5252;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000,
+    0 0 8px rgba(255, 82, 82, 0.9);
+}
+
+@keyframes deltaPulse {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-50%) scale(0.5);
+  }
+  8% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-50%) scale(1.4);
+  }
+  16% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-50%) scale(1);
+  }
+  28% {
+    opacity: 0.2;
+    transform: translateX(-50%) translateY(-50%) scale(1);
+  }
+  40% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-50%) scale(1);
+  }
+  55% {
+    opacity: 0.2;
+    transform: translateX(-50%) translateY(-50%) scale(1);
+  }
+  70% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-50%) scale(1);
+  }
 }
 
 .resource-image {

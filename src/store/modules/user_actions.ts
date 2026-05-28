@@ -279,7 +279,6 @@ const actions = {
       const seasons = response.data.seasons
       commit("set_seasons", seasons)
       commit("set_season", getters["all_seasons"][0].season)
-      dispatch("set_level_in_play", getters["all_seasons"][0].season.levels[0])
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при открытии уровней")
