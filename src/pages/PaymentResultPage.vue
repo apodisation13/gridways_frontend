@@ -123,12 +123,13 @@ export default defineComponent({
       }
     },
 
-    stopPolling(): void {
+    async stopPolling(): Promise<void> {
       if (this.intervalId !== null) {
         clearInterval(this.intervalId)
         this.intervalId = null
       }
       this.$store.commit("setPendingPurchaseId", null)
+      await this.$store.dispatch("getUserResources")
     },
   },
 })

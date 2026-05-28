@@ -30,6 +30,7 @@
           :key="name"
           :name="name"
           :count="count"
+          show_delta
         />
       </div>
     </div>
@@ -85,39 +86,70 @@
         <div class="expand-menu-right__content">
           <div @click="goToBonus">
             <div class="expand-menu-right__resources-row">
-              <resource-item name="raw_bronze" :count="resources.raw_bronze" />
-              <resource-item name="raw_silver" :count="resources.raw_silver" />
-              <resource-item name="raw_gold" :count="resources.raw_gold" />
+              <resource-item
+                name="raw_bronze"
+                :count="resources.raw_bronze"
+                show_delta
+              />
+              <resource-item
+                name="raw_silver"
+                :count="resources.raw_silver"
+                show_delta
+              />
+              <resource-item
+                name="raw_gold"
+                :count="resources.raw_gold"
+                show_delta
+              />
             </div>
             <div class="expand-menu-right__resources-row">
-              <resource-item name="scraps" :count="resources.scraps" />
+              <resource-item
+                name="scraps"
+                :count="resources.scraps"
+                show_delta
+              />
               <resource-item
                 name="bronze_ingots"
                 :count="resources.bronze_ingots"
+                show_delta
               />
               <resource-item
                 name="silver_ingots"
                 :count="resources.silver_ingots"
+                show_delta
               />
               <resource-item
                 name="gold_ingots"
                 :count="resources.gold_ingots"
+                show_delta
               />
             </div>
             <div class="expand-menu-right__resources-row">
-              <resource-item name="crops" :count="resources.crops" />
-              <resource-item name="wood" :count="resources.wood" />
-              <resource-item name="silk" :count="resources.silk" />
+              <resource-item name="crops" :count="resources.crops" show_delta />
+              <resource-item name="wood" :count="resources.wood" show_delta />
+              <resource-item name="silk" :count="resources.silk" show_delta />
             </div>
             <div class="expand-menu-right__resources-row">
-              <resource-item name="kegs" :count="resources.kegs" />
-              <resource-item name="big_kegs" :count="resources.big_kegs" />
-              <resource-item name="chests" :count="resources.chests" />
+              <resource-item name="kegs" :count="resources.kegs" show_delta />
+              <resource-item
+                name="big_kegs"
+                :count="resources.big_kegs"
+                show_delta
+              />
+              <resource-item
+                name="chests"
+                :count="resources.chests"
+                show_delta
+              />
             </div>
             <div class="expand-menu-right__resources-row">
-              <resource-item name="rare_gem" :count="resources.rare_gem" />
-              <resource-item name="keys" :count="resources.keys" />
-              <resource-item name="money" :count="resources.money" />
+              <resource-item
+                name="rare_gem"
+                :count="resources.rare_gem"
+                show_delta
+              />
+              <resource-item name="keys" :count="resources.keys" show_delta />
+              <resource-item name="money" :count="resources.money" show_delta />
             </div>
           </div>
           <div class="expand-menu-right__footer" @click="showRightMenu">
