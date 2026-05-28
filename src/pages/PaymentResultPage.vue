@@ -108,13 +108,13 @@ export default defineComponent({
           "checkPurchaseStatus",
           paymentId
         )
-        if (data.status === PurchaseStatus.SUCCESS) {
+        if (data === PurchaseStatus.SUCCESS) {
           this.status = PageStatus.SUCCESS
           this.stopPolling()
-        } else if (data.status === PurchaseStatus.FAILED) {
+        } else if (data === PurchaseStatus.FAILED) {
           this.status = PageStatus.FAILED
           this.stopPolling()
-        } else if (data.status === PurchaseStatus.ABANDONED) {
+        } else if (data === PurchaseStatus.ABANDONED) {
           this.status = PageStatus.FAILED
           this.stopPolling()
         }

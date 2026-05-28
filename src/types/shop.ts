@@ -20,6 +20,4 @@ export enum PurchaseStatus {
   ABANDONED = "abandoned",
 }
 
-export interface PurchaseStatusResponse {
-  status: PurchaseStatus
-}
+export type PurchaseStatusResponse = PurchaseStatus
