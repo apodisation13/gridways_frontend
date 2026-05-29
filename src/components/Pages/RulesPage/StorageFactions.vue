@@ -40,8 +40,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-@import "./rules-shared.css";
-
 .filter-factions {
   position: relative;
   padding: 15px 10px 10px;

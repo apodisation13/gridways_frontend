@@ -71,6 +71,4 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-@import "./rules-shared.css";
-</style>
+<style scoped></style>
