@@ -55,10 +55,20 @@ import BasicsGeneral from "@/components/Pages/RulesPage/BasicsGeneral.vue"
 import BasicsRoadmap from "@/components/Pages/RulesPage/BasicsRoadmap.vue"
 import CardsEnemyCards from "@/components/Pages/RulesPage/CardsEnemyCards.vue"
 import CardsPlayerCards from "@/components/Pages/RulesPage/CardsPlayerCards.vue"
+import GameAdditionalCards from "@/components/Pages/RulesPage/GameAdditionalCards.vue"
+import GameAfterMove from "@/components/Pages/RulesPage/GameAfterMove.vue"
+import GameEnemyMove from "@/components/Pages/RulesPage/GameEnemyMove.vue"
+import GameGeneral from "@/components/Pages/RulesPage/GameGeneral.vue"
+import GameMove from "@/components/Pages/RulesPage/GameMove.vue"
+import GamePassives from "@/components/Pages/RulesPage/GamePassives.vue"
+import GamePassivesEnemy from "@/components/Pages/RulesPage/GamePassivesEnemy.vue"
+import GameRedraw from "@/components/Pages/RulesPage/GameRedraw.vue"
+import GameScreen from "@/components/Pages/RulesPage/GameScreen.vue"
 import ModesGeneral from "@/components/Pages/RulesPage/ModesGeneral.vue"
 import ModesRandom from "@/components/Pages/RulesPage/ModesRandom.vue"
 import ModesSeasons from "@/components/Pages/RulesPage/ModesSeasons.vue"
 import ModesStartGame from "@/components/Pages/RulesPage/ModesStartGame.vue"
+import ResBonuses from "@/components/Pages/RulesPage/ResBonuses.vue"
 import StorageDeck from "@/components/Pages/RulesPage/StorageDeck.vue"
 import StorageDeckEdit from "@/components/Pages/RulesPage/StorageDeckEdit.vue"
 import StorageFactions from "@/components/Pages/RulesPage/StorageFactions.vue"
@@ -181,56 +191,181 @@ const RULES: RulesCategory[] = [
     id: "game",
     label: "Игра",
     subs: [
-      { id: "game-general", label: "Общее", content: "Раздел в разработке." },
+      { id: "game-general", label: "Общее", component: GameGeneral },
       {
-        id: "game-mode",
-        label: "Выбор режима",
-        content: "Раздел в разработке.",
+        id: "game-redraw",
+        label: "Раздача карт",
+        component: GameRedraw,
       },
-      { id: "game-seasons", label: "Сезоны", content: "Раздел в разработке." },
-      { id: "game-field", label: "Поле", content: "Раздел в разработке." },
-      { id: "game-hand", label: "Рука", content: "Раздел в разработке." },
-      { id: "game-deck", label: "Колода", content: "Раздел в разработке." },
-      { id: "game-discard", label: "Сброс", content: "Раздел в разработке." },
-      { id: "game-turn", label: "Ход", content: "Раздел в разработке." },
+      { id: "game-screen", label: "Игровой экран", component: GameScreen },
+      { id: "game-move", label: "Ход", component: GameMove },
+      {
+        id: "game-after-move",
+        label: "Переход хода",
+        component: GameAfterMove,
+      },
+      { id: "game-enemy-move", label: "Ход врага", component: GameEnemyMove },
+      { id: "game-passives", label: "Пассивки", component: GamePassives },
+      {
+        id: "game-enemy-passives",
+        label: "Пассивки врагов",
+        component: GamePassivesEnemy,
+      },
+      {
+        id: "game-enemy-deathwish",
+        label: "Завещания",
+        content:
+          "Завещания срабатывают для врагов, когда они умерли. О способности завещания можно прочитать в информации о враге",
+      },
+      {
+        id: "game-enemy-shield",
+        label: "Щит врага",
+        content:
+          "Если у врага есть щит, то первый урон, который ему будет нанесен, вначале собьет его щит",
+      },
+      {
+        id: "game-player-armor",
+        label: "Броня игрока",
+        content:
+          "Некоторые способности карт игрока и лидера добавляют колоде (лидеру) - броню. Броня отображается " +
+          "поверх здоровья в единицах. Максимальный размер брони - определяется прокачкой раздела броня. Урон, " +
+          "который наносят враги - вначале будет сбивать 1 единицу брони за каждое попадание урона от врага",
+      },
+      {
+        id: "game-additional-cards",
+        label: "Доп карты",
+        component: GameAdditionalCards,
+      },
+      {
+        id: "game-win-lose",
+        label: "Выигрыш и проигрыш",
+        content:
+          "За выигрыш - вы получаете ресурсы (в зависимости от уровня и сложности), а так же ключи. За простой уровень - 1 ключ," +
+          "за нормальный - 2, за сложный 3. Ключи можно открыть на странице бонусов. " +
+          "За проигрыш - ничего :) При выигрыше - вам открываются следующие уровни за текущим по стрелкам." +
+          "Если весь сезон завешен - открываются новые сезоны по стрелкам.",
+      },
     ],
   },
   {
     id: "resources",
     label: "Ресурсы",
     subs: [
-      { id: "res-general", label: "Общее", content: "Раздел в разработке." },
-      { id: "res-stones", label: "Камни", content: "Раздел в разработке." },
-      { id: "res-ingots", label: "Слитки", content: "Раздел в разработке." },
-      { id: "res-rags", label: "Тряпки", content: "Раздел в разработке." },
-      { id: "res-straw", label: "Солома", content: "Раздел в разработке." },
-      { id: "res-wood", label: "Дерево", content: "Раздел в разработке." },
-      { id: "res-silk", label: "Шелк", content: "Раздел в разработке." },
-      { id: "res-kegs", label: "Бочки", content: "Раздел в разработке." },
-      { id: "res-chests", label: "Коробки", content: "Раздел в разработке." },
+      {
+        id: "res-general",
+        label: "Общее",
+        content:
+          "Ваши ресурсы всегда отобржаются в правой верхней части экрана. " +
+          "Клик на них - открывает большое меню ресурсов, клик там - переход на страницу бонусов. " +
+          "Все ресурсы (кроме ключей) - имеют максимальный запас (некоторые изначально 0). " +
+          "Все запасы можно прокачивать на странице Прокачка ",
+      },
+      {
+        id: "res-money",
+        label: "Деньги",
+        content:
+          "Деньги нужно практически для всего - старт уровня, крафт карт, преобразование ресурсов, покупка итп",
+      },
+      {
+        id: "res-keys",
+        label: "Ключи",
+        content:
+          "Ключи выигрываются в уровнях. Легкий уровень - награда 1 ключ, нормальный - 2, сложный - 3." +
+          "Каждый ключ содержит три случайные награды на выбор! Выбрать можно из них только одну.",
+      },
+      {
+        id: "res-stones",
+        label: "Камни",
+        content:
+          "Камни можно получить, проходя уровни. 1 убитый враг = 1 камень, по цвету. " +
+          "Так же можно получить камни из слитков, если перемолоть (уничтожить) слитки." +
+          "Камни нужны для создания карт, крафта ресурсов и прокачек",
+      },
+      {
+        id: "res-ingots",
+        label: "Слитки",
+        content:
+          "Слитки создаются из камней или выпадают из ключей. " +
+          "Они нужны для создания карт и прокачек",
+      },
+      {
+        id: "res-scraps",
+        label: "Тряпки",
+        content: "Тряпки нужны для создания карт, прокачек и крафта ресурсов",
+      },
+      {
+        id: "res-crops-wood",
+        label: "Солома/Дерево",
+        content:
+          "Солома и дерево нужны для игры в уровни, для прокачек, для создания ресурсов",
+      },
+      {
+        id: "res-silk",
+        label: "Шелк",
+        content:
+          "Золотой шёлк нужен для игры в сложные уровни, а так же для прокачек и создания ресурсов",
+      },
+      {
+        id: "res-kegs",
+        label: "Бочки",
+        content:
+          "Бочки содержат внутри карты!" +
+          " Темная бочка содержит 3 карты на выбор, из которых можно выбрать одну, " +
+          "а светлая бочка содержит 5 карт на выбор, из которых можно выбрать одну",
+      },
+      {
+        id: "res-chests",
+        label: "Коробки",
+        content:
+          "Зеленая коробка - содержит в себе 3 карты, и все 3 эти карты становятся доступны игроку!",
+      },
       {
         id: "res-gem",
         label: "Редкий камень",
-        content: "Раздел в разработке.",
+        content:
+          "Редкий камень выпадает только из ключей и используется для крафта любой карты/лидера. " +
+          "При этом другие ресурсы не нужны. 1 камень - 1 любая созданная карта",
       },
-      { id: "res-money", label: "Деньги", content: "Раздел в разработке." },
+      {
+        id: "res-bonuses",
+        label: "Крафт ресурсов/Бонусы",
+        component: ResBonuses,
+      },
     ],
   },
   {
     id: "upgrades",
     label: "Прокачка",
     subs: [
-      { id: "upg-general", label: "Общее", content: "Раздел в разработке." },
+      {
+        id: "upg-general",
+        label: "Общее",
+        content:
+          "Почти всё в игре можно прокачать! Прокачка делится на 3 раздела:" +
+          "Ресурсы, Игровые и Настройки",
+      },
       {
         id: "upg-resources",
         label: "Ресурсы",
-        content: "Раздел в разработке.",
+        content:
+          "Здесь можно прокачивать максимальный размер ваших хранимых ресурсов. " +
+          "Осторожно - у каких-то ресурсов значение по умолчанию 0 - то есть вы не сможете иметь этот ресурс," +
+          "пока не прокачаете хотя бы на 1 уровень. Желтыми линями показано то, что вы уже прокачали. Зелеными - " +
+          "то, что можно прокачать сейчас (у вас хватает ресурсов). Серым - то что не прокачано и нельзя прокачать." +
+          "В каждом разделе есть кнопка все уровни, чтобы посмотреть, сколько нужно ресурсов на каком уровне",
       },
-      { id: "upg-game", label: "Игровые", content: "Раздел в разработке." },
+      {
+        id: "upg-game",
+        label: "Игровые",
+        content:
+          "Это раздел, влияющий на игровые параметры! Такие как:" +
+          "максимальное количество колод, жизней игрока, брони, количество карт в колоде, количество карт в руке ",
+      },
       {
         id: "upg-settings",
         label: "Настройки",
-        content: "Раздел в разработке.",
+        content:
+          "Здесь можно прокачать возможности настроек - пока только аватарку и незначительно цветовую схему",
       },
     ],
   },
@@ -238,11 +373,24 @@ const RULES: RulesCategory[] = [
     id: "shop",
     label: "Магазин",
     subs: [
-      { id: "shop-general", label: "Общее", content: "Раздел в разработке." },
+      {
+        id: "shop-general",
+        label: "Общее",
+        content:
+          "Наша игра - является абсолютно бесплатной!" +
+          "Мы не принуждаем вас к покупке! Всё можно пройти и собрать бесплатно. Если же вы хотите ускорить " +
+          "этот процесс, или просто хотите поблагодарить нас, милости просим в раздел покупки :)",
+      },
       {
         id: "shop-process",
         label: "Процесс покупки",
-        content: "Раздел в разработке.",
+        content:
+          "Выбираете товар, нажимаете купить, открывается форма оплаты, вводите туда " +
+          "свою карту, возможно потребуется подтверждение от банка, вводите тогда код. " +
+          "После оплаты нажимаете кнопку - вернуться в магазин. " +
+          "Ожидаете пока оплата пройдет, а ресурсы вам будут начислены." +
+          "Если ресурсы не начислены в течение 1 минуты - попробуйте перезайти в игру." +
+          "Если ресурсы так и не начислены вам - напишите нам - информация в разделе контакты",
       },
     ],
   },
@@ -253,7 +401,11 @@ const RULES: RulesCategory[] = [
       {
         id: "misc-settings",
         label: "Настройки",
-        content: "Раздел в разработке.",
+        content:
+          "В настройках можно выключить звуки, анимации дрожания врагов," +
+          "изменить время хода (от 500 до 1000мс - это 0.5 до 1сек). При прокачке открываются так же " +
+          "возможность сменить аватарку и цвет некоторых кнопок. Чтобы сохранить " +
+          "ваши настройки - нажмите кнопку запомнить мои настройки. Здесь же можно выйти из аккаунта",
       },
     ],
   },
