@@ -595,4 +595,89 @@ export default defineComponent({
   color: rgba(255, 255, 255, 0.85);
   white-space: pre-wrap;
 }
+
+/* Shared styles for rule content components */
+.rules-content :deep(.basics-general) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rules-content :deep(.text) {
+  font-family: "Philosopher", serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.rules-content :deep(.text--muted) {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 13px;
+}
+
+.rules-content :deep(.highlight-block) {
+  border-left: 3px solid #facf5d;
+  background: rgba(196, 155, 0, 0.1);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rules-content :deep(.highlight-block__label) {
+  font-family: "Philosopher", serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #facf5d;
+}
+
+.rules-content :deep(.highlight-block__text) {
+  font-family: "Philosopher", serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.rules-content :deep(.section-title) {
+  font-family: "Philosopher", serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #facf5d;
+  margin-bottom: -8px;
+}
+
+.rules-content :deep(.list) {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rules-content :deep(.list__item) {
+  font-family: "Philosopher", serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.8);
+  padding-left: 14px;
+  position: relative;
+}
+
+.rules-content :deep(.list__item::before) {
+  content: "–";
+  position: absolute;
+  left: 0;
+  color: #facf5d;
+}
+
+.rules-content :deep(.list__term) {
+  color: #facf5d;
+  font-weight: 700;
+}
 </style>
