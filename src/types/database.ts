@@ -339,6 +339,7 @@ export interface GameConst {
   start_level_prices: Record<string, unknown>
   cards_resources_prices: Record<string, unknown>
   upgrades: typeof Upgrades
+  arena_upgrades: Record<string, unknown>
 }
 
 export interface Faction {

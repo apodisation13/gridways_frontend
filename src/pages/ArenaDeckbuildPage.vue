@@ -51,10 +51,17 @@
           <button class="btn-extra" disabled>Card</button>
           <button class="btn-extra" disabled>Redraw</button>
           <button class="btn-extra" disabled>FixDraw</button>
-          <button class="btn-extra btn-upgrades" disabled>Upgrades</button>
+          <button
+            class="btn-extra btn-upgrades btn-active"
+            @click="showUpgrades = true"
+          >
+            Upgrades
+          </button>
         </div>
       </div>
     </div>
+
+    <arena-upgrades-modal v-if="showUpgrades" @close="showUpgrades = false" />
 
     <!-- Нижняя зона: сборка колоды -->
     <div class="bottom-zone">
@@ -72,11 +79,12 @@
 import { defineComponent } from "vue"
 
 import CardItem from "@/components/Cards/CardItem.vue"
+import ArenaUpgradesModal from "@/components/Pages/ArenaDeckbuildPage/ArenaUpgradesModal.vue"
 import BlockAssemblingTheDeck from "@/components/Pages/DeckbuildPage/BlockAssemblingTheDeck.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import type { CardEntry, DeckCardEntry, Leader, LeaderEntry } from "@/types"
 
-const MAX_CARDS = 10
+const MAX_CARDS = 12
 
 interface ActiveDeck {
   deck_id: null
@@ -96,10 +104,16 @@ function pickRandom<T>(arr: T[], count: number): T[] {
 
 export default defineComponent({
   name: "ArenaDeckbuildPage",
-  components: { CardItem, BlockAssemblingTheDeck, ThemedButton },
+  components: {
+    CardItem,
+    BlockAssemblingTheDeck,
+    ThemedButton,
+    ArenaUpgradesModal,
+  },
   data() {
     return {
       MAX_CARDS,
+      showUpgrades: false,
       phase: "picking_cards" as Phase,
       deck: {
         deck_id: null,
@@ -277,5 +291,15 @@ export default defineComponent({
 
 .btn-upgrades {
   margin-left: 8px;
+}
+
+.btn-active {
+  border-color: #c49000;
+  color: #c49000;
+  cursor: pointer;
+}
+
+.btn-active:active {
+  background: rgba(196, 144, 0, 0.15);
 }
 </style>

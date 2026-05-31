@@ -1,4 +1,5 @@
 import type { DeckCardEntry, Leader, MappedUserLevel } from "@/types"
+import type { UpgradeCategory } from "@/types/upgrades"
 
 export interface ArenaState {
   base_enemies: number
@@ -11,6 +12,7 @@ export interface ArenaState {
   health: number
   armor: number
   level: MappedUserLevel | null
+  arenaUpgrades: UpgradeCategory | null
 }
 
 const state: ArenaState = {
@@ -24,6 +26,7 @@ const state: ArenaState = {
   health: 0,
   armor: 0,
   level: null,
+  arenaUpgrades: null,
 }
 
 const getters = {
@@ -35,6 +38,7 @@ const getters = {
   arena_health: (state: ArenaState) => state.health,
   arena_armor: (state: ArenaState) => state.armor,
   arena_level: (state: ArenaState) => state.level,
+  arena_upgrades_config: (state: ArenaState) => state.arenaUpgrades,
 }
 
 const mutations = {
@@ -68,6 +72,9 @@ const mutations = {
     state.health = 0
     state.armor = 0
     state.level = null
+  },
+  setArenaUpgrades(state: ArenaState, payload: UpgradeCategory) {
+    state.arenaUpgrades = payload
   },
 }
 
