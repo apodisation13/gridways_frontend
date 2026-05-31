@@ -71,7 +71,29 @@
             </div>
           </div>
         </div>
-        <div v-if="gameMod.name === 'arena'">Пока не реализовано!</div>
+        <div v-if="gameMod.name === 'arena'" class="arena-entry">
+          <div class="global_text arena-entry__title">Стоимость входа</div>
+          <div class="arena-entry__costs">
+            <resource-item
+              name="money"
+              :count="1000"
+              style="transform: scale(1.4)"
+            />
+            <resource-item
+              name="crops"
+              :count="1000"
+              style="transform: scale(1.4)"
+            />
+            <resource-item
+              name="wood"
+              :count="1000"
+              style="transform: scale(1.4)"
+            />
+          </div>
+          <button class="arena-entry__btn" @click="enter_arena">
+            <themed-button title="НАЧАТЬ" />
+          </button>
+        </div>
         <div v-if="gameMod.name === 'random_select'">
           <div class="form-wrapper">
             <!-- Поле ввода числа -->
@@ -119,6 +141,8 @@ import { useToast } from "vue-toastification"
 
 import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
 import SeasonTree from "@/components/Pages/LevelPage/SeasonTree.vue"
+import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
+import ResourceItem from "@/components/UI/ResourceItem.vue"
 import {
   random_level_generator,
   random_level_generator_by_number,
@@ -134,6 +158,8 @@ export default defineComponent({
   components: {
     LevelPreviewComp,
     SeasonTree,
+    ThemedButton,
+    ResourceItem,
   },
   setup() {
     const toast = useToast()
@@ -269,6 +295,10 @@ export default defineComponent({
       this.randomLevelByNumber = random_level_generator_by_number(
         this.inputNumberEnemiesRandomLevel as number
       )
+    },
+    enter_arena(): void {
+      this.$store.commit("arena_reset")
+      this.$router.push("/arena/deckbuild")
     },
     setRandomLevelByNumber(): void {
       this.toast.warning(
@@ -476,5 +506,34 @@ div {
 .generate-btn:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+.arena-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 40px 20px;
+}
+
+.arena-entry__title {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.arena-entry__costs {
+  display: flex;
+  flex-direction: row;
+  gap: 36px;
+  align-items: center;
+  justify-content: center;
+}
+
+.arena-entry__btn {
+  width: 200px;
+  height: 60px;
+  margin-top: 10px;
 }
 </style>

@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router"
 
 import AboutPage from "@/pages/AboutPage"
+import ArenaDeckbuildPage from "@/pages/ArenaDeckbuildPage.vue"
+import ArenaStartGame from "@/pages/ArenaStartGame.vue"
+import ArenaWinPage from "@/pages/ArenaWinPage.vue"
 import BonusPage from "@/pages/BonusPage"
 import DeckbuildPage from "@/pages/DeckbuildPage"
 import EmblemPage from "@/pages/EmblemPage.vue"
@@ -192,6 +195,31 @@ const routes = [
     meta: {
       requireAuth: true,
       image: images.lose,
+    },
+  },
+  {
+    path: "/arena/deckbuild",
+    component: ArenaDeckbuildPage,
+    meta: {
+      requireAuth: true,
+      image: images.deckbuild,
+      withGradient: true,
+    },
+  },
+  {
+    path: "/arena/start_game",
+    component: ArenaStartGame,
+    meta: {
+      requireAuth: true,
+      image: images.start_game,
+    },
+  },
+  {
+    path: "/arena/win_game",
+    component: ArenaWinPage,
+    meta: {
+      requireAuth: true,
+      image: images.win,
     },
   },
 ]

@@ -31,6 +31,7 @@
     </div>
     <div class="deck-info-block">
       <input-name-for-deck
+        v-if="!arena_mode"
         :deck_name="deck.deck_name"
         @change_name_deck="$emit('change_name_deck', $event)"
       />
@@ -43,13 +44,13 @@
         {{ charges }}
       </div>
       <create-button
-        v-if="!patch"
+        v-if="!patch && !arena_mode"
         name="Создать"
         :disabled="cant_save_deck"
         @click="save_deck"
       />
       <create-button
-        v-if="patch"
+        v-if="patch && !arena_mode"
         name="Изменить"
         :disabled="cant_save_deck"
         @click="patch_deck"
@@ -94,6 +95,10 @@ export default defineComponent({
     },
     patch: {
       type: Boolean,
+    },
+    arena_mode: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: [

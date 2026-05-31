@@ -12,7 +12,11 @@ import { defineComponent } from "vue"
 export default defineComponent({
   name: "LosePage",
   created() {
-    this.$store.dispatch("re_set_deck")
+    if (this.$store.state.arena.is_active) {
+      this.$store.commit("arena_reset")
+    } else {
+      this.$store.dispatch("re_set_deck")
+    }
   },
 })
 </script>

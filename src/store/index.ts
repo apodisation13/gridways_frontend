@@ -1,5 +1,7 @@
 import { createStore } from "vuex"
 
+import type { ArenaState } from "@/store/modules/arena"
+import arena from "@/store/modules/arena"
 import database from "@/store/modules/database"
 import fullscreen from "@/store/modules/fullscreen"
 import type { GameState } from "@/store/modules/game"
@@ -16,6 +18,7 @@ import user_actions from "@/store/modules/user_actions"
 export interface RootState {
   game: GameState
   settings: SettingsState
+  arena: ArenaState
 }
 
 // ИНСТРУКЦИЯ:
@@ -28,6 +31,7 @@ const store = createStore({
     login,
     database,
     game,
+    arena,
     user_actions,
     news,
     purchases,
