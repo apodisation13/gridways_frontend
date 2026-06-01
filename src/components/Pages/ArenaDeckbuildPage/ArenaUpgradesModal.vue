@@ -28,8 +28,15 @@
               class="upgrade-item__segment"
               :class="{
                 'upgrade-item__segment--active': lvl <= userLevel(upgrade.key),
+                'upgrade-item__segment--affordable':
+                  lvl === userLevel(upgrade.key) + 1 &&
+                  canAfford(upgrade.key, upgrade.item) &&
+                  !isOnCooldown(upgrade.key),
               }"
             />
+          </div>
+          <div v-if="isOnCooldown(upgrade.key)" class="upgrade-item__cooldown">
+            Доступно с уровня {{ cooldownAvailableAt(upgrade.key) }}
           </div>
         </div>
       </div>
@@ -53,6 +60,10 @@
                 formatValue(detail.item.upgrades[userLevel(detail.key)]?.value)
               }}</span>
             </div>
+          </div>
+
+          <div v-if="isOnCooldown(detail.key)" class="detail__cooldown">
+            Кулдаун — доступно с уровня {{ cooldownAvailableAt(detail.key) }}
           </div>
 
           <template v-if="canUpgrade(detail.key, detail.item)">
@@ -100,8 +111,19 @@
               </div>
             </div>
 
-            <!-- Прокачка пока не подключена — будет добавлено вместе с userUpgrades -->
-            <button class="detail__upgrade-btn" disabled>Прокачать</button>
+            <button
+              class="detail__upgrade-btn"
+              :class="{
+                'detail__upgrade-btn--active': canAfford(
+                  detail.key,
+                  detail.item
+                ),
+              }"
+              :disabled="!canAfford(detail.key, detail.item)"
+              @click="doUpgrade(detail.key)"
+            >
+              Прокачать
+            </button>
           </template>
           <div v-else class="detail__maxed">Максимальный уровень</div>
 
@@ -231,12 +253,22 @@ export default defineComponent({
     resource(): Record<string, number> {
       return this.$store.getters["resource"]
     },
+    arena_params(): Record<string, number> {
+      return this.$store.getters["arena_params"] ?? {}
+    },
+    current_arena_level(): number {
+      return this.$store.getters["arena_current_level"]
+    },
   },
   methods: {
-    // TODO: подключить userUpgrades["arena"] когда будет готово API
-    userLevel(_key: string): number {
-      console.log(_key)
-      return 0
+    userLevel(key: string): number {
+      return this.$store.state.arena.user_upgrades[key] ?? 0
+    },
+    canAfford(key: string, item: UpgradeItem): boolean {
+      const cost = this.upgradeCost(key, item)
+      return Object.entries(cost).every(
+        ([name, amount]) => (this.resource[name] ?? 0) >= amount
+      )
     },
     totalLevels(item: UpgradeItem): number {
       return Object.keys(item.upgrades).length - 1
@@ -247,7 +279,20 @@ export default defineComponent({
       if (value === false) return "Закрыто"
       return String(value)
     },
+    cooldownAvailableAt(key: string): number | null {
+      if (key !== "arena_draw_exact_card") return null
+      const since =
+        this.$store.state.arena.user_upgrades["fix_draw_cooldown_since"]
+      if (since === undefined) return null
+      const cd = this.arena_params.cooldown_fix_draw ?? 3
+      return since + cd
+    },
+    isOnCooldown(key: string): boolean {
+      const at = this.cooldownAvailableAt(key)
+      return at !== null && this.current_arena_level < at
+    },
     canUpgrade(key: string, item: UpgradeItem): boolean {
+      if (this.isOnCooldown(key)) return false
       const level = this.userLevel(key)
       const currentEntry = item.upgrades[level]
       return !!(currentEntry?.next !== null && item.upgrades[level + 1])
@@ -283,6 +328,10 @@ export default defineComponent({
     closeDetail(): void {
       this.detail = null
       this.showRoadmap = false
+    },
+    doUpgrade(key: string): void {
+      this.$store.commit("arena_increment_upgrade", key)
+      this.$store.dispatch("sync_arena_game_params")
     },
   },
 })
@@ -406,6 +455,31 @@ export default defineComponent({
   background: var(--primary-gold-gradient, #c49000);
 }
 
+.upgrade-item__cooldown {
+  font-family: "Philosopher", serif;
+  font-size: 0.75rem;
+  color: rgba(255, 160, 60, 0.7);
+  margin-top: 4px;
+}
+
+.detail__cooldown {
+  font-family: "Philosopher", serif;
+  font-size: 0.9rem;
+  color: rgba(255, 160, 60, 0.85);
+  text-align: center;
+  padding: 6px 0;
+}
+
+.upgrade-item__segment--affordable {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(100, 220, 100, 0.55) 0px,
+    rgba(100, 220, 100, 0.55) 2px,
+    rgba(100, 220, 100, 0.15) 2px,
+    rgba(100, 220, 100, 0.15) 5px
+  );
+}
+
 /* -- detail modal -- */
 .detail-overlay {
   position: fixed;
@@ -500,6 +574,17 @@ export default defineComponent({
   font-weight: bold;
   color: rgba(255, 255, 255, 0.3);
   cursor: not-allowed;
+}
+
+.detail__upgrade-btn--active {
+  background: rgba(196, 144, 0, 0.2);
+  color: hsl(39, 82%, 62%);
+  cursor: pointer;
+  border: 1px solid rgba(196, 144, 0, 0.4);
+}
+
+.detail__upgrade-btn--active:active {
+  background: rgba(196, 144, 0, 0.35);
 }
 
 .detail__close-btn {

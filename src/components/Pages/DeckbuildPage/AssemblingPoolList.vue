@@ -2,8 +2,9 @@
   <transition-group name="flip-list" tag="div" class="assembling-pool-list">
     <card-item
       v-for="(full_card, index) in deck_is_progress"
-      :key="`${full_card.card?.id ?? ''}-${index}`"
+      :key="getStableKey(full_card)"
       class="pool-item"
+      :style="{ zIndex: index + 1 }"
       :card="full_card.card ? full_card.card : (full_card as any)"
       :user_card="full_card.card ? (full_card as any) : null"
       :is_previev="index + 1 !== deck_is_progress.length"
@@ -32,6 +33,15 @@ export default defineComponent({
     },
   },
   emits: ["delete_card_from_deck", "change_order_deck"],
+  setup() {
+    const stableKeys = new WeakMap<object, number>()
+    let nextKey = 0
+    const getStableKey = (entry: object): number => {
+      if (!stableKeys.has(entry)) stableKeys.set(entry, nextKey++)
+      return stableKeys.get(entry)!
+    }
+    return { getStableKey }
+  },
   methods: {
     delete_card_from_deck(card: DeckCardEntry): void {
       this.$emit("delete_card_from_deck", card)
@@ -48,8 +58,8 @@ export default defineComponent({
 
 <style scoped>
 .flip-list-move {
-  -webkit-transition: test 0.5s;
-  transition: transform 1s;
+  -webkit-transition: transform 0.6s ease;
+  transition: transform 1s ease;
 }
 
 .assembling-pool-list {

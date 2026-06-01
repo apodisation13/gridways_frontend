@@ -12,11 +12,12 @@ import { defineComponent } from "vue"
 export default defineComponent({
   name: "LosePage",
   created() {
-    if (this.$store.state.arena.is_active) {
+    if (this.$store.state.game.arena_mode) {
+      this.$store.commit("set_arena_mode", false)
       this.$store.commit("arena_reset")
-    } else {
-      this.$store.dispatch("re_set_deck")
+      this.$store.dispatch("syncGameUpgrades")
     }
+    this.$store.dispatch("re_set_deck")
   },
 })
 </script>
