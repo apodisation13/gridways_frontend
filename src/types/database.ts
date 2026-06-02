@@ -330,13 +330,17 @@ export interface OpenRelatedLevelsResponse {
   seasons: UserSeason[]
 }
 
+export interface ArenaRewardMultiply {
+  base: number
+  delta: number
+}
+
 export interface ArenaParams {
   enter_price: UserResources
   base_enemies: number
   delta_enemies: number
-  base_reward_delta: number
   cooldown_fix_draw: number
-  base_reward_multiply: number
+  win_multiply: Partial<Record<keyof UserResources, ArenaRewardMultiply>>
 }
 
 export interface GameConst {

@@ -148,27 +148,18 @@ export default defineComponent({
       const base_rewards = getRewardForLevel(win_level_rewards[difficulty])
 
       const arena_params = this.$store.getters["arena_params"]
-      const base_multiply: number = arena_params?.base_reward_multiply ?? 2
-      const base_delta: number = arena_params?.base_reward_delta ?? 0.2
+      const win_multiply = arena_params?.win_multiply ?? {}
       // arena_advance_level already ran, so current_level is the NEXT level
       const completed_level: number =
         (this.$store.getters["arena_current_level"] as number) - 1
-      const coefficient = base_multiply + (completed_level - 1) * base_delta
 
-      const MULTIPLY_KEYS = new Set([
-        "scraps",
-        "raw_bronze",
-        "raw_silver",
-        "raw_gold",
-        "crops",
-        "wood",
-        "silk",
-      ])
       this.pay_data = Object.fromEntries(
-        Object.entries(base_rewards).map(([k, v]) => [
-          k,
-          MULTIPLY_KEYS.has(k) ? Math.ceil(v * coefficient) : v,
-        ])
+        Object.entries(base_rewards).map(([k, v]) => {
+          const mult = win_multiply[k]
+          if (!mult) return [k, v]
+          const coefficient = mult.base + (completed_level - 1) * mult.delta
+          return [k, Math.ceil(v * coefficient)]
+        })
       )
 
       await this.$store.dispatch("processResources", {
@@ -196,6 +187,7 @@ export default defineComponent({
   flex-shrink: 0;
   padding: 8px 12px 4px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  margin-top: 30px;
 }
 
 .win-section {

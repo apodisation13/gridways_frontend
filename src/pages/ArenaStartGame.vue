@@ -251,6 +251,7 @@ export default defineComponent({
   flex-shrink: 0;
   padding: 6px 12px 4px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  margin-top: 30px;
 }
 
 .content-wrapper {
