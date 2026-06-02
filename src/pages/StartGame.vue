@@ -27,11 +27,13 @@
         <span class="global_text price-label">Стоимость игры</span>
         <div class="play-price">
           <resource-item
+            v-if="play_price.crops"
             name="crops"
             :count="play_price.crops"
             style="transform: scale(1.5)"
           />
           <resource-item
+            v-if="play_price.wood"
             name="wood"
             :count="play_price.wood"
             style="transform: scale(1.5)"
@@ -99,6 +101,12 @@ export default defineComponent({
   computed: {
     // теперь это используется только для отображения, и всё равно мы на бэке всё валидируем
     play_price(): Record<string, number> {
+      // первый уровень первого сезона теперь стоит 1 деньги :)
+      const levelId: number = this.selectedLevel.level.id
+      if (levelId === 1) {
+        return { money: 1 }
+      }
+
       const config = this.$store.getters["start_level_prices"]
       const diff = this.$store.state.game.level.difficulty
       const cards = this.selectedDeck.deck.cards

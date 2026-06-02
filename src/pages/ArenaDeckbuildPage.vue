@@ -1,5 +1,20 @@
 <template>
   <div class="arena-deckbuild-page">
+    <div class="arena-top-bar">
+      <button class="arena-exit-btn" @click="showExitConfirm = true">
+        ВЫХОД
+      </button>
+    </div>
+    <yesno-modal
+      v-if="showExitConfirm"
+      @confirm="exit_arena"
+      @cancel="showExitConfirm = false"
+    />
+
+    <div class="resources-bar">
+      <resource-list :resources="arena_resources" highlight_max_count />
+    </div>
+
     <!-- Верхняя зона: пик карт / лидеров / панель уровня -->
     <div class="top-zone">
       <!-- Фаза выбора карт (начальный набор) -->
@@ -159,10 +174,23 @@ import { useToast } from "vue-toastification"
 
 import CardItem from "@/components/Cards/CardItem.vue"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
+import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
 import ArenaUpgradesModal from "@/components/Pages/ArenaDeckbuildPage/ArenaUpgradesModal.vue"
 import BlockAssemblingTheDeck from "@/components/Pages/DeckbuildPage/BlockAssemblingTheDeck.vue"
+import ResourceList from "@/components/ResourceList.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import type { CardEntry, DeckCardEntry, Leader, LeaderEntry } from "@/types"
+
+const ARENA_RESOURCE_KEYS = [
+  "scraps",
+  "raw_bronze",
+  "raw_silver",
+  "raw_gold",
+  "crops",
+  "wood",
+  "silk",
+  "money",
+]
 
 interface ActiveDeck {
   deck_id: null
@@ -195,6 +223,16 @@ export default defineComponent({
     BlockAssemblingTheDeck,
     ThemedButton,
     ArenaUpgradesModal,
+    YesnoModal,
+    ResourceList,
+  },
+  beforeRouteLeave(to: { path: string }) {
+    const arenaForwardPaths = ["/arena/start_game", "/game"]
+    if (!arenaForwardPaths.includes(to.path)) {
+      this.$store.commit("set_arena_mode", false)
+      this.$store.commit("arena_reset")
+      this.$store.dispatch("syncGameUpgrades")
+    }
   },
   setup() {
     return { toast: useToast() }
@@ -202,6 +240,7 @@ export default defineComponent({
   data() {
     return {
       showUpgrades: false,
+      showExitConfirm: false,
       phase: "picking_cards" as Phase,
       active_special: null as null | "redraw" | "fixdraw",
       deck: {
@@ -217,6 +256,12 @@ export default defineComponent({
     }
   },
   computed: {
+    arena_resources(): Record<string, number> {
+      const all = this.$store.getters["resource"]
+      return Object.fromEntries(
+        ARENA_RESOURCE_KEYS.filter(k => (all[k] ?? 0) > 0).map(k => [k, all[k]])
+      )
+    },
     maxCardsInDeck(): number {
       return this.$store.getters["maxCardsInDeck"]
     },
@@ -396,6 +441,12 @@ export default defineComponent({
       )
       this.deck.deck_body.push(...this.deck.deck_body.splice(index, 1))
     },
+    exit_arena(): void {
+      this.$store.commit("set_arena_mode", false)
+      this.$store.commit("arena_reset")
+      this.$store.dispatch("syncGameUpgrades")
+      this.$router.push("/main")
+    },
     go_next(): void {
       if (!this.deck.leader) return
       this.$store.commit("arena_set_deck_complete", {
@@ -417,9 +468,43 @@ export default defineComponent({
   overflow: hidden;
 }
 
+.arena-top-bar {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 10px 0;
+}
+
+.resources-bar {
+  flex-shrink: 0;
+  padding: 6px 12px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.arena-exit-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 80, 80, 0.5);
+  border-radius: 6px;
+  background: rgba(180, 40, 40, 0.18);
+  color: rgba(255, 100, 100, 0.85);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+}
+
+.arena-exit-btn:active {
+  background: rgba(180, 40, 40, 0.35);
+}
+
 .top-zone {
-  flex: 0 0 auto;
-  padding: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  min-height: 0;
 }
 
 .bottom-zone {
@@ -428,6 +513,7 @@ export default defineComponent({
   background: #3c4d60;
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7);
   padding: 5px;
+  min-height: 0;
 }
 
 .pick-zone {
@@ -440,6 +526,7 @@ export default defineComponent({
 .pick-label {
   font-size: 14px;
   color: #fceabc;
+  margin-bottom: 20px;
 }
 
 .pick-row {
@@ -478,6 +565,8 @@ export default defineComponent({
   gap: 8px;
   flex-wrap: wrap;
   justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .btn-extra {

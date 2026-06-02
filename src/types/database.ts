@@ -330,6 +330,15 @@ export interface OpenRelatedLevelsResponse {
   seasons: UserSeason[]
 }
 
+export interface ArenaParams {
+  enter_price: UserResources
+  base_enemies: number
+  delta_enemies: number
+  base_reward_delta: number
+  cooldown_fix_draw: number
+  base_reward_multiply: number
+}
+
 export interface GameConst {
   max_random_n_enemies: number
   random_level_enemies_count: Record<string, unknown>
@@ -340,7 +349,7 @@ export interface GameConst {
   cards_resources_prices: Record<string, unknown>
   upgrades: typeof Upgrades
   arena_upgrades: Record<string, unknown>
-  arena_params: Record<string, unknown>
+  arena_params: ArenaParams
 }
 
 export interface Faction {

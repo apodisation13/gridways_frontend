@@ -1,5 +1,20 @@
 <template>
   <div class="start-game__page">
+    <div class="arena-top-bar">
+      <button class="arena-exit-btn" @click="showExitConfirm = true">
+        ВЫХОД
+      </button>
+    </div>
+    <yesno-modal
+      v-if="showExitConfirm"
+      @confirm="exit_arena"
+      @cancel="showExitConfirm = false"
+    />
+
+    <div class="resources-bar">
+      <resource-list :resources="arena_resources" highlight_max_count />
+    </div>
+
     <div class="content-wrapper">
       <!-- Уровень vs Колода -->
       <div class="battle-section">
@@ -58,25 +73,53 @@ import { defineComponent } from "vue"
 
 import DeckPreviewComp from "@/components/DeckPreviewComp.vue"
 import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
+import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
+import ResourceList from "@/components/ResourceList.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+
+const ARENA_RESOURCE_KEYS = [
+  "scraps",
+  "raw_bronze",
+  "raw_silver",
+  "raw_gold",
+  "crops",
+  "wood",
+  "silk",
+  "money",
+]
 import { random_level_generator_by_number } from "@/logic/random_level"
-import type { DeckCardEntry, DeckEntry, Leader, MappedUserLevel } from "@/types"
+import {
+  DeckCardEntry,
+  DeckEntry,
+  Leader,
+  MappedUserLevel,
+  PayResourcesSubtype,
+} from "@/types"
 
 export default defineComponent({
   name: "ArenaStartGame",
   components: {
     ResourceItem,
+    ResourceList,
     DeckPreviewComp,
     LevelPreviewComp,
     ThemedButton,
+    YesnoModal,
   },
   data() {
     return {
       loading: false,
+      showExitConfirm: false,
     }
   },
   computed: {
+    arena_resources(): Record<string, number> {
+      const all = this.$store.getters["resource"]
+      return Object.fromEntries(
+        ARENA_RESOURCE_KEYS.filter(k => (all[k] ?? 0) > 0).map(k => [k, all[k]])
+      )
+    },
     arena_level(): MappedUserLevel | null {
       return this.$store.getters["arena_level"]
     },
@@ -136,10 +179,26 @@ export default defineComponent({
     }
   },
   methods: {
-    start_game(): void {
+    exit_arena(): void {
+      this.$store.commit("set_arena_mode", false)
+      this.$store.commit("arena_reset")
+      this.$store.dispatch("syncGameUpgrades")
+      this.$router.push("/main")
+    },
+    async start_game(): Promise<void> {
       this.loading = true
 
       const level = this.arena_level!
+
+      // здесь мы все значения поставили с минусом, мы же списываем ресурс
+      const payload = Object.fromEntries(
+        Object.entries(this.play_price).map(([k, v]) => [k, -v])
+      )
+      await this.$store.dispatch("processResources", {
+        subtype: PayResourcesSubtype.startArenaLevel,
+        data: payload,
+      })
+
       this.$store.commit("set_level", level)
       this.$store.commit("set_enemy_leader", level.level.enemy_leader)
 
@@ -163,6 +222,35 @@ export default defineComponent({
   padding-bottom: calc(57px + env(safe-area-inset-bottom, 0px));
   height: calc(var(--vh, 1vh) * 100 - 100px);
   color: white;
+}
+
+.arena-top-bar {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 10px 0;
+}
+
+.arena-exit-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 80, 80, 0.5);
+  border-radius: 6px;
+  background: rgba(180, 40, 40, 0.18);
+  color: rgba(255, 100, 100, 0.85);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+}
+
+.arena-exit-btn:active {
+  background: rgba(180, 40, 40, 0.35);
+}
+
+.resources-bar {
+  flex-shrink: 0;
+  padding: 6px 12px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .content-wrapper {

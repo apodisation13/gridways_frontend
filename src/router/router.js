@@ -204,6 +204,7 @@ const routes = [
       requireAuth: true,
       image: images.deckbuild,
       withGradient: true,
+      notRequireMenu: true,
     },
   },
   {
@@ -212,6 +213,7 @@ const routes = [
     meta: {
       requireAuth: true,
       image: images.start_game,
+      notRequireMenu: true,
     },
   },
   {
@@ -220,6 +222,7 @@ const routes = [
     meta: {
       requireAuth: true,
       image: images.win,
+      notRequireMenu: true,
     },
   },
 ]

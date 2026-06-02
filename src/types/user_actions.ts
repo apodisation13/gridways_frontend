@@ -4,6 +4,10 @@ export enum PayResourcesSubtype {
   resourceTransition = "resource_transition",
   openBonusResource = "open_bonus_resource",
   acceptKeyReward = "accept_key_reward",
+  enterArena = "enter_arena",
+  startArenaLevel = "start_arena_level",
+  winArenaLevel = "win_arena_level",
+  upgradeInArena = "upgrade_in_arena",
 }
 
 export enum CraftMillCardActionSubtype {

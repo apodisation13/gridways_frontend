@@ -1,9 +1,8 @@
 import type { DeckCardEntry, Leader, MappedUserLevel } from "@/types"
+import type { ArenaParams } from "@/types/database"
 import type { UpgradeCategory } from "@/types/upgrades"
 
 export interface ArenaState {
-  base_enemies: number
-  delta_enemies: number
   current_level: number
   current_enemies: number
   deck: DeckCardEntry[]
@@ -13,14 +12,12 @@ export interface ArenaState {
   level: MappedUserLevel | null
   arenaUpgrades: UpgradeCategory | null
   user_upgrades: Record<string, number>
-  arena_params: Record<string, unknown>
+  arena_params: ArenaParams | null
 }
 
 const state: ArenaState = {
-  base_enemies: 10,
-  delta_enemies: 5,
   current_level: 1,
-  current_enemies: 10,
+  current_enemies: 0,
   deck: [],
   leader: null,
   health: 0,
@@ -28,7 +25,7 @@ const state: ArenaState = {
   level: null,
   arenaUpgrades: null,
   user_upgrades: {},
-  arena_params: {},
+  arena_params: null,
 }
 
 const getters = {
@@ -59,7 +56,7 @@ const mutations = {
   },
   arena_advance_level(state: ArenaState) {
     state.current_level += 1
-    state.current_enemies += state.delta_enemies
+    state.current_enemies += state.arena_params?.delta_enemies ?? 0
     state.level = null
   },
   arena_increment_upgrade(state: ArenaState, subtype: string) {
@@ -79,7 +76,7 @@ const mutations = {
   },
   arena_reset(state: ArenaState) {
     state.current_level = 1
-    state.current_enemies = state.base_enemies
+    state.current_enemies = state.arena_params?.base_enemies ?? 0
     state.deck = []
     state.leader = null
     state.health = 0
@@ -90,8 +87,9 @@ const mutations = {
   setArenaUpgrades(state: ArenaState, payload: UpgradeCategory) {
     state.arenaUpgrades = payload
   },
-  setArenaParams(state: ArenaState, params: Record<string, unknown>) {
+  setArenaParams(state: ArenaState, params: ArenaParams) {
     state.arena_params = params
+    state.current_enemies = params.base_enemies
   },
 }
 

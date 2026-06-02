@@ -75,18 +75,10 @@
           <div class="global_text arena-entry__title">Стоимость входа</div>
           <div class="arena-entry__costs">
             <resource-item
-              name="money"
-              :count="1000"
-              style="transform: scale(1.4)"
-            />
-            <resource-item
-              name="crops"
-              :count="1000"
-              style="transform: scale(1.4)"
-            />
-            <resource-item
-              name="wood"
-              :count="1000"
+              v-for="(amount, name) in arena_enter_price"
+              :key="name"
+              :name="String(name)"
+              :count="amount"
               style="transform: scale(1.4)"
             />
           </div>
@@ -147,7 +139,8 @@ import {
   random_level_generator,
   random_level_generator_by_number,
 } from "@/logic/random_level"
-import type { MappedUserLevel, SeasonEntry } from "@/types"
+import { MappedUserLevel, PayResourcesSubtype, SeasonEntry } from "@/types"
+import type { UserResources } from "@/types/database"
 
 interface GameType {
   name: string
@@ -195,6 +188,31 @@ export default defineComponent({
     }
   },
   computed: {
+    arena_enter_price_real(): UserResources | undefined {
+      return this.$store.getters["arena_params"]?.enter_price
+    },
+    arena_enter_price(): Record<string, number> {
+      const raw: UserResources =
+        this.$store.getters["arena_params"]?.enter_price ?? {}
+      const ORDER: Record<string, number> = {
+        scraps: 0,
+        raw_bronze: 1,
+        raw_silver: 2,
+        raw_gold: 3,
+        crops: 4,
+        wood: 5,
+        silk: 6,
+        bronze_ingots: 7,
+        silver_ingots: 8,
+        gold_ingots: 9,
+        money: Infinity,
+      }
+      return Object.fromEntries(
+        Object.entries(raw)
+          .sort(([a], [b]) => (ORDER[a] ?? 99) - (ORDER[b] ?? 99))
+          .map(([k, v]) => [k, Math.abs(v)])
+      )
+    },
     seasons(): SeasonEntry[] {
       return this.$store.getters["all_seasons"]
     },
@@ -296,7 +314,11 @@ export default defineComponent({
         this.inputNumberEnemiesRandomLevel as number
       )
     },
-    enter_arena(): void {
+    async enter_arena(): Promise<void> {
+      await this.$store.dispatch("processResources", {
+        subtype: PayResourcesSubtype.enterArena,
+        data: this.arena_enter_price_real,
+      })
       this.$store.commit("arena_reset")
       this.$router.push("/arena/deckbuild")
     },

@@ -205,6 +205,8 @@ import { defineComponent } from "vue"
 
 import ResourceList from "@/components/ResourceList.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { PayResourcesSubtype } from "@/types"
+import type { ArenaParams } from "@/types/database"
 import type { UpgradeCategory, UpgradeItem } from "@/types/upgrades"
 
 const RESOURCE_ORDER: Record<string, number> = {
@@ -253,8 +255,8 @@ export default defineComponent({
     resource(): Record<string, number> {
       return this.$store.getters["resource"]
     },
-    arena_params(): Record<string, number> {
-      return this.$store.getters["arena_params"] ?? {}
+    arena_params(): ArenaParams | null {
+      return this.$store.getters["arena_params"] ?? null
     },
     current_arena_level(): number {
       return this.$store.getters["arena_current_level"]
@@ -284,7 +286,7 @@ export default defineComponent({
       const since =
         this.$store.state.arena.user_upgrades["fix_draw_cooldown_since"]
       if (since === undefined) return null
-      const cd = this.arena_params.cooldown_fix_draw ?? 3
+      const cd = this.arena_params?.cooldown_fix_draw ?? 3
       return since + cd
     },
     isOnCooldown(key: string): boolean {
@@ -329,7 +331,17 @@ export default defineComponent({
       this.detail = null
       this.showRoadmap = false
     },
-    doUpgrade(key: string): void {
+    async doUpgrade(key: string): Promise<void> {
+      const item: UpgradeItem = this.config.upgrades[key]
+      const level = this.userLevel(key)
+      const next = item?.upgrades[level]?.next
+      if (!next) return
+
+      await this.$store.dispatch("processResources", {
+        subtype: PayResourcesSubtype.upgradeInArena,
+        data: next,
+      })
+
       this.$store.commit("arena_increment_upgrade", key)
       this.$store.dispatch("sync_arena_game_params")
     },
