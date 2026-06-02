@@ -22,6 +22,8 @@ export interface GameState {
   max_hp: number
   max_armor: number
 
+  arena_mode: boolean
+
   random_level_enemies_count: Record<string, unknown>
   max_random_n_enemies: number
 
@@ -85,12 +87,34 @@ const state: GameState = {
   player_turn: true,
 
   start_game_redirect: false,
+
+  arena_mode: false,
 }
 
 const getters = {
   // параметры для игры, которые берутся из апгрейдов
-  maxCardsInDeck: (state: GameState) => state.cards_in_deck,
-  handSize: (state: GameState) => state.hand_size,
+  maxCardsInDeck: (state: GameState, _getters: any, rootState: any) => {
+    if (state.arena_mode) {
+      const userLevel =
+        rootState.arena?.user_upgrades?.["max_cards_in_deck"] ?? 0
+      return (
+        rootState.arena?.arenaUpgrades?.upgrades?.["max_cards_in_deck"]
+          ?.upgrades?.[userLevel]?.value ?? state.cards_in_deck
+      )
+    }
+    return state.cards_in_deck
+  },
+  handSize: (state: GameState, _getters: any, rootState: any) => {
+    if (state.arena_mode) {
+      const userLevel = rootState.arena?.user_upgrades?.["hand_size"] ?? 0
+      return (
+        rootState.arena?.arenaUpgrades?.upgrades?.["hand_size"]?.upgrades?.[
+          userLevel
+        ]?.value ?? state.hand_size
+      )
+    }
+    return state.hand_size
+  },
   maxDecks: (state: GameState) => state.max_decks,
   maxHp: (state: GameState) => state.max_hp,
   maxArmor: (state: GameState) => state.max_armor,
@@ -220,9 +244,31 @@ const mutations = {
   set_enemies_grave(state: GameState, enemies_grave: Enemy[]) {
     state.enemies_grave = enemies_grave
   },
+
+  set_arena_mode(state: GameState, payload: boolean) {
+    state.arena_mode = payload
+  },
 }
 
 const actions = {
+  sync_arena_game_params({ commit, getters }: ActionContext) {
+    const arenaUpgrades = getters["arena_upgrades_config"]
+    const userUpgrades: Record<string, number> =
+      getters["arena_user_upgrades"] ?? {}
+
+    const arenaValue = (key: string, fallback: number): number => {
+      const level = userUpgrades[key] ?? 0
+      return (
+        arenaUpgrades?.upgrades?.[key]?.upgrades?.[level]?.value ?? fallback
+      )
+    }
+
+    commit("setUpgradesConst", {
+      max_hp: arenaValue("max_hp", getters["maxHp"]),
+      max_armor: arenaValue("max_armor", getters["maxArmor"]),
+    })
+  },
+
   set_deck_in_play(
     { commit, getters }: ActionContext,
     deck: DeckEntry | null = null

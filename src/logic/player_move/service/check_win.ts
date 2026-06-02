@@ -18,5 +18,9 @@ export function check_win(
 
   store.commit("set_win_redirect", true)
   store.commit("set_enemies_grave", enemies_grave)
-  router.push("win")
+  if (store.state.game.arena_mode) {
+    router.push("/arena/win_game")
+  } else {
+    router.push("win")
+  }
 }
