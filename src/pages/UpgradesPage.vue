@@ -249,6 +249,7 @@ const RESOURCE_ORDER: Record<string, number> = {
   bronze_ingots: 7,
   silver_ingots: 8,
   gold_ingots: 9,
+  flowers: 10,
   money: Infinity,
 }
 

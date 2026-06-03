@@ -61,8 +61,11 @@
           @target_enemy_multi="exec_damage_enemy_card_multi"
         />
 
-        <!-- Просто полоска с жизнями (пока что) -->
-        <health-comp />
+        <!-- Полоска с жизнями — клик открывает модалку использования предметов -->
+        <health-comp
+          style="cursor: pointer"
+          @click="show_special_items = true"
+        />
       </div>
     </div>
 
@@ -107,6 +110,11 @@
         @redraw_finished="redraw_finished"
       />
     </transition>
+
+    <use-special-items-component
+      v-if="show_special_items"
+      @close="show_special_items = false"
+    />
   </div>
 </template>
 
@@ -126,6 +134,7 @@ import LeaderComp from "@/components/Pages/GamePage/LeaderComp.vue"
 import PassComp from "@/components/Pages/GamePage/PassComp.vue"
 import RedrawComp from "@/components/Pages/GamePage/RedrawComp.vue"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities.vue"
+import UseSpecialItemsComponent from "@/components/Pages/GamePage/UseSpecialItemsComponent.vue"
 import {
   damage_ai_card,
   damage_ai_card_multi,
@@ -159,6 +168,7 @@ export default defineComponent({
     HealthComp,
     HandComp,
     SpecialCaseAbilities,
+    UseSpecialItemsComponent,
   },
   mixins: [draw, specialcaseabilities, execaimove, startgame],
 
@@ -193,6 +203,7 @@ export default defineComponent({
       inCrossEnemyIndex: null as number | null,
       // залоченные цели в режиме multi — остаются мигать до выстрела или отмены
       multiLockedIndices: [] as number[],
+      show_special_items: false,
     }
   },
   computed: {

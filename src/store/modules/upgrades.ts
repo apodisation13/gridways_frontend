@@ -110,6 +110,18 @@ const actions = {
         UpgradeType.GAME,
         UpgradeSubtype.MAX_ARMOR
       ),
+      first_aid_kits_heal: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.FIRST_AID_KIT_HEAL
+      ),
+      shield_armor: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.SHIELD_ARMOR
+      ),
     })
 
     // Создаем новый объект с теми же ключами
@@ -204,6 +216,24 @@ const actions = {
       userUpgrades,
       UpgradeType.RESOURCES,
       UpgradeSubtype.RAW
+    )
+    upgrades["flowers"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.FLOWERS
+    )
+    upgrades["first_aid_kits"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.FIRST_AID_KITS
+    )
+    upgrades["shields"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.SHIELDS
     )
     commit("setMaxResourcesValues", upgrades)
   },

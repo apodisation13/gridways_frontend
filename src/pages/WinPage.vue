@@ -69,6 +69,13 @@
         show_delta
         style="transform: scale(2)"
       />
+      <resource-item
+        v-if="pay_data.flowers"
+        name="kegs"
+        :count="pay_data.flowers"
+        show_delta
+        style="transform: scale(2)"
+      />
     </div>
     <div class="play-price">
       <resource-item

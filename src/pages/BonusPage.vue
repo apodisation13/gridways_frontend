@@ -72,6 +72,7 @@ export default defineComponent({
           keys: ["scraps", "bronze_ingots", "silver_ingots", "gold_ingots"],
         },
         { label: "Для уровней", keys: ["crops", "wood", "silk"] },
+        { label: "В игре", keys: ["flowers", "first_aid_kits", "shields"] },
       ] as { label: string; keys: string[] }[],
       keg_len: 0,
     }

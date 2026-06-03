@@ -296,6 +296,9 @@ export interface UserResources {
   keys: number
   rare_gem: number
   money: number
+  flowers: number
+  first_aid_kits: number
+  shields: number
 }
 
 export interface CardsResponse {
