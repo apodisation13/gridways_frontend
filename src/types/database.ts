@@ -38,6 +38,7 @@ export interface LeaderData {
     base_hp: number
   }
   heal?: number
+  armor?: number
   passive?: {
     value?: number
     timer?: number

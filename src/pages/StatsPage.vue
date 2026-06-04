@@ -13,9 +13,11 @@
       <div class="user-profile">
         <img
           v-if="selectedAvatar"
-          :src="require(`@/assets/icons/resources/${selectedAvatar}.svg`)"
-          alt=""
-          class="avatar"
+          :src="
+            selectedAvatar.includes('/')
+              ? require(`@/assets/${selectedAvatar}.svg`)
+              : require(`@/assets/icons/resources/${selectedAvatar}.svg`)
+          "
         />
         <div v-else class="avatar-placeholder" />
         <span class="username">{{ username }}</span>

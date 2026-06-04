@@ -40,6 +40,9 @@ export enum UpgradeSubtype {
   MAX_DECKS = "max_decks",
   FIRST_AID_KIT_HEAL = "first_aid_kit_heal",
   SHIELD_ARMOR = "shield_armor",
+  REDRAWS_INITIAL = "redraws_initial",
+  REDRAWS_DRAWN = "redraws_drawn",
+  CARDS_DRAWN = "cards_drawn",
 
   AVATAR = "avatar",
   THEME = "theme",

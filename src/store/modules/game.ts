@@ -23,6 +23,9 @@ export interface GameState {
   max_armor: number
   first_aid_kit_heal: number
   shield_armor: number
+  draws_initial: number
+  draws_after_redraw: number
+  cards_drawn: number
 
   arena_mode: boolean
 
@@ -68,6 +71,9 @@ const state: GameState = {
   max_armor: 0,
   first_aid_kit_heal: 0,
   shield_armor: 0,
+  draws_initial: 1,
+  draws_after_redraw: 0,
+  cards_drawn: 1,
 
   random_level_enemies_count: {},
   max_random_n_enemies: 0,
@@ -145,6 +151,9 @@ const mutations = {
       max_armor?: number
       first_aid_kit_heal?: number
       shield_armor?: number
+      draws_initial: number
+      draws_after_redraw: number
+      cards_drawn: number
     }
   ) {
     state.hand_size = payload.hand_size ?? state.hand_size
@@ -155,6 +164,10 @@ const mutations = {
     state.first_aid_kit_heal =
       payload.first_aid_kit_heal ?? state.first_aid_kit_heal
     state.shield_armor = payload.shield_armor ?? state.shield_armor
+    state.draws_initial = payload.draws_initial ?? state.draws_initial
+    state.draws_after_redraw =
+      payload.draws_after_redraw ?? state.draws_after_redraw
+    state.cards_drawn = payload.cards_drawn ?? state.cards_drawn
   },
 
   set_game_const(

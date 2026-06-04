@@ -122,6 +122,24 @@ const actions = {
         UpgradeType.GAME,
         UpgradeSubtype.SHIELD_ARMOR
       ),
+      draws_initial: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.REDRAWS_INITIAL
+      ),
+      draws_after_redraw: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.REDRAWS_DRAWN
+      ),
+      cards_drawn: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.CARDS_DRAWN
+      ),
     })
 
     // Создаем новый объект с теми же ключами

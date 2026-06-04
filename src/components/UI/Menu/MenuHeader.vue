@@ -19,7 +19,11 @@
         />
         <img
           v-else
-          :src="require(`@/assets/icons/resources/${path_to_icon}.svg`)"
+          :src="
+            path_to_icon.includes('/')
+              ? require(`@/assets/${path_to_icon}.svg`)
+              : require(`@/assets/icons/resources/${path_to_icon}.svg`)
+          "
           alt=""
           class="avatar__btn"
         />

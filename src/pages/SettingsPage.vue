@@ -38,9 +38,11 @@
       <setting-logout v-if="activeTab === 'logout'" />
     </div>
 
-    <button class="base-button" :disabled="isLoading" @click="updateSettings">
-      <span class="global_text base-button-text">Запомнить мои настройки!</span>
-    </button>
+    <div class="save-wrap">
+      <base-button :disabled="isLoading" @click="updateSettings">
+        Запомнить мои настройки!
+      </base-button>
+    </div>
   </div>
 </template>
 
@@ -53,6 +55,7 @@ import SettingChooseTheme from "@/components/Pages/SettingsPage/SettingChooseThe
 import SettingLogout from "@/components/Pages/SettingsPage/SettingLogout.vue"
 import SettingMoveTimeout from "@/components/Pages/SettingsPage/SettingMoveTimeout.vue"
 import SettingSound from "@/components/Pages/SettingsPage/SettingSound.vue"
+import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 
 export default defineComponent({
   name: "SettingsPage",
@@ -63,6 +66,7 @@ export default defineComponent({
     SettingAnimation,
     SettingSound,
     SettingMoveTimeout,
+    BaseButton,
   },
   data() {
     return {
@@ -161,8 +165,8 @@ export default defineComponent({
   background: transparent;
   display: flex;
   flex-direction: column;
-  height: 90vh;
-  max-height: 800px;
+  height: calc(var(--vh, 1vh) * 100 - 100px);
+  overflow: hidden;
 }
 
 .icons-panel {
@@ -274,6 +278,7 @@ export default defineComponent({
 .settings-zone {
   margin-top: 2vh;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 24px 20px;
   background: transparent;
@@ -320,24 +325,11 @@ export default defineComponent({
   }
 }
 
-.base-button {
-  background: linear-gradient(#1d252d, #000000, #282d33);
-  border: 2px solid #facf5d;
-  border-radius: 6px;
+.save-wrap {
   position: fixed;
   bottom: 15vh;
   left: 50%;
   transform: translateX(-50%);
-  width: 40%;
-  padding: 13px;
-  cursor: pointer;
-  outline: none;
-}
-
-.base-button-text {
-  font-size: 16px;
-  background: var(--primary-gold-gradient);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  z-index: 10;
 }
 </style>

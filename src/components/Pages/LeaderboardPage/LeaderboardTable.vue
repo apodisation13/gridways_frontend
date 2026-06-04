@@ -25,7 +25,11 @@
               <img
                 v-if="entry.user_avatar"
                 :src="
-                  require(`@/assets/icons/resources/${entry.user_avatar}.svg`)
+                  entry.user_avatar.includes('/')
+                    ? require(`@/assets/${entry.user_avatar}.svg`)
+                    : require(
+                        `@/assets/icons/resources/${entry.user_avatar}.svg`
+                      )
                 "
                 alt=""
                 class="avatar"
