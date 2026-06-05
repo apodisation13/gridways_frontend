@@ -21,6 +21,11 @@ export interface GameState {
   max_decks: number
   max_hp: number
   max_armor: number
+  first_aid_kit_heal: number
+  shield_armor: number
+  draws_initial: number
+  draws_after_redraw: number
+  cards_drawn: number
 
   arena_mode: boolean
 
@@ -49,6 +54,9 @@ export interface GameState {
   player_turn: boolean
 
   start_game_redirect: boolean
+
+  max_hp_shown: boolean
+  max_armor_shown: boolean
 }
 
 interface GameActionContext extends ActionContext {
@@ -61,6 +69,11 @@ const state: GameState = {
   max_decks: 2,
   max_hp: 100,
   max_armor: 0,
+  first_aid_kit_heal: 0,
+  shield_armor: 0,
+  draws_initial: 1,
+  draws_after_redraw: 0,
+  cards_drawn: 1,
 
   random_level_enemies_count: {},
   max_random_n_enemies: 0,
@@ -89,6 +102,9 @@ const state: GameState = {
   start_game_redirect: false,
 
   arena_mode: false,
+
+  max_hp_shown: false,
+  max_armor_shown: false,
 }
 
 const getters = {
@@ -133,6 +149,11 @@ const mutations = {
       max_decks?: number
       max_hp?: number
       max_armor?: number
+      first_aid_kit_heal?: number
+      shield_armor?: number
+      draws_initial: number
+      draws_after_redraw: number
+      cards_drawn: number
     }
   ) {
     state.hand_size = payload.hand_size ?? state.hand_size
@@ -140,6 +161,13 @@ const mutations = {
     state.max_decks = payload.max_decks ?? state.max_decks
     state.max_hp = payload.max_hp ?? state.max_hp
     state.max_armor = payload.max_armor ?? state.max_armor
+    state.first_aid_kit_heal =
+      payload.first_aid_kit_heal ?? state.first_aid_kit_heal
+    state.shield_armor = payload.shield_armor ?? state.shield_armor
+    state.draws_initial = payload.draws_initial ?? state.draws_initial
+    state.draws_after_redraw =
+      payload.draws_after_redraw ?? state.draws_after_redraw
+    state.cards_drawn = payload.cards_drawn ?? state.cards_drawn
   },
 
   set_game_const(
@@ -169,9 +197,12 @@ const mutations = {
   set_health(state: GameState, param: number) {
     // максимальные жизни колоды теперь ограничены апгрейдом
     if (param > state.max_hp) {
-      toast.info(
-        "Максимальный уровень здоровья достигнут. Увеличьте его в разделе Прокачка"
-      )
+      if (!state.max_hp_shown) {
+        toast.info(
+          "Максимальный уровень здоровья достигнут. Увеличьте его в разделе Прокачка"
+        )
+        state.max_hp_shown = true
+      }
       param = state.max_hp
     }
     state.health = param
@@ -195,9 +226,12 @@ const mutations = {
     state.health += param
     // максимальные жизни колоды теперь ограничены апгрейдом
     if (state.health > state.max_hp) {
-      toast.info(
-        "Максимальный уровень здоровья достигнут. Увеличьте его в разделе Прокачка"
-      )
+      if (!state.max_hp_shown) {
+        toast.info(
+          "Максимальный уровень здоровья достигнут. Увеличьте его в разделе Прокачка"
+        )
+        state.max_hp_shown = true
+      }
       state.health = state.max_hp
     }
   },
@@ -205,18 +239,24 @@ const mutations = {
     state.armor += armor_delta
     // максимальные броня теперь ограничена апгрейдом
     if (state.armor > state.max_armor) {
-      toast.info(
-        "Максимальный уровень брони достигнут. Увеличьте его в разделе Прокачка"
-      )
+      if (!state.max_armor_shown) {
+        toast.info(
+          "Максимальный уровень брони достигнут. Увеличьте его в разделе Прокачка"
+        )
+        state.max_armor_shown = true
+      }
       state.armor = state.max_armor
     }
   },
   set_armor(state: GameState, armor_value: number) {
     // максимальные броня теперь ограничена апгрейдом
     if (armor_value > state.max_armor) {
-      toast.info(
-        "Максимальный уровень брони достигнут. Увеличьте его в разделе Прокачка"
-      )
+      if (!state.max_armor_shown) {
+        toast.info(
+          "Максимальный уровень брони достигнут. Увеличьте его в разделе Прокачка"
+        )
+        state.max_armor_shown = true
+      }
       armor_value = state.max_armor
     }
     state.armor = armor_value

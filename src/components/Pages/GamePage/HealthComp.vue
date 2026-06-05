@@ -65,15 +65,23 @@ export default defineComponent({
     flashDuration(): number {
       return this.$store.getters["selectedMoveTimeout"]
     },
+    maxHp(): number {
+      return this.$store.getters["maxHp"] || 100
+    },
+    healthPercent(): number {
+      return Math.min(Math.max((this.health / this.maxHp) * 100, 0), 100)
+    },
     barStyle(): Record<string, string> {
-      if (this.health < 20) return { backgroundColor: "rgba(255, 59, 48, 0.2)" }
-      if (this.health < 35) return { backgroundColor: "rgba(255, 149, 0, 0.2)" }
-      if (this.health < 50) return { backgroundColor: "rgba(255, 204, 0, 0.2)" }
+      if (this.healthPercent < 20)
+        return { backgroundColor: "rgba(255, 59, 48, 0.2)" }
+      if (this.healthPercent < 35)
+        return { backgroundColor: "rgba(255, 149, 0, 0.2)" }
+      if (this.healthPercent < 50)
+        return { backgroundColor: "rgba(255, 204, 0, 0.2)" }
       return { backgroundColor: "rgba(52, 199, 89, 0.2)" }
     },
     fillStyle(): Record<string, string> {
-      const percent = Math.min(Math.max(this.health, 0), 100)
-      return { width: `${percent}%` }
+      return { width: `${this.healthPercent}%` }
     },
   },
   watch: {

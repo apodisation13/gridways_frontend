@@ -111,7 +111,7 @@ export function damage_ai_card(
     poison_all_enemies(gameObj, timeout)
   } else if (ability === CardAbility.AddArmor) {
     damage_one(enemy, card, gameObj, timeout)
-    const armor_value = (card as Card).data?.armor || 0
+    const armor_value = (card as Card | Leader).data?.armor || 0
     add_armor(armor_value, timeout)
   } else if (ability === CardAbility.Purify) {
     purify(enemy)
@@ -145,6 +145,13 @@ export function damage_ai_card_multi(
     if (!enemy) continue
     if (ability === CardAbility.Lock) lock_enemy(enemy)
     damage_one(enemy, card, gameObj, timeout)
+  }
+
+  if (ability === CardAbility.Heal) {
+    heal(card)
+  } else if (ability === CardAbility.AddArmor) {
+    const armor_value = (card as Card | Leader).data?.armor || 0
+    add_armor(armor_value, timeout)
   }
 
   // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда

@@ -1,0 +1,47 @@
+<svg width="29" height="31" viewBox="0 0 29 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g filter="url(#filter0_medkit)">
+
+    <!-- Ручка чемоданчика -->
+    <path d="M9 7 Q9 3.5 14.5 3.5 Q20 3.5 20 7" stroke="#8B5E3C" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+
+    <!-- Тело аптечки -->
+    <rect x="2.5" y="7" width="24" height="21" rx="2.5" fill="#D0D0D0"/>
+    <!-- Верхняя грань (светлее) -->
+    <rect x="2.5" y="7" width="24" height="6" rx="2.5" fill="#E8E8E8"/>
+    <!-- Нижняя грань (темнее) -->
+    <path d="M2.5 13 L2.5 26 Q2.5 28 5 28 L24 28 Q26.5 28 26.5 26 L26.5 13 Z" fill="#C4C4C4"/>
+
+    <!-- Красный крест -->
+    <rect x="11" y="10" width="7" height="15" rx="1.2" fill="#E02020"/>
+    <rect x="7"  y="14" width="15" height="7" rx="1.2" fill="#E02020"/>
+    <!-- Блики на кресте -->
+    <rect x="11.5" y="10.5" width="2.5" height="5" rx="0.5" fill="#FF5050" opacity="0.6"/>
+    <rect x="7.5"  y="14.5" width="5"   height="2.5" rx="0.5" fill="#FF5050" opacity="0.6"/>
+
+    <!-- Застёжка по центру -->
+    <rect x="12" y="17.5" width="5" height="3" rx="0.6" fill="#A0A0A0"/>
+    <rect x="13" y="17"   width="3" height="2" rx="0.5" fill="#888888"/>
+
+    <!-- Металлические уголки -->
+    <rect x="2.5" y="7"  width="3.5" height="3.5" rx="0.5" fill="#A8A8A8"/>
+    <rect x="23"  y="7"  width="3.5" height="3.5" rx="0.5" fill="#A8A8A8"/>
+    <rect x="2.5" y="24.5" width="3.5" height="3.5" rx="0.5" fill="#A8A8A8"/>
+    <rect x="23"  y="24.5" width="3.5" height="3.5" rx="0.5" fill="#A8A8A8"/>
+
+    <!-- Блик сверху -->
+    <path d="M5 8 Q14.5 7 24 8" stroke="#FFFFFF" stroke-width="0.9" stroke-linecap="round" opacity="0.7"/>
+
+  </g>
+  <defs>
+    <filter id="filter0_medkit" x="0" y="0" width="29" height="31" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dx="1" dy="2"/>
+      <feGaussianBlur stdDeviation="2"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+</svg>

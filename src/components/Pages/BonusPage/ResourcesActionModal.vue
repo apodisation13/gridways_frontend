@@ -173,6 +173,7 @@ export default defineComponent({
         crops: 4,
         wood: 5,
         silk: 6,
+        flowers: 7,
         money: Infinity,
       }
       const keys = [

@@ -1,0 +1,45 @@
+<svg width="29" height="31" viewBox="0 0 29 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g filter="url(#f_egg)">
+    <!-- Яйцо дракона (скорлупа) -->
+    <ellipse cx="14.5" cy="15.5" rx="11" ry="13.5" fill="url(#egg_shell)"/>
+    <!-- Внутреннее свечение сквозь трещины -->
+    <ellipse cx="14.5" cy="15.5" rx="7.5" ry="10" fill="url(#egg_glow)" opacity="0.65"/>
+    <!-- Чешуйчатый узор -->
+    <ellipse cx="10"   cy="11"   rx="2.3" ry="1.5" fill="none" stroke="#2A5A3A" stroke-width="0.45" opacity="0.5"/>
+    <ellipse cx="19"   cy="11"   rx="2.3" ry="1.5" fill="none" stroke="#2A5A3A" stroke-width="0.45" opacity="0.5"/>
+    <ellipse cx="14.5" cy="9.5"  rx="2.3" ry="1.4" fill="none" stroke="#2A5A3A" stroke-width="0.45" opacity="0.45"/>
+    <ellipse cx="10"   cy="18"   rx="2.3" ry="1.5" fill="none" stroke="#2A5A3A" stroke-width="0.45" opacity="0.5"/>
+    <ellipse cx="19"   cy="18"   rx="2.3" ry="1.5" fill="none" stroke="#2A5A3A" stroke-width="0.45" opacity="0.5"/>
+    <ellipse cx="14.5" cy="22"   rx="2.5" ry="1.5" fill="none" stroke="#2A5A3A" stroke-width="0.45" opacity="0.4"/>
+    <ellipse cx="10"   cy="25"   rx="2"   ry="1.3" fill="none" stroke="#2A5A3A" stroke-width="0.4"  opacity="0.4"/>
+    <ellipse cx="19"   cy="25"   rx="2"   ry="1.3" fill="none" stroke="#2A5A3A" stroke-width="0.4"  opacity="0.35"/>
+    <!-- Трещины (с оранжевым свечением) -->
+    <path d="M14.5 8 L13.2 11.5 L14.8 13.5 L13 16.5 L15.2 19 L14 22 L14.5 24" stroke="#FF8820" stroke-width="1.4" fill="none" opacity="0.95" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M14 11.5 L10.5 13 L12.5 14" stroke="#FFA030" stroke-width="0.9" fill="none" opacity="0.85" stroke-linecap="round"/>
+    <path d="M15.2 17 L18.5 18.5 L17 19.5" stroke="#FFB040" stroke-width="0.8" fill="none" opacity="0.8" stroke-linecap="round"/>
+    <path d="M13.5 20 L10.5 21.5 L11.5 23" stroke="#FF9020" stroke-width="0.75" fill="none" opacity="0.75" stroke-linecap="round"/>
+    <!-- Контур яйца -->
+    <ellipse cx="14.5" cy="15.5" rx="11" ry="13.5" stroke="#1E4A28" stroke-width="0.5" fill="none"/>
+  </g>
+  <defs>
+    <radialGradient id="egg_shell" cx="10" cy="9" r="16" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#3A6040"/>
+      <stop offset="55%"  stop-color="#1E3A24"/>
+      <stop offset="100%" stop-color="#0C1A10"/>
+    </radialGradient>
+    <radialGradient id="egg_glow" cx="14.5" cy="15.5" r="10" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#FF9020"/>
+      <stop offset="50%"  stop-color="#C04000" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#800000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="f_egg" x="0" y="0" width="29" height="31" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dx="1" dy="2"/><feGaussianBlur stdDeviation="2"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+</svg>

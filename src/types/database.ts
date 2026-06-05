@@ -38,6 +38,7 @@ export interface LeaderData {
     base_hp: number
   }
   heal?: number
+  armor?: number
   passive?: {
     value?: number
     timer?: number
@@ -296,6 +297,9 @@ export interface UserResources {
   keys: number
   rare_gem: number
   money: number
+  flowers: number
+  first_aid_kits: number
+  shields: number
 }
 
 export interface CardsResponse {
@@ -330,13 +334,17 @@ export interface OpenRelatedLevelsResponse {
   seasons: UserSeason[]
 }
 
+export interface ArenaRewardMultiply {
+  base: number
+  delta: number
+}
+
 export interface ArenaParams {
   enter_price: UserResources
   base_enemies: number
   delta_enemies: number
-  base_reward_delta: number
   cooldown_fix_draw: number
-  base_reward_multiply: number
+  win_multiply: Partial<Record<keyof UserResources, ArenaRewardMultiply>>
 }
 
 export interface GameConst {

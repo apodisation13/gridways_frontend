@@ -1,7 +1,11 @@
 <template>
   <div class="lose-page">
     <div class="arena-top-bar">
-      <button class="arena-exit-btn" @click="showExitConfirm = true">
+      <button
+        v-if="was_arena"
+        class="arena-exit-btn"
+        @click="showExitConfirm = true"
+      >
         ВЫХОД
       </button>
     </div>

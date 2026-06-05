@@ -1,0 +1,38 @@
+<svg width="29" height="31" viewBox="0 0 29 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g filter="url(#f_bow)">
+    <!-- Дуга лука (изогнутая) -->
+    <path d="M17 2 Q2 15 17 29" stroke="#7A5020" stroke-width="3.8" fill="none" stroke-linecap="round"/>
+    <path d="M17 2 Q4 15 17 29"  stroke="#A87040" stroke-width="2"   fill="none" stroke-linecap="round" opacity="0.55"/>
+    <path d="M17 2 Q3 15 17 29"  stroke="#C09050" stroke-width="0.9" fill="none" stroke-linecap="round" opacity="0.4"/>
+    <!-- Засечки на концах -->
+    <circle cx="17" cy="2.5"  r="1.5" fill="#8B5E2A"/>
+    <circle cx="17" cy="28.5" r="1.5" fill="#8B5E2A"/>
+    <!-- Тетива -->
+    <line x1="17" y1="2.5" x2="17" y2="28.5" stroke="#F0E8C0" stroke-width="1.1" opacity="0.9"/>
+    <!-- Стрела (горизонтальная) -->
+    <!-- Древко -->
+    <line x1="4" y1="15" x2="22" y2="15" stroke="#A07838" stroke-width="1.1"/>
+    <!-- Наконечник -->
+    <polygon points="22,15 19.5,13.5 19.5,16.5" fill="url(#arrow_tip)"/>
+    <!-- Оперение (левый конец) -->
+    <path d="M4 15 L7 12.8" stroke="#B03020" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M4 15 L7 17.2" stroke="#B03020" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M4 15 L6.5 13.5" stroke="#D84030" stroke-width="0.9" stroke-linecap="round" opacity="0.7"/>
+    <path d="M4 15 L6.5 16.5" stroke="#D84030" stroke-width="0.9" stroke-linecap="round" opacity="0.7"/>
+  </g>
+  <defs>
+    <linearGradient id="arrow_tip" x1="19.5" y1="13.5" x2="22" y2="16.5" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#D8E8F0"/>
+      <stop offset="100%" stop-color="#8898A8"/>
+    </linearGradient>
+    <filter id="f_bow" x="0" y="0" width="29" height="31" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dx="1" dy="2"/><feGaussianBlur stdDeviation="2"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+</svg>

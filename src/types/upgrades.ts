@@ -38,6 +38,11 @@ export enum UpgradeSubtype {
   MAX_ARMOR = "max_armor",
   MAX_HP = "max_hp",
   MAX_DECKS = "max_decks",
+  FIRST_AID_KIT_HEAL = "first_aid_kit_heal",
+  SHIELD_ARMOR = "shield_armor",
+  REDRAWS_INITIAL = "redraws_initial",
+  REDRAWS_DRAWN = "redraws_drawn",
+  CARDS_DRAWN = "cards_drawn",
 
   AVATAR = "avatar",
   THEME = "theme",
@@ -50,6 +55,9 @@ export enum UpgradeSubtype {
   WOOD = "wood",
   INGOTS = "ingots",
   RAW = "raw",
+  FLOWERS = "flowers",
+  FIRST_AID_KITS = "first_aid_kits",
+  SHIELDS = "shields",
 }
 
 export interface UpgradesResponse {
@@ -63,8 +71,9 @@ export function get_value_from_upgrades(
   upgradeType: UpgradeType,
   upgradeSubtype: UpgradeSubtype
 ) {
-  const userLevel = userUpgrades[upgradeType][upgradeSubtype]
-  if (userLevel === undefined || userLevel === null) return 0
-  return upgrades[upgradeType].upgrades[upgradeSubtype].upgrades[userLevel]
-    .value
+  const userLevel = userUpgrades[upgradeType]?.[upgradeSubtype] ?? 0
+  return (
+    upgrades[upgradeType]?.upgrades[upgradeSubtype]?.upgrades[userLevel]
+      ?.value ?? 0
+  )
 }

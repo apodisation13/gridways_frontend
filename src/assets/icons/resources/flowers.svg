@@ -1,0 +1,75 @@
+<svg width="29" height="31" viewBox="0 0 29 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g filter="url(#filter0_flowers)">
+
+    <!-- Пробка -->
+    <rect x="11.5" y="1" width="6" height="3.5" rx="1.2" fill="#9B6A38"/>
+    <rect x="11.5" y="1" width="6" height="1.4" rx="0.8" fill="#B8804A"/>
+    <rect x="12.5" y="1.5" width="4" height="0.6" rx="0.3" fill="#D4A06A" opacity="0.6"/>
+
+    <!-- Горлышко -->
+    <rect x="12" y="4.5" width="5" height="4.5" rx="0.8" fill="#B8D8E8"/>
+    <rect x="12.5" y="4.5" width="1.5" height="4.5" fill="#E0F4FF" opacity="0.55"/>
+    <rect x="12" y="4.5" width="5" height="4.5" rx="0.8" stroke="#88B8CC" stroke-width="0.5" fill="none"/>
+
+    <!-- Широкое тело бутылки -->
+    <ellipse cx="14.5" cy="19.5" rx="10.5" ry="9.5" fill="#A8CCE0"/>
+    <!-- Стеклянный блик -->
+    <ellipse cx="10.5" cy="15.5" rx="2.8" ry="5" fill="#E8F8FF" opacity="0.5"/>
+    <ellipse cx="9.5"  cy="14.5" rx="1"   ry="2.5" fill="#FFFFFF" opacity="0.35"/>
+
+    <!-- Зелье (заполняет ~80% тела) -->
+    <ellipse cx="14.5" cy="20.5" rx="9.5" ry="8" fill="#9020B0"/>
+    <!-- Поверхность зелья — блестящая -->
+    <ellipse cx="14.5" cy="12.8" rx="9.5" ry="2.2" fill="#C040D8"/>
+    <ellipse cx="14.5" cy="12.5" rx="7"   ry="1.2" fill="#D860E8" opacity="0.7"/>
+
+    <!-- Внутреннее свечение зелья -->
+    <ellipse cx="12"   cy="18" rx="3.5" ry="5.5" fill="#C040D0" opacity="0.4"/>
+    <ellipse cx="11.5" cy="17" rx="1.5" ry="3"   fill="#E070F0" opacity="0.25"/>
+
+    <!-- Цветок внутри -->
+    <ellipse cx="14.5" cy="20" rx="1.3" ry="2.2" fill="#FFB0E8" opacity="0.9"/>
+    <ellipse cx="14.5" cy="20" rx="1.3" ry="2.2" fill="#FF90D8" opacity="0.85" transform="rotate(60  14.5 20)"/>
+    <ellipse cx="14.5" cy="20" rx="1.3" ry="2.2" fill="#FF90D8" opacity="0.85" transform="rotate(120 14.5 20)"/>
+    <ellipse cx="14.5" cy="20" rx="1.3" ry="2.2" fill="#FFB0E8" opacity="0.8"  transform="rotate(180 14.5 20)"/>
+    <ellipse cx="14.5" cy="20" rx="1.3" ry="2.2" fill="#FFB0E8" opacity="0.8"  transform="rotate(240 14.5 20)"/>
+    <ellipse cx="14.5" cy="20" rx="1.3" ry="2.2" fill="#FFB0E8" opacity="0.8"  transform="rotate(300 14.5 20)"/>
+    <circle cx="14.5" cy="20" r="1.5" fill="#FFE060"/>
+    <circle cx="14.5" cy="20" r="0.8" fill="#FFF4A0"/>
+
+    <!-- Пузырьки -->
+    <circle cx="11"   cy="17" r="0.7" fill="#FFFFFF" opacity="0.3"/>
+    <circle cx="17.5" cy="15" r="0.5" fill="#FFFFFF" opacity="0.3"/>
+    <circle cx="13"   cy="24" r="0.55" fill="#FFFFFF" opacity="0.25"/>
+    <circle cx="18"   cy="22" r="0.4" fill="#FFFFFF" opacity="0.25"/>
+
+    <!-- Контур тела бутылки -->
+    <ellipse cx="14.5" cy="19.5" rx="10.5" ry="9.5" stroke="#78A8C0" stroke-width="0.7" fill="none"/>
+
+    <!-- Плечи бутылки — соединение горлышка с телом -->
+    <path d="M12 9 Q8 10 4 14" stroke="#88B8CC" stroke-width="0.6" fill="none"/>
+    <path d="M17 9 Q21 10 25 14" stroke="#88B8CC" stroke-width="0.6" fill="none"/>
+
+    <!-- Магическое свечение снаружи -->
+    <circle cx="5"  cy="13" r="0.7" fill="#FF80FF" opacity="0.85"/>
+    <circle cx="24" cy="15" r="0.6" fill="#FF80FF" opacity="0.75"/>
+    <circle cx="4.5" cy="21" r="0.5" fill="#FFFFFF"  opacity="0.7"/>
+    <circle cx="25"  cy="22" r="0.55" fill="#FFD0FF" opacity="0.8"/>
+    <!-- звёздочка -->
+    <path d="M24 9 L24.4 10.8 L26.2 10.8 L24.8 11.8 L25.3 13.6 L24 12.5 L22.7 13.6 L23.2 11.8 L21.8 10.8 L23.6 10.8 Z"
+          fill="#FFD700" opacity="0.6"/>
+
+  </g>
+  <defs>
+    <filter id="filter0_flowers" x="0" y="0" width="29" height="31" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dx="1" dy="2"/>
+      <feGaussianBlur stdDeviation="2"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.3 0 0 0 0 0 0 0 0 0.3 0 0 0 0 0.35 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+</svg>

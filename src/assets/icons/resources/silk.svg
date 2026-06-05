@@ -1,60 +1,56 @@
 <svg width="29" height="31" viewBox="0 0 29 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <g filter="url(#filter0_silk3)">
-    <!-- Основа - сложенная ткань снизу -->
-    <path d="M4 20 L8 18 L20 18 L24 20 L24 24 L20 26 L8 26 L4 24 Z" fill="#D4B030"/>
-    <path d="M4 20 L8 18 L20 18 L24 20 L20 22 L8 22 Z" fill="#E8C840"/>
-    <path d="M4 20 L8 22 L8 26 L4 24 Z" fill="#B09020"/>
-    <path d="M24 20 L20 22 L20 26 L24 24 Z" fill="#C0A028"/>
-    <path d="M4 20 L8 18 L20 18 L24 20" stroke="#8A6A10" stroke-width="0.6" fill="none"/>
+  <g filter="url(#filter0_silk)">
 
-    <!-- Средний слой - изгиб ткани -->
-    <path d="M6 14 Q10 12 14 13 Q18 12 22 14 L22 20 L14 18 L6 20 Z" fill="#F0D848"/>
-    <path d="M6 14 Q10 12 14 13 Q18 12 22 14" stroke="#9A7A18" stroke-width="0.6" fill="none"/>
-    <!-- Складка посередине -->
-    <path d="M14 13 L14 18" stroke="#C8A830" stroke-width="0.8"/>
-    <!-- Блик -->
-    <path d="M8 13 Q11 12 14 12.5 Q17 12 20 13 L19 14.5 Q15 13.5 9 14.5 Z" fill="#FFF888" fill-opacity="0.7"/>
+    <!-- Верхний фланец -->
+    <ellipse cx="14.5" cy="4.5" rx="11.5" ry="3.5" fill="#C89010"/>
+    <ellipse cx="14.5" cy="4.5" rx="11.5" ry="3.5" stroke="#9A6A08" stroke-width="0.6"/>
+    <ellipse cx="14.5" cy="4"   rx="10.5" ry="2.6" fill="#E8B020"/>
+    <ellipse cx="12"   cy="3.4" rx="4"    ry="1"   fill="#FFE060" opacity="0.7"/>
 
-    <!-- Верхний завиток - главный элемент -->
-    <!-- Внешняя часть завитка -->
-    <path d="M5 12 Q4 8 7 5 Q12 2 18 3 Q24 4 25 8 Q26 12 23 14 L20 12 Q22 10 21 7 Q18 5 13 5 Q9 5 8 8 Q7 10 9 12 Z"
-          fill="#FFEC58" stroke="#9A7A18" stroke-width="0.7"/>
+    <!-- Боковые стенки бобины -->
+    <rect x="3"  y="4.5" width="3" height="20" rx="0.5" fill="#B88010"/>
+    <rect x="23" y="4.5" width="3" height="20" rx="0.5" fill="#D09818"/>
 
-    <!-- Внутренняя часть завитка (тень) -->
-    <path d="M9 12 Q8 10 9 8 Q11 6 15 6 Q19 6 20 8 Q21 10 20 12 L17 11 Q18 9 16 8 Q13 7 11 9 Q10 10 11 11 Z"
-          fill="#D0B030"/>
+    <!-- Намотанная нить — слои -->
+    <ellipse cx="14.5" cy="7"  rx="8" ry="2.2" fill="#F0C030"/>
+    <ellipse cx="14.5" cy="9"  rx="8" ry="2.2" fill="#EDB828"/>
+    <ellipse cx="14.5" cy="11" rx="8" ry="2.2" fill="#F0C030"/>
+    <ellipse cx="14.5" cy="13" rx="8" ry="2.2" fill="#EDB828"/>
+    <ellipse cx="14.5" cy="15" rx="8" ry="2.2" fill="#F0C030"/>
+    <ellipse cx="14.5" cy="17" rx="8" ry="2.2" fill="#EDB828"/>
+    <ellipse cx="14.5" cy="19" rx="8" ry="2.2" fill="#F0C030"/>
+    <ellipse cx="14.5" cy="21" rx="8" ry="2.2" fill="#EDB828"/>
 
-    <!-- Самый внутренний завиток -->
-    <ellipse cx="14" cy="9" rx="2.5" ry="2" fill="#E8D040"/>
-    <ellipse cx="14" cy="9" rx="2.5" ry="2" stroke="#A88820" stroke-width="0.5"/>
-    <ellipse cx="14" cy="9" rx="1.3" ry="1" fill="#C8A828"/>
+    <!-- Линии между витками -->
+    <line x1="6.5" y1="8"  x2="22.5" y2="8"  stroke="#9A7008" stroke-width="0.4" opacity="0.5"/>
+    <line x1="6.5" y1="10" x2="22.5" y2="10" stroke="#9A7008" stroke-width="0.4" opacity="0.5"/>
+    <line x1="6.5" y1="12" x2="22.5" y2="12" stroke="#9A7008" stroke-width="0.4" opacity="0.5"/>
+    <line x1="6.5" y1="14" x2="22.5" y2="14" stroke="#9A7008" stroke-width="0.4" opacity="0.5"/>
+    <line x1="6.5" y1="16" x2="22.5" y2="16" stroke="#9A7008" stroke-width="0.4" opacity="0.5"/>
+    <line x1="6.5" y1="18" x2="22.5" y2="18" stroke="#9A7008" stroke-width="0.4" opacity="0.5"/>
+    <line x1="6.5" y1="20" x2="22.5" y2="20" stroke="#9A7008" stroke-width="0.4" opacity="0.5"/>
 
-    <!-- Свисающий конец справа -->
-    <path d="M23 14 Q25 16 24 20 Q23 24 21 26 L19 25 Q21 22 21 19 Q22 16 20 14 Z"
-          fill="#F5E048" stroke="#9A7A18" stroke-width="0.5"/>
-    <!-- Складки на свисающем конце -->
-    <path d="M22 16 Q23 19 22 22" stroke="#C8A830" stroke-width="0.5" fill="none"/>
+    <!-- Атласный блик на намотке -->
+    <ellipse cx="10.5" cy="14" rx="2.2" ry="9"   fill="#FFF080" opacity="0.22"/>
+    <ellipse cx="9.5"  cy="13" rx="0.9" ry="6.5" fill="#FFFFFF" opacity="0.18"/>
 
-    <!-- Свисающий конец слева -->
-    <path d="M5 12 Q3 15 4 19 Q5 23 7 25 L9 24 Q7 21 7 18 Q6 15 8 13 Z"
-          fill="#FFEC58" stroke="#9A7A18" stroke-width="0.5"/>
-    <path d="M6 15 Q5 18 6 21" stroke="#D0B838" stroke-width="0.5" fill="none"/>
+    <!-- Нижний фланец -->
+    <ellipse cx="14.5" cy="24.5" rx="11.5" ry="3.5" fill="#C89010"/>
+    <ellipse cx="14.5" cy="24.5" rx="11.5" ry="3.5" stroke="#9A6A08" stroke-width="0.6"/>
+    <ellipse cx="14.5" cy="24"   rx="10.5" ry="2.6" fill="#DDA018"/>
+    <ellipse cx="14.5" cy="24.5" rx="9"    ry="1.6" fill="#B88010" opacity="0.5"/>
 
-    <!-- Яркие блики на завитке -->
-    <path d="M7 6 Q10 4 15 4 Q18 4 20 5" stroke="#FFFFA0" stroke-width="1" stroke-linecap="round" opacity="0.8"/>
-    <circle cx="8" cy="6" r="0.7" fill="#FFFFFF" fill-opacity="0.9"/>
-    <circle cx="18" cy="5" r="0.5" fill="#FFFFFF" fill-opacity="0.8"/>
+    <!-- Свободный конец нити -->
+    <path d="M23 23 Q25 26 23 29 Q21 30 19.5 29.5" stroke="#F0C030" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <circle cx="19.5" cy="29.5" r="0.8" fill="#FFE050"/>
 
-    <!-- Блики на складках -->
-    <path d="M7 14 L12 13" stroke="#FFF880" stroke-width="0.8" stroke-linecap="round" opacity="0.6"/>
-    <path d="M16 13 L21 14" stroke="#FFF880" stroke-width="0.8" stroke-linecap="round" opacity="0.6"/>
   </g>
   <defs>
-    <filter id="filter0_silk3" x="0" y="0" width="29" height="31" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+    <filter id="filter0_silk" x="0" y="0" width="29" height="31" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
       <feFlood flood-opacity="0" result="BackgroundImageFix"/>
       <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-      <feOffset dx="0.5" dy="1"/>
-      <feGaussianBlur stdDeviation="1"/>
+      <feOffset dx="1" dy="2"/>
+      <feGaussianBlur stdDeviation="2"/>
       <feComposite in2="hardAlpha" operator="out"/>
       <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0"/>
       <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>

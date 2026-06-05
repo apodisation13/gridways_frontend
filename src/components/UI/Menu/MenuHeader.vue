@@ -19,7 +19,11 @@
         />
         <img
           v-else
-          :src="require(`@/assets/icons/resources/${path_to_icon}.svg`)"
+          :src="
+            path_to_icon.includes('/')
+              ? require(`@/assets/${path_to_icon}.svg`)
+              : require(`@/assets/icons/resources/${path_to_icon}.svg`)
+          "
           alt=""
           class="avatar__btn"
         />
@@ -139,6 +143,23 @@
               <resource-item
                 name="chests"
                 :count="resources.chests"
+                show_delta
+              />
+            </div>
+            <div class="expand-menu-right__resources-row">
+              <resource-item
+                name="flowers"
+                :count="resources.flowers"
+                show_delta
+              />
+              <resource-item
+                name="first_aid_kits"
+                :count="resources.first_aid_kits"
+                show_delta
+              />
+              <resource-item
+                name="shields"
+                :count="resources.shields"
                 show_delta
               />
             </div>
@@ -434,7 +455,7 @@ export default defineComponent({
 .expand-menu-right__wrapper {
   background-image: url("~@/assets/header-menu-background.png");
   width: 207px;
-  height: 331px;
+  height: 387px;
   border-radius: 8px;
   margin-right: 10px;
   z-index: 8;

@@ -1,13 +1,14 @@
 <template>
   <div v-if="changeAvatarsOpened">
-    <div v-for="(el, index) in avatars" :key="index" class="inlines">
-      <div class="inlines">
-        <img
-          :src="require(`@/assets/icons/resources/${el.link}.svg`)"
-          alt=""
-          class="wood"
-          @dblclick="setAvatar(el.link)"
-        />
+    <div class="avatar-grid">
+      <div
+        v-for="(el, index) in avatars"
+        :key="index"
+        class="avatar-cell"
+        :class="{ 'avatar-cell--selected': selectedAvatar === el.link }"
+        @click="setAvatar(el.link)"
+      >
+        <img :src="avatarSrc(el.link)" alt="" class="avatar-img" />
       </div>
     </div>
     <base-button class="reset-avatar" @click="resetAvatar">
@@ -30,9 +31,23 @@ export default defineComponent({
   components: { BaseButton },
   data() {
     return {
-      avatars: [{ link: "wood" }, { link: "kegs" }, { link: "chests" }] as {
-        link: string
-      }[],
+      avatars: [
+        { link: "avatars/axe" },
+        { link: "avatars/book" },
+        { link: "avatars/bow" },
+        { link: "avatars/chalice" },
+        { link: "avatars/crown" },
+        { link: "avatars/dragon_egg" },
+        { link: "avatars/gem" },
+        { link: "avatars/hammer" },
+        { link: "avatars/helmet" },
+        { link: "avatars/orb" },
+        { link: "avatars/scroll" },
+        { link: "avatars/shield" },
+        { link: "avatars/staff" },
+        { link: "avatars/sword" },
+        { link: "avatars/torch" },
+      ] as { link: string }[],
     }
   },
   computed: {
@@ -43,8 +58,15 @@ export default defineComponent({
         ] == 1
       )
     },
+    selectedAvatar(): string {
+      return this.$store.getters["selectedAvatar"]
+    },
   },
   methods: {
+    avatarSrc(link: string): string {
+      if (link.includes("/")) return require(`@/assets/${link}.svg`)
+      return require(`@/assets/icons/resources/${link}.svg`)
+    },
     setAvatar(path: string): void {
       this.$store.commit("set_avatar", path)
     },
@@ -56,16 +78,49 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.inlines {
-  display: inline;
-  margin: 5px;
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  padding: 4px 0;
 }
 
-.wood {
-  max-height: 60px;
+.avatar-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 6px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.avatar-cell:hover {
+  border-color: rgba(250, 207, 93, 0.45);
+  background: rgba(250, 207, 93, 0.07);
+}
+
+.avatar-cell--selected {
+  border-color: #facf5d;
+  background: rgba(250, 207, 93, 0.14);
+}
+
+.avatar-img {
+  width: 36px;
+  height: 40px;
+  display: block;
 }
 
 .reset-avatar {
-  margin-top: 2vh;
+  margin-top: 12px;
+}
+
+.avatar-locked {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
 }
 </style>
