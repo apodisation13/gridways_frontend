@@ -15,20 +15,19 @@
       Сбросить аватар
     </base-button>
   </div>
-  <div v-else class="avatar-locked">
-    Изменение аватара закрыто! Измените это в разделе Прокачка
-  </div>
+  <setting-locked v-else title="Аватар заблокирован" />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue"
 
+import SettingLocked from "@/components/Pages/SettingsPage/SettingLocked.vue"
 import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 import { UpgradeSubtype, UpgradeType } from "@/types/upgrades"
 
 export default defineComponent({
   name: "SettingAvatar",
-  components: { BaseButton },
+  components: { BaseButton, SettingLocked },
   data() {
     return {
       avatars: [
@@ -117,10 +116,5 @@ export default defineComponent({
 
 .reset-avatar {
   margin-top: 12px;
-}
-
-.avatar-locked {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 14px;
 }
 </style>

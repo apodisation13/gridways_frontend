@@ -16,19 +16,19 @@
       </button>
     </div>
   </div>
-  <div v-else class="themes-locked">
-    Изменение темы закрыто! Измените это в разделе Прокачка
-  </div>
+  <setting-locked v-else title="Тема заблокирована" />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue"
 
+import SettingLocked from "@/components/Pages/SettingsPage/SettingLocked.vue"
 import { styleOuter, styleWrapper } from "@/logic/border_styles"
 import { UpgradeSubtype, UpgradeType } from "@/types/upgrades"
 
 export default defineComponent({
   name: "SettingChooseTheme",
+  components: { SettingLocked },
   data() {
     return {
       themes: [1, 2, 3, 4],

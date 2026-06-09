@@ -90,12 +90,17 @@ export default defineComponent({
   /* Заменяем 100vh на безопасные единицы */
   height: 100dvh; /* dynamic viewport height - учитывает адресную строку */
 }
+
 .logo {
   position: absolute;
   width: 204px;
   height: 204px;
   top: 212px;
-  background: url("~@/assets/icons/logo.png");
+  background-color: #000;
+  background-image: url("~@/assets/icons/gridways-logo.webp");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 .start {

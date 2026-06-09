@@ -41,9 +41,32 @@ export default defineComponent({
   },
 
   async created() {
-    const tg = (window as any).Telegram.WebApp
-    tg.ready()
-    tg.expand()
+    const isMobile =
+      /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+      navigator.maxTouchPoints > 1
+
+    if (isMobile) {
+      try {
+        const tg = await Promise.race([
+          new Promise<any>(resolve => {
+            const poll = setInterval(() => {
+              const obj = (window as any).Telegram?.WebApp
+              if (obj) {
+                clearInterval(poll)
+                resolve(obj)
+              }
+            }, 100)
+          }),
+          new Promise<null>(resolve => setTimeout(() => resolve(null), 3000)),
+        ])
+        if (tg) {
+          tg.ready()
+          tg.expand()
+        }
+      } catch {
+        // skip if Telegram unavailable
+      }
+    }
 
     // iOS WKWebView suppresses dblclick when touch-action: manipulation is active.
     // Polyfill: detect double-tap via pointerup and dispatch synthetic dblclick.

@@ -46,6 +46,7 @@ export enum UpgradeSubtype {
 
   AVATAR = "avatar",
   THEME = "theme",
+  FIELD = "field",
 
   MONEY = "money",
   SCRAPS = "scraps",
