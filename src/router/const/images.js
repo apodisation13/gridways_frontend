@@ -50,7 +50,7 @@ export const images = {
     morning: `${path}/lose_day.webp`,
   },
   field: {
-    default: `${path}/field3.webp`,
+    default: `${path}/field1.webp`,
   },
   work_in_progress: {
     default: `${path}/library.jpg`,

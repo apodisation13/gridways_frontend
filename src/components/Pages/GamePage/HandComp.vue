@@ -84,13 +84,27 @@ export default defineComponent({
   },
   methods: {
     cardStyle(index: number): Record<string, string | number> {
-      const mid = (this.displayedHand.length - 1) / 2
+      const count = this.displayedHand.length
+      const mid = (count - 1) / 2
       const offset = index - mid
-      return {
+
+      const style: Record<string, string | number> = {
         "--z": 10 - index,
         "--rot": `${offset}deg`,
         "--arc": `${-Math.abs(offset) * 3}px`,
       }
+
+      if (count > 6) {
+        // При 6 картах с margin ±10% каждая карта занимает 80% своей ширины.
+        // Для n карт считаем margin так, чтобы суммарная ширина оставалась прежней.
+        const sideMargin = (((1 - 4.8 / count) / 2) * 100).toFixed(2)
+        const halfMargin = (((1 - 4.8 / count) / 4) * 100).toFixed(2)
+        style.marginLeft = index === 0 ? `-${halfMargin}%` : `-${sideMargin}%`
+        style.marginRight =
+          index === count - 1 ? `-${halfMargin}%` : `-${sideMargin}%`
+      }
+
+      return style
     },
 
     effectiveMultiCount(rawCount: number): number {

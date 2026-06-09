@@ -32,6 +32,8 @@
       <div v-if="activeTab === 'language'">Пока не реализовано</div>
       <!-- Цветовая схема -->
       <setting-choose-theme v-if="activeTab === 'colorscheme'" />
+      <!-- Цветовая схема -->
+      <setting-field v-if="activeTab === 'field'" />
       <!-- Аватарка -->
       <setting-avatar v-if="activeTab === 'avatar'" />
       <!-- Выход из аккаунта -->
@@ -52,6 +54,7 @@ import { defineComponent } from "vue"
 import SettingAnimation from "@/components/Pages/SettingsPage/SettingAnimation.vue"
 import SettingAvatar from "@/components/Pages/SettingsPage/SettingAvatar.vue"
 import SettingChooseTheme from "@/components/Pages/SettingsPage/SettingChooseTheme.vue"
+import SettingField from "@/components/Pages/SettingsPage/SettingField.vue"
 import SettingLogout from "@/components/Pages/SettingsPage/SettingLogout.vue"
 import SettingMoveTimeout from "@/components/Pages/SettingsPage/SettingMoveTimeout.vue"
 import SettingSound from "@/components/Pages/SettingsPage/SettingSound.vue"
@@ -60,6 +63,7 @@ import BaseButton from "@/components/UI/Buttons/BaseButton.vue"
 export default defineComponent({
   name: "SettingsPage",
   components: {
+    SettingField,
     SettingAvatar,
     SettingChooseTheme,
     SettingLogout,
@@ -99,6 +103,11 @@ export default defineComponent({
           id: "colorscheme",
           label: "Цвета",
           icon: require("@/assets/icons/settings/setting_color_scheme.svg"),
+        },
+        {
+          id: "field",
+          label: "Поле",
+          icon: require("@/assets/icons/settings/setting_field.svg"),
         },
         {
           id: "avatar",

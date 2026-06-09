@@ -1,0 +1,14 @@
+<svg viewBox="0 0 24 24" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+  <!-- Frame dark fill -->
+  <rect x="2" y="3" width="20" height="18" rx="2" fill="#0a0a1a" opacity="0.55"/>
+  <!-- Sky -->
+  <rect x="3" y="4" width="18" height="10" fill="#3B82F6" opacity="0.35"/>
+  <!-- Ground -->
+  <rect x="3" y="14" width="18" height="5.5" fill="#22C55E" opacity="0.45"/>
+  <!-- Mountain -->
+  <polygon points="6,14 12,6 18,14" fill="#6366F1" opacity="0.55"/>
+  <!-- Sun -->
+  <circle cx="18.5" cy="7.5" r="2" fill="#F59E0B" opacity="0.9"/>
+  <!-- Frame border -->
+  <rect x="2" y="3" width="20" height="18" rx="2" fill="none" stroke="#6366F1" stroke-width="1.5" opacity="0.9"/>
+</svg>

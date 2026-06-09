@@ -9,6 +9,7 @@ const toast = useToast()
 export interface SettingsState {
   theme: number
   avatar: string
+  field: string
   soundOn: boolean
   animationOn: boolean
   moveTimeout: number
@@ -17,6 +18,7 @@ export interface SettingsState {
 const state: SettingsState = {
   theme: 1,
   avatar: "",
+  field: "",
   soundOn: true,
   animationOn: true,
   moveTimeout: 1000,
@@ -25,6 +27,7 @@ const state: SettingsState = {
 const getters = {
   selectedTheme: (state: SettingsState) => state.theme,
   selectedAvatar: (state: SettingsState) => state.avatar,
+  selectedField: (state: SettingsState) => state.field,
   selectedMoveTimeout: (state: SettingsState) => state.moveTimeout,
   soundOn: (state: SettingsState) => state.soundOn,
   animationOn: (state: SettingsState) => state.animationOn,
@@ -36,6 +39,9 @@ const mutations = {
   },
   set_avatar(state: SettingsState, payload: string) {
     state.avatar = payload
+  },
+  set_field(state: SettingsState, payload: string) {
+    state.field = payload
   },
   switchSound(state: SettingsState) {
     state.soundOn = !state.soundOn
@@ -49,6 +55,7 @@ const mutations = {
   setPreferences(state: SettingsState, payload: UserPreferencesResponse) {
     state.theme = payload.data.theme
     state.avatar = payload.data.avatar
+    state.field = payload.data.field || ""
     state.soundOn = payload.data.sound_on
     state.animationOn = payload.data.animation_on
     state.moveTimeout = payload.data.move_timeout
@@ -77,6 +84,7 @@ const actions = {
         animation_on: getters.animationOn,
         move_timeout: getters.selectedMoveTimeout,
         avatar: getters.selectedAvatar,
+        field: getters.selectedField,
         theme: getters.selectedTheme,
       },
     }
