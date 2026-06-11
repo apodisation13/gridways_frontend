@@ -7,6 +7,8 @@ import fullscreen from "@/store/modules/fullscreen"
 import type { GameState } from "@/store/modules/game"
 import game from "@/store/modules/game"
 import login from "@/store/modules/login"
+import type { MultiState } from "@/store/modules/multi"
+import multi from "@/store/modules/multi"
 import news from "@/store/modules/news"
 import purchases from "@/store/modules/purchases"
 import type { SettingsState } from "@/store/modules/settings"
@@ -19,6 +21,7 @@ export interface RootState {
   game: GameState
   settings: SettingsState
   arena: ArenaState
+  multi: MultiState
 }
 
 // ИНСТРУКЦИЯ:
@@ -32,6 +35,7 @@ const store = createStore({
     database,
     game,
     arena,
+    multi,
     user_actions,
     news,
     purchases,

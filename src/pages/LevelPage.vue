@@ -122,6 +122,12 @@
             </div>
           </div>
         </div>
+        <div v-if="gameMod.name === 'multi'" class="arena-entry">
+          <div class="global_text arena-entry__title">Стоимость входа</div>
+          <button class="arena-entry__btn" @click="enter_multiplayer">
+            <themed-button title="НАЧАТЬ" />
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -179,6 +185,10 @@ export default defineComponent({
         {
           name: "arena",
           name_ru: "Арена",
+        },
+        {
+          name: "multi",
+          name_ru: "Мультиплеер",
         },
       ] as GameType[],
       gameMod: null as GameType | null,
@@ -321,6 +331,9 @@ export default defineComponent({
       })
       this.$store.commit("arena_reset")
       this.$router.push("/arena/deckbuild")
+    },
+    async enter_multiplayer(): Promise<void> {
+      this.$router.push("/multi/waiting")
     },
     setRandomLevelByNumber(): void {
       this.toast.warning(
