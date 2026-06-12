@@ -11,6 +11,10 @@ export function damage_player(
 ): void {
   if ((field[i] as Enemy).locked) return
 
+  // Логируем каждую атаку для мультиплеерной синхронизации.
+  // Игрок 2 прогонит эти же удары через свою броню независимо.
+  store.commit("log_player_attack", (field[i] as Enemy).data.damage)
+
   if (store.state.game.armor > 0) {
     timeoutAnimationFlag(field[i], "damages_player", null, timeout * 0.5)
     store.commit("change_armor", -1)

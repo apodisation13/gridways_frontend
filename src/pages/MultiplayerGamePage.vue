@@ -589,18 +589,34 @@ export default defineComponent({
         if (this.myRedrawDone) this.startGameTurn()
       } else if (msg.event === "GAME_STATE") {
         // Активный игрок прислал текущее состояние поля и урон.
-        // Обновляем поле/врагов/могилу и применяем дельты HP/брони.
-        // Дельты приходят только отрицательными (урон); лечение не передаётся.
+        // Обновляем поле/врагов/могилу, затем применяем HP-изменения.
         this.gameObj.field = JSON.parse(JSON.stringify(msg.field))
         this.gameObj.enemies = JSON.parse(JSON.stringify(msg.enemies))
         this.gameObj.enemy_leader = JSON.parse(JSON.stringify(msg.enemy_leader))
         this.gameObj.enemies_grave = JSON.parse(
           JSON.stringify(msg.enemies_grave)
         )
-        const healthDelta = Number(msg.health_delta ?? 0)
-        const armorDelta = Number(msg.armor_delta ?? 0)
-        if (healthDelta !== 0) this.$store.commit("change_health", healthDelta)
-        if (armorDelta !== 0) this.$store.commit("change_armor", armorDelta)
+        const attackLog = (msg.attack_log as number[]) ?? []
+        if (attackLog.length > 0) {
+          // Прогоняем каждую атаку противника через нашу собственную броню —
+          // так же, как это делает damage_player() на стороне активного игрока.
+          // 1 единица брони поглощает 1 атаку целиком, независимо от damage.
+          for (const damage of attackLog) {
+            if (this.$store.state.game.armor > 0) {
+              this.$store.commit("change_armor", -1)
+            } else {
+              this.$store.commit("change_health", -damage)
+            }
+          }
+        } else {
+          // Нет атак — применяем дельты для пассивных HP-изменений (не урон от врагов).
+          // Дельты приходят только отрицательными; лечение не передаётся.
+          const healthDelta = Number(msg.health_delta ?? 0)
+          const armorDelta = Number(msg.armor_delta ?? 0)
+          if (healthDelta !== 0)
+            this.$store.commit("change_health", healthDelta)
+          if (armorDelta !== 0) this.$store.commit("change_armor", armorDelta)
+        }
       } else if (msg.event === "TURN_END") {
         // Противник закончил свой ход → теперь наш ход.
         // Разблокируем карты и обновляем флаг can_draw.
@@ -825,6 +841,15 @@ export default defineComponent({
       if (!ws || ws.readyState !== WebSocket.OPEN) return
       const currentHealth = this.$store.state.game.health
       const currentArmor = this.$store.state.game.armor
+
+      // Забираем накопленный лог атак и сразу очищаем его в сторе.
+      // attack_log содержит значение damage каждого вызова damage_player за этот
+      // интервал — противник прогонит их через свою броню независимо.
+      const attackLog: number[] = [...this.$store.state.game.attack_log]
+      this.$store.commit("clear_attack_log")
+
+      const hasAttacks = includeHealth && attackLog.length > 0
+
       ws.send(
         JSON.stringify({
           event: "GAME_STATE",
@@ -832,12 +857,19 @@ export default defineComponent({
           enemies: JSON.parse(JSON.stringify(this.gameObj.enemies)),
           enemy_leader: JSON.parse(JSON.stringify(this.gameObj.enemy_leader)),
           enemies_grave: JSON.parse(JSON.stringify(this.gameObj.enemies_grave)),
-          health_delta: includeHealth
-            ? Math.min(0, currentHealth - this.lastSentHealth)
-            : 0,
-          armor_delta: includeHealth
-            ? Math.min(0, currentArmor - this.lastSentArmor)
-            : 0,
+          // Если есть атаки — передаём их список; дельты не нужны (противник сам всё посчитает).
+          // Если атак нет — можем передать дельту для пассивных HP-изменений (не урон от врагов).
+          attack_log: hasAttacks ? attackLog : [],
+          health_delta: hasAttacks
+            ? 0
+            : includeHealth
+              ? Math.min(0, currentHealth - this.lastSentHealth)
+              : 0,
+          armor_delta: hasAttacks
+            ? 0
+            : includeHealth
+              ? Math.min(0, currentArmor - this.lastSentArmor)
+              : 0,
         })
       )
       this.lastSentHealth = currentHealth
