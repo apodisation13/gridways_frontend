@@ -57,6 +57,12 @@ export interface GameState {
 
   max_hp_shown: boolean
   max_armor_shown: boolean
+
+  // Лог атак врагов на игрока за текущий интервал между sendGameState.
+  // Каждая запись — значение damage одного вызова damage_player.
+  // Используется в мультиплеере, чтобы игрок 2 применял каждую атаку
+  // через свою броню, а не получал суммарную дельту HP напрямую.
+  attack_log: number[]
 }
 
 interface GameActionContext extends ActionContext {
@@ -105,6 +111,8 @@ const state: GameState = {
 
   max_hp_shown: false,
   max_armor_shown: false,
+
+  attack_log: [],
 }
 
 const getters = {
@@ -263,6 +271,13 @@ const mutations = {
   },
   set_armor_delta(state: GameState, armor_delta: number | null) {
     state.armor_delta = armor_delta
+  },
+
+  log_player_attack(state: GameState, damage: number) {
+    state.attack_log.push(damage)
+  },
+  clear_attack_log(state: GameState) {
+    state.attack_log = []
   },
 
   set_ppa_end_turn(state: GameState, payload: boolean) {

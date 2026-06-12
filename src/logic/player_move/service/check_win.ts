@@ -21,6 +21,6 @@ export function check_win(
   if (store.state.game.arena_mode) {
     router.push("/arena/win_game")
   } else {
-    router.push("win")
+    router.push("/win")
   }
 }

@@ -14,6 +14,8 @@ import LoadingPage from "@/pages/LoadingPage"
 import LoginPage from "@/pages/LoginPage"
 import LosePage from "@/pages/LosePage"
 import MainPage from "@/pages/MainPage"
+import MultiplayerGamePage from "@/pages/MultiplayerGamePage.vue"
+import MultiplayerWaitingPage from "@/pages/MultiplayerWaitingPage.vue"
 import PaymentFailPage from "@/pages/PaymentFailPage"
 import PaymentResultPage from "@/pages/PaymentResultPage"
 import RulesPage from "@/pages/RulesPage"
@@ -224,6 +226,29 @@ const routes = [
       image: images.win,
       notRequireMenu: true,
     },
+  },
+  {
+    path: "/multi/waiting",
+    component: MultiplayerWaitingPage,
+    meta: {
+      requireAuth: true,
+      notRequireMenu: true,
+      image: images.field,
+    },
+  },
+  {
+    path: "/multi/game",
+    component: MultiplayerGamePage,
+    meta: {
+      requireAuth: true,
+      notRequireMenu: true,
+      image: images.field,
+    },
+    props: route => ({
+      room_id: route.query.room_id,
+      role: route.query.role,
+      opponent_id: route.query.opponent_id,
+    }),
   },
 ]
 

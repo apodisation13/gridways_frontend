@@ -6,6 +6,17 @@ function getDomain(): string {
   return process.env.VUE_APP_DOMAIN ?? ""
 }
 
+function getWsDomain(): string {
+  if (getEnv() === "development_local") return "ws://127.0.0.1:8002"
+  else if (getEnv() === "docker_local") return "ws://127.0.0.1:8003"
+  const domain = process.env.VUE_APP_DOMAIN ?? ""
+  return domain
+    .replace(/^https?/, match => (match === "https" ? "wss" : "ws"))
+    .replace(/\/api\/v1$/, "")
+}
+
+export const WS_MATCHMAKING = `${getWsDomain()}/ws/matchmaking`
+
 // для получения новостей
 export const LIST_NEWS = `${getDomain()}/news/list-news`
 
