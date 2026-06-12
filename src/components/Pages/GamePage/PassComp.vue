@@ -4,9 +4,14 @@
       v-if="$store.state.game.player_turn"
       class="pass-btn"
       :disabled="!$store.state.game.player_turn"
-      :style="themedStyle"
+      :style="[
+        themedStyle,
+        timer > 0
+          ? { color: timerColor, fontSize: '30px', fontWeight: '700' }
+          : {},
+      ]"
     >
-      ХОД 🔄
+      {{ timer > 0 ? timer : "ХОД 🔄" }}
     </button>
     <button v-else class="pass-btn" :disabled="!$store.state.game.player_turn">
       ХОД 🔄
@@ -21,6 +26,12 @@ import { styleWrapper } from "@/logic/border_styles"
 
 export default defineComponent({
   name: "PassComp",
+  props: {
+    timer: {
+      type: Number,
+      default: 0,
+    },
+  },
   data() {
     return {
       lastTapTime: 0,
@@ -29,6 +40,11 @@ export default defineComponent({
   computed: {
     themedStyle(): Record<string, string> | undefined {
       return styleWrapper(this.$store.getters["selectedTheme"])
+    },
+    timerColor(): string {
+      if (this.timer > 15) return "#4ade80"
+      if (this.timer > 5) return "#fb923c"
+      return "#ef4444"
     },
   },
   methods: {

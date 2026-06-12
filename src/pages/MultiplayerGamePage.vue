@@ -109,7 +109,11 @@
                   Различаем карту и врага по наличию поля 'move' (Enemy имеет move, Card — нет).
 
                3. myTurn=false, SCA нет → надпись "Ход противника..." -->
-          <pass-comp v-if="myTurn" @dblclick="exec_ai_move" />
+          <pass-comp
+            v-if="myTurn"
+            :timer="turnTimeLeft"
+            @dblclick="exec_ai_move"
+          />
           <div v-else-if="opponentSCACard" class="opponent-sca-slot">
             <card-item
               v-if="!('move' in opponentSCACard)"
@@ -413,6 +417,10 @@ export default defineComponent({
       opponentActivityFlash: false,
       opponentFlashTimer: null as ReturnType<typeof setTimeout> | null,
 
+      // Таймер хода: 30 секунд на ход, при 0 — авто-пас
+      turnTimeLeft: 0,
+      turnTimer: null as ReturnType<typeof setInterval> | null,
+
       // Флаг конца игры: предотвращает двойную обработку win/lose
       // (например, если health watcher и GAME_END придут одновременно).
       gameOver: false,
@@ -546,6 +554,7 @@ export default defineComponent({
 
   beforeUnmount() {
     this.clearDisconnectTimer()
+    this.stopTurnTimer()
     // Закрываем WS и сбрасываем multi-состояние стора при уходе со страницы
     this.$store.commit("multi_reset")
   },
@@ -635,6 +644,7 @@ export default defineComponent({
         this.$store.commit("set_player_turn", true)
         this.can_draw = this.calc_can_draw()
         this.flashOpponent()
+        this.startTurnTimer()
       } else if (msg.event === "PLAYER_STATE") {
         // Противник прислал свой стейт для отображения у нас в полоске сверху
         this.opponentHand = (msg.hand as Array<{ faction: string }>) ?? []
@@ -833,6 +843,7 @@ export default defineComponent({
     startGameTurn(): void {
       this.isActive.player_cards = this.myTurn
       this.$store.commit("set_player_turn", this.myTurn)
+      if (this.myTurn) this.startTurnTimer()
     },
 
     // ── Синхронизация стейта ─────────────────────────────────────────────────
@@ -931,8 +942,9 @@ export default defineComponent({
     //   +100 мс — небольшой буфер поверх анимационного таймаута.
     exec_ai_move(): void {
       if (!this.myTurn) return
+      this.stopTurnTimer()
       this.$store.commit("set_player_turn", false)
-      const timeout: number = this.$store.getters["selectedMoveTimeout"]
+      const timeout: number = 1000
 
       // Шаг 1: пассивки игрока конца хода
       player_passive_abilities_end_turn(this.gameObj, timeout)
@@ -940,7 +952,10 @@ export default defineComponent({
       const await_ppa = setInterval(() => {
         if (!this.$store.state.game.ppa_end_turn) {
           clearInterval(await_ppa)
-          setTimeout(() => this.sendGameState(), timeout + 100) // синк после шага 1
+          // Сразу — чтобы игрок 2 увидел урон от пассивок (враг ещё может стоять).
+          // Потом через timeout+100 — чистое состояние с уже удалёнными трупами.
+          this.sendGameState()
+          setTimeout(() => this.sendGameState(), timeout + 100)
 
           // Шаг 2: ход врагов (AI)
           ai_move(this.gameObj.field, timeout)
@@ -948,7 +963,8 @@ export default defineComponent({
           const await_ai = setInterval(() => {
             if (!this.$store.state.game.ai_move) {
               clearInterval(await_ai)
-              setTimeout(() => this.sendGameState(), timeout + 100) // синк после шага 2
+              this.sendGameState()
+              setTimeout(() => this.sendGameState(), timeout + 100)
 
               // Шаг 3: пассивки врагов конца хода
               enemy_passive_abilities_end_turn(this.gameObj, timeout)
@@ -956,6 +972,7 @@ export default defineComponent({
               const await_epa = setInterval(() => {
                 if (!this.$store.state.game.epa_end_turn) {
                   clearInterval(await_epa)
+                  this.sendGameState()
 
                   // Шаг 4: выходит новый враг из очереди (если есть)
                   appear_new_enemy(this.gameObj.field, this.gameObj.enemies)
@@ -1159,6 +1176,26 @@ export default defineComponent({
           this.multiLockedIndices.push(indexOrNull)
         }
       }
+    },
+
+    startTurnTimer(): void {
+      this.stopTurnTimer()
+      this.turnTimeLeft = 30
+      this.turnTimer = setInterval(() => {
+        this.turnTimeLeft -= 1
+        if (this.turnTimeLeft <= 0) {
+          this.stopTurnTimer()
+          this.exec_ai_move()
+        }
+      }, 1000)
+    },
+
+    stopTurnTimer(): void {
+      if (this.turnTimer !== null) {
+        clearInterval(this.turnTimer)
+        this.turnTimer = null
+      }
+      this.turnTimeLeft = 0
     },
 
     // Одноразовое мигание кнопки-тогглера при любом входящем событии от противника.
