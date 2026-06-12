@@ -347,6 +347,10 @@ export interface ArenaParams {
   win_multiply: Partial<Record<keyof UserResources, ArenaRewardMultiply>>
 }
 
+interface Multiplayer {
+  max_enemies: Record<string, number>
+}
+
 export interface GameConst {
   max_random_n_enemies: number
   random_level_enemies_count: Record<string, unknown>
@@ -358,6 +362,7 @@ export interface GameConst {
   upgrades: typeof Upgrades
   arena_upgrades: Record<string, unknown>
   arena_params: ArenaParams
+  multiplayer: Multiplayer
 }
 
 export interface Faction {

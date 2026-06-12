@@ -268,6 +268,7 @@ import PassComp from "@/components/Pages/GamePage/PassComp.vue"
 import RedrawComp from "@/components/Pages/GamePage/RedrawComp.vue"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities.vue"
 import UseSpecialItemsComponent from "@/components/Pages/GamePage/UseSpecialItemsComponent.vue"
+import { randInt } from "@/lib/utils"
 import { ai_move, enemy_leader_ai_move_once } from "@/logic/ai_move/ai_move"
 import { enemy_passive_abilities_end_turn } from "@/logic/ai_move/ai_passive_abilties"
 import { draw_hand } from "@/logic/game_logic/draw_hand"
@@ -298,9 +299,6 @@ import {
   UpgradeSubtype,
   UpgradeType,
 } from "@/types/upgrades"
-
-// Сколько врагов генерировать для мультиплеерного матча
-const MULTI_ENEMIES_COUNT = 10
 
 export default defineComponent({
   components: {
@@ -468,13 +466,12 @@ export default defineComponent({
   },
 
   watch: {
-    // При любом изменении gameObj (поле, рука, лидер и т.д.) — шлём PLAYER_STATE
-    // чтобы у противника обновилась полоска нашей руки и наши HP.
-    gameObj: {
-      handler() {
-        if (this.gameInitialized) this.sendPlayerState()
-      },
-      deep: true,
+    // чтобы у противника обновилась полоска нашей руки и возможно лидер
+    "gameObj.hand"() {
+      if (this.gameInitialized) this.sendPlayerState()
+    },
+    "gameObj.leader"() {
+      if (this.gameInitialized) this.sendPlayerState()
     },
 
     // HP может меняться и вне gameObj (стор game.health).
@@ -652,7 +649,12 @@ export default defineComponent({
     // Только хост: генерирует врагов, расставляет на поле, раздаёт свою руку,
     // сохраняет начальный стейт в стор и отправляет его гостю через GAME_INIT.
     initAsHost(): void {
-      const generated = random_level_generator_by_number(MULTI_ENEMIES_COUNT)
+      const generated = random_level_generator_by_number(
+        randInt(
+          this.$store.getters["maxEnemies"].min,
+          this.$store.getters["maxEnemies"].max
+        )
+      )
       const enemies: Enemy[] = JSON.parse(
         JSON.stringify(generated.level.enemies)
       )

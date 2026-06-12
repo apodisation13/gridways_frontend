@@ -8,6 +8,8 @@ export interface MultiState {
   initial_field: (Enemy | "")[]
   initial_enemy_leader: EnemyLeader | null
   ws: WebSocket | null
+
+  maxEnemies: Record<string, number>
 }
 
 const state: MultiState = {
@@ -18,6 +20,7 @@ const state: MultiState = {
   initial_field: Array(12).fill("") as (Enemy | "")[],
   initial_enemy_leader: null,
   ws: null,
+  maxEnemies: { min: 0, max: 0 },
 }
 
 const mutations = {
@@ -56,11 +59,13 @@ const mutations = {
     state.initial_enemy_leader = null
     state.ws = null
   },
+  setMaxEnemies(state: MultiState, payload: Record<string, number>) {
+    state.maxEnemies = payload
+  },
 }
 
 const getters = {
-  multi_role: (state: MultiState) => state.role,
-  multi_ws: (state: MultiState) => state.ws,
+  maxEnemies: (state: MultiState) => state.maxEnemies,
 }
 
 export default { state, mutations, getters }

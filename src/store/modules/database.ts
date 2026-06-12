@@ -310,6 +310,7 @@ const actions = {
       commit("setUpgrades", game_const.upgrades) // все данные об апгрейдах
       commit("setArenaUpgrades", game_const.arena_upgrades) // все данные об апгрейдах для арены
       commit("setArenaParams", game_const.arena_params)
+      commit("setMaxEnemies", game_const.multiplayer.max_enemies)
       commit("set_game_const", {
         random_level_enemies_count: game_const.random_level_enemies_count,
         max_random_n_enemies: game_const.max_random_n_enemies,

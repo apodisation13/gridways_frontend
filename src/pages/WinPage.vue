@@ -1,5 +1,5 @@
 <template>
-  <div class="win-section">
+  <div class="win-section" @click="$router.push('/bonus')">
     <span class="global_text price-label">ВАШ ВЫИГРЫШ</span>
     <div class="play-price">
       <resource-item
