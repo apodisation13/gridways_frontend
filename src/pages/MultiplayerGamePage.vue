@@ -56,6 +56,7 @@
                Показывает количество карт в руке противника. -->
           <button
             class="opponent-hand-toggle"
+            :class="{ 'opponent-hand-toggle--flash': opponentActivityFlash }"
             :style="{
               borderColor: factionColor(opponentLeaderFaction),
               color: factionColor(opponentLeaderFaction),
@@ -408,6 +409,10 @@ export default defineComponent({
       // Отображается в слоте кнопки Пас пока ход противника.
       opponentSCACard: null as Card | Enemy | null,
 
+      // Мигание кнопки-тогглера при любом событии от противника
+      opponentActivityFlash: false,
+      opponentFlashTimer: null as ReturnType<typeof setTimeout> | null,
+
       // Флаг конца игры: предотвращает двойную обработку win/lose
       // (например, если health watcher и GAME_END придут одновременно).
       gameOver: false,
@@ -467,8 +472,11 @@ export default defineComponent({
 
   watch: {
     // чтобы у противника обновилась полоска нашей руки и возможно лидер
-    "gameObj.hand"() {
-      if (this.gameInitialized) this.sendPlayerState()
+    "gameObj.hand": {
+      handler() {
+        if (this.gameInitialized) this.sendPlayerState()
+      },
+      deep: true,
     },
     "gameObj.leader"() {
       if (this.gameInitialized) this.sendPlayerState()
@@ -587,6 +595,7 @@ export default defineComponent({
         // Если мы тоже закончили — запускаем первый ход (startGameTurn).
         this.opponentRedrawDone = true
         if (this.myRedrawDone) this.startGameTurn()
+        this.flashOpponent()
       } else if (msg.event === "GAME_STATE") {
         // Активный игрок прислал текущее состояние поля и урон.
         // Обновляем поле/врагов/могилу, затем применяем HP-изменения.
@@ -617,6 +626,7 @@ export default defineComponent({
             this.$store.commit("change_health", healthDelta)
           if (armorDelta !== 0) this.$store.commit("change_armor", armorDelta)
         }
+        this.flashOpponent()
       } else if (msg.event === "TURN_END") {
         // Противник закончил свой ход → теперь наш ход.
         // Разблокируем карты и обновляем флаг can_draw.
@@ -624,6 +634,7 @@ export default defineComponent({
         this.isActive.player_cards = true
         this.$store.commit("set_player_turn", true)
         this.can_draw = this.calc_can_draw()
+        this.flashOpponent()
       } else if (msg.event === "PLAYER_STATE") {
         // Противник прислал свой стейт для отображения у нас в полоске сверху
         this.opponentHand = (msg.hand as Array<{ faction: string }>) ?? []
@@ -632,9 +643,11 @@ export default defineComponent({
         this.opponentMaxHp = Number(msg.max_hp ?? 0)
         this.opponentArmor = Number(msg.armor ?? 0)
         this.opponentMaxArmor = Number(msg.max_armor ?? 0)
+        this.flashOpponent()
       } else if (msg.event === "SCA_SHOW") {
         // Противник поднял карту в SCA-режим для выбора цели → показываем у нас
         this.opponentSCACard = (msg.card as Card | Enemy) ?? null
+        this.flashOpponent()
       } else if (msg.event === "SCA_HIDE") {
         // Противник закончил SCA-взаимодействие (атаковал или отменил)
         this.opponentSCACard = null
@@ -1148,6 +1161,20 @@ export default defineComponent({
       }
     },
 
+    // Одноразовое мигание кнопки-тогглера при любом входящем событии от противника.
+    // nextTick-trick: снимаем класс → ждём перерисовку → вешаем обратно,
+    // чтобы анимация перезапускалась даже если предыдущая ещё не закончилась.
+    flashOpponent(): void {
+      clearTimeout(this.opponentFlashTimer ?? undefined)
+      this.opponentActivityFlash = false
+      this.$nextTick(() => {
+        this.opponentActivityFlash = true
+        this.opponentFlashTimer = setTimeout(() => {
+          this.opponentActivityFlash = false
+        }, 500)
+      })
+    },
+
     // Мульти-атака: карта/лидер бьёт сразу по нескольким целям (AOE-способности).
     // targets — массив { isLeader, fieldValue } — всё что выбрал игрок.
     exec_damage_enemy_card_multi(
@@ -1203,6 +1230,21 @@ export default defineComponent({
 
 .opponent-hand-toggle:active {
   background: rgba(255, 200, 50, 0.1);
+}
+
+@keyframes opponent-flash {
+  0% {
+    background: rgba(255, 200, 50, 0.35);
+    box-shadow: 0 0 8px rgba(255, 200, 50, 0.5);
+  }
+  100% {
+    background: rgba(0, 0, 0, 0.35);
+    box-shadow: none;
+  }
+}
+
+.opponent-hand-toggle--flash {
+  animation: opponent-flash 0.5s ease-out;
 }
 
 /* Слот для SCA-карты противника — занимает то же место что кнопка Пас */
