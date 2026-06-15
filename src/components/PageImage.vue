@@ -26,7 +26,9 @@ export default defineComponent({
 
       if ((image as any).default) {
         clearInterval(this.intervalId ?? undefined)
-        const isGameRoute = this.$router.currentRoute.value.path === "/game"
+        const isGameRoute =
+          this.$router.currentRoute.value.path === "/game" ||
+          this.$router.currentRoute.value.path === "/multi/game"
         const selectedField = this.$store.getters["selectedField"]
         if (isGameRoute && selectedField) {
           return require("@/assets/" + selectedField)
