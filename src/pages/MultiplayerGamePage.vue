@@ -121,7 +121,7 @@
             />
             <enemy-comp v-else :enemy="opponentSCACard" />
           </div>
-          <div v-else class="opponent-turn-indicator">Ход противника...</div>
+          <div v-else class="opponent-turn-indicator">Ход напарника...</div>
 
           <!-- Колода и сброс игрока (нижняя пара кнопок правой панели) -->
           <div class="div-two-buttons">
@@ -555,6 +555,12 @@ export default defineComponent({
   beforeUnmount() {
     this.clearDisconnectTimer()
     this.stopTurnTimer()
+    // Возвращаем игровые флаги в исходное состояние — стор общий,
+    // и обычная игра не ожидает что player_turn или ai_move будут грязными.
+    this.$store.commit("set_player_turn", true)
+    this.$store.commit("set_ai_move", false)
+    this.$store.commit("set_ppa_end_turn", false)
+    this.$store.commit("set_epa_end_turn", false)
     // Закрываем WS и сбрасываем multi-состояние стора при уходе со страницы
     this.$store.commit("multi_reset")
   },
@@ -944,7 +950,7 @@ export default defineComponent({
       if (!this.myTurn) return
       this.stopTurnTimer()
       this.$store.commit("set_player_turn", false)
-      const timeout: number = 1000
+      const timeout: number = 500
 
       // Шаг 1: пассивки игрока конца хода
       player_passive_abilities_end_turn(this.gameObj, timeout)
@@ -975,6 +981,7 @@ export default defineComponent({
                   this.sendGameState()
 
                   // Шаг 4: выходит новый враг из очереди (если есть)
+                  appear_new_enemy(this.gameObj.field, this.gameObj.enemies)
                   appear_new_enemy(this.gameObj.field, this.gameObj.enemies)
 
                   // Шаг 5: ждём пока все таймеры удаления мёртвых врагов сработают,
@@ -1254,7 +1261,7 @@ export default defineComponent({
 .opponent-hand-toggle {
   width: 98%;
   padding: 3px 6px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   color: rgba(255, 200, 50, 0.8);
   background: rgba(0, 0, 0, 0.35);
@@ -1318,7 +1325,7 @@ export default defineComponent({
   left: 0;
   right: 24.5%; /* не заезжает на правую панель */
   z-index: 10;
-  height: 4.5vh;
+  height: 7.5vh;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1345,7 +1352,7 @@ export default defineComponent({
 }
 
 .opp-stat {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
@@ -1379,7 +1386,7 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: min(8px, calc(var(--vh, 1vh) * 1));
+  gap: min(6px, calc(var(--vh, 1vh) * 1));
 }
 
 /* Пара кнопок в ряд (оставшиеся враги + могила; колода + сброс) */
