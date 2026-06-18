@@ -140,6 +140,18 @@ const actions = {
         UpgradeType.GAME,
         UpgradeSubtype.CARDS_DRAWN
       ),
+      max_immune_turns: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.MAX_IMMUNE_TURNS
+      ),
+      immune_magics_turns: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.IMMUNE_MAGICS_TURNS
+      ),
     })
 
     // Создаем новый объект с теми же ключами
@@ -252,6 +264,12 @@ const actions = {
       userUpgrades,
       UpgradeType.RESOURCES,
       UpgradeSubtype.SHIELDS
+    )
+    upgrades["immune_magics"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.RESOURCES,
+      UpgradeSubtype.IMMUNE_MAGICS
     )
     commit("setMaxResourcesValues", upgrades)
   },

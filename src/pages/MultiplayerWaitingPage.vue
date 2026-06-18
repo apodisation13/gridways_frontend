@@ -10,11 +10,11 @@
 
       <div v-else-if="status === 'waiting'" class="status-block">
         <div class="spinner" />
-        <div class="status-text">Ожидание противника...</div>
+        <div class="status-text">Ожидание напарника...</div>
       </div>
 
       <div v-else-if="status === 'matched'" class="status-block">
-        <div class="status-text matched">Противник найден! Запуск...</div>
+        <div class="status-text matched">Напарник найден! Запуск...</div>
       </div>
 
       <div v-else-if="status === 'error'" class="status-block">

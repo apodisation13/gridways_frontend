@@ -10,6 +10,7 @@ export enum PayResourcesSubtype {
   upgradeInArena = "upgrade_in_arena",
   useFirstAidKit = "use_first_aid_kit",
   useShields = "use_shields",
+  useImmuneMagics = "use_immune_magics",
 }
 
 export enum CraftMillCardActionSubtype {

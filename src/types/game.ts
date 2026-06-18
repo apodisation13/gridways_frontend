@@ -61,6 +61,7 @@ export enum CardAbility {
   Purify = "purify",
   AddArmor = "add-armor",
   GiveChargesToAll = "give-charges-to-all",
+  AddInvulnerability = "add-invulnerability",
   // special case abilities
   Resurrect = "resurrect",
   DrawTwoCards = "draw-two-cards",

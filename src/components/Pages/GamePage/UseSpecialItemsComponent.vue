@@ -10,6 +10,12 @@
           <span class="stat-icon">🛡</span>
           <span class="stat-value">{{ armor }} / {{ maxArmor }}</span>
         </div>
+        <div class="stat">
+          <span class="stat-icon">✨</span>
+          <span class="stat-value"
+            >{{ invulnerability }} / {{ maxImmuneTurns }}</span
+          >
+        </div>
       </div>
 
       <div class="item-row">
@@ -28,6 +34,22 @@
         <resource-item name="shields" :count="shieldsCount" show_max_count />
         <span class="item-gain">+{{ armorValue }} броня</span>
         <button class="use-btn" :disabled="!canUseShield" @click="useShield">
+          Использовать
+        </button>
+      </div>
+
+      <div class="item-row">
+        <resource-item
+          name="immune_magics"
+          :count="immuneMagicsCount"
+          show_max_count
+        />
+        <span class="item-gain">+{{ immuneValue }} ход</span>
+        <button
+          class="use-btn"
+          :disabled="!canUseImmuneMagics"
+          @click="useImmuneMagics"
+        >
           Использовать
         </button>
       </div>
@@ -63,11 +85,20 @@ export default defineComponent({
     maxArmor(): number {
       return this.$store.getters["maxArmor"]
     },
+    maxImmuneTurns(): number {
+      return this.$store.getters["maxImmuneTurns"]
+    },
+    invulnerability(): number {
+      return this.$store.state.game.invulnerability
+    },
     firstAidCount(): number {
       return (this.$store.getters["resource"].first_aid_kits as number) ?? 0
     },
     shieldsCount(): number {
       return (this.$store.getters["resource"].shields as number) ?? 0
+    },
+    immuneMagicsCount(): number {
+      return (this.$store.getters["resource"].immune_magics as number) ?? 0
     },
     healValue(): number {
       return get_value_from_upgrades(
@@ -85,12 +116,27 @@ export default defineComponent({
         UpgradeSubtype.SHIELD_ARMOR
       )
     },
+    immuneValue(): number {
+      return get_value_from_upgrades(
+        this.$store.getters["upgradesConfig"],
+        this.$store.getters["userUpgrades"],
+        UpgradeType.GAME,
+        UpgradeSubtype.IMMUNE_MAGICS_TURNS
+      )
+    },
     canUseKit(): boolean {
       return this.firstAidCount > 0 && this.health < this.maxHp
     },
     canUseShield(): boolean {
       return (
         this.shieldsCount > 0 && this.maxArmor > 0 && this.armor < this.maxArmor
+      )
+    },
+    canUseImmuneMagics(): boolean {
+      return (
+        this.immuneMagicsCount > 0 &&
+        this.maxImmuneTurns > 0 &&
+        this.invulnerability < this.maxImmuneTurns
       )
     },
   },
@@ -112,6 +158,16 @@ export default defineComponent({
       setTimeout(() => {
         this.$store.commit("set_armor_delta", null)
       }, 500)
+    },
+    async useImmuneMagics(): Promise<void> {
+      await this.$store.dispatch("processResources", {
+        subtype: PayResourcesSubtype.useImmuneMagics,
+        data: { immune_magics: -1 },
+      })
+      this.$store.commit(
+        "set_invulnerability",
+        this.invulnerability + this.immuneValue
+      )
     },
   },
 })

@@ -12,6 +12,10 @@ export function sound_hit_armor(): void {
   sound("./../../audio/sounds/hit_armor.mp3")
 }
 
+export function sound_immune_hit(): void {
+  sound("./../../audio/sounds/immune_hit.mp3")
+}
+
 export function sound_damage_all(): void {
   sound("./../../audio/sounds/damage_all.wav")
 }

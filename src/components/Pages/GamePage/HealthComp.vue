@@ -1,5 +1,19 @@
 <template>
   <div class="health-container" :class="{ 'has-armor': armor > 0 }">
+    <!-- Invulnerability bar (ВЫШЕ брони и жизней) -->
+    <transition name="immune">
+      <div
+        v-if="invulnerability > 0"
+        class="immune-bar"
+        :class="immuneAnimClass"
+      >
+        <div class="immune-content">
+          <span class="immune-icon">✨</span>
+          <span class="immune-value">{{ invulnerability }}</span>
+        </div>
+      </div>
+    </transition>
+
     <!-- Armor bar (СВЕРХУ, отдельным блоком) -->
     <transition name="armor">
       <div v-if="armor > 0" class="armor-bar" :class="armorAnimClass">
@@ -50,6 +64,8 @@ export default defineComponent({
       deltaTimer: null as ReturnType<typeof setTimeout> | null,
       armorAnimClass: null as string | null,
       armorAnimTimer: null as ReturnType<typeof setTimeout> | null,
+      immuneAnimClass: null as string | null,
+      immuneAnimTimer: null as ReturnType<typeof setTimeout> | null,
     }
   },
   computed: {
@@ -61,6 +77,12 @@ export default defineComponent({
     },
     armorDelta(): number {
       return this.$store.state.game.armor_delta
+    },
+    invulnerability(): number {
+      return this.$store.state.game.invulnerability
+    },
+    invulnerabilityHit(): boolean {
+      return this.$store.state.game.invulnerability_hit
     },
     flashDuration(): number {
       return this.$store.getters["selectedMoveTimeout"]
@@ -104,6 +126,14 @@ export default defineComponent({
         newVal > 0 ? "armor-flash--gain" : "armor-flash--damage"
       this.armorAnimTimer = setTimeout(() => {
         this.armorAnimClass = null
+      }, this.flashDuration * 0.5)
+    },
+    invulnerabilityHit(newVal: boolean) {
+      if (!newVal) return
+      if (this.immuneAnimTimer !== null) clearTimeout(this.immuneAnimTimer)
+      this.immuneAnimClass = "immune-flash--hit"
+      this.immuneAnimTimer = setTimeout(() => {
+        this.immuneAnimClass = null
       }, this.flashDuration * 0.5)
     },
   },
@@ -521,6 +551,160 @@ export default defineComponent({
 }
 .health-delta.damage {
   color: #ff3b30;
+}
+
+/* ─── Полоска неуязвимости ───────────────────────────────────── */
+.immune-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 15;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 210, 60, 0.95);
+  box-shadow:
+    0 0 14px rgba(255, 190, 0, 0.7),
+    inset 0 0 20px rgba(255, 200, 50, 0.15);
+  background: linear-gradient(
+    135deg,
+    rgba(60, 40, 0, 0.55) 0%,
+    rgba(100, 70, 0, 0.4) 50%,
+    rgba(60, 40, 0, 0.55) 100%
+  );
+}
+
+.immune-content {
+  position: absolute;
+  inset: 0;
+  z-index: 16;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-weight: bold;
+  font-size: 17px;
+  color: white;
+  text-shadow:
+    0 0 10px rgba(255, 200, 0, 1),
+    1px 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.immune-icon {
+  font-size: 18px;
+  animation: immune-pulse 1.8s infinite;
+}
+
+.immune-value {
+  font-family: "Arial Black", "Arial Bold", sans-serif;
+  font-size: 16px;
+  color: #fff7cc;
+  background: rgba(60, 40, 0, 0.75);
+  padding: 1px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 210, 60, 0.7);
+}
+
+@keyframes immune-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 3px #ffa500);
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 10px #ffe566);
+    transform: scale(1.15);
+  }
+}
+
+/* Анимация удара по неуязвимому — яркая золотая вспышка + тряска */
+.immune-flash--hit {
+  animation: immune-hit 0.55s ease-out forwards;
+}
+
+@keyframes immune-hit {
+  0% {
+    box-shadow: 0 0 14px rgba(255, 190, 0, 0.7);
+  }
+  8% {
+    box-shadow:
+      0 0 35px 14px rgba(255, 230, 0, 1),
+      0 0 70px 25px rgba(255, 160, 0, 0.9);
+    background: rgba(255, 210, 0, 0.45);
+    transform: translateX(-5px);
+    border-color: rgba(255, 240, 0, 1);
+  }
+  18% {
+    transform: translateX(5px);
+  }
+  28% {
+    transform: translateX(-4px);
+  }
+  38% {
+    transform: translateX(4px);
+  }
+  50% {
+    transform: translateX(0);
+    box-shadow:
+      0 0 20px 6px rgba(255, 200, 0, 0.6),
+      0 0 40px 10px rgba(255, 130, 0, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 14px rgba(255, 190, 0, 0.7);
+    background: linear-gradient(
+      135deg,
+      rgba(60, 40, 0, 0.55) 0%,
+      rgba(100, 70, 0, 0.4) 50%,
+      rgba(60, 40, 0, 0.55) 100%
+    );
+    border-color: rgba(255, 210, 60, 0.95);
+    transform: translateX(0);
+  }
+}
+
+/* Появление / исчезновение полоски неуязвимости */
+.immune-enter-active {
+  animation: immune-appear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+.immune-leave-active {
+  animation: immune-disappear 0.45s ease-in forwards;
+}
+
+@keyframes immune-appear {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+    opacity: 0;
+  }
+  60% {
+    box-shadow:
+      0 0 35px 12px rgba(255, 210, 0, 0.9),
+      0 0 60px 20px rgba(255, 150, 0, 0.5);
+    background-color: rgba(255, 190, 0, 0.3);
+  }
+  100% {
+    transform: scaleX(1);
+    transform-origin: left;
+    opacity: 1;
+  }
+}
+
+@keyframes immune-disappear {
+  0% {
+    opacity: 1;
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  30% {
+    box-shadow: 0 0 30px 10px rgba(255, 230, 0, 0.9);
+    filter: brightness(1.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
 }
 
 @keyframes delta-float {

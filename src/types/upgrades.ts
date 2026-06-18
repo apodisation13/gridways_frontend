@@ -43,6 +43,8 @@ export enum UpgradeSubtype {
   REDRAWS_INITIAL = "redraws_initial",
   REDRAWS_DRAWN = "redraws_drawn",
   CARDS_DRAWN = "cards_drawn",
+  MAX_IMMUNE_TURNS = "max_immune_turns",
+  IMMUNE_MAGICS_TURNS = "immune_magics_turns",
 
   AVATAR = "avatar",
   THEME = "theme",
@@ -59,6 +61,7 @@ export enum UpgradeSubtype {
   FLOWERS = "flowers",
   FIRST_AID_KITS = "first_aid_kits",
   SHIELDS = "shields",
+  IMMUNE_MAGICS = "immune_magics",
 }
 
 export interface UpgradesResponse {
