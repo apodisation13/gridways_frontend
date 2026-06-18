@@ -123,13 +123,24 @@
           </div>
         </div>
         <div v-if="gameMod.name === 'multi'" class="arena-entry">
-          <div class="global_text arena-entry__title">Стоимость входа</div>
+          <div class="multi-deck-label global_text">Колода</div>
+          <deck-preview-comp
+            :deck="selectedDeck"
+            :deckbuilder="true"
+            @dblclick="trigger_decks_list_modal(true)"
+          />
           <button class="arena-entry__btn" @click="enter_multiplayer">
             <themed-button title="НАЧАТЬ" />
           </button>
         </div>
       </div>
     </div>
+
+    <decks-list-modal
+      v-if="show_decks_list_modal"
+      :deckbuilder="false"
+      @close_decks_list_modal="trigger_decks_list_modal(false)"
+    />
   </div>
 </template>
 
@@ -137,7 +148,9 @@
 import { defineComponent } from "vue"
 import { useToast } from "vue-toastification"
 
+import DeckPreviewComp from "@/components/DeckPreviewComp.vue"
 import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
+import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
 import SeasonTree from "@/components/Pages/LevelPage/SeasonTree.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
@@ -156,6 +169,8 @@ interface GameType {
 export default defineComponent({
   components: {
     LevelPreviewComp,
+    DeckPreviewComp,
+    DecksListModal,
     SeasonTree,
     ThemedButton,
     ResourceItem,
@@ -193,6 +208,7 @@ export default defineComponent({
       ] as GameType[],
       gameMod: null as GameType | null,
       seasonLevelsTreeOpened: false,
+      show_decks_list_modal: false,
       randomLevelByNumber: null as MappedUserLevel | null,
       inputNumberEnemiesRandomLevel: 5 as number | null | "",
     }
@@ -222,6 +238,9 @@ export default defineComponent({
           .sort(([a], [b]) => (ORDER[a] ?? 99) - (ORDER[b] ?? 99))
           .map(([k, v]) => [k, Math.abs(v)])
       )
+    },
+    selectedDeck(): any {
+      return this.$store.state.game.whole_deck
     },
     seasons(): SeasonEntry[] {
       return this.$store.getters["all_seasons"]
@@ -331,6 +350,9 @@ export default defineComponent({
       })
       this.$store.commit("arena_reset")
       this.$router.push("/arena/deckbuild")
+    },
+    trigger_decks_list_modal(value: boolean): void {
+      this.show_decks_list_modal = value
     },
     async enter_multiplayer(): Promise<void> {
       this.$router.push("/multi/waiting")
@@ -570,5 +592,12 @@ div {
   width: 200px;
   height: 60px;
   margin-top: 10px;
+}
+
+.multi-deck-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: -16px;
 }
 </style>

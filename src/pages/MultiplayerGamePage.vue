@@ -659,7 +659,10 @@ export default defineComponent({
           if (this.$store.state.game.invulnerability > 0) {
             // Пассивный игрок неуязвим — все атаки этой волны заблокированы.
             this.$store.commit("set_invulnerability_hit", true)
-            setTimeout(() => this.$store.commit("set_invulnerability_hit", false), 500)
+            setTimeout(
+              () => this.$store.commit("set_invulnerability_hit", false),
+              500
+            )
           } else {
             // Прогоняем каждую атаку напарника через нашу собственную броню —
             // так же, как это делает damage_player() на стороне активного игрока.

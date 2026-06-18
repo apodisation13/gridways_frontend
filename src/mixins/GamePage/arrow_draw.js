@@ -19,6 +19,8 @@ export const arrowMixin = {
       multiMode: false,
       multiCount: 0,
       multiLockedTargets: [], // { isLeader: bool, fieldValue: Enemy|null }
+      _multiHoverTimer: null,
+      _multiHoverTargetKey: null,
     }
   },
 
@@ -67,6 +69,7 @@ export const arrowMixin = {
       this.multiMode = multiCount > 1
       this.multiCount = multiCount
       this.multiLockedTargets = []
+      this._clearMultiHoverTimer()
       this.addArrowEventListeners()
       this.drawArrow()
     },
@@ -197,6 +200,7 @@ export const arrowMixin = {
     stopArrowDrawing(clientX, clientY) {
       if (!this.isDrawingArrow) return
       this.isDrawingArrow = false
+      this._clearMultiHoverTimer()
       this.removeArrowEventListeners()
       if (this.ctx && this.canvas) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
@@ -264,6 +268,14 @@ export const arrowMixin = {
       if (id.includes("enemy_leader")) return { isLeader: true, index: null }
       const index = parseInt(id.slice(id.indexOf("_") + 1))
       return { isLeader: false, index }
+    },
+
+    _clearMultiHoverTimer() {
+      if (this._multiHoverTimer) {
+        clearTimeout(this._multiHoverTimer)
+        this._multiHoverTimer = null
+      }
+      this._multiHoverTargetKey = null
     },
 
     addArrowEventListeners() {
@@ -340,6 +352,7 @@ export const arrowMixin = {
 
       if (!id) {
         console.log("Цель не определена")
+        if (this.multiMode) this._clearMultiHoverTimer()
         this.$emit("enemy_leader_in_cross", false)
         this.$emit("enemy_in_cross", null)
         return false
@@ -354,20 +367,33 @@ export const arrowMixin = {
           return false
         } else {
           if (this.$store.getters["animationOn"]) {
-            // В multi режиме: лочим лидера врагов, если ещё не залочен и лимит не набран
+            // В multi режиме: лочим лидера врагов с задержкой 1 сек
             if (
               this.multiMode &&
               this.multiLockedTargets.length < this.multiCount - 1
             ) {
-              const alreadyLocked = this.multiLockedTargets.some(
-                t => t.isLeader
-              )
-              if (!alreadyLocked) {
-                this.multiLockedTargets.push({
-                  isLeader: true,
-                  fieldValue: null,
-                })
-                this.$emit("enemy_in_cross_locked", "leader")
+              const targetKey = "leader"
+              if (this._multiHoverTargetKey !== targetKey) {
+                this._clearMultiHoverTimer()
+                this._multiHoverTargetKey = targetKey
+                const alreadyLocked = this.multiLockedTargets.some(
+                  t => t.isLeader
+                )
+                if (!alreadyLocked) {
+                  this._multiHoverTimer = setTimeout(() => {
+                    this._multiHoverTimer = null
+                    if (
+                      this.multiLockedTargets.length < this.multiCount - 1 &&
+                      !this.multiLockedTargets.some(t => t.isLeader)
+                    ) {
+                      this.multiLockedTargets.push({
+                        isLeader: true,
+                        fieldValue: null,
+                      })
+                      this.$emit("enemy_in_cross_locked", "leader")
+                    }
+                  }, 1000)
+                }
               }
             }
             this.$emit("enemy_leader_in_cross", true)
@@ -385,20 +411,36 @@ export const arrowMixin = {
         return false
       } else {
         if (this.$store.getters["animationOn"]) {
-          // В multi режиме: лочим этого врага, если ещё не залочен и лимит не набран
+          // В multi режиме: лочим этого врага с задержкой 1 сек
           if (
             this.multiMode &&
             this.multiLockedTargets.length < this.multiCount - 1
           ) {
-            const alreadyLocked = this.multiLockedTargets.some(
-              t => !t.isLeader && t.fieldValue === this.field[index]
-            )
-            if (!alreadyLocked) {
-              this.multiLockedTargets.push({
-                isLeader: false,
-                fieldValue: this.field[index],
-              })
-              this.$emit("enemy_in_cross_locked", index)
+            const targetKey = `field_${index}`
+            if (this._multiHoverTargetKey !== targetKey) {
+              this._clearMultiHoverTimer()
+              this._multiHoverTargetKey = targetKey
+              const fieldValue = this.field[index]
+              const alreadyLocked = this.multiLockedTargets.some(
+                t => !t.isLeader && t.fieldValue === fieldValue
+              )
+              if (!alreadyLocked) {
+                this._multiHoverTimer = setTimeout(() => {
+                  this._multiHoverTimer = null
+                  if (
+                    this.multiLockedTargets.length < this.multiCount - 1 &&
+                    !this.multiLockedTargets.some(
+                      t => !t.isLeader && t.fieldValue === fieldValue
+                    )
+                  ) {
+                    this.multiLockedTargets.push({
+                      isLeader: false,
+                      fieldValue,
+                    })
+                    this.$emit("enemy_in_cross_locked", index)
+                  }
+                }, 1000)
+              }
             }
           }
           this.$emit("enemy_in_cross", index)
