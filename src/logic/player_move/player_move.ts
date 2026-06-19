@@ -12,6 +12,7 @@ import { give_charges_to_all } from "@/logic/player_move/abilities/ability_give_
 import { heal } from "@/logic/player_move/abilities/ability_heal"
 import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_grave"
 import { incr_dmg_to_all_hand } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_hand"
+import { add_invulnerability } from "@/logic/player_move/abilities/ability_invulnerability"
 import { lock_enemy } from "@/logic/player_move/abilities/ability_lock"
 import { move_enemy } from "@/logic/player_move/abilities/ability_move_enemy"
 import { place_self_in_field } from "@/logic/player_move/abilities/ability_place_self_in_field"
@@ -119,6 +120,10 @@ export function damage_ai_card(
   } else if (ability === CardAbility.GiveChargesToAll) {
     damage_one(enemy, card, gameObj, timeout)
     give_charges_to_all(card as Card, gameObj, timeout)
+  } else if (ability === CardAbility.AddInvulnerability) {
+    damage_one(enemy, card, gameObj, timeout)
+    const invulnerability_value = (card as Card | Leader).data?.value || 0
+    add_invulnerability(invulnerability_value)
   } else damage_one(enemy, card, gameObj, timeout)
 
   // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда
@@ -152,6 +157,9 @@ export function damage_ai_card_multi(
   } else if (ability === CardAbility.AddArmor) {
     const armor_value = (card as Card | Leader).data?.armor || 0
     add_armor(armor_value, timeout)
+  } else if (ability === CardAbility.AddInvulnerability) {
+    const invulnerability_value = (card as Card | Leader).data?.value || 0
+    add_invulnerability(invulnerability_value)
   }
 
   // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда

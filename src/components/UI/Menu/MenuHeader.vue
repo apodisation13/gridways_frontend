@@ -162,6 +162,11 @@
                 :count="resources.shields"
                 show_delta
               />
+              <resource-item
+                name="immune_magics"
+                :count="resources.immune_magics"
+                show_delta
+              />
             </div>
             <div class="expand-menu-right__resources-row">
               <resource-item

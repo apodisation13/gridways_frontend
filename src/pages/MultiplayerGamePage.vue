@@ -7,11 +7,11 @@
     <template v-if="gameInitialized">
       <!-- Основной блок: поле (слева/центр) + правая панель -->
       <div class="game-block">
-        <!-- ── Полоска руки противника ──────────────────────────────────────
+        <!-- ── Полоска руки напарника ──────────────────────────────────────
              Накладывается поверх поля (position: absolute), видна по кнопке-тогглу.
-             Данные приходят от противника через PLAYER_STATE по WS. -->
+             Данные приходят от напарника через PLAYER_STATE по WS. -->
         <div v-if="showOpponentHand" class="opponent-hand-strip">
-          <!-- Рубашки карт противника: цвет фона = фракция карты.
+          <!-- Рубашки карт напарника: цвет фона = фракция карты.
                Реальные карты не передаём — только faction для цветовой индикации. -->
           <div class="opponent-strip-cards">
             <div
@@ -26,13 +26,18 @@
             </span>
           </div>
 
-          <!-- HP и броня противника (из PLAYER_STATE) -->
+          <!-- HP, броня и неуязвимость напарника (из PLAYER_STATE) -->
           <div class="opponent-strip-stats">
             <span class="opp-stat opp-hp"
               >❤ {{ opponentHealth }}/{{ opponentMaxHp }}</span
             >
             <span class="opp-stat opp-armor"
               >🛡 {{ opponentArmor }}/{{ opponentMaxArmor }}</span
+            >
+            <span v-if="opponentMaxImmuneTurns > 0" class="opp-stat opp-immune"
+              >✨ {{ opponentInvulnerability }}/{{
+                opponentMaxImmuneTurns
+              }}</span
             >
           </div>
         </div>
@@ -51,9 +56,9 @@
 
         <!-- ── Правая панель ─────────────────────────────────────────────── -->
         <div class="right-panel">
-          <!-- Кнопка-тогглер полоски противника.
-               Цвет рамки/текста = цвет фракции лидера противника (из opponentLeaderFaction).
-               Показывает количество карт в руке противника. -->
+          <!-- Кнопка-тогглер полоски напарника.
+               Цвет рамки/текста = цвет фракции лидера напарника (из opponentLeaderFaction).
+               Показывает количество карт в руке напарника. -->
           <button
             class="opponent-hand-toggle"
             :class="{ 'opponent-hand-toggle--flash': opponentActivityFlash }"
@@ -90,7 +95,7 @@
 
           <!-- Кнопка "добрать карту".
                Видна только когда can_draw=true И сейчас ход игрока (player_turn из стора).
-               В мультиплеере player_turn=false когда ход противника → кнопка скрыта. -->
+               В мультиплеере player_turn=false когда ход напарника → кнопка скрыта. -->
           <div class="draw">
             <draw-comp
               v-show="can_draw && $store.state.game.player_turn"
@@ -108,7 +113,7 @@
                   Приходит через WS: SCA_SHOW / SCA_HIDE.
                   Различаем карту и врага по наличию поля 'move' (Enemy имеет move, Card — нет).
 
-               3. myTurn=false, SCA нет → надпись "Ход противника..." -->
+               3. myTurn=false, SCA нет → надпись "Ход напарника..." -->
           <pass-comp
             v-if="myTurn"
             :timer="turnTimeLeft"
@@ -230,23 +235,23 @@
       </div>
     </div>
 
-    <!-- ── Оверлей ожидания редро противника ─────────────────────────────────
-         Виден когда мы уже закончили замену карт, а противник ещё нет.
+    <!-- ── Оверлей ожидания редро напарника ─────────────────────────────────
+         Виден когда мы уже закончили замену карт, а напарник ещё нет.
          waitingForOpponentRedraw = myRedrawDone && !opponentRedrawDone. -->
     <div v-if="waitingForOpponentRedraw" class="init-overlay">
       <div class="init-card">
         <div class="spinner" />
-        <div class="init-text">Ожидание замены карт противника...</div>
+        <div class="init-text">Ожидание замены карт напарника...</div>
       </div>
     </div>
 
-    <!-- ── Оверлей отключения противника ─────────────────────────────────────
+    <!-- ── Оверлей отключения напарника ─────────────────────────────────────
          Появляется при onclose/onerror WS или при получении OPPONENT_DISCONNECTED.
          Обратный отсчёт 10 секунд → автоматический переход на /levelselect. -->
     <div v-if="disconnectCountdown !== null" class="disconnect-overlay">
       <div class="disconnect-card">
         <div class="disconnect-icon">⚠</div>
-        <div class="disconnect-title">Противник отключился</div>
+        <div class="disconnect-title">Напарник отключился</div>
         <div class="disconnect-sub">Возврат на выбор уровня через</div>
         <div class="disconnect-timer">{{ disconnectCountdown }}</div>
       </div>
@@ -328,7 +333,7 @@ export default defineComponent({
 
   // ── Перехват навигации при завершении игры ───────────────────────────────
   // Срабатывает когда check_lose() или check_win() делают router.push("/lose") / router.push("/win").
-  // Задача: перед уходом уведомить противника через GAME_END, затем разрешить переход.
+  // Задача: перед уходом уведомить напарника через GAME_END, затем разрешить переход.
   beforeRouteLeave(to: { path: string }) {
     // Если игра ещё не началась или конец уже был обработан — пропускаем
     if (!this.gameInitialized || this.gameOver) return true
@@ -382,38 +387,40 @@ export default defineComponent({
       // ── Мультиплеерные флаги ───────────────────────────────────────────
       gameInitialized: false, // true когда оба игрока готовы (данные получены)
       myRedrawDone: false, // мы завершили замену карт
-      opponentRedrawDone: false, // противник завершил замену карт
+      opponentRedrawDone: false, // напарник завершил замену карт
 
-      // Данные противника — обновляются через PLAYER_STATE по WS
+      // Данные напарника — обновляются через PLAYER_STATE по WS
       opponentHand: [] as Array<{ faction: string }>, // только фракции (не реальные карты)
       opponentLeaderFaction: "",
       opponentHealth: 0,
       opponentMaxHp: 0,
       opponentArmor: 0,
       opponentMaxArmor: 0,
-      showOpponentHand: false, // показывать ли полоску карт противника
+      opponentInvulnerability: 0,
+      opponentMaxImmuneTurns: 0,
+      showOpponentHand: false, // показывать ли полоску карт напарника
 
-      // Отключение: countdown от 10 до 0, null = противник подключён
+      // Отключение: countdown от 10 до 0, null = напарник подключён
       disconnectCountdown: null as number | null,
       disconnectTimer: null as ReturnType<typeof setInterval> | null,
 
       // ── Управление ходами ──────────────────────────────────────────────
       // myTurn=true: наш ход (активны карты, доступна кнопка Пас).
-      // myTurn=false: ход противника (UI заблокирован, показывается индикатор).
+      // myTurn=false: ход напарника (UI заблокирован, показывается индикатор).
       myTurn: false,
 
       // Базовые значения HP/брони на момент последней отправки GAME_STATE.
       // Используются для вычисления delta: отправляем только урон (Math.min(0, delta)),
-      // лечение каждый игрок считает независимо и противнику не передаёт.
+      // лечение каждый игрок считает независимо и напарнику не передаёт.
       lastSentHealth: 0,
       lastSentArmor: 0,
 
-      // SCA-карта противника: какую карту он держит в руке перед атакой через SCA.
+      // SCA-карта напарника: какую карту он держит в руке перед атакой через SCA.
       // Приходит через SCA_SHOW, сбрасывается через SCA_HIDE.
-      // Отображается в слоте кнопки Пас пока ход противника.
+      // Отображается в слоте кнопки Пас пока ход напарника.
       opponentSCACard: null as Card | Enemy | null,
 
-      // Мигание кнопки-тогглера при любом событии от противника
+      // Мигание кнопки-тогглера при любом событии от напарника
       opponentActivityFlash: false,
       opponentFlashTimer: null as ReturnType<typeof setTimeout> | null,
 
@@ -466,7 +473,7 @@ export default defineComponent({
         this.gameObj.enemy_leader.data.hp > 0
       )
     },
-    // true пока мы закончили редро, но противник ещё нет → показываем спиннер
+    // true пока мы закончили редро, но напарник ещё нет → показываем спиннер
     waitingForOpponentRedraw(): boolean {
       return this.myRedrawDone && !this.opponentRedrawDone
     },
@@ -476,10 +483,13 @@ export default defineComponent({
     armor(): number {
       return this.$store.state.game.armor
     },
+    invulnerability(): number {
+      return this.$store.state.game.invulnerability
+    },
   },
 
   watch: {
-    // чтобы у противника обновилась полоска нашей руки и возможно лидер
+    // чтобы у напарника обновилась полоска нашей руки и возможно лидер
     "gameObj.hand": {
       handler() {
         if (this.gameInitialized) this.sendPlayerState()
@@ -492,7 +502,7 @@ export default defineComponent({
 
     // HP может меняться и вне gameObj (стор game.health).
     // Два случая:
-    // 1. Шлём обновлённый PLAYER_STATE противнику.
+    // 1. Шлём обновлённый PLAYER_STATE напарнику.
     // 2. Если это пассивный игрок (не наш ход) и HP упало в 0 —
     //    check_lose() у нас не вызывается (он запускается только внутри ai_move активного игрока),
     //    поэтому сами идём на /lose.
@@ -509,11 +519,16 @@ export default defineComponent({
       if (this.gameInitialized) this.sendPlayerState()
     },
 
+    // Неуязвимость тоже меняется вне gameObj (предмет или декремент хода)
+    invulnerability() {
+      if (this.gameInitialized) this.sendPlayerState()
+    },
+
     // Окно выбора карты SCA закрылось (show_pick_a_card_selection: true → false).
     // В момент закрытия карта уже сыграна и урон нанесён, но враг удаляется
     // через setTimeout(timeout). Ждём timeout+100 мс и только потом шлём GAME_STATE,
-    // чтобы противник не увидел врага с отрицательными HP.
-    // includeHealth=false: лечение от SCA не передаём противнику.
+    // чтобы напарника не увидел врага с отрицательными HP.
+    // includeHealth=false: лечение от SCA не передаём напарнику.
     show_pick_a_card_selection(val: boolean, oldVal: boolean) {
       if (oldVal && !val && this.myTurn && this.gameInitialized) {
         const t = this.$store.getters["selectedMoveTimeout"]
@@ -522,7 +537,7 @@ export default defineComponent({
     },
 
     // Флаг "карта поднята в SCA для выбора цели" (show_picked_card из миксина).
-    // Когда поднимаем — шлём SCA_SHOW с данными карты, чтобы противник видел
+    // Когда поднимаем — шлём SCA_SHOW с данными карты, чтобы напарник видел
     // что именно мы держим. Когда опускаем — шлём SCA_HIDE.
     show_picked_card(val: boolean) {
       if (!this.myTurn || !this.gameInitialized) return
@@ -553,6 +568,14 @@ export default defineComponent({
   },
 
   beforeUnmount() {
+    // Снимаем WS-обработчики ДО multi_reset — иначе onclose сработает уже после
+    // размонтирования компонента (замыкание держит this) и запустит startDisconnectCountdown.
+    const ws: WebSocket | null = this.$store.state.multi.ws
+    if (ws) {
+      ws.onmessage = null
+      ws.onclose = null
+      ws.onerror = null
+    }
     this.clearDisconnectTimer()
     this.stopTurnTimer()
     // Возвращаем игровые флаги в исходное состояние — стор общий,
@@ -561,6 +584,9 @@ export default defineComponent({
     this.$store.commit("set_ai_move", false)
     this.$store.commit("set_ppa_end_turn", false)
     this.$store.commit("set_epa_end_turn", false)
+    // Восстанавливаем колоду до исходного состояния (HP, состав) — с задержкой,
+    // чтобы WinPage/LosePage успели прочитать текущий стейт до перезаписи.
+    this.$store.dispatch("re_set_deck")
     // Закрываем WS и сбрасываем multi-состояние стора при уходе со страницы
     this.$store.commit("multi_reset")
   },
@@ -576,12 +602,20 @@ export default defineComponent({
       ws.onmessage = (event: MessageEvent) => this.handleWsMessage(event)
       // onclose/onerror: если соединение упало во время игры — запускаем таймер отключения
       ws.onclose = () => {
-        if (this.disconnectCountdown === null && this.gameInitialized) {
+        if (
+          this.disconnectCountdown === null &&
+          this.gameInitialized &&
+          !this.gameOver
+        ) {
           this.startDisconnectCountdown()
         }
       }
       ws.onerror = () => {
-        if (this.disconnectCountdown === null && this.gameInitialized) {
+        if (
+          this.disconnectCountdown === null &&
+          this.gameInitialized &&
+          !this.gameOver
+        ) {
           this.startDisconnectCountdown()
         }
       }
@@ -606,7 +640,7 @@ export default defineComponent({
         })
         this.initFromStore()
       } else if (msg.event === "REDRAW_DONE") {
-        // Противник закончил замену карт.
+        // Напарник закончил замену карт.
         // Если мы тоже закончили — запускаем первый ход (startGameTurn).
         this.opponentRedrawDone = true
         if (this.myRedrawDone) this.startGameTurn()
@@ -622,14 +656,23 @@ export default defineComponent({
         )
         const attackLog = (msg.attack_log as number[]) ?? []
         if (attackLog.length > 0) {
-          // Прогоняем каждую атаку противника через нашу собственную броню —
-          // так же, как это делает damage_player() на стороне активного игрока.
-          // 1 единица брони поглощает 1 атаку целиком, независимо от damage.
-          for (const damage of attackLog) {
-            if (this.$store.state.game.armor > 0) {
-              this.$store.commit("change_armor", -1)
-            } else {
-              this.$store.commit("change_health", -damage)
+          if (this.$store.state.game.invulnerability > 0) {
+            // Пассивный игрок неуязвим — все атаки этой волны заблокированы.
+            this.$store.commit("set_invulnerability_hit", true)
+            setTimeout(
+              () => this.$store.commit("set_invulnerability_hit", false),
+              500
+            )
+          } else {
+            // Прогоняем каждую атаку напарника через нашу собственную броню —
+            // так же, как это делает damage_player() на стороне активного игрока.
+            // 1 единица брони поглощает 1 атаку целиком, независимо от damage.
+            for (const damage of attackLog) {
+              if (this.$store.state.game.armor > 0) {
+                this.$store.commit("change_armor", -1)
+              } else {
+                this.$store.commit("change_health", -damage)
+              }
             }
           }
         } else {
@@ -643,8 +686,14 @@ export default defineComponent({
         }
         this.flashOpponent()
       } else if (msg.event === "TURN_END") {
-        // Противник закончил свой ход → теперь наш ход.
+        // Напарник закончил свой ход → теперь наш ход.
         // Разблокируем карты и обновляем флаг can_draw.
+        // ИИ уже отходил на стороне напарника — декрементируем свою неуязвимость
+        // симметрично тому, как активный игрок делает это в exec_ai_move().
+        const invulnerability = this.$store.state.game.invulnerability
+        if (invulnerability > 0) {
+          this.$store.commit("set_invulnerability", invulnerability - 1)
+        }
         this.myTurn = true
         this.isActive.player_cards = true
         this.$store.commit("set_player_turn", true)
@@ -652,20 +701,22 @@ export default defineComponent({
         this.flashOpponent()
         this.startTurnTimer()
       } else if (msg.event === "PLAYER_STATE") {
-        // Противник прислал свой стейт для отображения у нас в полоске сверху
+        // Напарник прислал свой стейт для отображения у нас в полоске сверху
         this.opponentHand = (msg.hand as Array<{ faction: string }>) ?? []
         this.opponentLeaderFaction = String(msg.leader_faction ?? "")
         this.opponentHealth = Number(msg.health ?? 0)
         this.opponentMaxHp = Number(msg.max_hp ?? 0)
         this.opponentArmor = Number(msg.armor ?? 0)
         this.opponentMaxArmor = Number(msg.max_armor ?? 0)
+        this.opponentInvulnerability = Number(msg.invulnerability ?? 0)
+        this.opponentMaxImmuneTurns = Number(msg.max_immune_turns ?? 0)
         this.flashOpponent()
       } else if (msg.event === "SCA_SHOW") {
-        // Противник поднял карту в SCA-режим для выбора цели → показываем у нас
+        // Напарник поднял карту в SCA-режим для выбора цели → показываем у нас
         this.opponentSCACard = (msg.card as Card | Enemy) ?? null
         this.flashOpponent()
       } else if (msg.event === "SCA_HIDE") {
-        // Противник закончил SCA-взаимодействие (атаковал или отменил)
+        // Напарник закончил SCA-взаимодействие (атаковал или отменил)
         this.opponentSCACard = null
       } else if (msg.event === "GAME_END") {
         // Активный игрок уведомил нас что игра закончена (перехвачено в beforeRouteLeave).
@@ -684,8 +735,10 @@ export default defineComponent({
           this.$router.push("/lose")
         }
       } else if (msg.event === "OPPONENT_DISCONNECTED") {
-        // Бэкенд уведомил что второй игрок вышел из комнаты
-        this.startDisconnectCountdown()
+        // Бэкенд уведомил что второй игрок вышел из комнаты.
+        // Игнорируем если игра уже завершена (GAME_END был обработан) —
+        // сервер шлёт это событие когда проигравший закрывает WS в beforeUnmount.
+        if (!this.gameOver) this.startDisconnectCountdown()
       }
     },
 
@@ -694,6 +747,8 @@ export default defineComponent({
     // Только хост: генерирует врагов, расставляет на поле, раздаёт свою руку,
     // сохраняет начальный стейт в стор и отправляет его гостю через GAME_INIT.
     initAsHost(): void {
+      this.$store.commit("set_invulnerability", 0)
+      this.$store.commit("set_armor", 0)
       const generated = random_level_generator_by_number(
         randInt(
           this.$store.getters["maxEnemies"].min,
@@ -791,7 +846,7 @@ export default defineComponent({
       this.sendPlayerState()
     },
 
-    // ── Отключение противника ────────────────────────────────────────────────
+    // ── Отключение напарника ────────────────────────────────────────────────
 
     // Запускаем таймер 10 секунд → потом уходим на /levelselect
     startDisconnectCountdown(): void {
@@ -817,8 +872,8 @@ export default defineComponent({
     // ── Редро ────────────────────────────────────────────────────────────────
 
     // Переопределяем метод из миксина draw: добавляем WS-синхронизацию.
-    // После того как игрок подтвердил замену карт — шлём REDRAW_DONE противнику.
-    // Если противник уже прислал своё REDRAW_DONE — сразу стартуем ход.
+    // После того как игрок подтвердил замену карт — шлём REDRAW_DONE напарнику.
+    // Если напарник уже прислал своё REDRAW_DONE — сразу стартуем ход.
     redraw_finished(dict: { hand: Card[]; deck: Card[] }): void {
       this.draw = false
       this.gameObj.hand = dict.hand
@@ -854,7 +909,7 @@ export default defineComponent({
 
     // ── Синхронизация стейта ─────────────────────────────────────────────────
 
-    // Отправляем противнику текущее состояние поля + дельты HP/брони.
+    // Отправляем напарнику текущее состояние поля + дельты HP/брони.
     //
     // includeHealth=true (по умолчанию): вычисляем дельту HP и брони относительно
     //   lastSentHealth/lastSentArmor. Передаём только отрицательную дельту (урон).
@@ -862,7 +917,7 @@ export default defineComponent({
     //   т.к. у каждого игрока своё лечение от пассивок.
     //
     // includeHealth=false: шлём delta=0 (после сыгранной карты игрока — её лечение
-    //   тоже не должно уходить противнику).
+    //   тоже не должно уходить напарнику).
     //
     // lastSentHealth/Armor всегда обновляем до текущего значения — следующая
     // дельта будет вычислена от актуальной базы.
@@ -874,7 +929,7 @@ export default defineComponent({
 
       // Забираем накопленный лог атак и сразу очищаем его в сторе.
       // attack_log содержит значение damage каждого вызова damage_player за этот
-      // интервал — противник прогонит их через свою броню независимо.
+      // интервал — напарник прогонит их через свою броню независимо.
       const attackLog: number[] = [...this.$store.state.game.attack_log]
       this.$store.commit("clear_attack_log")
 
@@ -887,7 +942,7 @@ export default defineComponent({
           enemies: JSON.parse(JSON.stringify(this.gameObj.enemies)),
           enemy_leader: JSON.parse(JSON.stringify(this.gameObj.enemy_leader)),
           enemies_grave: JSON.parse(JSON.stringify(this.gameObj.enemies_grave)),
-          // Если есть атаки — передаём их список; дельты не нужны (противник сам всё посчитает).
+          // Если есть атаки — передаём их список; дельты не нужны (напарник сам всё посчитает).
           // Если атак нет — можем передать дельту для пассивных HP-изменений (не урон от врагов).
           attack_log: hasAttacks ? attackLog : [],
           health_delta: hasAttacks
@@ -906,7 +961,7 @@ export default defineComponent({
       this.lastSentArmor = currentArmor
     },
 
-    // Сигнал конца игры противнику (перехвачен в beforeRouteLeave).
+    // Сигнал конца игры напарнику (перехвачен в beforeRouteLeave).
     // Передаём enemies_grave для начисления ресурсов на WinPage у обоих игроков.
     sendGameEnd(result: "win" | "lose"): void {
       const ws: WebSocket | null = this.$store.state.multi.ws
@@ -920,7 +975,7 @@ export default defineComponent({
       )
     },
 
-    // Сигнал что наш ход закончен → противник получает управление (myTurn=true у него)
+    // Сигнал что наш ход закончен → напарник получает управление (myTurn=true у него)
     sendTurnEnd(): void {
       const ws: WebSocket | null = this.$store.state.multi.ws
       if (ws && ws.readyState === WebSocket.OPEN) {
@@ -944,7 +999,7 @@ export default defineComponent({
     //
     // Почему setTimeout(timeout+100)?
     //   enemy_takes_damage() удаляет мёртвого врага через setTimeout(timeout).
-    //   Если отправить GAME_STATE до этого — противник увидит врага с отрицательными HP.
+    //   Если отправить GAME_STATE до этого — напарник увидит врага с отрицательными HP.
     //   +100 мс — небольшой буфер поверх анимационного таймаута.
     exec_ai_move(): void {
       if (!this.myTurn) return
@@ -985,13 +1040,21 @@ export default defineComponent({
                   appear_new_enemy(this.gameObj.field, this.gameObj.enemies)
 
                   // Шаг 5: ждём пока все таймеры удаления мёртвых врагов сработают,
-                  // затем шлём финальный стейт и передаём ход противнику
+                  // затем шлём финальный стейт и передаём ход напарник
                   setTimeout(() => {
                     this.sendGameState() // финальный GAME_STATE
                     this.isActive.player_cards = false
                     this.myTurn = false
-                    this.sendTurnEnd() // TURN_END — ход переходит к противнику
+                    this.sendTurnEnd() // TURN_END — ход переходит к напарнику
                   }, timeout + 100)
+
+                  const invulnerability: number =
+                    this.$store.state.game.invulnerability
+                  if (invulnerability > 0) {
+                    let new_value = invulnerability - 1
+                    if (new_value < 0) new_value = 0
+                    this.$store.commit("set_invulnerability", new_value)
+                  }
                 }
               }, timeout * 0.5)
             }
@@ -1000,7 +1063,7 @@ export default defineComponent({
       }, timeout * 0.5)
     },
 
-    // Отправляем противнику наш PLAYER_STATE: рука (только фракции), лидер-фракция, HP, броня.
+    // Отправляем напарнику наш PLAYER_STATE: рука (только фракции), лидер-фракция, HP, броня.
     // Вызывается при любом изменении gameObj, HP и брони.
     sendPlayerState(): void {
       const ws: WebSocket | null = this.$store.state.multi.ws
@@ -1016,13 +1079,15 @@ export default defineComponent({
           max_hp: this.$store.getters["maxHp"],
           armor: this.$store.state.game.armor,
           max_armor: this.$store.getters["maxArmor"],
+          invulnerability: this.$store.state.game.invulnerability,
+          max_immune_turns: this.$store.getters["maxImmuneTurns"],
         })
       )
     },
 
     // ── Утилиты цветов фракций ───────────────────────────────────────────────
 
-    // Цвет рамки/текста для кнопки-тогглера руки противника
+    // Цвет рамки/текста для кнопки-тогглера руки напарника
     factionColor(faction: string): string {
       switch (faction) {
         case "Soldiers":
@@ -1036,7 +1101,7 @@ export default defineComponent({
       }
     },
 
-    // Градиент фона для рубашки карты противника (по фракции)
+    // Градиент фона для рубашки карты напарника (по фракции)
     factionCardGradient(faction: string): string {
       switch (faction) {
         case "Soldiers":
@@ -1053,7 +1118,7 @@ export default defineComponent({
     // ── Игровые действия (идентичны GamePage.vue, плюс guard !myTurn) ────────
 
     // Игрок выбрал карту из руки для атаки.
-    // Guard !myTurn: блокируем если сейчас ход противника.
+    // Guard !myTurn: блокируем если сейчас ход напарника.
     chose_player_card(card: Card): void {
       this.sca = false
       if (!this.myTurn || !this.isActive.player_cards) return
@@ -1088,7 +1153,7 @@ export default defineComponent({
     // 1. Проверяем нет ли SCA (особой способности) — если есть, уходим в её флоу.
     // 2. Если SCA нет — удаляем сыгранную карту из руки (в могилу или обратно в колоду).
     // 3. Шлём GAME_STATE с небольшой задержкой (чтоб enemy removal timeout уже сработал).
-    //    includeHealth=false: урон от карты игрока НЕ передаём противнику (это урон врагам, а не нам).
+    //    includeHealth=false: урон от карты игрока НЕ передаём напарнику (это урон врагам, а не нам).
     afterDamage(): void {
       this.special_case_abilities() // из миксина specialcaseabilities
       if (!this.show_pick_a_card_selection) {
@@ -1205,7 +1270,7 @@ export default defineComponent({
       this.turnTimeLeft = 0
     },
 
-    // Одноразовое мигание кнопки-тогглера при любом входящем событии от противника.
+    // Одноразовое мигание кнопки-тогглера при любом входящем событии от напарника.
     // nextTick-trick: снимаем класс → ждём перерисовку → вешаем обратно,
     // чтобы анимация перезапускалась даже если предыдущая ещё не закончилась.
     flashOpponent(): void {
@@ -1254,10 +1319,10 @@ export default defineComponent({
   min-height: 0;
   display: flex;
   justify-content: center;
-  position: relative; /* нужно для absolute-позиционирования полоски руки противника */
+  position: relative; /* нужно для absolute-позиционирования полоски руки напарника */
 }
 
-/* Кнопка показа/скрытия руки противника */
+/* Кнопка показа/скрытия руки напарника */
 .opponent-hand-toggle {
   width: 98%;
   padding: 3px 6px;
@@ -1291,7 +1356,7 @@ export default defineComponent({
   animation: opponent-flash 0.5s ease-out;
 }
 
-/* Слот для SCA-карты противника — занимает то же место что кнопка Пас */
+/* Слот для SCA-карты напарника — занимает то же место что кнопка Пас */
 .opponent-sca-slot {
   height: 10vh;
   width: 98%;
@@ -1302,7 +1367,7 @@ export default defineComponent({
   justify-content: center;
 }
 
-/* Индикатор "Ход противника..." — на месте кнопки Пас когда не наш ход */
+/* Индикатор "Ход напарника..." — на месте кнопки Пас когда не наш ход */
 .opponent-turn-indicator {
   height: 10vh;
   width: 98%;
@@ -1318,7 +1383,7 @@ export default defineComponent({
   margin-top: 1%;
 }
 
-/* Полоска руки противника: накладывается поверх поля сверху */
+/* Полоска руки напарника: накладывается поверх поля сверху */
 .opponent-hand-strip {
   position: absolute;
   top: 0;
@@ -1364,8 +1429,11 @@ export default defineComponent({
 .opp-armor {
   color: #7ab8ff;
 }
+.opp-immune {
+  color: #ffe566;
+}
 
-/* Рубашка карты противника: маленький прямоугольник с цветом фракции */
+/* Рубашка карты напарника: маленький прямоугольник с цветом фракции */
 .opponent-card-back {
   width: 2.6vh;
   height: 3.6vh;
@@ -1429,7 +1497,7 @@ export default defineComponent({
   }
 }
 
-/* ── Оверлеи (инициализация, редро противника, отключение) ── */
+/* ── Оверлеи (инициализация, редро напарника, отключение) ── */
 
 .init-overlay,
 .disconnect-overlay {

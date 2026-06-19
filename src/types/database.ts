@@ -39,6 +39,7 @@ export interface LeaderData {
   }
   heal?: number
   armor?: number
+  value?: number
   passive?: {
     value?: number
     timer?: number
@@ -300,6 +301,7 @@ export interface UserResources {
   flowers: number
   first_aid_kits: number
   shields: number
+  immune_magics: number
 }
 
 export interface CardsResponse {

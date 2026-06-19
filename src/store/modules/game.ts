@@ -26,6 +26,8 @@ export interface GameState {
   draws_initial: number
   draws_after_redraw: number
   cards_drawn: number
+  max_immune_turns: number
+  immune_magics_turns: number
 
   arena_mode: boolean
 
@@ -57,12 +59,19 @@ export interface GameState {
 
   max_hp_shown: boolean
   max_armor_shown: boolean
+  max_immune_shown: boolean
 
   // Лог атак врагов на игрока за текущий интервал между sendGameState.
   // Каждая запись — значение damage одного вызова damage_player.
   // Используется в мультиплеере, чтобы игрок 2 применял каждую атаку
   // через свою броню, а не получал суммарную дельту HP напрямую.
   attack_log: number[]
+
+  // Количество ходов неуязвимости: 0 = нет, >0 = активна.
+  // Пока >0 — damage_player не наносит урон и не тратит броню.
+  invulnerability: number
+  // Флаг "попали по неуязвимому": true на короткое время → анимация в HealthComp.
+  invulnerability_hit: boolean
 }
 
 interface GameActionContext extends ActionContext {
@@ -80,6 +89,8 @@ const state: GameState = {
   draws_initial: 1,
   draws_after_redraw: 0,
   cards_drawn: 1,
+  max_immune_turns: 0,
+  immune_magics_turns: 0,
 
   random_level_enemies_count: {},
   max_random_n_enemies: 0,
@@ -111,8 +122,12 @@ const state: GameState = {
 
   max_hp_shown: false,
   max_armor_shown: false,
+  max_immune_shown: false,
 
   attack_log: [],
+
+  invulnerability: 0,
+  invulnerability_hit: false,
 }
 
 const getters = {
@@ -142,6 +157,7 @@ const getters = {
   maxDecks: (state: GameState) => state.max_decks,
   maxHp: (state: GameState) => state.max_hp,
   maxArmor: (state: GameState) => state.max_armor,
+  maxImmuneTurns: (state: GameState) => state.max_immune_turns,
 
   get_season: (state: GameState) => state.season,
   currentLevel: (state: GameState) => state.level,
@@ -162,6 +178,8 @@ const mutations = {
       draws_initial: number
       draws_after_redraw: number
       cards_drawn: number
+      max_immune_turns: number
+      immune_magics_turns: number
     }
   ) {
     state.hand_size = payload.hand_size ?? state.hand_size
@@ -176,6 +194,9 @@ const mutations = {
     state.draws_after_redraw =
       payload.draws_after_redraw ?? state.draws_after_redraw
     state.cards_drawn = payload.cards_drawn ?? state.cards_drawn
+    state.max_immune_turns = payload.max_immune_turns ?? state.max_immune_turns
+    state.immune_magics_turns =
+      payload.immune_magics_turns ?? state.immune_magics_turns
   },
 
   set_game_const(
@@ -278,6 +299,22 @@ const mutations = {
   },
   clear_attack_log(state: GameState) {
     state.attack_log = []
+  },
+
+  set_invulnerability(state: GameState, value: number) {
+    if (value > state.max_immune_turns) {
+      if (!state.max_immune_shown) {
+        toast.info(
+          "Максимальный уровень неуязвимости достигнут. Увеличьте его в разделе Прокачка"
+        )
+        state.max_immune_shown = true
+      }
+      value = state.max_immune_turns
+    }
+    state.invulnerability = value
+  },
+  set_invulnerability_hit(state: GameState, value: boolean) {
+    state.invulnerability_hit = value
   },
 
   set_ppa_end_turn(state: GameState, payload: boolean) {

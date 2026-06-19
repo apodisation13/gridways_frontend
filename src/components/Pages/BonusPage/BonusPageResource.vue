@@ -38,6 +38,7 @@
       <button
         v-if="actions.craft"
         class="action-btn btn--craft"
+        :class="{ 'btn--craft-first': onlyCraftAndSell }"
         title="Создать"
         @click="openModal('craft')"
       >
@@ -97,6 +98,16 @@ export default defineComponent({
       active_action: null as "buy" | "sell" | "craft" | "mill" | null,
       open_item_visible: false,
     }
+  },
+  computed: {
+    onlyCraftAndSell(): boolean {
+      return (
+        !this.actions.buy &&
+        !!this.actions.sell &&
+        !!this.actions.craft &&
+        !this.actions.mill
+      )
+    },
   },
   methods: {
     openModal(action: "buy" | "sell" | "craft" | "mill"): void {
@@ -221,5 +232,8 @@ export default defineComponent({
   background: linear-gradient(135deg, #f44336, #b71c1c);
   color: white;
   font-size: 0.85rem;
+}
+.btn--craft-first {
+  order: -1;
 }
 </style>

@@ -44,6 +44,14 @@ export default defineComponent({
                   this.isActive.player_cards = true
                   this.can_draw = this.calc_can_draw()
                   this.$store.commit("set_player_turn", true)
+
+                  const invulnerability: number =
+                    this.$store.state.game.invulnerability
+                  if (invulnerability > 0) {
+                    let new_value = invulnerability - 1
+                    if (new_value < 0) new_value = 0
+                    this.$store.commit("set_invulnerability", new_value)
+                  }
                 }
               }, timeout * 0.5)
             }
