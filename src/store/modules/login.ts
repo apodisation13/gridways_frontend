@@ -129,10 +129,21 @@ const actions = {
       toast.success(
         "Успешно зарегистрированы, а теперь войдите, используя свои данные"
       )
-    } catch (err) {
+    } catch (err: any) {
       console.log(err)
-      toast.error("Произошла ошибка!")
-      throw new Error("Ошибка регистрации")
+      const apiError = err?.error?.error
+      let message = "Неизвестная ошибка при регистрации"
+      if (apiError?.code === "BAD_REQUEST") {
+        if (apiError.message?.includes("{email}")) {
+          message = "Эта почта уже занята"
+        } else if (apiError.message?.includes("{username}")) {
+          message = "Это имя пользователя уже занято"
+        }
+      } else if (apiError?.code === "VALIDATION_ERROR") {
+        message = apiError.message
+      }
+      toast.error(message)
+      throw new Error(message)
     }
   },
   logOut({ commit }: ActionContext) {

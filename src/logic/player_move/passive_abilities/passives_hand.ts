@@ -2,6 +2,8 @@ import { allowActionTimer } from "@/logic/game_logic/timers"
 import { add_armor_passive } from "@/logic/player_move/passive_abilities/passives_in_hand/armor"
 import { damage_random_enemy } from "@/logic/player_move/passive_abilities/passives_in_hand/damage_random_enemy"
 import { destroy_2_enemies } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_2_enemies"
+import { destroy_with_passive } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_with_passive"
+import { passive_destroy_with_status } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_with_status"
 import { heal_leader } from "@/logic/player_move/passive_abilities/passives_in_hand/heal_leader"
 import {
   inc_dmg_by_len_grave,
@@ -10,11 +12,18 @@ import {
   incr_dmg_to_random,
   incr_self_dmg,
 } from "@/logic/player_move/passive_abilities/passives_in_hand/incr_dmg"
+import { lock_random } from "@/logic/player_move/passive_abilities/passives_in_hand/lock_random"
 import {
   poison_all_enemies_passive,
   poison_random_enemy_passive,
 } from "@/logic/player_move/passive_abilities/passives_in_hand/poison"
+import { remove_deathwish } from "@/logic/player_move/passive_abilities/passives_in_hand/remove_deathwish"
+import { remove_passive } from "@/logic/player_move/passive_abilities/passives_in_hand/remove_passive"
 import { set_dmg_as_random_enemy_grave } from "@/logic/player_move/passive_abilities/passives_in_hand/set_dmg_as_random_enemy_grave"
+import {
+  spawn_random_enemy_in_deck,
+  spawn_random_enemy_in_hand,
+} from "@/logic/player_move/passive_abilities/passives_in_hand/spawn_enemy"
 import { spawn_random_in_hand } from "@/logic/player_move/passive_abilities/passives_in_hand/spawn_random_in_hand"
 import { add_charges_if_playing_d_all } from "@/logic/player_move/passive_abilities/passives_leader/add-charges-if-playing-d-all"
 import type { Card, GameObj } from "@/types"
@@ -56,5 +65,19 @@ export function hand_passives(
     poison_all_enemies_passive(card, gameObj, timeout)
   } else if (pa === "add-armor") {
     add_armor_passive(card, timeout)
+  } else if (pa === "create-enemy-and-put-to-hand") {
+    spawn_random_enemy_in_hand(card, gameObj, timeout)
+  } else if (pa === "passive-lock") {
+    lock_random(card, gameObj, timeout)
+  } else if (pa === "destroy-with-passive") {
+    destroy_with_passive(card, gameObj, timeout)
+  } else if (pa === "destroy-with-status") {
+    passive_destroy_with_status(card, gameObj, timeout)
+  } else if (pa === "remove-passive") {
+    remove_passive(card, gameObj, timeout)
+  } else if (pa === "create-enemy-and-put-to-deck") {
+    spawn_random_enemy_in_deck(card, gameObj, timeout)
+  } else if (pa === "remove-deathwish") {
+    remove_deathwish(card, gameObj, timeout)
   }
 }

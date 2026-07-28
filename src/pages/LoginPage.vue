@@ -23,7 +23,7 @@
     </div>
 
     <!-- Форма, включая поле с дополнительными функциями -->
-    <form class="form" @submit.prevent>
+    <form class="form" autocomplete="off" @submit.prevent>
       <div class="form__content">
         <div class="inputs">
           <div class="form__auth">
@@ -34,8 +34,6 @@
               :class="email_valid ? '' : 'form__data_error'"
               class="form__data"
               autocomplete="off"
-              @focus="input_enabled = true"
-              @blur="input_enabled = false"
             />
           </div>
           <div v-if="!formLogin" class="form__auth">
@@ -47,8 +45,6 @@
               v-model="username"
               class="form__data"
               autocomplete="off"
-              @focus="input_enabled = true"
-              @blur="input_enabled = false"
             />
           </div>
           <div class="form__auth form__auth_pass">
@@ -59,10 +55,8 @@
               :class="password_valid ? '' : 'form__data_error'"
               class="form__data"
               type="password"
-              autocomplete="off"
+              :autocomplete="formLogin ? 'current-password' : 'new-password'"
               @keyup.enter="login"
-              @focus="input_enabled = true"
-              @blur="input_enabled = false"
             />
             <div class="eye" @click="toggle_pass_visibility">
               <div class="eye__apple"></div>
@@ -78,10 +72,8 @@
               :class="confirm_password_valid ? '' : 'form__data_error'"
               class="form__data"
               type="password"
-              autocomplete="off"
+              autocomplete="new-password"
               @keyup.enter="userRegister"
-              @focus="input_enabled = true"
-              @blur="input_enabled = false"
             />
             <div class="eye" @click="toggle_pass_visibility">
               <div class="eye__apple"></div>
@@ -90,7 +82,7 @@
         </div>
 
         <!-- Поле с дополнительными функциями -->
-        <div v-if="formLogin && !input_enabled" class="form__additional">
+        <div v-if="formLogin" class="form__additional">
           <div class="form__login-with">
             <a
               class="login-with__btn login-with__google"
@@ -109,7 +101,7 @@
             <a class="forgot__text">Забыли пароль?</a>
           </div>
         </div>
-        <div v-else-if="!formLogin && !input_enabled" class="form__additional">
+        <div v-else-if="!formLogin" class="form__additional">
           <div class="form__agree">
             <div class="agree__user">
               <div
@@ -203,7 +195,6 @@ export default defineComponent({
       show_policy_modal: false,
       is_user_agree: false,
       is_policy_agree: false,
-      input_enabled: false,
     }
   },
   computed: {
@@ -264,9 +255,8 @@ export default defineComponent({
           password: this.password,
         })
         this.formLogin = true
-      } catch (err) {
-        this.error = err as string
-        throw err
+      } catch (err: any) {
+        this.error = err.message
       }
     },
 
@@ -307,8 +297,10 @@ export default defineComponent({
     choseFormRegister(): void {
       this.error = ""
       this.formLogin = false
+      this.username = ""
       this.email = ""
       this.password = ""
+      this.confirm_password = ""
     },
     // :disabled="!(email && password)"
     reset_highlight(): void {

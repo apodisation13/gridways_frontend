@@ -33,7 +33,9 @@
         card.ability.name === CardAbility.DestroyHighestDamage ||
         card.ability.name === CardAbility.DestroyRandom ||
         card.ability.name === CardAbility.DestroyAllSameHp ||
-        card.ability.name === CardAbility.DestroyRandomEnemyInDeck
+        card.ability.name === CardAbility.DestroyRandomEnemyInDeck ||
+        card.ability.name === CardAbility.DestroyAllWithPassive ||
+        card.ability.name === CardAbility.DestroyWithStatus
       "
       :icon="require('@/assets/icons/card/destroy.svg')"
     />
@@ -54,7 +56,8 @@
         card.ability.name === CardAbility.CreateSpecial ||
         card.ability.name === CardAbility.CreateAnyUnit ||
         card.ability.name === CardAbility.CreateAndPutToDeck ||
-        card.ability.name === CardAbility.DrawExact
+        card.ability.name === CardAbility.DrawExact ||
+        card.ability.name === CardAbility.MoveEnemyFromDeckToHand
       "
       :icon="require('@/assets/icons/card/additional_card.svg')"
     />

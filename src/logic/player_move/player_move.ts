@@ -1,13 +1,17 @@
+import { add_charges_to_leader } from "@/logic/player_move/abilities/ability_add_charges_to_leader"
+import { add_damage_to_leader } from "@/logic/player_move/abilities/ability_add_damage_to_leader"
 import { add_armor } from "@/logic/player_move/abilities/ability_armor"
 import { damage_all } from "@/logic/player_move/abilities/ability_damage_all"
 import { damage_column } from "@/logic/player_move/abilities/ability_damage_column"
 import { damage_one } from "@/logic/player_move/abilities/ability_damage_one"
 import { damage_row } from "@/logic/player_move/abilities/ability_damage_row"
+import { destroy_all_with_passive } from "@/logic/player_move/abilities/ability_destroy_all_passives"
 import { destroy_all_same_hp } from "@/logic/player_move/abilities/ability_destroy_all_same_hp"
 import { destroy_highest_damage } from "@/logic/player_move/abilities/ability_destroy_highest_damage"
 import { destroy_highest_hp } from "@/logic/player_move/abilities/ability_destroy_highest_hp"
 import { destroy_random } from "@/logic/player_move/abilities/ability_destroy_random"
 import { destroy_random_enemy_in_deck } from "@/logic/player_move/abilities/ability_destroy_random_enemy_in_deck"
+import { destroy_with_status } from "@/logic/player_move/abilities/ability_destroy_with_status"
 import { give_charges_to_all } from "@/logic/player_move/abilities/ability_give_charges_to_all"
 import { heal } from "@/logic/player_move/abilities/ability_heal"
 import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_grave"
@@ -21,12 +25,14 @@ import {
   poison_one_enemy,
 } from "@/logic/player_move/abilities/ability_poison"
 import { purify } from "@/logic/player_move/abilities/ability_purify"
+import { replace_leader } from "@/logic/player_move/abilities/ability_replace_leader"
 import { set_enemy_as_token } from "@/logic/player_move/abilities/ability_set_enemy_as_token"
 import { set_lowest_dmg_to_as_highest } from "@/logic/player_move/abilities/ability_set_lowest_dmg_to_as_highest"
 import { spawn_self_at_deck } from "@/logic/player_move/abilities/ability_spawn_self_at_deck"
 import { spawn_self_at_grave } from "@/logic/player_move/abilities/ability_spawn_self_at_grave"
 import { spawn_tokens_at_enemy_deck } from "@/logic/player_move/abilities/ability_spawn_tokens_at_enemy_deck"
 import { spread_damage } from "@/logic/player_move/abilities/ability_spread_damage"
+import { take_enemy_to_hand } from "@/logic/player_move/abilities/ability_take_enemy_to_hand"
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
 import { player_passive_abilities_upon_playing_a_card } from "@/logic/player_move/player_passive_abilities_upon_playing_a_card"
 import { check_win } from "@/logic/player_move/service/check_win"
@@ -124,6 +130,21 @@ export function damage_ai_card(
     damage_one(enemy, card, gameObj, timeout)
     const invulnerability_value = (card as Card | Leader).data?.value || 0
     add_invulnerability(invulnerability_value)
+  } else if (ability === CardAbility.AddDamageToLeader) {
+    damage_one(enemy, card, gameObj, timeout)
+    add_damage_to_leader(card as Card, leader, timeout)
+  } else if (ability === CardAbility.ReplaceLeader) {
+    damage_one(enemy, card, gameObj, timeout)
+    replace_leader(gameObj)
+  } else if (ability === CardAbility.DestroyAllWithPassive) {
+    destroy_all_with_passive(gameObj, timeout)
+  } else if (ability === CardAbility.DestroyWithStatus) {
+    destroy_with_status(enemy, gameObj, timeout)
+  } else if (ability === CardAbility.TakeEnemyToHand) {
+    take_enemy_to_hand(card as Card, enemy as Enemy, gameObj, timeout)
+  } else if (ability === CardAbility.AddChargesToLeader) {
+    damage_one(enemy, card, gameObj, timeout)
+    add_charges_to_leader(card as Card, leader, timeout)
   } else damage_one(enemy, card, gameObj, timeout)
 
   // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда

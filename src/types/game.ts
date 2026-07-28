@@ -36,6 +36,7 @@ export enum EnemyStatus {
 }
 
 export enum CardAbility {
+  DamageOne = "damage-one",
   Heal = "heal",
   DamageAll = "damage-all",
   SpreadDamage = "spread-damage",
@@ -62,6 +63,15 @@ export enum CardAbility {
   AddArmor = "add-armor",
   GiveChargesToAll = "give-charges-to-all",
   AddInvulnerability = "add-invulnerability",
+  AddDamageToLeader = "add-damage-to-leader",
+  AddChargesToLeader = "add-charges-to-leader",
+  DestroyWithPassive = "destroy-with-passive",
+  DestroyAllWithPassive = "destroy-all-with-passive",
+  DestroyWithDeathwish = "destroy-with-deathwish",
+  DestroyAllWithDeathwish = "destroy-all-with-deathwish",
+  DestroyWithStatus = "destroy-with-status",
+  ReplaceLeader = "replace-leader",
+  TakeEnemyToHand = "take-enemy-to-hand",
   // special case abilities
   Resurrect = "resurrect",
   DrawTwoCards = "draw-two-cards",
@@ -81,6 +91,10 @@ export enum CardAbility {
   CreateAnyUnit = "create-any-unit",
   CreateAndPutToDeck = "create-and-put-to-deck",
   DrawExact = "draw-exact",
+  MoveEnemyFromDeckToDeck = "move-enemy-from-deck-to-deck",
+  CreateEnemyAndPutToDeck = "create-enemy-and-put-to-deck",
+  MoveEnemyFromGraveToDeck = "move-enemy-from-grave-to-deck",
+  MoveEnemyFromDeckToHand = "move-enemy-from-deck-to-hand",
   // пока нету
   SpawnEffectInRow = "spawn-effect-in-row",
 }
