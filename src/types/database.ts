@@ -23,6 +23,7 @@ export interface CardData {
     reset_timer?: boolean
     each_tick?: boolean
     upon_beginning?: boolean
+    upon_playing_a_card?: boolean
   }
   multi?: {
     value: number
@@ -47,6 +48,7 @@ export interface LeaderData {
     default_timer?: number
     reset_timer?: boolean
     each_tick?: boolean
+    upon_playing_a_card?: boolean
   }
   multi?: {
     value: number

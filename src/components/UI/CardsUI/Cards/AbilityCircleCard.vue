@@ -35,7 +35,10 @@
         card.ability.name === CardAbility.DestroyAllSameHp ||
         card.ability.name === CardAbility.DestroyRandomEnemyInDeck ||
         card.ability.name === CardAbility.DestroyAllWithPassive ||
-        card.ability.name === CardAbility.DestroyWithStatus
+        card.ability.name === CardAbility.DestroyWithStatus ||
+        card.ability.name === CardAbility.DestroyWithDeathwish ||
+        card.ability.name === CardAbility.DestroyWithPassive ||
+        card.ability.name === CardAbility.DestroyAllWithDeathwish
       "
       :icon="require('@/assets/icons/card/destroy.svg')"
     />

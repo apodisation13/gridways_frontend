@@ -6,7 +6,7 @@ import type { Card, Enemy, EnemyLeader, Leader } from "@/types"
 // диспетчер вызова пассивных абилок
 // player_card - та карта, которую мы играем
 // enemy - тот враг, в которого мы бьем
-export function player_passive_abilities_upon_playing_a_card(
+export function leader_passive_abilities_upon_playing_a_card(
   player_card: Card | Leader,
   leader: Leader,
   enemy: Enemy | EnemyLeader

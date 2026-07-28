@@ -162,6 +162,15 @@ export default defineComponent({
         this.cards_pool = this.gameObj.enemies_grave
         // сколько зарядов установить той карте врага, которую мы возьмем
         this.special_case_value = this.selected_card?.data?.value || 0
+      } else if (ability === CardAbility.CreateEnemyAndPutToDeck) {
+        this.enemyView = true
+        const pool: Enemy[] = this.$store.getters["all_enemies"]
+        for (let i = 0; i < 3; i++) {
+          const r = choice_element(pool)
+          this.cards_pool.push(copyObj(r))
+        }
+        // сколько зарядов установить той карте врага, которую мы возьмем
+        this.special_case_value = this.selected_card?.data?.value || 0
       }
       this.ability = this.selected_card!.ability.name
       if (this.cards_pool.length) {
@@ -257,6 +266,10 @@ export default defineComponent({
           this.gameObj.enemies_grave.indexOf(card as Enemy),
           1
         )
+        this.gameObj.deck.push(
+          enemy_as_card(card as Enemy, this.special_case_value!)
+        )
+      } else if (this.ability === CardAbility.CreateEnemyAndPutToDeck) {
         this.gameObj.deck.push(
           enemy_as_card(card as Enemy, this.special_case_value!)
         )
