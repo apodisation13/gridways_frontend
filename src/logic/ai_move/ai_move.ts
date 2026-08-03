@@ -7,6 +7,7 @@ import { set_already_jumped } from "@/logic/ai_move/service/service_for_ai_move"
 import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
 import store from "@/store"
 import type { Enemy, GameObj } from "@/types"
+import { EnemyMove } from "@/types"
 
 export function ai_move(field: (Enemy | "")[], timeout = 1000): void {
   store.commit("set_ai_move", true)
@@ -22,16 +23,16 @@ export function ai_move(field: (Enemy | "")[], timeout = 1000): void {
       store.commit("set_ai_move", false)
     } else {
       // ДИСПЕТЧЕР способностей хода врагов
-      if ((enemies[i] as Enemy).move.name === "stand") {
+      if ((enemies[i] as Enemy).move.name === EnemyMove.Stand) {
         stand_still(field, field.indexOf(enemies[i] as Enemy), timeout)
       } else if (
-        (enemies[i] as Enemy).move.name === "random" &&
+        (enemies[i] as Enemy).move.name === EnemyMove.Random &&
         !(enemies[i] as Enemy).already_jumped
       ) {
         random_move(field, field.indexOf(enemies[i] as Enemy), timeout)
-      } else if ((enemies[i] as Enemy).move.name === "down") {
+      } else if ((enemies[i] as Enemy).move.name === EnemyMove.Down) {
         down_move(field, field.indexOf(enemies[i] as Enemy), timeout)
-      } else if ((enemies[i] as Enemy).move.name === "right") {
+      } else if ((enemies[i] as Enemy).move.name === EnemyMove.Right) {
         right_move(field, field.indexOf(enemies[i] as Enemy), timeout)
       }
 
@@ -47,11 +48,11 @@ export function enemy_leader_ai_move_once(gameObj: GameObj): void {
 
   if (!ela) return // есть лидеры у кого абилки нет
 
-  if (ela === "damage-once") {
+  if (ela === EnemyMove.DamageOnce) {
     const value = enemy_leader.data?.value || 0
     store.commit("change_health", -value)
     check_lose()
-  } else if (ela === "decrease-all-player-damage") {
+  } else if (ela === EnemyMove.DecreaseAllPlayerDamage) {
     const value = enemy_leader.data?.value || 0
     deck.forEach(card => {
       card.data.damage -= value

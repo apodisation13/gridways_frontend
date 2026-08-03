@@ -30,6 +30,7 @@ import {
 } from "@/logic/ai_move/passive_abilities/passives_in_field/spawns"
 import { allowActionTimer } from "@/logic/game_logic/timers"
 import type { Enemy, GameObj } from "@/types"
+import { EnemyPassive } from "@/types"
 
 export function field_passives(
   enemy: Enemy,
@@ -41,49 +42,49 @@ export function field_passives(
   const { enemy_leader, field, hand } = gameObj
   const pea = enemy.passive_ability?.name
 
-  if (pea === "incr-self-dmg") {
+  if (pea === EnemyPassive.IncrSelfDmg) {
     incr_self_dmg(enemy, timeout)
-  } else if (pea === "heal-self") {
+  } else if (pea === EnemyPassive.HealSelf) {
     heal_self(enemy, timeout)
-  } else if (pea === "heal-leader") {
+  } else if (pea === EnemyPassive.HealLeader) {
     heal_enemy_leader(enemy, enemy_leader, timeout)
-  } else if (pea === "regain-shield") {
+  } else if (pea === EnemyPassive.RegainShield) {
     regain_shield(enemy)
-  } else if (pea === "heal-all") {
+  } else if (pea === EnemyPassive.HealAll) {
     heal_all(enemy, field, enemy_leader, timeout)
-  } else if (pea === "heal-random") {
+  } else if (pea === EnemyPassive.HealRandom) {
     heal_random(enemy, field, enemy_leader, timeout)
-  } else if (pea === "incr-random-dmg") {
+  } else if (pea === EnemyPassive.IncrRandomDmg) {
     incr_random_dmg(enemy, field, timeout)
-  } else if (pea === "decr-player-dmg") {
+  } else if (pea === EnemyPassive.DecrPlayerDmg) {
     decrease_player_damage(enemy, hand, timeout)
-  } else if (pea === "set-hp-random-grave") {
+  } else if (pea === EnemyPassive.SetHpRandomGrave) {
     set_hp_random_grave(enemy, gameObj, timeout)
-  } else if (pea === "set-dmg-as-highest-hand") {
+  } else if (pea === EnemyPassive.SetDmgAsHighestHand) {
     set_dmg_as_highest_hand(enemy, gameObj, timeout)
-  } else if (pea === "set-dmg-random-grave") {
+  } else if (pea === EnemyPassive.SetDmgRandomGrave) {
     set_dmg_random_grave(enemy, gameObj, timeout)
-  } else if (pea === "heal-self-by-highest-hp") {
+  } else if (pea === EnemyPassive.HealSelfByHighestHp) {
     heal_self_by_highest_hp(enemy, field, enemy_leader, timeout)
-  } else if (pea === "heal-row") {
+  } else if (pea === EnemyPassive.HealRow) {
     heal_row(enemy, field, timeout)
-  } else if (pea === "heal-column") {
+  } else if (pea === EnemyPassive.HealColumn) {
     heal_column(enemy, field, timeout)
-  } else if (pea === "incr-dmg-row") {
+  } else if (pea === EnemyPassive.IncrDmgRow) {
     incr_dmg_row(enemy, field, timeout)
-  } else if (pea === "incr-dmg-column") {
+  } else if (pea === EnemyPassive.IncrDmgColumn) {
     incr_dmg_column(enemy, field, timeout)
-  } else if (pea === "spawn-self-in-deck") {
+  } else if (pea === EnemyPassive.SpawnSelfInDeck) {
     spawn_self_at_deck(enemy, gameObj, timeout)
-  } else if (pea === "spawn-tokens-in-deck") {
+  } else if (pea === EnemyPassive.SpawnTokensInDeck) {
     spawn_tokens_in_deck(enemy, gameObj, timeout)
-  } else if (pea === "spawn-token") {
+  } else if (pea === EnemyPassive.SpawnToken) {
     spawn_token(enemy, field, timeout)
-  } else if (pea === "spawn-random-token") {
+  } else if (pea === EnemyPassive.SpawnRandomToken) {
     spawn_random_token(enemy, gameObj, timeout)
-  } else if (pea === "give-shield") {
+  } else if (pea === EnemyPassive.GiveShield) {
     give_shield(field, enemy_leader)
-  } else if (pea === "spawn-faction-unit") {
+  } else if (pea === EnemyPassive.SpawnFactionUnit) {
     spawn_faction_unit(enemy, gameObj, true, timeout)
   }
 }

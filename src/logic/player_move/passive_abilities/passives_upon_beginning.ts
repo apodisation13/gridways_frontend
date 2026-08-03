@@ -1,5 +1,5 @@
 import { set_self_as_deck_len } from "@/logic/player_move/passive_abilities/passives_upon_beginning/set_self_as_deck_len"
-import { GameObj } from "@/types"
+import { CardPassiveAbility, GameObj } from "@/types"
 
 // эта функция срабатывает для всех карт (до первого дро), для которых пассивка
 // должна сработать один раз в начале игры
@@ -11,8 +11,7 @@ export function passives_upon_beginning(gameObj: GameObj): void {
 
   for (const card of pool) {
     const passive_ability = card.passive_ability.name
-    if (passive_ability === "set-self-as-deck-len") {
-      console.log(passive_ability)
+    if (passive_ability === CardPassiveAbility.SetSelfAsDeckLen) {
       set_self_as_deck_len(card, deck)
     }
   }

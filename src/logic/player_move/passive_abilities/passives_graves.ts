@@ -5,7 +5,7 @@ import {
 import { if_in_grave_spawn_self_in_enemy_grave } from "@/logic/player_move/passive_abilities/passives_in_grave/if_in_grave_spawn_self_in_enemy_grave"
 import { heal_leader } from "@/logic/player_move/passive_abilities/passives_in_hand/heal_leader"
 import { incr_self_dmg } from "@/logic/player_move/passive_abilities/passives_in_hand/incr_dmg"
-import type { Card, GameObj } from "@/types"
+import { Card, CardPassiveAbility, GameObj } from "@/types"
 
 export function grave_passives(
   card: Card,
@@ -18,11 +18,11 @@ export function grave_passives(
 
   // ДИСПЕТЧЕР ПАССИВНЫХ АБИЛОК В КЛАДБИЩЕ
   const cpa = card?.passive_ability?.name
-  if (cpa === "incr-self-dmg") {
+  if (cpa === CardPassiveAbility.IncrSelfDmg) {
     incr_self_dmg(card, true, timeout)
-  } else if (cpa === "heal-leader") {
+  } else if (cpa === CardPassiveAbility.HealLeader) {
     heal_leader(card, timeout)
-  } else if (cpa === "if-in-grave-spawn-self-in-enemy-grave") {
+  } else if (cpa === CardPassiveAbility.IfInGraveSpawnSelfInEnemyGrave) {
     if_in_grave_spawn_self_in_enemy_grave(card, gameObj, timeout)
   }
 }
