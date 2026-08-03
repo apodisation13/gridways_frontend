@@ -1,5 +1,7 @@
 import type { Card, Enemy, EnemyLeader, Leader } from "./database"
 
+export type CardLocation = "hand" | "deck" | "grave" | "field" | null
+
 export interface GameObj {
   deck: Card[]
   hand: Card[]

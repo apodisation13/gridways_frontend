@@ -134,7 +134,11 @@
           :damage="card.data.damage"
         />
         <card-ability-circle v-if="card.ability" :card="card" />
-        <card-passive v-if="card.passive_ability?.name" :card="card" />
+        <card-passive
+          v-if="card.passive_ability?.name"
+          :card="card"
+          :location="location"
+        />
         <card-charges
           v-if="'charges' in card.data"
           :charge="card.data.charges"
@@ -221,6 +225,10 @@ export default defineComponent({
     is_previev: {
       type: Boolean,
       default: false,
+    },
+    location: {
+      type: String as PropType<"hand" | "deck" | "grave" | "field" | null>,
+      default: null,
     },
   },
   computed: {

@@ -1,7 +1,11 @@
 <template>
   <div class="enemies">
     <div v-for="enemy in enemies" :key="enemy.id" class="enemy">
-      <enemy-comp :enemy="enemy" @dblclick="choseEnemy(enemy)" />
+      <enemy-comp
+        :enemy="enemy"
+        :location="location"
+        @dblclick="choseEnemy(enemy)"
+      />
     </div>
   </div>
 </template>
@@ -10,7 +14,7 @@
 import { defineComponent, type PropType } from "vue"
 
 import EnemyComp from "@/components/Cards/EnemyComp.vue"
-import type { Enemy } from "@/types"
+import type { CardLocation, Enemy } from "@/types"
 
 export default defineComponent({
   name: "EnemyList",
@@ -19,6 +23,10 @@ export default defineComponent({
     enemies: {
       type: Array as PropType<Enemy[]>,
       required: true,
+    },
+    location: {
+      type: String as PropType<CardLocation>,
+      default: null,
     },
   },
   emits: ["chose-enemy"],

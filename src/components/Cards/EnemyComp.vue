@@ -9,7 +9,7 @@
       @contextmenu.prevent
       @click.right="show_modal"
     >
-      <enemy-ui :enemy="enemy" />
+      <enemy-ui :enemy="enemy" :location="location" />
     </div>
     <card-modal
       v-if="show_enemy_modal"
@@ -30,7 +30,7 @@ import {
 import EnemyUi from "@/components/Cards/EnemyUi.vue"
 import CardModal from "@/components/ModalWindows/CardModal.vue"
 import { border_for_card } from "@/logic/border_styles"
-import type { Enemy } from "@/types"
+import type { CardLocation, Enemy } from "@/types"
 
 export default defineComponent({
   name: "EnemyComp",
@@ -51,6 +51,10 @@ export default defineComponent({
       type: Boolean,
       required: false,
       default: false,
+    },
+    location: {
+      type: String as PropType<CardLocation>,
+      default: null,
     },
   },
   data() {

@@ -92,7 +92,7 @@
     <transition name="modal">
       <modal-window v-if="flag" v-touch:swipe="close_self">
         <button-close @close_self="close_self" />
-        <card-list-component :cards="deckEntries" />
+        <card-list-component :cards="deckEntries" location="deck" />
       </modal-window>
     </transition>
   </div>

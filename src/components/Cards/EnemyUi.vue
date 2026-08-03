@@ -42,7 +42,11 @@
           </span>
         </div>
 
-        <card-passive v-if="enemy.passive_ability?.name" :card="e" />
+        <card-passive
+          v-if="enemy.passive_ability?.name"
+          :card="e"
+          :location="location"
+        />
         <enemy-shield v-if="enemy.data.shield" />
         <enemy-locked v-if="enemy.locked" />
         <deathwish-ability v-if="enemy.deathwish?.name" />
@@ -73,7 +77,7 @@ import {
   background_color_hp,
   card_margin,
 } from "@/logic/border_styles"
-import type { Enemy, EnemyLeader } from "@/types"
+import type { CardLocation, Enemy, EnemyLeader } from "@/types"
 
 export default defineComponent({
   name: "EnemyUi",
@@ -91,6 +95,10 @@ export default defineComponent({
     enemy: {
       type: Object as PropType<Enemy | EnemyLeader>,
       required: true,
+    },
+    location: {
+      type: String as PropType<CardLocation>,
+      default: null,
     },
   },
   computed: {

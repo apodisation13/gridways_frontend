@@ -12,6 +12,7 @@
       :deckbuilder="deckbuilder"
       :bonus="bonus"
       :is_leader="is_leader"
+      :location="location"
       @dblclick="chose_player_card(user_card)"
     />
   </div>
@@ -21,7 +22,7 @@
 import { defineComponent, type PropType } from "vue"
 
 import CardItem from "@/components/Cards/CardItem.vue"
-import type { CardEntry, LeaderEntry } from "@/types"
+import type { CardEntry, CardLocation, LeaderEntry } from "@/types"
 export default defineComponent({
   components: {
     CardItem,
@@ -52,6 +53,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
       required: false,
+    },
+    location: {
+      type: String as PropType<CardLocation>,
+      default: null,
     },
   },
   emits: ["chose_player_card"],
