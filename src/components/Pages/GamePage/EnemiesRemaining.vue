@@ -120,7 +120,7 @@
     <transition name="modal">
       <modal-window v-if="visible" v-touch:swipe.left="close_self">
         <button-close @close_self="close_self" />
-        <enemy-list :enemies="enemies" />
+        <enemy-list :enemies="enemies" location="deck" />
       </modal-window>
     </transition>
   </div>

@@ -24,6 +24,7 @@ import {
 } from "@/logic/ai_move/passive_abilities/passives_in_field/spawns"
 import { sound_deathwish } from "@/logic/play_sounds"
 import type { Enemy, EnemyLeader, GameObj } from "@/types"
+import { EnemyDeathwish } from "@/types"
 
 // ДИСПЕТЧЕР абилок deathwish у врага
 export function deathwish(
@@ -34,35 +35,37 @@ export function deathwish(
   if (!deathwish_enemy) return
 
   const d = deathwish_enemy.deathwish?.name
-  if (d === "spawn-self") spawn_self(deathwish_enemy as Enemy, gameObj)
-  else if (d === "spawn-tokens") spawn_tokens(deathwish_enemy as Enemy, gameObj)
-  else if (d === "incr-dmg-to-hand-by-value") {
+  if (d === EnemyDeathwish.SpawnSelf)
+    spawn_self(deathwish_enemy as Enemy, gameObj)
+  else if (d === EnemyDeathwish.SpawnTokens)
+    spawn_tokens(deathwish_enemy as Enemy, gameObj)
+  else if (d === EnemyDeathwish.IncrDmgToHandByValue) {
     deathwish_incr_dmg_to_all_hand(deathwish_enemy as Enemy, gameObj, timeout)
-  } else if (d === "heal-all")
+  } else if (d === EnemyDeathwish.HealAll)
     deathwish_heal_all(deathwish_enemy as Enemy, gameObj, timeout)
-  else if (d === "spawn-self-at-deck") {
+  else if (d === EnemyDeathwish.SpawnSelfAtDeck) {
     spawn_self_at_deck(deathwish_enemy as Enemy, gameObj, timeout)
-  } else if (d === "destroy_random_card_in_player_deck") {
+  } else if (d === EnemyDeathwish.DestroyRandomCardInPlayerDeck) {
     destroy_player_card_in_deck(gameObj)
-  } else if (d === "set_hp") {
+  } else if (d === EnemyDeathwish.SetHp) {
     set_hp(deathwish_enemy as Enemy)
-  } else if (d === "spawn-tokens-at-deck") {
+  } else if (d === EnemyDeathwish.SpawnTokensAtDeck) {
     spawn_tokens_at_deck(deathwish_enemy as Enemy, gameObj, timeout)
-  } else if (d === "spawn-self-at-grave") {
+  } else if (d === EnemyDeathwish.SpawnSelfAtGrave) {
     spawn_self_at_grave(deathwish_enemy as Enemy, gameObj, timeout)
-  } else if (d === "give-shields-to-all") {
+  } else if (d === EnemyDeathwish.GiveShieldsToAll) {
     give_shields_to_all(gameObj)
-  } else if (d === "give-shields-to-all-deck") {
+  } else if (d === EnemyDeathwish.GiveShieldsToAllDeck) {
     give_shield_to_all_deck(gameObj, timeout)
-  } else if (d === "set-weakest-hp-as-highest") {
+  } else if (d === EnemyDeathwish.SetWeakestHpAsHighest) {
     set_weakest_hp_as_highest(gameObj, timeout)
-  } else if (d === "spawn-faction-unit") {
+  } else if (d === EnemyDeathwish.SpawnFactionUnit) {
     sound_deathwish()
     spawn_faction_unit(deathwish_enemy as Enemy, gameObj, true, timeout) // а вот это из пассивок! один в один
-  } else if (d === "spawn-faction-unit-at-deck") {
+  } else if (d === EnemyDeathwish.SpawnFactionUnitAtDeck) {
     sound_deathwish()
     spawn_faction_unit_at_deck(deathwish_enemy as Enemy, gameObj, timeout) // а вот это из пассивок! один в один
-  } else if (d === "spawn-unit") {
+  } else if (d === EnemyDeathwish.SpawnUnit) {
     sound_deathwish()
     spawn_faction_unit(deathwish_enemy as Enemy, gameObj, false, timeout) // передаем false, чтобы взять вообще любого врага
   }

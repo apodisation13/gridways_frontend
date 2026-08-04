@@ -7,6 +7,7 @@ import {
   timeoutAnimationFlag,
 } from "@/logic/game_logic/timers"
 import type { Enemy, GameObj } from "@/types"
+import { EnemyPassive } from "@/types"
 
 export function deck_passives(
   enemy: Enemy,
@@ -21,9 +22,9 @@ export function deck_passives(
 
   timeoutAnimationFlag(enemies[0], "trigger_deck_passive", null, timeout * 0.5)
 
-  if (pea === "heal-random") {
+  if (pea === EnemyPassive.HealRandom) {
     heal_random(enemy, field, enemy_leader, timeout)
-  } else if (pea === "heal-self") {
+  } else if (pea === EnemyPassive.HealSelf) {
     heal_self(enemy, timeout)
   }
 }

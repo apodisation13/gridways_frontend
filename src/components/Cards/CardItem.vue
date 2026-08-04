@@ -83,6 +83,10 @@ export default defineComponent({
       type: Number,
       default: undefined,
     },
+    location: {
+      type: String as PropType<"hand" | "deck" | "grave" | "field" | null>,
+      default: null,
+    },
   },
   emits: ["open_card_modal"],
   data() {

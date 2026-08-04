@@ -65,6 +65,36 @@
             </div>
           </div>
         </transition>
+        <transition name="poison">
+          <div
+            v-if="card.passive_locking"
+            class="lock-overlay"
+            :style="{ '--flash-duration': flashDuration + 'ms' }"
+          >
+            <div class="poison-icon-wrap">
+              <img
+                class="lock-icon"
+                :src="require(`@/assets/icons/card/locked.svg`)"
+                alt="lock"
+              />
+            </div>
+          </div>
+        </transition>
+        <transition name="poison">
+          <div
+            v-if="card.passive_destroying"
+            class="destroy-overlay"
+            :style="{ '--flash-duration': flashDuration + 'ms' }"
+          >
+            <div class="poison-icon-wrap">
+              <img
+                class="destroy-icon"
+                :src="require(`@/assets/icons/card/destroy.svg`)"
+                alt="destroy"
+              />
+            </div>
+          </div>
+        </transition>
       </div>
       <!-- увеличение урона при ХОДЕ картой -->
       <div
@@ -104,7 +134,11 @@
           :damage="card.data.damage"
         />
         <card-ability-circle v-if="card.ability" :card="card" />
-        <card-passive v-if="card.passive_ability?.name" :card="card" />
+        <card-passive
+          v-if="card.passive_ability?.name"
+          :card="card"
+          :location="location"
+        />
         <card-charges
           v-if="'charges' in card.data"
           :charge="card.data.charges"
@@ -191,6 +225,10 @@ export default defineComponent({
     is_previev: {
       type: Boolean,
       default: false,
+    },
+    location: {
+      type: String as PropType<"hand" | "deck" | "grave" | "field" | null>,
+      default: null,
     },
   },
   computed: {
@@ -501,6 +539,46 @@ export default defineComponent({
     opacity: 0;
     transform: scale(1);
   }
+}
+
+.lock-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(80, 80, 80, 0.25);
+  border-radius: inherit;
+  --flash-duration: 500ms;
+  animation: poison-pulse var(--flash-duration, 500ms) ease-out forwards;
+}
+
+.lock-icon {
+  width: 3.5rem;
+  height: auto;
+  display: block;
+  animation: poison-icon-pop var(--flash-duration, 500ms) ease-out forwards;
+  filter: drop-shadow(0 0 8px rgba(200, 200, 200, 0.9));
+}
+
+.destroy-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(80, 80, 80, 0.25);
+  border-radius: inherit;
+  --flash-duration: 500ms;
+  animation: poison-pulse var(--flash-duration, 500ms) ease-out forwards;
+}
+
+.destroy-icon {
+  width: 3.5rem;
+  height: auto;
+  display: block;
+  animation: poison-icon-pop var(--flash-duration, 500ms) ease-out forwards;
+  filter: drop-shadow(0 0 8px rgba(200, 200, 200, 0.9));
 }
 
 .damage-overlay {

@@ -3,8 +3,13 @@
     <div
       v-if="!card || card.data?.passive?.timer === 0"
       class="passive-clock"
+      :class="{ 'passive-clock--inactive': !isActive }"
     ></div>
-    <div v-else class="passive-timer">
+    <div
+      v-else
+      class="passive-timer"
+      :class="{ 'passive-timer--inactive': !isActive }"
+    >
       <span class="passive-timer-value">{{ card.data.passive?.timer }}</span>
     </div>
   </div>
@@ -13,7 +18,8 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
 
-import type { Card, Enemy, Leader } from "@/types"
+import type { Card, CardLocation, Enemy, Leader } from "@/types"
+
 export default defineComponent({
   props: {
     card: {
@@ -24,6 +30,31 @@ export default defineComponent({
     inline: {
       type: Boolean,
       default: false,
+    },
+    location: {
+      type: String as PropType<CardLocation>,
+      default: null,
+    },
+  },
+  computed: {
+    isActive(): boolean {
+      if (!this.location || !this.card) return true
+
+      const passive = (this.card.data?.passive ?? {}) as Record<string, unknown>
+
+      const hasHand = !!passive.has_passive_in_hand
+      const hasDeck = !!passive.has_passive_in_deck
+      const hasGrave = !!passive.has_passive_in_grave
+      const hasField = !!passive.has_passive_in_field
+
+      if (!hasHand && !hasDeck && !hasGrave && !hasField) return true
+
+      if (this.location === "hand") return hasHand
+      if (this.location === "deck") return hasDeck
+      if (this.location === "grave") return hasGrave
+      if (this.location === "field") return hasField
+
+      return true
     },
   },
 })
@@ -65,11 +96,19 @@ export default defineComponent({
   background-image: url("~@/assets/icons/card/passive_clock.svg");
 }
 
+.passive-clock--inactive {
+  background-image: url("~@/assets/icons/card/passive_clock_inactive.svg");
+}
+
 .passive-timer {
   background-image: url("~@/assets/icons/card/passive_timer.svg");
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.passive-timer--inactive {
+  background-image: url("~@/assets/icons/card/passive_timer_inactive.svg");
 }
 
 .passive-timer-value {

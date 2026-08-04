@@ -8,6 +8,7 @@ import {
   timeoutAnimationFlag,
 } from "@/logic/game_logic/timers"
 import type { Enemy, GameObj } from "@/types"
+import { EnemyPassive } from "@/types"
 
 export function grave_passives(
   enemy: Enemy,
@@ -27,11 +28,11 @@ export function grave_passives(
     timeout * 0.5
   )
 
-  if (pea === "heal-random") {
+  if (pea === EnemyPassive.HealRandom) {
     heal_random(enemy, field, enemy_leader, timeout)
-  } else if (pea === "incr-self-dmg") {
+  } else if (pea === EnemyPassive.IncrSelfDmg) {
     incr_self_dmg(enemy, timeout)
-  } else if (pea === "incr-random-dmg") {
+  } else if (pea === EnemyPassive.IncrRandomDmg) {
     incr_random_dmg(enemy, field, timeout)
   }
 }

@@ -22,6 +22,8 @@ export interface CardData {
     default_timer?: number
     reset_timer?: boolean
     each_tick?: boolean
+    upon_beginning?: boolean
+    upon_playing_a_card?: boolean
   }
   multi?: {
     value: number
@@ -46,6 +48,7 @@ export interface LeaderData {
     default_timer?: number
     reset_timer?: boolean
     each_tick?: boolean
+    upon_playing_a_card?: boolean
   }
   multi?: {
     value: number
@@ -137,7 +140,9 @@ export interface Card {
   healing?: boolean | null
   p_dmg_delta?: number | null
   passive_poisoning?: boolean | null
+  passive_destroying?: boolean | null
   spawning?: boolean | null
+  passive_locking?: boolean | null
   p_damages_enemy?: boolean | null
   trigger_deck_passive?: boolean | null
   trigger_grave_passive?: boolean | null
@@ -154,10 +159,13 @@ export interface Leader {
   image: string
   newly_added: boolean
   // animation fields
+  dmg_delta?: number | null
   charges_delta?: number | null
   damages_enemy?: boolean | null
   p_damages_enemy?: boolean | null
   passive_poisoning?: boolean | null
+  passive_locking?: boolean | null
+  passive_destroying?: boolean | null
 }
 
 export interface Enemy {

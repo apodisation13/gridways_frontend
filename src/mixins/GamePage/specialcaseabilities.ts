@@ -5,6 +5,7 @@ import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
 import {
   change_card_charges,
+  enemy_as_card,
   remove_dead_card,
 } from "@/logic/player_move/service/service_for_player_move"
 import type { Card, CardEntry, Enemy, Leader } from "@/types"
@@ -148,6 +149,28 @@ export default defineComponent({
       } else if (ability === CardAbility.DrawExact) {
         // берем из колоды ЛЮБУЮ КАРТУ!
         if (this.calc_can_draw()) this.cards_pool = this.gameObj.deck
+      } else if (
+        ability === CardAbility.MoveEnemyFromDeckToHand ||
+        ability === CardAbility.MoveEnemyFromDeckToDeck
+      ) {
+        this.enemyView = true
+        this.cards_pool = this.gameObj.enemies
+        // сколько зарядов установить той карте врага, которую мы возьмем
+        this.special_case_value = this.selected_card?.data?.value || 0
+      } else if (ability === CardAbility.MoveEnemyFromGraveToDeck) {
+        this.enemyView = true
+        this.cards_pool = this.gameObj.enemies_grave
+        // сколько зарядов установить той карте врага, которую мы возьмем
+        this.special_case_value = this.selected_card?.data?.value || 0
+      } else if (ability === CardAbility.CreateEnemyAndPutToDeck) {
+        this.enemyView = true
+        const pool: Enemy[] = this.$store.getters["all_enemies"]
+        for (let i = 0; i < 3; i++) {
+          const r = choice_element(pool)
+          this.cards_pool.push(copyObj(r))
+        }
+        // сколько зарядов установить той карте врага, которую мы возьмем
+        this.special_case_value = this.selected_card?.data?.value || 0
       }
       this.ability = this.selected_card!.ability.name
       if (this.cards_pool.length) {
@@ -222,6 +245,34 @@ export default defineComponent({
       } else if (this.ability === CardAbility.DrawExact) {
         this.gameObj.deck.splice(this.gameObj.deck.indexOf(card as Card), 1)
         this.gameObj.hand.push(card as Card)
+      } else if (this.ability === CardAbility.MoveEnemyFromDeckToHand) {
+        this.gameObj.enemies.splice(
+          this.gameObj.enemies.indexOf(card as Enemy),
+          1
+        )
+        this.gameObj.hand.push(
+          enemy_as_card(card as Enemy, this.special_case_value!)
+        )
+      } else if (this.ability === CardAbility.MoveEnemyFromDeckToDeck) {
+        this.gameObj.enemies.splice(
+          this.gameObj.enemies.indexOf(card as Enemy),
+          1
+        )
+        this.gameObj.deck.push(
+          enemy_as_card(card as Enemy, this.special_case_value!)
+        )
+      } else if (this.ability === CardAbility.MoveEnemyFromGraveToDeck) {
+        this.gameObj.enemies_grave.splice(
+          this.gameObj.enemies_grave.indexOf(card as Enemy),
+          1
+        )
+        this.gameObj.deck.push(
+          enemy_as_card(card as Enemy, this.special_case_value!)
+        )
+      } else if (this.ability === CardAbility.CreateEnemyAndPutToDeck) {
+        this.gameObj.deck.push(
+          enemy_as_card(card as Enemy, this.special_case_value!)
+        )
       }
 
       // сбрасываем ИСХОДНУЮ карту, которой 1й раз играли

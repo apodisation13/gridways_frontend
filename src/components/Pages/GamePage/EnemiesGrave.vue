@@ -154,7 +154,7 @@
     <transition name="modal">
       <modal-window v-if="visible" v-touch:swipe.left="close_self">
         <button-close @close_self="close_self" />
-        <enemy-list :enemies="enemies_grave" />
+        <enemy-list :enemies="enemies_grave" location="grave" />
       </modal-window>
     </transition>
   </div>

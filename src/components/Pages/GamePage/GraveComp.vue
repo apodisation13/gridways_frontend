@@ -154,7 +154,7 @@
     <transition name="modal">
       <modal-window v-if="flag" v-touch:swipe="close_self">
         <button-close @close_self="close_self" />
-        <card-list-component :cards="graveEntries" />
+        <card-list-component :cards="graveEntries" location="grave" />
       </modal-window>
     </transition>
   </div>
