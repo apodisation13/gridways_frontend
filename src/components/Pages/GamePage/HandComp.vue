@@ -9,7 +9,12 @@
         @mousedown="handleCardMouseDown($event, index)"
         @touchstart="handleCardTouchStart($event, index)"
       >
-        <card-item :card="card" :index="index" class="card_in_hand" />
+        <card-item
+          :card="card"
+          :index="index"
+          class="card_in_hand"
+          location="hand"
+        />
       </div>
     </transition-group>
   </div>

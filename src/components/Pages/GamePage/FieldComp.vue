@@ -20,6 +20,7 @@
               in_cross_enemy_index === idx - 1 ||
               multi_locked_indices.includes(idx - 1)
             "
+            location="field"
           />
         </transition>
       </div>
