@@ -1,4 +1,5 @@
 import { choice, copyObj } from "@/lib/utils"
+import { enemySpawnsAtEmptyCell } from "@/logic/ai_move/effects_interaction"
 import { get_default_enemy } from "@/logic/ai_move/service/service_for_ai_move"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { sound_deathwish } from "@/logic/play_sounds"
@@ -6,7 +7,11 @@ import { get_empty_field_indexes } from "@/logic/player_move/service/service_for
 import type { Enemy, GameObj } from "@/types"
 
 // создает на поле deathwish_value копий убитого врага без deathwish в случайных свободных клетках
-export function spawn_self(enemy: Enemy, gameObj: GameObj): void {
+export function spawn_self(
+  enemy: Enemy,
+  gameObj: GameObj,
+  timeout = 1000
+): void {
   const defaultEnemy = get_default_enemy(enemy)
   if (!defaultEnemy) return
 
@@ -19,7 +24,12 @@ export function spawn_self(enemy: Enemy, gameObj: GameObj): void {
   for (let i = 0; i < spawn_self_count; i++) {
     const emptyField = get_empty_field_indexes(field)
     const randomIndex = choice(emptyField)
-    field[emptyField[randomIndex]] = copyObj(defaultEnemy)
+    enemySpawnsAtEmptyCell(
+      copyObj(defaultEnemy),
+      emptyField[randomIndex],
+      gameObj,
+      timeout
+    )
   }
 }
 

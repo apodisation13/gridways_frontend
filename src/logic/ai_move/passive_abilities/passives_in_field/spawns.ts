@@ -1,4 +1,5 @@
 import { choice, choice_element, copyObj } from "@/lib/utils"
+import { enemySpawnsAtEmptyCell } from "@/logic/ai_move/effects_interaction"
 import {
   create_token,
   create_token_with_passive,
@@ -41,13 +42,14 @@ export function spawn_tokens_in_deck(
 // создаёт токен этого врага, снимает у того пассивную способность и помещает его на случайную свободную клетку
 export function spawn_token(
   enemy: Enemy,
-  field: (Enemy | "")[],
+  gameObj: GameObj,
   timeout = 1000
 ): void {
+  const { field } = gameObj
   const token = create_token(enemy)
   const emptyField = get_empty_field_indexes(field)
   const randomIndex = choice(emptyField)
-  field[emptyField[randomIndex]] = copyObj(token)
+  enemySpawnsAtEmptyCell(copyObj(token), emptyField[randomIndex], gameObj)
   sound_appear_new_enemy()
   timeoutAnimationFlag(enemy, "spawning", null, timeout * 0.5)
 }
@@ -67,7 +69,7 @@ export function spawn_random_token(
   const token = create_token_with_passive(random_enemy)
   const emptyField = get_empty_field_indexes(field)
   const randomIndex = choice(emptyField)
-  field[emptyField[randomIndex]] = copyObj(token)
+  enemySpawnsAtEmptyCell(copyObj(token), emptyField[randomIndex], gameObj)
   sound_appear_new_enemy()
   timeoutAnimationFlag(enemy, "spawning", null, timeout * 0.5)
 }
@@ -94,7 +96,11 @@ export function spawn_faction_unit(
 
   const emptyField = get_empty_field_indexes(field)
   const randomIndex = choice(emptyField)
-  field[emptyField[randomIndex]] = copyObj(random_enemy)
+  enemySpawnsAtEmptyCell(
+    copyObj(random_enemy),
+    emptyField[randomIndex],
+    gameObj
+  )
   sound_appear_new_enemy()
   timeoutAnimationFlag(enemy, "spawning", null, timeout * 0.5)
 }
