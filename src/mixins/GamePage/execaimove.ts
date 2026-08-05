@@ -26,7 +26,7 @@ export default defineComponent({
         if (!this.$store.state.game.ppa_end_turn) {
           console.log("закончили ppa_end_turn, начинает ходить комп")
           clearInterval(await_ppa_end_turn)
-          ai_move(this.gameObj.field, timeout)
+          ai_move(this.gameObj, timeout)
 
           const await_ai_move = setInterval(() => {
             if (!this.$store.state.game.ai_move) {
@@ -40,7 +40,7 @@ export default defineComponent({
                     "всё закончили, щас появится новый враг и можно ходить снова"
                   )
                   clearInterval(await_epa_end_turn)
-                  appear_new_enemy(this.gameObj.field, this.gameObj.enemies)
+                  appear_new_enemy(this.gameObj, timeout)
                   this.isActive.player_cards = true
                   this.can_draw = this.calc_can_draw()
                   this.$store.commit("set_player_turn", true)
