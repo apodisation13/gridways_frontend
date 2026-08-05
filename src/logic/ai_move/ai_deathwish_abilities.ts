@@ -36,9 +36,9 @@ export function deathwish(
 
   const d = deathwish_enemy.deathwish?.name
   if (d === EnemyDeathwish.SpawnSelf)
-    spawn_self(deathwish_enemy as Enemy, gameObj)
+    spawn_self(deathwish_enemy as Enemy, gameObj, timeout)
   else if (d === EnemyDeathwish.SpawnTokens)
-    spawn_tokens(deathwish_enemy as Enemy, gameObj)
+    spawn_tokens(deathwish_enemy as Enemy, gameObj, timeout)
   else if (d === EnemyDeathwish.IncrDmgToHandByValue) {
     deathwish_incr_dmg_to_all_hand(deathwish_enemy as Enemy, gameObj, timeout)
   } else if (d === EnemyDeathwish.HealAll)
