@@ -1,5 +1,7 @@
 import Upgrades from "@/store/modules/upgrades"
 
+import type { EffectObject } from "./game"
+
 export interface CardData {
   damage: number
   charges: number
@@ -28,6 +30,7 @@ export interface CardData {
   multi?: {
     value: number
   }
+  field_interaction: EffectObject | null
 }
 
 export interface LeaderData {
@@ -53,6 +56,7 @@ export interface LeaderData {
   multi?: {
     value: number
   }
+  field_interaction: EffectObject | null
 }
 
 export interface EnemyData {

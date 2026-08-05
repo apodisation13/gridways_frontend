@@ -2,6 +2,18 @@ import type { Card, Enemy, EnemyLeader, Leader } from "./database"
 
 export type CardLocation = "hand" | "deck" | "grave" | "field" | null
 
+export enum EffectType {
+  Mine = "mine",
+  Rain = "rain",
+}
+
+export type EffectObject = {
+  type: EffectType
+  damage?: number
+  turns?: number
+  times_count?: number
+}
+
 export interface GameObj {
   deck: Card[]
   hand: Card[]
@@ -11,6 +23,7 @@ export interface GameObj {
   enemy_leader: EnemyLeader
   enemies: Enemy[]
   enemies_grave: Enemy[]
+  effects: (EffectObject | "")[]
 }
 
 export interface IsActive {
