@@ -1,3 +1,4 @@
+import { decrementEffectTurns } from "@/logic/ai_move/effects_interaction"
 import { down_move } from "@/logic/ai_move/moves/move_down"
 import { random_move } from "@/logic/ai_move/moves/move_random"
 import { right_move } from "@/logic/ai_move/moves/move_right"
@@ -9,7 +10,8 @@ import store from "@/store"
 import type { Enemy, GameObj } from "@/types"
 import { EnemyMove } from "@/types"
 
-export function ai_move(field: (Enemy | "")[], timeout = 1000): void {
+export function ai_move(gameObj: GameObj, timeout = 1000): void {
+  const { field } = gameObj
   store.commit("set_ai_move", true)
   set_already_jumped(field) // установить false параметр enemy.already_jumped
 
@@ -20,20 +22,23 @@ export function ai_move(field: (Enemy | "")[], timeout = 1000): void {
   let id = setInterval(() => {
     if (i === enemies.length) {
       clearInterval(id)
+      decrementEffectTurns(gameObj)
       store.commit("set_ai_move", false)
     } else {
       // ДИСПЕТЧЕР способностей хода врагов
-      if ((enemies[i] as Enemy).move.name === EnemyMove.Stand) {
-        stand_still(field, field.indexOf(enemies[i] as Enemy), timeout)
+      const idx = field.indexOf(enemies[i] as Enemy)
+      const move = (enemies[i] as Enemy).move.name
+      if (move === EnemyMove.Stand) {
+        stand_still(field, idx, gameObj, timeout)
       } else if (
-        (enemies[i] as Enemy).move.name === EnemyMove.Random &&
+        move === EnemyMove.Random &&
         !(enemies[i] as Enemy).already_jumped
       ) {
-        random_move(field, field.indexOf(enemies[i] as Enemy), timeout)
-      } else if ((enemies[i] as Enemy).move.name === EnemyMove.Down) {
-        down_move(field, field.indexOf(enemies[i] as Enemy), timeout)
-      } else if ((enemies[i] as Enemy).move.name === EnemyMove.Right) {
-        right_move(field, field.indexOf(enemies[i] as Enemy), timeout)
+        random_move(field, idx, gameObj, timeout)
+      } else if (move === EnemyMove.Down) {
+        down_move(field, idx, gameObj, timeout)
+      } else if (move === EnemyMove.Right) {
+        right_move(field, idx, gameObj, timeout)
       }
 
       i += 1
