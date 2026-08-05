@@ -97,6 +97,7 @@ export function enemy_as_card(enemy: Enemy, charges: number): Card {
       },
       passive: {},
       value: enemy.data.value,
+      field_interaction: null,
     },
     image: enemy.image,
     newly_added: false,
