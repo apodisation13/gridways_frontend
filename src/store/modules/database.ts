@@ -15,6 +15,8 @@ import {
   CardsResponse,
   Deck,
   DeckEntry,
+  EffectInfo,
+  EffectType,
   Enemy,
   EnemyLeader,
   Faction,
@@ -61,6 +63,8 @@ interface DatabaseState {
   leadersdb: Map<number, Leader>
   enemiesdb: Record<number, Enemy>
   enemyleadersdb: Record<number, EnemyLeader>
+
+  effectsInfo: Partial<Record<EffectType, EffectInfo>>
 }
 
 const state: DatabaseState = {
@@ -85,6 +89,8 @@ const state: DatabaseState = {
   leadersdb: new Map<number, Leader>(),
   enemiesdb: {},
   enemyleadersdb: {},
+
+  effectsInfo: {},
 }
 
 const getters = {
@@ -160,6 +166,8 @@ const getters = {
   gold_enemies: (state: DatabaseState) =>
     state.enemies.filter(e => e.color === "Gold"),
   all_enemy_leaders: (state: DatabaseState) => state.enemy_leaders,
+
+  effectsInfo: (state: DatabaseState) => state.effectsInfo,
 }
 
 const mutations = {
@@ -257,6 +265,13 @@ const mutations = {
       stats: userSeason.stats,
     }))
   },
+
+  setEffectsInfo(
+    state: DatabaseState,
+    effects_info: Record<EffectType, EffectInfo>
+  ) {
+    state.effectsInfo = effects_info
+  },
 }
 
 const actions = {
@@ -315,6 +330,7 @@ const actions = {
         random_level_enemies_count: game_const.random_level_enemies_count,
         max_random_n_enemies: game_const.max_random_n_enemies,
       }) // распределение рандомных врагов
+      commit("setEffectsInfo", game_const.effects)
       commit("set_resources_transitions", game_const.resources_transitions) // покупка/продажа ресурсов
       commit("set_keys_rewards", game_const.keys_rewards) // награды за открытие ключей
       commit("set_win_level_rewards", game_const.win_level_rewards) // награды за прохождение уровня

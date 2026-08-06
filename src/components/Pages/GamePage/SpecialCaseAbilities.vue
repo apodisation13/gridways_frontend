@@ -91,6 +91,10 @@ export default defineComponent({
     "enemy_in_cross",
     "enemy_in_cross_locked",
     "target_enemy_multi",
+    "target_empty_cell",
+    "target_empty_cell_multi",
+    "cell_in_cross",
+    "cell_in_cross_locked",
   ],
 
   data() {
@@ -127,19 +131,38 @@ export default defineComponent({
       const leaderCount = (this.enemy_leader?.data?.hp ?? 0) > 0 ? 1 : 0
       return Math.min(rawCount, fieldCount + leaderCount)
     },
+    _resolveMulti(card: Card): {
+      multiCount: number
+      isFieldInteraction: boolean
+    } {
+      const rawCount = card.data.multi?.value ?? 0
+      const isFieldInteraction = !!card.data.field_interaction
+      if (isFieldInteraction && rawCount > 1) {
+        const emptyCells = (this.field || []).filter(f => f === "").length
+        return {
+          multiCount: Math.min(rawCount, emptyCells),
+          isFieldInteraction,
+        }
+      }
+      return {
+        multiCount: this.effectiveMultiCount(rawCount),
+        isFieldInteraction,
+      }
+    },
     handleCardMouseDown(e: MouseEvent): void {
       e.preventDefault()
       e.stopPropagation()
       const faction = (this.pickedCard ?? this.pickedEnemy)?.faction
-      const multiCount = this.effectiveMultiCount(
-        this.pickedCard?.data?.multi?.value ?? 0
-      )
+      const { multiCount, isFieldInteraction } = this.pickedCard
+        ? this._resolveMulti(this.pickedCard)
+        : { multiCount: this.effectiveMultiCount(0), isFieldInteraction: false }
       ;(this as any).beginArrowDrawing(
         e.currentTarget,
         e.clientX,
         e.clientY,
         faction,
-        multiCount
+        multiCount,
+        isFieldInteraction
       )
     },
     handleCardTouchStart(e: TouchEvent): void {
@@ -147,15 +170,16 @@ export default defineComponent({
       e.stopPropagation()
       const touch = e.touches[0]
       const faction = (this.pickedCard ?? this.pickedEnemy)?.faction
-      const multiCount = this.effectiveMultiCount(
-        this.pickedCard?.data?.multi?.value ?? 0
-      )
+      const { multiCount, isFieldInteraction } = this.pickedCard
+        ? this._resolveMulti(this.pickedCard)
+        : { multiCount: this.effectiveMultiCount(0), isFieldInteraction: false }
       ;(this as any).beginArrowDrawing(
         e.currentTarget,
         touch.clientX,
         touch.clientY,
         faction,
-        multiCount
+        multiCount,
+        isFieldInteraction
       )
     },
 

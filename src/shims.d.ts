@@ -13,8 +13,10 @@ declare module '@vue/runtime-core' {
     selected_card: Card | Leader | null
     can_draw: boolean
     draw: boolean
+    sca: boolean
     setActive(): void
     calc_can_draw(): boolean
     draw_one_card(): void
+    afterDamage(): void
   }
 }

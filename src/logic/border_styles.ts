@@ -1,6 +1,6 @@
-import type { Card, Enemy, EnemyLeader, Leader } from "@/types"
+import { Card, CardAbility, Enemy, EnemyLeader, Leader } from "@/types"
 
-function border_for_card(card: Card | Enemy): Record<string, string> {
+export function border_for_card(card: Card | Enemy): Record<string, string> {
   if (card.color === "Bronze") {
     return {
       // padding: "1px",
@@ -23,7 +23,7 @@ function border_for_card(card: Card | Enemy): Record<string, string> {
   return {}
 }
 
-function card_margin(card: Card | Enemy): Record<string, string> {
+export function card_margin(card: Card | Enemy): Record<string, string> {
   if ((card as Enemy).damages_player) return { border: "outset 4px red" } // враг наносит урон игроку
   if ((card as Card).damages_enemy) return { border: "outset 4px orange" } // карта игрока наносит урон врагу
   if (card.incr_dmg) return { border: "outset 4px purple" } // карта игрока или враг увеличивают свой урон
@@ -48,7 +48,9 @@ function card_margin(card: Card | Enemy): Record<string, string> {
   }
 }
 
-function border_leader(leader: Leader | EnemyLeader): Record<string, string> {
+export function border_leader(
+  leader: Leader | EnemyLeader
+): Record<string, string> {
   if (leader.faction === "Soldiers") return { border: "solid 3px blue" }
   else if (leader.faction === "Monsters") return { border: "solid 3px red" }
   else if (leader.faction === "Animals") return { border: "solid 3px green" }
@@ -56,7 +58,7 @@ function border_leader(leader: Leader | EnemyLeader): Record<string, string> {
 }
 
 // задний фон значка урона для всех карт и значка пассивок
-function background_color(card: Card | Enemy): Record<string, string> {
+export function background_color(card: Card | Enemy): Record<string, string> {
   if (card.faction === "Soldiers") {
     if (card.color === "Bronze") return { backgroundColor: "blue" }
     else if (card.color === "Silver") {
@@ -88,7 +90,7 @@ function background_color(card: Card | Enemy): Record<string, string> {
   } else return {}
 }
 
-function background_color_hp(color: string): string {
+export function background_color_hp(color: string): string {
   switch (color) {
     case "Bronze":
       return "#a9916e"
@@ -101,7 +103,7 @@ function background_color_hp(color: string): string {
   }
 }
 
-function background_color_charges(color: string): string {
+export function background_color_charges(color: string): string {
   switch (color) {
     case "Bronze":
       return "#857359"
@@ -114,7 +116,7 @@ function background_color_charges(color: string): string {
   }
 }
 
-function background_color_leader(factionColor: string): string {
+export function background_color_leader(factionColor: string): string {
   switch (factionColor) {
     case "Soldiers":
       return "blue"
@@ -129,7 +131,7 @@ function background_color_leader(factionColor: string): string {
   }
 }
 
-function background_color_deck(deck: {
+export function background_color_deck(deck: {
   leader?: { faction: string } | null
 }): Record<string, string> {
   if (deck.leader?.faction === "Soldiers") return { backgroundColor: "blue" }
@@ -142,58 +144,59 @@ function background_color_deck(deck: {
 
 // используется для определения значка способности в зависимости от способности карты
 // сейчас юзается в CardModal/CardDescriptions
-function ability_icon(ability: string): string {
-  if (ability === "damage-all")
+export function ability_icon(ability: string): string {
+  if (ability === CardAbility.DamageAll)
     return `url(${require("@/assets/icons/card/all_attack.svg")})`
-  else if (ability === "heal")
+  else if (ability === CardAbility.Heal)
     return `url(${require("@/assets/icons/card/emerald.svg")})`
-  else if (ability === "damage-row")
+  else if (ability === CardAbility.DamageRow)
     return `url(${require("@/assets/icons/card/row_attack.svg")})`
-  else if (ability === "damage-column")
+  else if (ability === CardAbility.DamageColumn)
     return `url(${require("@/assets/icons/card/column_attack.svg")})`
-  else if (ability === "spread-damage")
+  else if (ability === CardAbility.SpreadDamage)
     return `url(${require("@/assets/icons/card/spread_attack.svg")})`
-  else if (ability === "lock")
+  else if (ability === CardAbility.Lock)
     return `url(${require("@/assets/icons/card/locked.svg")})`
   else if (
-    ability === "destroy-highest-hp" ||
-    ability === "destroy-highest-damage" ||
-    ability === "destroy-random" ||
-    ability === "destroy-all-same-hp" ||
-    ability === "destroy-random-enemy-in-deck"
+    ability === CardAbility.DestroyHighestHp ||
+    ability === CardAbility.DestroyHighestDamage ||
+    ability === CardAbility.DestroyRandom ||
+    ability === CardAbility.DestroyAllSameHp ||
+    ability === CardAbility.DestroyRandomEnemyInDeck ||
+    ability === CardAbility.DestroyAllWithPassive ||
+    ability === CardAbility.DestroyWithStatus ||
+    ability === CardAbility.DestroyWithDeathwish ||
+    ability === CardAbility.DestroyWithPassive ||
+    ability === CardAbility.DestroyAllWithDeathwish
   )
     return `url(${require("@/assets/icons/card/destroy.svg")})`
   else if (
-    ability === "resurrect" ||
-    ability === "draw-two-cards" ||
-    ability === "give-charges-to-card-in-hand-1" ||
-    ability === "play-from-deck" ||
-    ability === "discard-draw-2" ||
-    ability === "play-from-grave" ||
-    ability === "incr-dmg-to-hand-by-self-dmg" ||
-    ability === "play-enemy-from-grave" ||
-    ability === "play-special-from-deck" ||
-    ability === "play-special-from-grave" ||
-    ability === "decr-dmg-to-hand-incr-to-random-hand" ||
-    ability === "incr-dmg-by-n-charges" ||
-    ability === "create-special" ||
-    ability === "create-any-unit" ||
-    ability === "create-and-put-to-deck" ||
-    ability === "draw-exact"
+    ability === CardAbility.Resurrect ||
+    ability === CardAbility.DrawTwoCards ||
+    ability === CardAbility.GiveChargesToCardInHand1 ||
+    ability === CardAbility.PlayFromDeck ||
+    ability === CardAbility.DiscardDraw2 ||
+    ability === CardAbility.PlayFromDeck ||
+    ability === CardAbility.IncrDmgToHandBySelfDmg ||
+    ability === CardAbility.PlayEnemyFromGrave ||
+    ability === CardAbility.PlaySpecialFromDeck ||
+    ability === CardAbility.PlaySpecialFromGrave ||
+    ability === CardAbility.DecrDmgToHandIncrToRandomHand ||
+    ability === CardAbility.IncrDmgByNCharges ||
+    ability === CardAbility.CreateSpecial ||
+    ability === CardAbility.CreateAnyUnit ||
+    ability === CardAbility.CreateAndPutToDeck ||
+    ability === CardAbility.DrawExact ||
+    ability === CardAbility.MoveEnemyFromDeckToHand
   )
     return `url(${require("@/assets/icons/card/additional_card.svg")})`
-  else if (
-    ability === "move-enemy" ||
-    ability === "set-enemy-as-token" ||
-    ability === "place-self-in-field" ||
-    ability === "spawn-effect-in-row"
-  )
+  else if (ability === CardAbility.SpawnEffectInRow)
     return `url(${require("@/assets/icons/card/field_interaction.svg")})`
   else return `url(${require("@/assets/icons/card/sword.svg")})`
 }
 
 // цвета доступных тем в игре, рамки
-function styleOuter(el: number): Record<string, string> | undefined {
+export function styleOuter(el: number): Record<string, string> | undefined {
   if (el === 1)
     // зеленый
     return {
@@ -220,7 +223,7 @@ function styleOuter(el: number): Record<string, string> | undefined {
     }
 }
 
-function styleWrapper(el: number): Record<string, string> | undefined {
+export function styleWrapper(el: number): Record<string, string> | undefined {
   if (el === 1)
     // зеленый
     return {
@@ -242,18 +245,4 @@ function styleWrapper(el: number): Record<string, string> | undefined {
       background:
         "linear-gradient(180deg, #FF00E5 -45.45%, #821A71 49.76%, #FF00E5 133.33%)",
     }
-}
-
-export {
-  ability_icon,
-  background_color,
-  background_color_charges,
-  background_color_deck,
-  background_color_hp,
-  background_color_leader,
-  border_for_card,
-  border_leader,
-  card_margin,
-  styleOuter,
-  styleWrapper,
 }

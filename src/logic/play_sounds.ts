@@ -79,3 +79,27 @@ export function sound_deathwish(): void {
 export function sound_timer_down(): void {
   sound("./../../audio/sounds/timer_count_down.wav")
 }
+
+export function mine_placed(): void {
+  sound("./../../audio/sounds/mine_placed.mp3")
+}
+
+export function mine_triggerred(): void {
+  sound("./../../audio/sounds/mine_triggerred.mp3")
+}
+
+export function rain_applied(): void {
+  sound("./../../audio/sounds/rain_applied.mp3")
+}
+
+export function rain_triggerred(): void {
+  sound("./../../audio/sounds/rain_triggerred.mp3")
+}
+
+export function veil_placed(): void {
+  sound("./../../audio/sounds/veil_placed.mp3")
+}
+
+export function veil_triggerred(): void {
+  sound("./../../audio/sounds/veil_triggerred.mp3")
+}

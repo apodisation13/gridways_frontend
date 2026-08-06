@@ -1,6 +1,6 @@
 import Upgrades from "@/store/modules/upgrades"
 
-import type { EffectObject } from "./game"
+import { EffectObject, EffectType } from "./game"
 
 export interface CardData {
   damage: number
@@ -377,6 +377,7 @@ export interface GameConst {
   arena_upgrades: Record<string, unknown>
   arena_params: ArenaParams
   multiplayer: Multiplayer
+  effects: Record<EffectType, EffectInfo>
 }
 
 export interface Faction {
@@ -431,4 +432,9 @@ export interface SeasonEntry {
   finished: boolean | null
   season: MappedSeason
   stats: Stats
+}
+
+export interface EffectInfo {
+  description: string
+  title: string
 }

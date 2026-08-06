@@ -5,13 +5,20 @@ export type CardLocation = "hand" | "deck" | "grave" | "field" | null
 export enum EffectType {
   Mine = "mine",
   Rain = "rain",
+  Spikes = "spikes",
+  Veil = "veil",
+  Purify = "purify",
+  Lock = "lock",
+  Heal = "heal",
+  IncrDmg = "incr_dmg",
 }
 
 export type EffectObject = {
   type: EffectType
-  damage?: number
+  value?: number
   turns?: number
   times_count?: number
+  negative?: boolean
 }
 
 export interface GameObj {

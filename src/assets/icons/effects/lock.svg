@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+  <rect width="100" height="100" fill="rgba(8,5,3,0.28)"/>
+
+  <!-- lock 1, medium (cx=14) -->
+  <g>
+    <path d="M 10,-8 L 10,-11 Q 10,-14 14,-14 Q 18,-14 18,-11 L 18,-8" fill="none" stroke="#c0a050" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="7" y="-8" width="14" height="8" rx="2" fill="#7a7040" stroke="#b09040" stroke-width="0.9"/>
+    <circle cx="14" cy="-4" r="1.6" fill="#1a0e04"/>
+    <rect x="13.2" y="-4" width="1.6" height="2.8" rx="0.7" fill="#1a0e04"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 150" dur="2.8s" begin="0s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- lock 2, small (cx=32) -->
+  <g>
+    <path d="M 29,-7 L 29,-9.5 Q 29,-12 32,-12 Q 35,-12 35,-9.5 L 35,-7" fill="none" stroke="#b89848" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="26" y="-7" width="12" height="7" rx="1.5" fill="#6e6838" stroke="#a08838" stroke-width="0.8"/>
+    <circle cx="32" cy="-3.5" r="1.4" fill="#1a0e04"/>
+    <rect x="31.3" y="-3.5" width="1.4" height="2.5" rx="0.6" fill="#1a0e04"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 150" dur="3.5s" begin="0.6s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- lock 3, large (cx=51) -->
+  <g>
+    <path d="M 46,-10 L 46,-13.5 Q 46,-17 51,-17 Q 56,-17 56,-13.5 L 56,-10" fill="none" stroke="#d0aa58" stroke-width="2.2" stroke-linecap="round"/>
+    <rect x="44" y="-10" width="14" height="10" rx="2.5" fill="#8a7848" stroke="#c09848" stroke-width="1"/>
+    <circle cx="51" cy="-5" r="2" fill="#1a0e04"/>
+    <rect x="50" y="-5" width="2" height="3.5" rx="0.9" fill="#1a0e04"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 150" dur="2.2s" begin="1.3s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- lock 4, medium (cx=68) -->
+  <g>
+    <path d="M 64,-8 L 64,-11 Q 64,-14 68,-14 Q 72,-14 72,-11 L 72,-8" fill="none" stroke="#c0a050" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="61" y="-8" width="14" height="8" rx="2" fill="#7a7040" stroke="#b09040" stroke-width="0.9"/>
+    <circle cx="68" cy="-4" r="1.6" fill="#1a0e04"/>
+    <rect x="67.2" y="-4" width="1.6" height="2.8" rx="0.7" fill="#1a0e04"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 150" dur="3.8s" begin="0.9s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- lock 5, small (cx=84) -->
+  <g>
+    <path d="M 81,-7 L 81,-9.5 Q 81,-12 84,-12 Q 87,-12 87,-9.5 L 87,-7" fill="none" stroke="#b09048" stroke-width="1.5" stroke-linecap="round"/>
+    <rect x="78" y="-7" width="12" height="7" rx="1.5" fill="#706838" stroke="#a08038" stroke-width="0.8"/>
+    <circle cx="84" cy="-3.5" r="1.4" fill="#1a0e04"/>
+    <rect x="83.3" y="-3.5" width="1.4" height="2.5" rx="0.6" fill="#1a0e04"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 150" dur="2.5s" begin="1.8s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- lock 6, medium-small (cx=21) -->
+  <g>
+    <path d="M 17.5,-8 L 17.5,-10.5 Q 17.5,-13 21,-13 Q 24.5,-13 24.5,-10.5 L 24.5,-8" fill="none" stroke="#b89848" stroke-width="1.6" stroke-linecap="round"/>
+    <rect x="14.5" y="-8" width="13" height="8" rx="1.8" fill="#726e38" stroke="#a28838" stroke-width="0.9"/>
+    <circle cx="21" cy="-4" r="1.5" fill="#1a0e04"/>
+    <rect x="20.2" y="-4" width="1.5" height="2.6" rx="0.6" fill="#1a0e04"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 150" dur="4.1s" begin="2.6s" repeatCount="indefinite"/>
+  </g>
+</svg>
