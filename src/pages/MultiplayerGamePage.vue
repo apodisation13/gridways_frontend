@@ -49,6 +49,7 @@
              @exec_damage_ai_card — когда игрок кликает по врагу на поле. -->
         <field-comp
           :field="gameObj.field"
+          :effects="gameObj.effects"
           :in_cross_enemy_index="inCrossEnemyIndex"
           :multi_locked_indices="multiLockedIndices"
           @exec_damage_ai_card="exec_damage_enemy_card"
@@ -1019,7 +1020,7 @@ export default defineComponent({
           setTimeout(() => this.sendGameState(), timeout + 100)
 
           // Шаг 2: ход врагов (AI)
-          ai_move(this.gameObj.field, timeout)
+          ai_move(this.gameObj, timeout)
 
           const await_ai = setInterval(() => {
             if (!this.$store.state.game.ai_move) {
@@ -1036,8 +1037,8 @@ export default defineComponent({
                   this.sendGameState()
 
                   // Шаг 4: выходит новый враг из очереди (если есть)
-                  appear_new_enemy(this.gameObj.field, this.gameObj.enemies)
-                  appear_new_enemy(this.gameObj.field, this.gameObj.enemies)
+                  appear_new_enemy(this.gameObj, timeout)
+                  appear_new_enemy(this.gameObj, timeout)
 
                   // Шаг 5: ждём пока все таймеры удаления мёртвых врагов сработают,
                   // затем шлём финальный стейт и передаём ход напарник

@@ -5,6 +5,11 @@
         v-for="idx in 12"
         :key="idx - 1"
         class="cell"
+        :class="[
+          'cell-' + (idx - 1),
+          { 'cell--in-cross': in_cross_cell_index === idx - 1 },
+          { 'cell--locked': multi_locked_cell_indices.includes(idx - 1) },
+        ]"
         @dblclick="exec_damage_ai_card(idx - 1)"
         @contextmenu.prevent
       >
@@ -23,6 +28,11 @@
             location="field"
           />
         </transition>
+        <effect-comp
+          v-if="effects[idx - 1]"
+          :effect-object="effects[idx - 1] as EffectObject"
+          :has-enemy="!!field[idx - 1]"
+        />
       </div>
     </div>
   </div>
@@ -32,15 +42,20 @@
 import { defineComponent, type PropType } from "vue"
 
 import EnemyComp from "@/components/Cards/EnemyComp.vue"
-import type { Enemy } from "@/types"
+import EffectComp from "@/components/Pages/GamePage/EffectComp.vue"
+import type { EffectObject, Enemy } from "@/types"
 
 export default defineComponent({
   name: "FieldComp",
-  components: { EnemyComp },
+  components: { EnemyComp, EffectComp },
   props: {
     field: {
       required: true,
       type: Array as PropType<(Enemy | "")[]>,
+    },
+    effects: {
+      required: true,
+      type: Array as PropType<(EffectObject | "")[]>,
     },
     in_cross_enemy_index: {
       required: false,
@@ -48,6 +63,16 @@ export default defineComponent({
       type: Number as unknown as PropType<number | null>,
     },
     multi_locked_indices: {
+      required: false,
+      default: () => [],
+      type: Array as PropType<number[]>,
+    },
+    in_cross_cell_index: {
+      required: false,
+      default: null,
+      type: Number as unknown as PropType<number | null>,
+    },
+    multi_locked_cell_indices: {
       required: false,
       default: () => [],
       type: Array as PropType<number[]>,
@@ -117,12 +142,66 @@ export default defineComponent({
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(4, 1fr);
   width: 100%;
-  height: 100%;
+  height: 98%;
 }
 
 .cell {
-  overflow: hidden;
+  overflow: visible;
   padding: 3px;
+  position: relative;
+}
+
+.cell--in-cross::after,
+.cell--locked::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  width: min(calc(100% - 6px), calc(var(--vh, 1vh) * 11.5));
+  aspect-ratio: 1 / 1.43;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.cell--in-cross::after {
+  animation: cell-in-cross 1.2s ease-in-out infinite;
+}
+
+.cell--locked::after {
+  box-shadow:
+    inset 0 0 0 2px rgba(79, 195, 240, 0.8),
+    inset 0 0 12px rgba(79, 195, 240, 0.3);
+}
+
+@keyframes cell-in-cross {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 0 2px rgba(247, 37, 133, 0.5),
+      inset 0 0 10px rgba(247, 37, 133, 0.2);
+  }
+  20% {
+    box-shadow:
+      inset 0 0 0 2px rgba(247, 37, 133, 0.9),
+      inset 0 0 20px rgba(247, 37, 133, 0.5);
+  }
+  40% {
+    box-shadow:
+      inset 0 0 0 2px rgba(79, 195, 240, 0.9),
+      inset 0 0 20px rgba(79, 195, 240, 0.5);
+  }
+  60% {
+    box-shadow:
+      inset 0 0 0 2px rgba(247, 37, 133, 0.7),
+      inset 0 0 14px rgba(247, 37, 133, 0.4);
+  }
+  80% {
+    box-shadow:
+      inset 0 0 0 2px rgba(79, 195, 240, 0.7),
+      inset 0 0 14px rgba(79, 195, 240, 0.4);
+  }
 }
 
 .cell :deep(.card-enemy-component) {

@@ -51,6 +51,10 @@ export default defineComponent({
     "enemy_in_cross",
     "enemy_in_cross_locked",
     "target_enemy_multi",
+    "target_empty_cell",
+    "target_empty_cell_multi",
+    "cell_in_cross",
+    "cell_in_cross_locked",
   ],
   mounted() {
     ;(this as any).initArrowCanvas(9998)
@@ -67,6 +71,21 @@ export default defineComponent({
       const leaderCount = (this.enemy_leader?.data?.hp ?? 0) > 0 ? 1 : 0
       return Math.min(rawCount, fieldCount + leaderCount)
     },
+    _resolveMulti(): { multiCount: number; isFieldInteraction: boolean } {
+      const rawCount = this.leader.data.multi?.value ?? 0
+      const isFieldInteraction = !!this.leader.data.field_interaction
+      if (isFieldInteraction && rawCount > 1) {
+        const emptyCells = (this.field || []).filter(f => f === "").length
+        return {
+          multiCount: Math.min(rawCount, emptyCells),
+          isFieldInteraction,
+        }
+      }
+      return {
+        multiCount: this.effectiveMultiCount(rawCount),
+        isFieldInteraction,
+      }
+    },
     handleCardMouseDown(e: MouseEvent): void {
       e.preventDefault()
       e.stopPropagation()
@@ -74,15 +93,14 @@ export default defineComponent({
       const el = document.querySelector(".leader-comp")
       if (!el) return
       this.$emit("exec_leader")
-      const multiCount = this.effectiveMultiCount(
-        this.leader.data?.multi?.value ?? 0
-      )
+      const { multiCount, isFieldInteraction } = this._resolveMulti()
       ;(this as any).beginArrowDrawing(
         el,
         e.clientX,
         e.clientY,
         this.leader.faction,
-        multiCount
+        multiCount,
+        isFieldInteraction
       )
     },
     handleCardTouchStart(e: TouchEvent): void {
@@ -93,15 +111,14 @@ export default defineComponent({
       if (!el) return
       const touch = e.touches[0]
       this.$emit("exec_leader")
-      const multiCount = this.effectiveMultiCount(
-        this.leader.data?.multi?.value ?? 0
-      )
+      const { multiCount, isFieldInteraction } = this._resolveMulti()
       ;(this as any).beginArrowDrawing(
         el,
         touch.clientX,
         touch.clientY,
         this.leader.faction,
-        multiCount
+        multiCount,
+        isFieldInteraction
       )
     },
   },
