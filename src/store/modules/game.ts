@@ -1,5 +1,3 @@
-import { useToast } from "vue-toastification"
-
 import type {
   ActionContext,
   DeckCardEntry,
@@ -11,8 +9,6 @@ import type {
   MappedSeason,
   MappedUserLevel,
 } from "@/types"
-
-const toast = useToast()
 
 export interface GameState {
   // параметры из UpgradesConfig[UpgradeType.GAME]
@@ -56,10 +52,6 @@ export interface GameState {
   player_turn: boolean
 
   start_game_redirect: boolean
-
-  max_hp_shown: boolean
-  max_armor_shown: boolean
-  max_immune_shown: boolean
 
   // Лог атак врагов на игрока за текущий интервал между sendGameState.
   // Каждая запись — значение damage одного вызова damage_player.
@@ -120,10 +112,6 @@ const state: GameState = {
 
   arena_mode: false,
 
-  max_hp_shown: false,
-  max_armor_shown: false,
-  max_immune_shown: false,
-
   attack_log: [],
 
   invulnerability: 0,
@@ -131,6 +119,10 @@ const state: GameState = {
 }
 
 const getters = {
+  health(state: GameState): number {
+    return state.health
+  },
+
   // параметры для игры, которые берутся из апгрейдов
   maxCardsInDeck: (state: GameState, _getters: any, rootState: any) => {
     if (state.arena_mode) {
@@ -226,12 +218,6 @@ const mutations = {
   set_health(state: GameState, param: number) {
     // максимальные жизни колоды теперь ограничены апгрейдом
     if (param > state.max_hp) {
-      if (!state.max_hp_shown) {
-        toast.info(
-          "Максимальный уровень здоровья достигнут. Увеличьте его в разделе Прокачка"
-        )
-        state.max_hp_shown = true
-      }
       param = state.max_hp
     }
     state.health = param
@@ -255,12 +241,6 @@ const mutations = {
     state.health += param
     // максимальные жизни колоды теперь ограничены апгрейдом
     if (state.health > state.max_hp) {
-      if (!state.max_hp_shown) {
-        toast.info(
-          "Максимальный уровень здоровья достигнут. Увеличьте его в разделе Прокачка"
-        )
-        state.max_hp_shown = true
-      }
       state.health = state.max_hp
     }
   },
@@ -268,24 +248,12 @@ const mutations = {
     state.armor += armor_delta
     // максимальные броня теперь ограничена апгрейдом
     if (state.armor > state.max_armor) {
-      if (!state.max_armor_shown) {
-        toast.info(
-          "Максимальный уровень брони достигнут. Увеличьте его в разделе Прокачка"
-        )
-        state.max_armor_shown = true
-      }
       state.armor = state.max_armor
     }
   },
   set_armor(state: GameState, armor_value: number) {
     // максимальные броня теперь ограничена апгрейдом
     if (armor_value > state.max_armor) {
-      if (!state.max_armor_shown) {
-        toast.info(
-          "Максимальный уровень брони достигнут. Увеличьте его в разделе Прокачка"
-        )
-        state.max_armor_shown = true
-      }
       armor_value = state.max_armor
     }
     state.armor = armor_value
@@ -303,12 +271,6 @@ const mutations = {
 
   set_invulnerability(state: GameState, value: number) {
     if (value > state.max_immune_turns) {
-      if (!state.max_immune_shown) {
-        toast.info(
-          "Максимальный уровень неуязвимости достигнут. Увеличьте его в разделе Прокачка"
-        )
-        state.max_immune_shown = true
-      }
       value = state.max_immune_turns
     }
     state.invulnerability = value

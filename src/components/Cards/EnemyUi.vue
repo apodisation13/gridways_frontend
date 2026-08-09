@@ -27,7 +27,7 @@
         <ability-circle-enemy v-if="e.move" :enemy="enemy as Enemy" />
         <!--Иконка урона, для всех врагов или если у лидера врага есть урон-->
         <card-damage-icon
-          v-if="e.data.damage"
+          v-if="e.data.damage !== undefined && e.data.damage !== null"
           :style="background_color(enemy)"
           :damage="e.data.damage"
         />

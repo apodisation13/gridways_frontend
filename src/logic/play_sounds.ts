@@ -40,6 +40,10 @@ export function sound_heal(): void {
   sound("./../../audio/sounds/heal.wav")
 }
 
+export function sound_enemy_heal(): void {
+  sound("./../../audio/sounds/heal_enemy.mp3")
+}
+
 export function sound_destroy_enemy(): void {
   sound("./../../audio/sounds/destroy_enemy.wav")
 }
@@ -80,6 +84,10 @@ export function sound_timer_down(): void {
   sound("./../../audio/sounds/timer_count_down.wav")
 }
 
+export function lock_sound(): void {
+  sound("./../../audio/sounds/lock_enemy.mp3")
+}
+
 export function mine_placed(): void {
   sound("./../../audio/sounds/mine_placed.mp3")
 }
@@ -94,6 +102,10 @@ export function rain_applied(): void {
 
 export function rain_triggerred(): void {
   sound("./../../audio/sounds/rain_triggerred.mp3")
+}
+
+export function lock_placed(): void {
+  sound("./../../audio/sounds/lock_placed.mp3")
 }
 
 export function veil_placed(): void {

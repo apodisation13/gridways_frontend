@@ -1,4 +1,5 @@
 import { copyObj } from "@/lib/utils"
+import { change_health } from "@/logic/game_logic/change_health"
 import { add_charges_to_leader } from "@/logic/player_move/abilities/ability_add_charges_to_leader"
 import { add_damage_to_leader } from "@/logic/player_move/abilities/ability_add_damage_to_leader"
 import { add_armor } from "@/logic/player_move/abilities/ability_armor"
@@ -17,7 +18,6 @@ import { destroy_random_enemy_in_deck } from "@/logic/player_move/abilities/abil
 import { destroy_with_deathwish } from "@/logic/player_move/abilities/ability_destroy_with_deathwish"
 import { destroy_with_status } from "@/logic/player_move/abilities/ability_destroy_with_status"
 import { give_charges_to_all } from "@/logic/player_move/abilities/ability_give_charges_to_all"
-import { heal } from "@/logic/player_move/abilities/ability_heal"
 import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_grave"
 import { incr_dmg_to_all_hand } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_hand"
 import { add_invulnerability } from "@/logic/player_move/abilities/ability_invulnerability"
@@ -63,7 +63,7 @@ export function damage_ai_card(
 
   if (ability === CardAbility.Heal) {
     damage_one(enemy, card, gameObj, timeout)
-    heal(card)
+    change_health(card)
   } else if (ability === CardAbility.DamageAll) {
     damage_all(field, card, gameObj, timeout)
     if (enemy_leader.data.hp > 0)
@@ -192,7 +192,7 @@ export function damage_ai_card_multi(
   }
 
   if (ability === CardAbility.Heal) {
-    heal(card)
+    change_health(card)
   } else if (ability === CardAbility.AddArmor) {
     const armor_value = (card as Card | Leader).data?.armor || 0
     add_armor(armor_value, timeout)

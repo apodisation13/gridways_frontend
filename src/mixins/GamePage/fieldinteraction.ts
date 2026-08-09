@@ -1,10 +1,14 @@
 import { defineComponent } from "vue"
 
 import { copyObj } from "@/lib/utils"
-import { mine_placed, rain_applied } from "@/logic/play_sounds"
+import {
+  lock_placed,
+  mine_placed,
+  rain_applied,
+  veil_placed,
+} from "@/logic/play_sounds"
 import { change_card_charges } from "@/logic/player_move/service/service_for_player_move"
-import type { Card, EffectObject, Leader } from "@/types"
-import { EffectType } from "@/types"
+import { Card, EffectObject, EffectType, Leader } from "@/types"
 
 export default defineComponent({
   data() {
@@ -40,6 +44,10 @@ export default defineComponent({
         mine_placed()
       } else if (fi.type === EffectType.Rain) {
         rain_applied()
+      } else if (fi.type === EffectType.Lock) {
+        lock_placed()
+      } else if (fi.type === EffectType.Veil) {
+        veil_placed()
       }
       change_card_charges(card, -1, this.$store.getters["selectedMoveTimeout"])
       if (!this.sca && "color" in card) this.isActive.player_cards = false

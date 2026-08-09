@@ -1,3 +1,4 @@
+import { lock_sound } from "@/logic/play_sounds"
 import { Enemy, EnemyLeader, EnemyStatus } from "@/types"
 
 export function lock_enemy(enemy: Enemy | EnemyLeader): void {
@@ -5,5 +6,8 @@ export function lock_enemy(enemy: Enemy | EnemyLeader): void {
   enemy.data.shield = false
   enemy.passive_ability = null
   enemy.deathwish = null
-  enemy.locked = true
+  if (!enemy.locked) {
+    enemy.locked = true
+    lock_sound()
+  }
 }

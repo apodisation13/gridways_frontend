@@ -479,7 +479,7 @@ export default defineComponent({
       return this.myRedrawDone && !this.opponentRedrawDone
     },
     health(): number {
-      return this.$store.state.game.health
+      return this.$store.getters["health"]
     },
     armor(): number {
       return this.$store.state.game.armor
@@ -794,7 +794,7 @@ export default defineComponent({
       this.draw = true // открываем окно редро
       this.gameInitialized = true
       this.myTurn = true // хост ходит первым
-      this.lastSentHealth = this.$store.state.game.health
+      this.lastSentHealth = this.$store.getters["health"]
       this.lastSentArmor = this.$store.state.game.armor
       this.sendPlayerState() // сразу отправляем наш стейт гостю
     },
@@ -842,7 +842,7 @@ export default defineComponent({
       this.draw = true
       this.gameInitialized = true
       this.myTurn = false // гость ждёт TURN_END от хоста
-      this.lastSentHealth = this.$store.state.game.health
+      this.lastSentHealth = this.$store.getters["health"]
       this.lastSentArmor = this.$store.state.game.armor
       this.sendPlayerState()
     },
@@ -925,7 +925,7 @@ export default defineComponent({
     sendGameState(includeHealth = true): void {
       const ws: WebSocket | null = this.$store.state.multi.ws
       if (!ws || ws.readyState !== WebSocket.OPEN) return
-      const currentHealth = this.$store.state.game.health
+      const currentHealth = this.$store.getters["health"]
       const currentArmor = this.$store.state.game.armor
 
       // Забираем накопленный лог атак и сразу очищаем его в сторе.
@@ -1076,7 +1076,7 @@ export default defineComponent({
             faction: c.faction ?? "",
           })),
           leader_faction: (this.gameObj.leader as any)?.faction ?? "",
-          health: this.$store.state.game.health,
+          health: this.$store.getters["health"],
           max_hp: this.$store.getters["maxHp"],
           armor: this.$store.state.game.armor,
           max_armor: this.$store.getters["maxArmor"],

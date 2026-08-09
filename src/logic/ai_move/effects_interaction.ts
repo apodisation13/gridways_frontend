@@ -1,4 +1,12 @@
-import { mine_triggerred, rain_triggerred } from "@/logic/play_sounds"
+import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import {
+  mine_triggerred,
+  rain_triggerred,
+  sound_passive_increase_damage,
+  veil_triggerred,
+} from "@/logic/play_sounds"
+import { lock_enemy } from "@/logic/player_move/abilities/ability_lock"
+import { purify } from "@/logic/player_move/abilities/ability_purify"
 import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
 import type { EffectObject, Enemy, GameObj } from "@/types"
@@ -18,6 +26,13 @@ export function applyEffectAtCell(
   const effect = cellObj as EffectObject
   let enemyKilled = false
 
+  const e = enemy as Enemy
+
+  if (effect.times_count !== undefined) {
+    effect.times_count -= 1
+    if (effect.times_count <= 0) gameObj.effects[index] = ""
+  }
+
   if (effect.type === EffectType.Mine) {
     mine_triggerred()
     enemy_takes_damage(
@@ -29,14 +44,34 @@ export function applyEffectAtCell(
     enemyKilled = true
   } else if (effect.type === EffectType.Rain) {
     rain_triggerred()
-    const e = enemy as Enemy
     hit_one_enemy(e, { data: { damage: effect.value || 0 } }, gameObj, timeout)
     if (e.data.hp <= 0) enemyKilled = true
-  }
-
-  if (effect.times_count !== undefined) {
-    effect.times_count -= 1
-    if (effect.times_count <= 0) gameObj.effects[index] = ""
+  } else if (effect.type === EffectType.Spikes) {
+    if (e.data.damage <= 0) return true // вот тут типа враг не будет наносить урон
+    let effectValue = effect.value || 0 // 3
+    let resultDamage = e.data.damage - effectValue // 2 - (+3) = -1
+    if (resultDamage < 0) {
+      resultDamage = 0 // 0
+      effectValue = e.data.damage
+    }
+    timeoutAnimationFlag(
+      enemy,
+      "incr_dmg",
+      sound_passive_increase_damage,
+      timeout * 0.5
+    )
+    enemy.dmg_delta = effectValue
+    setTimeout(() => {
+      enemy.dmg_delta = null
+    }, timeout * 0.5)
+    enemy.data.damage = resultDamage
+  } else if (effect.type === EffectType.Veil) {
+    veil_triggerred()
+    return true // враг по сути не может наносить урон
+  } else if (effect.type === EffectType.Purify) {
+    purify(e)
+  } else if (effect.type === EffectType.Lock) {
+    lock_enemy(e)
   }
 
   return enemyKilled

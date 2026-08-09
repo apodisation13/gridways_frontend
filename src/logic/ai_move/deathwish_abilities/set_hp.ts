@@ -2,7 +2,7 @@ import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import {
   sound_deathwish,
   sound_enemy_damage_player,
-  sound_heal,
+  sound_enemy_heal,
 } from "@/logic/play_sounds"
 import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
 import store from "@/store"
@@ -29,6 +29,6 @@ export function set_weakest_hp_as_highest(
   let weakest = all_enemies.at(-1)
   if (!weakest) return
   weakest.data.hp = strongest.data.hp
-  sound_heal()
+  sound_enemy_heal()
   timeoutAnimationFlag(weakest, "healing", null, timeout * 0.5)
 }
