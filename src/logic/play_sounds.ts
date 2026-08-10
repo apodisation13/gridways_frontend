@@ -88,6 +88,10 @@ export function lock_sound(): void {
   sound("./../../audio/sounds/lock_enemy.mp3")
 }
 
+export function purify_sound(): void {
+  sound("./../../audio/sounds/purify.mp3")
+}
+
 export function mine_placed(): void {
   sound("./../../audio/sounds/mine_placed.mp3")
 }
@@ -114,4 +118,8 @@ export function veil_placed(): void {
 
 export function veil_triggerred(): void {
   sound("./../../audio/sounds/veil_triggerred.mp3")
+}
+
+export function spikes(): void {
+  sound("./../../audio/sounds/spikes.mp3")
 }

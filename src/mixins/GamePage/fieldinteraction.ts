@@ -4,7 +4,9 @@ import { copyObj } from "@/lib/utils"
 import {
   lock_placed,
   mine_placed,
+  purify_sound,
   rain_applied,
+  spikes,
   veil_placed,
 } from "@/logic/play_sounds"
 import { change_card_charges } from "@/logic/player_move/service/service_for_player_move"
@@ -48,6 +50,10 @@ export default defineComponent({
         lock_placed()
       } else if (fi.type === EffectType.Veil) {
         veil_placed()
+      } else if (fi.type === EffectType.Purify) {
+        purify_sound()
+      } else if (fi.type === EffectType.Spikes) {
+        spikes()
       }
       change_card_charges(card, -1, this.$store.getters["selectedMoveTimeout"])
       if (!this.sca && "color" in card) this.isActive.player_cards = false

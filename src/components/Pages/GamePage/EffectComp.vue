@@ -36,7 +36,10 @@
       "
       v-touch:longtap="() => (showModal = true)"
       class="effect-turns"
-      :class="{ 'effect-turns--negative': effectObject.negative }"
+      :class="{
+        'effect-turns--negative': effectObject.negative,
+        'effect-turns--times': effectObject.times_count !== undefined,
+      }"
       @click="showModal = true"
       @contextmenu.prevent.stop="showModal = true"
     >
@@ -181,5 +184,27 @@ export default defineComponent({
 .effect-turns--negative {
   background: rgba(180, 30, 20, 0.85);
   border-color: rgba(255, 100, 80, 0.5);
+}
+
+/* times_count: star shape */
+.effect-turns--times {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
 }
 </style>

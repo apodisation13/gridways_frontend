@@ -3,6 +3,7 @@ import {
   mine_triggerred,
   rain_triggerred,
   sound_passive_increase_damage,
+  spikes,
   veil_triggerred,
 } from "@/logic/play_sounds"
 import { lock_enemy } from "@/logic/player_move/abilities/ability_lock"
@@ -65,6 +66,7 @@ export function applyEffectAtCell(
       enemy.dmg_delta = null
     }, timeout * 0.5)
     enemy.data.damage = resultDamage
+    spikes()
   } else if (effect.type === EffectType.Veil) {
     veil_triggerred()
     return true // враг по сути не может наносить урон
