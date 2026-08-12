@@ -4,6 +4,10 @@ import { damage_random_enemy } from "@/logic/player_move/passive_abilities/passi
 import { destroy_2_enemies } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_2_enemies"
 import { destroy_with_passive } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_with_passive"
 import { passive_destroy_with_status } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_with_status"
+import {
+  spawn_effect,
+  spawn_effect_random,
+} from "@/logic/player_move/passive_abilities/passives_in_hand/effects"
 import { heal_leader } from "@/logic/player_move/passive_abilities/passives_in_hand/heal_leader"
 import {
   inc_dmg_by_len_grave,
@@ -83,5 +87,9 @@ export function hand_passives(
     remove_deathwish(card, gameObj, timeout)
   } else if (pa === CardPassiveAbility.RemoveShield) {
     remove_shield(card, gameObj, timeout)
+  } else if (pa === CardPassiveAbility.SpawnEffect) {
+    spawn_effect(card, gameObj)
+  } else if (pa === CardPassiveAbility.SpawnEffectRandom) {
+    spawn_effect_random(card, gameObj)
   }
 }

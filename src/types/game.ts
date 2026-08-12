@@ -94,6 +94,8 @@ export enum CardAbility {
   DestroyWithStatus = "destroy-with-status",
   ReplaceLeader = "replace-leader",
   TakeEnemyToHand = "take-enemy-to-hand",
+  IncrEffects = "incr-effects",
+  RemoveEffects = "remove-effects",
   // special case abilities
   Resurrect = "resurrect",
   DrawTwoCards = "draw-two-cards",
@@ -117,8 +119,10 @@ export enum CardAbility {
   CreateEnemyAndPutToDeck = "create-enemy-and-put-to-deck",
   MoveEnemyFromGraveToDeck = "move-enemy-from-grave-to-deck",
   MoveEnemyFromDeckToHand = "move-enemy-from-deck-to-hand",
-  // пока нету
-  SpawnEffectInRow = "spawn-effect-in-row",
+  // Effects
+  SpawnEffect = "spawn-effect",
+  SpawnEffectRow = "spawn-effect-row",
+  SpawnEffectColumn = "spawn-effect-column",
 }
 
 export enum CardPassiveAbility {
@@ -143,6 +147,11 @@ export enum CardPassiveAbility {
   SpawnRandomEnemyInDeck = "spawn-random-enemy-in-deck",
   RemoveDeathwish = "remove-deathwish",
   RemoveShield = "remove-shield",
+  // effects
+  SpawnEffect = "spawn-effect",
+  SpawnEffectRandom = "spawn-effect-random",
+  IncrEffect = "incr-effect",
+  RemoveEffect = "remove-effect",
   // upon beginning, once time
   SetSelfAsDeckLen = "set-self-as-deck-len",
   // upon playing a card

@@ -190,7 +190,11 @@ export function ability_icon(ability: string): string {
     ability === CardAbility.MoveEnemyFromDeckToHand
   )
     return `url(${require("@/assets/icons/card/additional_card.svg")})`
-  else if (ability === CardAbility.SpawnEffectInRow)
+  else if (
+    ability === CardAbility.SpawnEffect ||
+    ability === CardAbility.SpawnEffectRow ||
+    ability === CardAbility.SpawnEffectColumn
+  )
     return `url(${require("@/assets/icons/card/field_interaction.svg")})`
   else return `url(${require("@/assets/icons/card/sword.svg")})`
 }

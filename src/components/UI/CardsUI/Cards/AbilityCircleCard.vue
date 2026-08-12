@@ -65,7 +65,11 @@
       :icon="require('@/assets/icons/card/additional_card.svg')"
     />
     <ability-icon
-      v-else-if="card.ability.name === CardAbility.SpawnEffectInRow"
+      v-else-if="
+        card.ability.name === CardAbility.SpawnEffect ||
+        card.ability.name === CardAbility.SpawnEffectRow ||
+        card.ability.name === CardAbility.SpawnEffectColumn
+      "
       :icon="require('@/assets/icons/card/field_interaction.svg')"
     />
   </div>

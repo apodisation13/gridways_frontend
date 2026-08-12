@@ -26,6 +26,7 @@ export interface CardData {
     each_tick?: boolean
     upon_beginning?: boolean
     upon_playing_a_card?: boolean
+    field_interaction?: EffectObject
   }
   multi?: {
     value: number
@@ -52,6 +53,7 @@ export interface LeaderData {
     reset_timer?: boolean
     each_tick?: boolean
     upon_playing_a_card?: boolean
+    field_interaction?: EffectObject
   }
   multi?: {
     value: number
@@ -437,4 +439,6 @@ export interface SeasonEntry {
 export interface EffectInfo {
   description: string
   title: string
+  turn_type: "turns" | "times_count"
+  negative?: boolean
 }

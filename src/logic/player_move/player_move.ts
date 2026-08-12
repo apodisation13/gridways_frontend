@@ -17,6 +17,10 @@ import { destroy_random } from "@/logic/player_move/abilities/ability_destroy_ra
 import { destroy_random_enemy_in_deck } from "@/logic/player_move/abilities/ability_destroy_random_enemy_in_deck"
 import { destroy_with_deathwish } from "@/logic/player_move/abilities/ability_destroy_with_deathwish"
 import { destroy_with_status } from "@/logic/player_move/abilities/ability_destroy_with_status"
+import {
+  incr_effects,
+  remove_effects,
+} from "@/logic/player_move/abilities/ability_effects"
 import { give_charges_to_all } from "@/logic/player_move/abilities/ability_give_charges_to_all"
 import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_grave"
 import { incr_dmg_to_all_hand } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_hand"
@@ -158,6 +162,12 @@ export function damage_ai_card(
     destroy_with_passive(enemy, gameObj, timeout)
   } else if (ability === CardAbility.DestroyWithDeathwish) {
     destroy_with_deathwish(enemy, gameObj, timeout)
+  } else if (ability === CardAbility.IncrEffects) {
+    incr_effects(card, gameObj)
+    damage_one(enemy, card, gameObj, timeout)
+  } else if (ability === CardAbility.RemoveEffects) {
+    remove_effects(gameObj)
+    damage_one(enemy, card, gameObj, timeout)
   } else damage_one(enemy, card, gameObj, timeout)
 
   // убираем карту игрока, если в ней не осталось зарядов, из руки и из колоды, если играли оттуда

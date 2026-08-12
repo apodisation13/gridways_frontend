@@ -1,4 +1,11 @@
-import { Card, CardAbility, Enemy, EnemyLeader, Leader } from "@/types"
+import {
+  Card,
+  CardAbility,
+  EffectObject,
+  Enemy,
+  EnemyLeader,
+  Leader,
+} from "@/types"
 
 // сбрасываем карту из руки или из колоды в сброс, если у нее 0 зарядов
 // если лидер - не сбрасываем его никуда (у него нет card.color)
@@ -55,6 +62,15 @@ export function get_empty_field_indexes(field: (Enemy | "")[]): number[] {
     if (!field[i] || (field[i] as Enemy).data.hp <= 0) emptyIndexesArray.push(i)
   }
   return emptyIndexesArray
+}
+
+// собирает клетки на поле в которых есть эффекты
+export function get_effects_indexes(effects: (EffectObject | "")[]): number[] {
+  let effectsIndexesArray: number[] = []
+  for (let i = 0; i < effects.length; i++) {
+    if (effects[i]) effectsIndexesArray.push(i)
+  }
+  return effectsIndexesArray
 }
 
 export function change_card_charges(
