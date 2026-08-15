@@ -12,7 +12,7 @@ export function random_move(
   const random = Math.floor(Math.random() * field.length)
   if (field[random]) {
     console.log(`враг c ${i}, хотел на ${random}, а там враг`)
-    const killed = applyEffectAtCell(i, gameObj, timeout)
+    const killed = applyEffectAtCell(i, gameObj, timeout * 0.75)
     if (!killed) damage_player(field, i, timeout)
   } else {
     console.log(`враг c ${i}, хотел на ${random}, и прыгнул`)
@@ -20,6 +20,6 @@ export function random_move(
     field[random] = field[i]
     field[i] = ""
     sound_enemy_move_down()
-    applyEffectAtCell(random, gameObj, timeout)
+    applyEffectAtCell(random, gameObj, timeout * 0.75)
   }
 }

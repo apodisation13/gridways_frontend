@@ -3,14 +3,19 @@ import type { Card, Enemy, EnemyLeader, Leader } from "./database"
 export type CardLocation = "hand" | "deck" | "grave" | "field" | null
 
 export enum EffectType {
-  Mine = "mine",
-  Rain = "rain",
-  Spikes = "spikes",
-  Veil = "veil",
-  Purify = "purify",
-  Lock = "lock",
-  Heal = "heal",
-  IncrDmg = "incr_dmg",
+  Mine = "mine", // times_count
+  LightMine = "light_mine", // times_count
+  Rain = "rain", // turns
+  Frost = "frost", // times_count
+  Spikes = "spikes", // turns
+  Veil = "veil", // turns
+  Purify = "purify", // turns
+  Lock = "lock", // turns
+  MiddleMine = "middle_mine", // times_count
+  Poison = "poison", // times_count
+  // negative effects
+  Heal = "heal", //
+  IncrDmg = "incr_dmg", //
 }
 
 export type EffectObject = {

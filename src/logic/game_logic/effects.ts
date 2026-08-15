@@ -1,6 +1,8 @@
 import {
+  frost_sound,
   lock_placed,
   mine_placed,
+  poison_sound,
   purify_sound,
   rain_applied,
   spikes,
@@ -9,7 +11,11 @@ import {
 import { EffectObject, EffectType } from "@/types"
 
 export function effectsSounds(fi: EffectObject) {
-  if (fi.type === EffectType.Mine) {
+  if (
+    fi.type === EffectType.Mine ||
+    fi.type === EffectType.LightMine ||
+    fi.type === EffectType.MiddleMine
+  ) {
     mine_placed()
   } else if (fi.type === EffectType.Rain) {
     rain_applied()
@@ -21,5 +27,9 @@ export function effectsSounds(fi: EffectObject) {
     purify_sound()
   } else if (fi.type === EffectType.Spikes) {
     spikes()
+  } else if (fi.type === EffectType.Poison) {
+    poison_sound()
+  } else if (fi.type === EffectType.Frost) {
+    frost_sound()
   }
 }

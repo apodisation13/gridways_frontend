@@ -92,6 +92,10 @@ export function purify_sound(): void {
   sound("./../../audio/sounds/purify.mp3")
 }
 
+export function poison_sound(): void {
+  sound("./../../audio/sounds/poison.mp3")
+}
+
 export function mine_placed(): void {
   sound("./../../audio/sounds/mine_placed.mp3")
 }
@@ -122,4 +126,8 @@ export function veil_triggerred(): void {
 
 export function spikes(): void {
   sound("./../../audio/sounds/spikes.mp3")
+}
+
+export function frost_sound(): void {
+  sound("./../../audio/sounds/frost.mp3")
 }

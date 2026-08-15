@@ -1,5 +1,6 @@
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import {
+  frost_sound,
   mine_triggerred,
   rain_triggerred,
   sound_passive_increase_damage,
@@ -7,10 +8,11 @@ import {
   veil_triggerred,
 } from "@/logic/play_sounds"
 import { lock_enemy } from "@/logic/player_move/abilities/ability_lock"
+import { poison_one_enemy } from "@/logic/player_move/abilities/ability_poison"
 import { purify } from "@/logic/player_move/abilities/ability_purify"
 import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
-import type { EffectObject, Enemy, GameObj } from "@/types"
+import { EffectObject, Enemy, EnemyStatus, GameObj } from "@/types"
 import { EffectType } from "@/types"
 
 // Apply the cell effect at index after an enemy has landed there.
@@ -29,11 +31,6 @@ export function applyEffectAtCell(
 
   const e = enemy as Enemy
 
-  if (effect.times_count !== undefined) {
-    effect.times_count -= 1
-    if (effect.times_count <= 0) gameObj.effects[index] = ""
-  }
-
   if (effect.type === EffectType.Mine) {
     mine_triggerred()
     enemy_takes_damage(
@@ -43,10 +40,12 @@ export function applyEffectAtCell(
       timeout
     )
     enemyKilled = true
+    effectDecrement(index, effect, gameObj)
   } else if (effect.type === EffectType.Rain) {
     rain_triggerred()
     hit_one_enemy(e, { data: { damage: effect.value || 0 } }, gameObj, timeout)
     if (e.data.hp <= 0) enemyKilled = true
+    effectDecrement(index, effect, gameObj)
   } else if (effect.type === EffectType.Spikes) {
     if (e.data.damage <= 0) return true // вот тут типа враг не будет наносить урон
     let effectValue = effect.value || 0 // 3
@@ -67,16 +66,65 @@ export function applyEffectAtCell(
     }, timeout * 0.5)
     enemy.data.damage = resultDamage
     spikes()
+    effectDecrement(index, effect, gameObj)
   } else if (effect.type === EffectType.Veil) {
     veil_triggerred()
+    effectDecrement(index, effect, gameObj)
     return true // враг по сути не может наносить урон
   } else if (effect.type === EffectType.Purify) {
+    effectDecrement(index, effect, gameObj)
     purify(e)
   } else if (effect.type === EffectType.Lock) {
     lock_enemy(e)
+    effectDecrement(index, effect, gameObj)
+  } else if (effect.type === EffectType.LightMine) {
+    if (enemy.data.shield || enemy.data.status) {
+      mine_triggerred()
+      enemy_takes_damage(
+        enemy,
+        { data: { damage: enemy.data.hp } },
+        gameObj,
+        timeout
+      )
+      enemyKilled = true
+      effectDecrement(index, effect, gameObj)
+    }
+  } else if (effect.type === EffectType.Frost) {
+    frost_sound()
+    hit_one_enemy(e, { data: { damage: effect.value || 0 } }, gameObj, timeout)
+    if (e.data.hp <= 0) enemyKilled = true
+    effectDecrement(index, effect, gameObj)
+  } else if (effect.type === EffectType.Poison) {
+    poison_one_enemy(e, gameObj, timeout)
+    if (e?.data?.status === EnemyStatus.Poison) {
+      effectDecrement(index, effect, gameObj)
+    }
+  } else if (effect.type === EffectType.MiddleMine) {
+    if (enemy.passive_ability?.name || enemy.deathwish?.name) {
+      mine_triggerred()
+      enemy_takes_damage(
+        enemy,
+        { data: { damage: enemy.data.hp } },
+        gameObj,
+        timeout
+      )
+      enemyKilled = true
+      effectDecrement(index, effect, gameObj)
+    }
   }
 
   return enemyKilled
+}
+
+function effectDecrement(
+  index: number,
+  effect: EffectObject,
+  gameObj: GameObj
+) {
+  if (effect.times_count !== undefined) {
+    effect.times_count -= 1
+    if (effect.times_count <= 0) gameObj.effects[index] = ""
+  }
 }
 
 // Decrement turns for all active effects — called once after all enemies have moved.
@@ -100,5 +148,5 @@ export function enemySpawnsAtEmptyCell(
   timeout = 1000
 ): void {
   gameObj.field[index] = enemy
-  applyEffectAtCell(index, gameObj, timeout)
+  applyEffectAtCell(index, gameObj, timeout * 0.75)
 }

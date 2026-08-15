@@ -21,7 +21,10 @@ export function spawn_effect(card: Card | Leader, gameObj: GameObj) {
   if (!effectObject) return
 
   const emptyIndexes = get_empty_field_indexes(field)
-  const randomIndex = choice_element(emptyIndexes)
+  const emptyEffectIndexes = get_effects_indexes(effects)
+  const effectSet = new Set(emptyEffectIndexes)
+  const available = emptyIndexes.filter(i => !effectSet.has(i))
+  const randomIndex = choice_element(available)
 
   if (!randomIndex) return
 

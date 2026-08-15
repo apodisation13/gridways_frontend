@@ -8,6 +8,6 @@ export function stand_still(
   gameObj: GameObj,
   timeout = 1000
 ): void {
-  const killed = applyEffectAtCell(i, gameObj, timeout)
+  const killed = applyEffectAtCell(i, gameObj, timeout * 0.75)
   if (!killed) damage_player(field, i, timeout)
 }

@@ -11,7 +11,7 @@ export function down_move(
 ): void {
   // Enemy already at the bottom row or blocked below — check effect then damage player
   if (i >= 9 || field[i + 3]) {
-    const killed = applyEffectAtCell(i, gameObj, timeout)
+    const killed = applyEffectAtCell(i, gameObj, timeout * 0.75)
     if (!killed) damage_player(field, i, timeout)
     return
   }
@@ -20,5 +20,5 @@ export function down_move(
   field[i + 3] = field[i]
   field[i] = ""
   sound_enemy_move_down()
-  applyEffectAtCell(i + 3, gameObj, timeout)
+  applyEffectAtCell(i + 3, gameObj, timeout * 0.75)
 }

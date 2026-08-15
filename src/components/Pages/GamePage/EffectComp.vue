@@ -1,20 +1,21 @@
 <template>
   <div class="effect-comp">
-    <!-- Mine: card-sized, only when no enemy on cell -->
+    <!-- Card-sized traps: mine hidden when enemy present; light_mine and poison always shown -->
     <div
-      v-if="effectObject.type === EffectType.Mine && !hasEnemy"
+      v-if="showCardSizeTrap"
       v-touch:longtap="() => (showModal = true)"
       class="effect-mine"
+      :class="{ 'effect-mine--with-enemy': hasEnemy }"
       @contextmenu.prevent.stop="showModal = true"
     >
       <img
-        src="@/assets/icons/effects/mine.svg"
+        :src="cardSizeSrc"
         class="effect-mine__icon"
-        alt="mine"
+        :alt="effectObject.type"
       />
     </div>
 
-    <!-- Full-cell overlay effects (rain, spikes, veil, purify, lock, heal, incr_dmg) -->
+    <!-- Full-cell overlay effects (rain, frost, spikes, veil, purify, lock, heal, incr_dmg, remove_status) -->
     <div
       v-if="fullCellSrc"
       v-touch:longtap="() => (showModal = true)"
@@ -57,9 +58,14 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
 
+import frostSrc from "@/assets/icons/effects/frost.svg"
 import healSrc from "@/assets/icons/effects/heal.svg"
 import incrDmgSrc from "@/assets/icons/effects/incr_dmg.svg"
+import lightMineSrc from "@/assets/icons/effects/light_mine.svg"
 import lockSrc from "@/assets/icons/effects/lock.svg"
+import middleMineSrc from "@/assets/icons/effects/middle_mine.svg"
+import mineSrc from "@/assets/icons/effects/mine.svg"
+import poisonSrc from "@/assets/icons/effects/poison.svg"
 import purifySrc from "@/assets/icons/effects/purify.svg"
 import rainSrc from "@/assets/icons/effects/rain.svg"
 import spikesSrc from "@/assets/icons/effects/spikes.svg"
@@ -68,8 +74,16 @@ import EffectModal from "@/components/ModalWindows/EffectModal.vue"
 import type { EffectObject } from "@/types"
 import { EffectType } from "@/types"
 
+const CARD_SIZE_SRCS: Partial<Record<EffectType, string>> = {
+  [EffectType.Mine]: mineSrc,
+  [EffectType.LightMine]: lightMineSrc,
+  [EffectType.MiddleMine]: middleMineSrc,
+  [EffectType.Poison]: poisonSrc,
+}
+
 const FULL_CELL_SRCS: Partial<Record<EffectType, string>> = {
   [EffectType.Rain]: rainSrc,
+  [EffectType.Frost]: frostSrc,
   [EffectType.Spikes]: spikesSrc,
   [EffectType.Veil]: veilSrc,
   [EffectType.Purify]: purifySrc,
@@ -99,6 +113,14 @@ export default defineComponent({
     }
   },
   computed: {
+    cardSizeSrc(): string | undefined {
+      return CARD_SIZE_SRCS[this.effectObject.type]
+    },
+    showCardSizeTrap(): boolean {
+      if (!this.cardSizeSrc) return false
+      if (this.effectObject.type === EffectType.Mine) return !this.hasEnemy
+      return true
+    },
     fullCellSrc(): string | undefined {
       return FULL_CELL_SRCS[this.effectObject.type]
     },
@@ -117,7 +139,7 @@ export default defineComponent({
   pointer-events: none;
 }
 
-/* Mine: card-sized, centered */
+/* Card-sized traps: mine, light_mine, poison */
 .effect-mine {
   position: absolute;
   top: 3px;
@@ -131,6 +153,17 @@ export default defineComponent({
   justify-content: center;
   pointer-events: auto;
   cursor: pointer;
+}
+
+/* light_mine / poison when enemy is on the same cell: small badge in bottom-left */
+.effect-mine--with-enemy {
+  width: 26px;
+  height: 26px;
+  aspect-ratio: 1;
+  top: auto;
+  bottom: 2px;
+  left: 3px;
+  transform: none;
 }
 
 .effect-mine__icon {

@@ -25,10 +25,14 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
 
+import frostSrc from "@/assets/icons/effects/frost.svg"
 import healSrc from "@/assets/icons/effects/heal.svg"
 import incrDmgSrc from "@/assets/icons/effects/incr_dmg.svg"
+import lightMineSrc from "@/assets/icons/effects/light_mine.svg"
 import lockSrc from "@/assets/icons/effects/lock.svg"
+import middleMineSrc from "@/assets/icons/effects/middle_mine.svg"
 import mineSrc from "@/assets/icons/effects/mine.svg"
+import poisonSrc from "@/assets/icons/effects/poison.svg"
 import purifySrc from "@/assets/icons/effects/purify.svg"
 import rainSrc from "@/assets/icons/effects/rain.svg"
 import spikesSrc from "@/assets/icons/effects/spikes.svg"
@@ -38,15 +42,19 @@ import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import type { EffectObject } from "@/types"
 import { EffectType } from "@/types"
 
-const EFFECT_SRCS: Record<EffectType, string> = {
+const EFFECT_SRCS: Partial<Record<EffectType, string>> = {
   [EffectType.Mine]: mineSrc,
+  [EffectType.LightMine]: lightMineSrc,
   [EffectType.Rain]: rainSrc,
+  [EffectType.Frost]: frostSrc,
   [EffectType.Spikes]: spikesSrc,
   [EffectType.Veil]: veilSrc,
   [EffectType.Purify]: purifySrc,
   [EffectType.Lock]: lockSrc,
   [EffectType.Heal]: healSrc,
   [EffectType.IncrDmg]: incrDmgSrc,
+  [EffectType.MiddleMine]: middleMineSrc,
+  [EffectType.Poison]: poisonSrc,
 }
 
 export default defineComponent({
@@ -66,7 +74,7 @@ export default defineComponent({
     effectsInfo() {
       return this.$store.getters["effectsInfo"]
     },
-    iconSrc(): string {
+    iconSrc(): string | undefined {
       return EFFECT_SRCS[this.effectObject.type]
     },
   },
