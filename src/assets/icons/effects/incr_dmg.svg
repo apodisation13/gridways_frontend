@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+  <rect width="100" height="100" fill="rgba(18,5,3,0.25)"/>
+
+  <!-- sword 1, small -->
+  <g>
+    <polygon points="10,103 8,115 12,115" fill="#d4d4d4"/>
+    <rect x="5.5" y="114" width="9" height="1.6" rx="0.5" fill="#9a6028"/>
+    <rect x="8.5" y="115.6" width="3" height="3.8" rx="0.5" fill="#703820"/>
+    <circle cx="10" cy="121" r="1.8" fill="#b07828"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 -150" dur="2.6s" begin="0s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- sword 2, medium -->
+  <g>
+    <polygon points="28,103 25.5,118 30.5,118" fill="#d8d8d8"/>
+    <rect x="23" y="117" width="11" height="1.8" rx="0.5" fill="#a06830"/>
+    <rect x="26.5" y="118.8" width="3" height="4.5" rx="0.5" fill="#7a4020"/>
+    <circle cx="28" cy="125" r="2" fill="#b08030"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 -150" dur="3.3s" begin="0.8s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- sword 3, large (center) -->
+  <g>
+    <polygon points="47,103 44,121 50,121" fill="#e0e0e0"/>
+    <rect x="41" y="120" width="12" height="2" rx="0.6" fill="#a87040"/>
+    <rect x="44.5" y="122" width="5" height="5.5" rx="0.6" fill="#7a4820"/>
+    <circle cx="47" cy="129" r="2.5" fill="#c08840"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 -150" dur="2.1s" begin="1.5s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- sword 4, medium -->
+  <g>
+    <polygon points="65,103 62.5,117 67.5,117" fill="#d6d6d6"/>
+    <rect x="60" y="116" width="11" height="1.8" rx="0.5" fill="#906030"/>
+    <rect x="63.5" y="117.8" width="3" height="4" rx="0.5" fill="#703820"/>
+    <circle cx="65" cy="123.5" r="2" fill="#b07830"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 -150" dur="3.6s" begin="0.3s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- sword 5, small -->
+  <g>
+    <polygon points="83,103 81.2,113 84.8,113" fill="#cccccc"/>
+    <rect x="78.7" y="112" width="8.6" height="1.5" rx="0.5" fill="#885028"/>
+    <rect x="81.5" y="113.5" width="3" height="3.5" rx="0.5" fill="#683018"/>
+    <circle cx="83" cy="118.8" r="1.7" fill="#a06828"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 -150" dur="2.9s" begin="2.0s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- sword 6, medium-small -->
+  <g>
+    <polygon points="18,103 16,115 20,115" fill="#d0d0d0"/>
+    <rect x="13.5" y="114" width="9" height="1.6" rx="0.5" fill="#906030"/>
+    <rect x="16.5" y="115.6" width="3" height="4" rx="0.5" fill="#703820"/>
+    <circle cx="18" cy="121.3" r="1.9" fill="#a87030"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 -150" dur="4.1s" begin="1.2s" repeatCount="indefinite"/>
+  </g>
+</svg>

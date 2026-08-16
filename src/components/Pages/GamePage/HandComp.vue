@@ -12,8 +12,8 @@
         <card-item
           :card="card"
           :index="index"
-          class="card_in_hand"
           location="hand"
+          class="card_in_hand"
         />
       </div>
     </transition-group>
@@ -65,6 +65,10 @@ export default defineComponent({
     "enemy_in_cross",
     "enemy_in_cross_locked",
     "target_enemy_multi",
+    "target_empty_cell",
+    "target_empty_cell_multi",
+    "cell_in_cross",
+    "cell_in_cross_locked",
   ],
   data() {
     return {
@@ -118,22 +122,40 @@ export default defineComponent({
       const leaderCount = (this.enemy_leader?.data?.hp ?? 0) > 0 ? 1 : 0
       return Math.min(rawCount, fieldCount + leaderCount)
     },
+    _resolveMulti(card: Card): {
+      multiCount: number
+      isFieldInteraction: boolean
+    } {
+      const rawCount = card.data.multi?.value ?? 0
+      const isFieldInteraction = !!card.data.field_interaction
+      if (isFieldInteraction && rawCount > 1) {
+        const emptyCells = (this.field || []).filter(f => f === "").length
+        return {
+          multiCount: Math.min(rawCount, emptyCells),
+          isFieldInteraction,
+        }
+      }
+      return {
+        multiCount: this.effectiveMultiCount(rawCount),
+        isFieldInteraction,
+      }
+    },
     handleCardMouseDown(e: MouseEvent, index: number): void {
       e.preventDefault()
       e.stopPropagation()
       if (!this.player_cards_active) return
       const el = document.querySelectorAll(".card_in_hand")[index]
       if (!el) return
-      this.$emit("chose_player_card", this.hand[index])
-      const multiCount = this.effectiveMultiCount(
-        this.hand[index].data?.multi?.value ?? 0
-      )
+      const card = this.hand[index]
+      this.$emit("chose_player_card", card)
+      const { multiCount, isFieldInteraction } = this._resolveMulti(card)
       ;(this as any).beginArrowDrawing(
         el,
         e.clientX,
         e.clientY,
-        this.hand[index].faction,
-        multiCount
+        card.faction,
+        multiCount,
+        isFieldInteraction
       )
     },
     handleCardTouchStart(e: TouchEvent, index: number): void {
@@ -143,16 +165,16 @@ export default defineComponent({
       const el = document.querySelectorAll(".card_in_hand")[index]
       if (!el) return
       const touch = e.touches[0]
-      this.$emit("chose_player_card", this.hand[index])
-      const multiCount = this.effectiveMultiCount(
-        this.hand[index].data?.multi?.value ?? 0
-      )
+      const card = this.hand[index]
+      this.$emit("chose_player_card", card)
+      const { multiCount, isFieldInteraction } = this._resolveMulti(card)
       ;(this as any).beginArrowDrawing(
         el,
         touch.clientX,
         touch.clientY,
-        this.hand[index].faction,
-        multiCount
+        card.faction,
+        multiCount,
+        isFieldInteraction
       )
     },
   },

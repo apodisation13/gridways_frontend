@@ -50,6 +50,22 @@
     <div v-if="show_ability && !forEnemy && c.data?.multi" class="text">
       Карта бьет по {{ c.data.multi.value }} целям <br />
     </div>
+    <div
+      v-if="show_ability && !forEnemy && c.data?.field_interaction"
+      class="text"
+    >
+      Эффект
+      {{
+        formatEffect(c, effectsInfo[c.data.field_interaction.type].description)
+      }}
+      <br />
+      Эффект длится
+      {{
+        c.data.field_interaction?.times_count || c.data.field_interaction?.turns
+      }}
+      <p v-if="c.data.field_interaction?.times_count">раз</p>
+      <p v-if="c.data.field_interaction?.turns">ходов</p>
+    </div>
     <!--Описание абилки для карты врага-->
     <div v-if="show_ability && forEnemy" class="text">
       {{ formatEnemyMove(c) }} <br />
@@ -58,6 +74,28 @@
     <div v-if="show_passive && card.passive_ability?.name" class="text">
       {{ formatCardPassiveAbility(c) }} <br />
       <br />
+      <div
+        v-if="
+          show_passive && !forEnemy && c.data?.passive?.field_interaction?.type
+        "
+        class="text"
+      >
+        Эффект
+        {{
+          formatEffect(
+            c,
+            effectsInfo[c.data.passive.field_interaction?.type]?.description
+          )
+        }}
+        <br />
+        Эффект длится
+        {{
+          c.data.passive.field_interaction?.times_count ||
+          c.data.passive.field_interaction?.turns
+        }}
+        <p v-if="c.data.field_interaction?.times_count">раз</p>
+        <p v-if="c.data.field_interaction?.turns">ходов</p>
+      </div>
       <span v-if="c.data.passive?.has_passive_in_field">
         Срабатывает когда карта <b>НА ПОЛЕ</b>
       </span>
@@ -124,6 +162,9 @@ export default defineComponent({
     icon(): string {
       return ability_icon((this.card as any)?.ability?.name)
     },
+    effectsInfo() {
+      return this.$store.getters["effectsInfo"]
+    },
   },
   created() {
     const c = this.card as any
@@ -167,6 +208,14 @@ export default defineComponent({
           /{value}/g,
           card.data.value !== undefined ? `{{ ${card.data.value} }}` : "{value}"
         )
+    },
+    formatEffect(card: any, ability_description: string): string {
+      return ability_description.replace(
+        /{value}/g,
+        card.data?.field_interaction?.value !== undefined
+          ? `{{ ${card.data.field_interaction.value} }}`
+          : "{value}"
+      )
     },
     formatEnemyMove(enemy: any): string {
       return enemy.move.description.replace(

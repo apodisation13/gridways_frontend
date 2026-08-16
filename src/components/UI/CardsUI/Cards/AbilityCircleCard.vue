@@ -66,10 +66,9 @@
     />
     <ability-icon
       v-else-if="
-        card.ability.name === CardAbility.MoveEnemy ||
-        card.ability.name === CardAbility.SetEnemyAsToken ||
-        card.ability.name === CardAbility.PlaceSelfInField ||
-        card.ability.name === CardAbility.SpawnEffectInRow
+        card.ability.name === CardAbility.SpawnEffect ||
+        card.ability.name === CardAbility.SpawnEffectRow ||
+        card.ability.name === CardAbility.SpawnEffectColumn
       "
       :icon="require('@/assets/icons/card/field_interaction.svg')"
     />

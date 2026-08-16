@@ -1,5 +1,7 @@
 import Upgrades from "@/store/modules/upgrades"
 
+import { EffectObject, EffectType } from "./game"
+
 export interface CardData {
   damage: number
   charges: number
@@ -24,10 +26,12 @@ export interface CardData {
     each_tick?: boolean
     upon_beginning?: boolean
     upon_playing_a_card?: boolean
+    field_interaction?: EffectObject
   }
   multi?: {
     value: number
   }
+  field_interaction: EffectObject | null
 }
 
 export interface LeaderData {
@@ -49,10 +53,12 @@ export interface LeaderData {
     reset_timer?: boolean
     each_tick?: boolean
     upon_playing_a_card?: boolean
+    field_interaction?: EffectObject
   }
   multi?: {
     value: number
   }
+  field_interaction: EffectObject | null
 }
 
 export interface EnemyData {
@@ -373,6 +379,7 @@ export interface GameConst {
   arena_upgrades: Record<string, unknown>
   arena_params: ArenaParams
   multiplayer: Multiplayer
+  effects: Record<EffectType, EffectInfo>
 }
 
 export interface Faction {
@@ -427,4 +434,11 @@ export interface SeasonEntry {
   finished: boolean | null
   season: MappedSeason
   stats: Stats
+}
+
+export interface EffectInfo {
+  description: string
+  title: string
+  turn_type: "turns" | "times_count"
+  negative?: boolean
 }

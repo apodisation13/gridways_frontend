@@ -4,7 +4,7 @@ import store from "@/store"
 
 // функция проверки жизней, проигрыша
 export function check_lose(): void {
-  if (store.state.game.health <= 0) {
+  if (store.getters["health"] <= 0) {
     sound_lose_game()
     router.push("/lose")
   }

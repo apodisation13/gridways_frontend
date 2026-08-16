@@ -74,7 +74,7 @@ export default defineComponent({
   emits: ["close"],
   computed: {
     health(): number {
-      return this.$store.state.game.health
+      return this.$store.getters["health"]
     },
     armor(): number {
       return this.$store.state.game.armor

@@ -1,21 +1,25 @@
+import { applyEffectAtCell } from "@/logic/ai_move/effects_interaction"
 import { damage_player } from "@/logic/ai_move/moves/damage"
 import { sound_enemy_move_down } from "@/logic/play_sounds"
-import type { Enemy } from "@/types"
+import type { Enemy, GameObj } from "@/types"
 
 export function random_move(
   field: (Enemy | "")[],
   i: number,
+  gameObj: GameObj,
   timeout = 1000
 ): void {
-  let random = Math.floor(Math.random() * field.length)
+  const random = Math.floor(Math.random() * field.length)
   if (field[random]) {
     console.log(`враг c ${i}, хотел на ${random}, а там враг`)
-    damage_player(field, i, timeout)
+    const killed = applyEffectAtCell(i, gameObj, timeout * 0.75)
+    if (!killed) damage_player(field, i, timeout)
   } else {
     console.log(`враг c ${i}, хотел на ${random}, и прыгнул`)
-    ;(field[i] as Enemy).already_jumped = true // он уже прыгнул, чтобы потом не прыгать ещё раз
-    field[random] = field[i] // враг прыгнул рандом клетку
+    ;(field[i] as Enemy).already_jumped = true
+    field[random] = field[i]
     field[i] = ""
     sound_enemy_move_down()
+    applyEffectAtCell(random, gameObj, timeout * 0.75)
   }
 }

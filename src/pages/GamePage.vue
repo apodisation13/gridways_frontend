@@ -4,8 +4,11 @@
       <!-- поле с врагами -->
       <field-comp
         :field="gameObj.field"
+        :effects="gameObj.effects"
         :in_cross_enemy_index="inCrossEnemyIndex"
         :multi_locked_indices="multiLockedIndices"
+        :in_cross_cell_index="inCrossCellIndex"
+        :multi_locked_cell_indices="multiLockedCellIndices"
         @exec_damage_ai_card="exec_damage_enemy_card"
       />
 
@@ -59,6 +62,10 @@
           @enemy_in_cross="switch_enemy_in_cross"
           @enemy_in_cross_locked="switch_enemy_in_cross_locked"
           @target_enemy_multi="exec_damage_enemy_card_multi"
+          @target_empty_cell="target_empty_cell"
+          @target_empty_cell_multi="target_empty_cell_multi"
+          @cell_in_cross="switch_cell_in_cross"
+          @cell_in_cross_locked="switch_cell_in_cross_locked"
         />
 
         <!-- Полоска с жизнями — клик открывает модалку использования предметов -->
@@ -83,6 +90,10 @@
       @enemy_in_cross="switch_enemy_in_cross"
       @enemy_in_cross_locked="switch_enemy_in_cross_locked"
       @target_enemy_multi="exec_damage_enemy_card_multi"
+      @target_empty_cell="target_empty_cell"
+      @target_empty_cell_multi="target_empty_cell_multi"
+      @cell_in_cross="switch_cell_in_cross"
+      @cell_in_cross_locked="switch_cell_in_cross_locked"
     />
 
     <special-case-abilities
@@ -100,6 +111,10 @@
       @enemy_in_cross="switch_enemy_in_cross"
       @enemy_in_cross_locked="switch_enemy_in_cross_locked"
       @target_enemy_multi="exec_damage_enemy_card_multi"
+      @target_empty_cell="target_empty_cell"
+      @target_empty_cell_multi="target_empty_cell_multi"
+      @cell_in_cross="switch_cell_in_cross"
+      @cell_in_cross_locked="switch_cell_in_cross_locked"
     />
 
     <transition name="modal" appear>
@@ -142,9 +157,10 @@ import {
 import { remove_dead_card } from "@/logic/player_move/service/service_for_player_move"
 import draw from "@/mixins/GamePage/draw"
 import execaimove from "@/mixins/GamePage/execaimove"
+import fieldinteraction from "@/mixins/GamePage/fieldinteraction"
 import specialcaseabilities from "@/mixins/GamePage/specialcaseabilities"
 import startgame from "@/mixins/GamePage/startgame"
-import type {
+import {
   Card,
   Enemy,
   EnemyLeader as EnemyLeaderType,
@@ -170,7 +186,7 @@ export default defineComponent({
     SpecialCaseAbilities,
     UseSpecialItemsComponent,
   },
-  mixins: [draw, specialcaseabilities, execaimove, startgame],
+  mixins: [draw, specialcaseabilities, execaimove, startgame, fieldinteraction],
 
   data() {
     return {
@@ -184,6 +200,7 @@ export default defineComponent({
           | Enemy
           | ""
         )[],
+        effects: ["", "", "", "", "", "", "", "", "", "", "", ""],
         enemy_leader: null as EnemyLeaderType | null,
         enemies: [] as Enemy[], // колода врагов, приходит из start_game
         enemies_grave: [] as Enemy[], // кладбище врагов
@@ -201,7 +218,7 @@ export default defineComponent({
       // если лидер врагов или враг под прицелом, у него будет анимация свечения
       inCrossEnemyLeader: false,
       inCrossEnemyIndex: null as number | null,
-      // залоченные цели в режиме multi — остаются мигать до выстрела или отмены
+
       multiLockedIndices: [] as number[],
       show_special_items: false,
     }
@@ -387,6 +404,16 @@ export default defineComponent({
         }
       }
       // "leader" — лидер врагов залочен как первая цель; его анимация управляется inCrossEnemyLeader
+    },
+    switch_cell_in_cross(index: number | null): void {
+      this.inCrossCellIndex = index
+    },
+    switch_cell_in_cross_locked(indexOrNull: number | null): void {
+      if (indexOrNull === null) {
+        this.multiLockedCellIndices = []
+      } else if (!this.multiLockedCellIndices.includes(indexOrNull)) {
+        this.multiLockedCellIndices.push(indexOrNull)
+      }
     },
 
     // multi: выстрел по нескольким целям одновременно

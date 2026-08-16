@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Disc shadow -->
+  <ellipse cx="51" cy="54" rx="34" ry="7" fill="rgba(0,0,0,0.18)"/>
+
+  <!-- Outer rim (bevel edge) -->
+  <circle cx="50" cy="50" r="34" fill="rgba(100,105,118,0.88)" stroke="rgba(195,200,215,0.52)" stroke-width="1.5"/>
+
+  <!-- Main disc surface -->
+  <circle cx="50" cy="50" r="30" fill="rgba(148,153,165,0.86)" stroke="rgba(215,220,232,0.58)" stroke-width="1.2"/>
+
+  <!-- Bevel highlight (top arc) -->
+  <path d="M24 43 Q50 33 76 43" fill="none" stroke="rgba(235,240,252,0.42)" stroke-width="2.8" stroke-linecap="round"/>
+
+  <!-- Middle ring -->
+  <circle cx="50" cy="50" r="20" fill="rgba(128,133,146,0.70)" stroke="rgba(188,193,208,0.40)" stroke-width="1"/>
+
+  <!-- Inner ring -->
+  <circle cx="50" cy="50" r="11" fill="rgba(112,117,130,0.76)" stroke="rgba(172,177,192,0.38)" stroke-width="0.8"/>
+
+  <!-- Center mechanism -->
+  <circle cx="50" cy="50" r="5.5" fill="rgba(90,95,110,0.90)" stroke="rgba(155,160,176,0.48)" stroke-width="0.8"/>
+
+  <!-- Amber indicator LED -->
+  <circle cx="50" cy="50" r="2.8" fill="rgba(210,160,0,0.88)" stroke="rgba(160,110,0,0.52)" stroke-width="0.8"/>
+
+  <!-- Crosshair arms extending just beyond disc -->
+  <line x1="50" y1="10" x2="50" y2="18" stroke="rgba(185,190,212,0.40)" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="50" y1="82" x2="50" y2="90" stroke="rgba(185,190,212,0.40)" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="10" y1="50" x2="18" y2="50" stroke="rgba(185,190,212,0.40)" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="82" y1="50" x2="90" y2="50" stroke="rgba(185,190,212,0.40)" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Corner targeting brackets -->
+  <path d="M16 22 L22 22 L22 28" fill="none" stroke="rgba(185,190,212,0.36)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M84 22 L78 22 L78 28" fill="none" stroke="rgba(185,190,212,0.36)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M16 78 L22 78 L22 72" fill="none" stroke="rgba(185,190,212,0.36)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M84 78 L78 78 L78 72" fill="none" stroke="rgba(185,190,212,0.36)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

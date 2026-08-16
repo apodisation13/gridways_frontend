@@ -79,7 +79,7 @@ export function field_passives(
   } else if (pea === EnemyPassive.SpawnTokensInDeck) {
     spawn_tokens_in_deck(enemy, gameObj, timeout)
   } else if (pea === EnemyPassive.SpawnToken) {
-    spawn_token(enemy, field, timeout)
+    spawn_token(enemy, gameObj, timeout)
   } else if (pea === EnemyPassive.SpawnRandomToken) {
     spawn_random_token(enemy, gameObj, timeout)
   } else if (pea === EnemyPassive.GiveShield) {

@@ -1,6 +1,6 @@
 import { choice_element } from "@/lib/utils"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
-import { sound_heal } from "@/logic/play_sounds"
+import { sound_enemy_heal } from "@/logic/play_sounds"
 import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
 import type { Enemy, EnemyLeader } from "@/types"
 
@@ -14,7 +14,7 @@ export function heal_self(enemy: Enemy, timeout = 1000): void {
     enemy.hp_delta = null
   }, timeout)
   enemy.data.hp += hp_delta
-  timeoutAnimationFlag(enemy, "healing", sound_heal, timeout * 0.5)
+  timeoutAnimationFlag(enemy, "healing", sound_enemy_heal, timeout * 0.5)
 }
 
 // враг лечит пассивно в конце хода лидера врагов на VALUE
@@ -30,7 +30,7 @@ export function heal_enemy_leader(
     enemy_leader.hp_delta = null
   }, timeout)
   enemy_leader.data.hp += hp_delta
-  timeoutAnimationFlag(enemy, "healing", sound_heal, timeout * 0.5)
+  timeoutAnimationFlag(enemy, "healing", sound_enemy_heal, timeout * 0.5)
 }
 
 // враг лечит пассивно в конце хода всех врагов на VALUE
@@ -44,7 +44,7 @@ export function heal_all(
 
   const hp_delta = enemy.data?.passive?.value
   if (!hp_delta) return
-  sound_heal()
+  sound_enemy_heal()
   all_enemies.forEach(e => {
     e.hp_delta = hp_delta
     setTimeout(() => {
@@ -52,7 +52,7 @@ export function heal_all(
     }, timeout)
     e.data.hp += hp_delta
   })
-  timeoutAnimationFlag(enemy, "healing", sound_heal, timeout * 0.5)
+  timeoutAnimationFlag(enemy, "healing", sound_enemy_heal, timeout * 0.5)
 }
 
 export function heal_random(
@@ -72,7 +72,7 @@ export function heal_random(
     random_enemy.hp_delta = null
   }, timeout)
   random_enemy.data.hp += hp_delta
-  timeoutAnimationFlag(enemy, "healing", sound_heal, timeout * 0.5)
+  timeoutAnimationFlag(enemy, "healing", sound_enemy_heal, timeout * 0.5)
 }
 
 export function heal_self_by_highest_hp(
@@ -93,7 +93,7 @@ export function heal_self_by_highest_hp(
     enemy.hp_delta = null
   }, timeout)
   enemy.data.hp += target.data.hp
-  timeoutAnimationFlag(enemy, "healing", sound_heal, timeout * 0.5)
+  timeoutAnimationFlag(enemy, "healing", sound_enemy_heal, timeout * 0.5)
 }
 
 export function heal_row(
@@ -106,7 +106,7 @@ export function heal_row(
   let index = field.indexOf(enemy)
   let min = Math.floor(index / 3) * 3
   let max = min + 3
-  timeoutAnimationFlag(enemy, "healing", sound_heal, timeout * 0.5)
+  timeoutAnimationFlag(enemy, "healing", sound_enemy_heal, timeout * 0.5)
   field.slice(min, max).forEach(e => {
     if (e) {
       e.hp_delta = hp_delta
@@ -127,7 +127,7 @@ export function heal_column(
   if (!hp_delta) return
   let index = field.indexOf(enemy) % 3
   let indexes = [index, index + 3, index + 6, index + 9]
-  timeoutAnimationFlag(enemy, "healing", sound_heal, timeout * 0.5)
+  timeoutAnimationFlag(enemy, "healing", sound_enemy_heal, timeout * 0.5)
   indexes.forEach(i => {
     const e = field[i]
     if (e) {

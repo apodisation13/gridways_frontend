@@ -18,9 +18,10 @@ export const arrowMixin = {
       // multi-target state
       multiMode: false,
       multiCount: 0,
-      multiLockedTargets: [], // { isLeader: bool, fieldValue: Enemy|null }
+      multiLockedTargets: [], // { isLeader: bool, fieldValue: Enemy|null } or { cellIndex: N }
       _multiHoverTimer: null,
       _multiHoverTargetKey: null,
+      isFieldInteraction: false,
     }
   },
 
@@ -58,7 +59,14 @@ export const arrowMixin = {
 
     // Единая точка входа — каждый компонент передаёт свой DOM-элемент и фракцию
     // multiCount > 1 включает режим мульти-целей
-    beginArrowDrawing(startElement, clientX, clientY, faction, multiCount = 0) {
+    beginArrowDrawing(
+      startElement,
+      clientX,
+      clientY,
+      faction,
+      multiCount = 0,
+      isFieldInteraction = false
+    ) {
       const rect = startElement.getBoundingClientRect()
       this.arrowStartX = rect.left + rect.width / 2
       this.arrowStartY = rect.top + rect.height / 2
@@ -69,6 +77,7 @@ export const arrowMixin = {
       this.multiMode = multiCount > 1
       this.multiCount = multiCount
       this.multiLockedTargets = []
+      this.isFieldInteraction = isFieldInteraction
       this._clearMultiHoverTimer()
       this.addArrowEventListeners()
       this.drawArrow()
@@ -210,49 +219,80 @@ export const arrowMixin = {
 
       if (this.multiMode) {
         const targetInfo = this._getTargetInfo(elems)
-        // Финальный выстрел: все предыдущие цели залочены, эта — последняя
+        const _resetMulti = () => {
+          this.$emit("enemy_in_cross", null)
+          this.$emit("enemy_leader_in_cross", false)
+          this.$emit("enemy_in_cross_locked", null)
+          this.$emit("cell_in_cross", null)
+          this.$emit("cell_in_cross_locked", null)
+          this.multiLockedTargets = []
+          this.multiMode = false
+          this.multiCount = 0
+          this.isFieldInteraction = false
+        }
+
         if (
           targetInfo &&
           this.multiLockedTargets.length === this.multiCount - 1
         ) {
-          const finalTarget = targetInfo.isLeader
-            ? { isLeader: true, fieldValue: null }
-            : { isLeader: false, fieldValue: this.field[targetInfo.index] }
-          const alreadyLocked = targetInfo.isLeader
-            ? this.multiLockedTargets.some(t => t.isLeader)
-            : this.multiLockedTargets.some(
-                t => !t.isLeader && t.fieldValue === finalTarget.fieldValue
-              )
-          if (alreadyLocked) {
-            this.$emit("enemy_in_cross", null)
-            this.$emit("enemy_leader_in_cross", false)
-            this.$emit("enemy_in_cross_locked", null)
-            this.multiLockedTargets = []
-            this.multiMode = false
-            this.multiCount = 0
-            return
+          if (this.isFieldInteraction) {
+            // Финальный выстрел по пустым клеткам
+            const alreadyLocked = this.multiLockedTargets.some(
+              t => t.cellIndex === targetInfo.cellIndex
+            )
+            if (!alreadyLocked) {
+              const allIndices = [
+                ...this.multiLockedTargets.map(t => t.cellIndex),
+                targetInfo.cellIndex,
+              ]
+              _resetMulti()
+              this.$emit("target_empty_cell_multi", allIndices)
+            } else {
+              _resetMulti()
+            }
+          } else {
+            // Финальный выстрел по врагам (оригинальная логика)
+            const finalTarget = targetInfo.isLeader
+              ? { isLeader: true, fieldValue: null }
+              : { isLeader: false, fieldValue: this.field[targetInfo.index] }
+            const alreadyLocked = targetInfo.isLeader
+              ? this.multiLockedTargets.some(t => t.isLeader)
+              : this.multiLockedTargets.some(
+                  t => !t.isLeader && t.fieldValue === finalTarget.fieldValue
+                )
+            if (!alreadyLocked) {
+              const allTargets = [...this.multiLockedTargets, finalTarget]
+              _resetMulti()
+              this.$emit("target_enemy_multi", allTargets)
+            } else {
+              _resetMulti()
+            }
           }
-          const allTargets = [...this.multiLockedTargets, finalTarget]
-          this.$emit("enemy_in_cross", null)
-          this.$emit("enemy_leader_in_cross", false)
-          this.$emit("enemy_in_cross_locked", null)
-          this.$emit("target_enemy_multi", allTargets)
         } else {
           // Отмена: отпустили мимо цели или не набрали нужное число залоченных
-          this.$emit("enemy_in_cross", null)
-          this.$emit("enemy_leader_in_cross", false)
-          this.$emit("enemy_in_cross_locked", null)
+          _resetMulti()
         }
-        this.multiLockedTargets = []
-        this.multiMode = false
-        this.multiCount = 0
       } else {
         this.get_target(elems, true)
+        this.isFieldInteraction = false
       }
     },
 
     // Возвращает информацию о цели под курсором без эмитов (только для stopArrowDrawing)
     _getTargetInfo(elems) {
+      if (this.isFieldInteraction) {
+        for (const el of elems) {
+          const cellMatch = Array.from(el.classList).find(c =>
+            /^cell-\d+$/.test(c)
+          )
+          if (cellMatch) {
+            const idx = parseInt(cellMatch.slice(5))
+            if (this.field[idx] === "") return { cellIndex: idx }
+          }
+        }
+        return null
+      }
+
       let elem = null
       elems.forEach(el => {
         if (
@@ -334,6 +374,10 @@ export const arrowMixin = {
     },
 
     get_target(elems, fire) {
+      if (this.isFieldInteraction) {
+        return this._get_target_cell(elems, fire)
+      }
+
       let elem = null
       elems.forEach((el, index) => {
         if (
@@ -347,6 +391,64 @@ export const arrowMixin = {
       return this.target_emit(elem, fire)
     },
 
+    _get_target_cell(elems, fire) {
+      let emptyCellIndex = null
+      for (const el of elems) {
+        if (emptyCellIndex !== null) break
+        const cellMatch = Array.from(el.classList).find(c =>
+          /^cell-\d+$/.test(c)
+        )
+        if (cellMatch) {
+          const idx = parseInt(cellMatch.slice(5))
+          if (this.field[idx] === "") emptyCellIndex = idx
+        }
+      }
+
+      if (emptyCellIndex === null) {
+        if (this.multiMode) this._clearMultiHoverTimer()
+        this.$emit("cell_in_cross", null)
+        return false
+      }
+
+      if (fire) {
+        this.$emit("cell_in_cross", null)
+        this.$emit("target_empty_cell", emptyCellIndex)
+        return false
+      }
+
+      this.$emit("cell_in_cross", emptyCellIndex)
+
+      // hover — мульти-лок пустых клеток
+      if (
+        this.multiMode &&
+        this.multiLockedTargets.length < this.multiCount - 1
+      ) {
+        const targetKey = `cell_${emptyCellIndex}`
+        if (this._multiHoverTargetKey !== targetKey) {
+          this._clearMultiHoverTimer()
+          this._multiHoverTargetKey = targetKey
+          const alreadyLocked = this.multiLockedTargets.some(
+            t => t.cellIndex === emptyCellIndex
+          )
+          if (!alreadyLocked) {
+            this._multiHoverTimer = setTimeout(() => {
+              this._multiHoverTimer = null
+              if (
+                this.multiLockedTargets.length < this.multiCount - 1 &&
+                !this.multiLockedTargets.some(
+                  t => t.cellIndex === emptyCellIndex
+                )
+              ) {
+                this.multiLockedTargets.push({ cellIndex: emptyCellIndex })
+                this.$emit("cell_in_cross_locked", emptyCellIndex)
+              }
+            }, 1000)
+          }
+        }
+      }
+      return true
+    },
+
     target_emit(elem, fire) {
       const id = elem?.id
 
@@ -355,6 +457,7 @@ export const arrowMixin = {
         if (this.multiMode) this._clearMultiHoverTimer()
         this.$emit("enemy_leader_in_cross", false)
         this.$emit("enemy_in_cross", null)
+        this.$emit("cell_in_cross", null)
         return false
       }
 

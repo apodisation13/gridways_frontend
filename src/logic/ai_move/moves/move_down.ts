@@ -1,28 +1,24 @@
+import { applyEffectAtCell } from "@/logic/ai_move/effects_interaction"
 import { damage_player } from "@/logic/ai_move/moves/damage"
 import { sound_enemy_move_down } from "@/logic/play_sounds"
-import type { Enemy } from "@/types"
+import type { Enemy, GameObj } from "@/types"
 
 export function down_move(
   field: (Enemy | "")[],
   i: number,
+  gameObj: GameObj,
   timeout = 1000
 ): void {
-  // враги которые уже стоят внизу
-  if (i >= 9) {
-    damage_player(field, i, timeout)
+  // Enemy already at the bottom row or blocked below — check effect then damage player
+  if (i >= 9 || field[i + 3]) {
+    const killed = applyEffectAtCell(i, gameObj, timeout * 0.75)
+    if (!killed) damage_player(field, i, timeout)
     return
   }
 
-  // ДЛЯ ОСТАЛЬНЫХ ВРАГОВ, i < 9, верхние 3 строки
-
-  // ЕСЛИ У ВРАГА ЕСТЬ ВРАГ ПОД НИМ ВНИЗУ
-  if (field[i + 3]) {
-    damage_player(field, i, timeout)
-    return
-  }
-
-  // ДЛЯ ОСТАЛЬНЫХ, КОМУ ЕСТЬ КУДА ПОХОДИТЬ
-  field[i + 3] = field[i] // типа враг прыгнул на клеточку ниже
+  // Empty cell below — move there, then check effect at new position
+  field[i + 3] = field[i]
   field[i] = ""
   sound_enemy_move_down()
+  applyEffectAtCell(i + 3, gameObj, timeout * 0.75)
 }

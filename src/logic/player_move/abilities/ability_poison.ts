@@ -1,3 +1,4 @@
+import { poison_sound } from "@/logic/play_sounds"
 import { remove_dead_enemy } from "@/logic/player_move/abilities/enemy_takes_damage"
 import type { Enemy, EnemyLeader, GameObj } from "@/types"
 import { EnemyStatus } from "@/types"
@@ -17,11 +18,13 @@ export function poison_one_enemy(
   // если у врага уже есть яд, убиваем его (снимаем ему в кладбище статус)
   if (enemy.data.status === EnemyStatus.Poison) {
     enemy.data.status = null
+    poison_sound()
     remove_dead_enemy(enemy, gameObj, timeout)
     return
   }
 
   enemy.data.status = EnemyStatus.Poison
+  poison_sound()
 }
 
 export function poison_all_enemies(gameObj: GameObj, timeout = 1000): void {

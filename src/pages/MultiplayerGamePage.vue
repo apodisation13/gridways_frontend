@@ -49,6 +49,7 @@
              @exec_damage_ai_card — когда игрок кликает по врагу на поле. -->
         <field-comp
           :field="gameObj.field"
+          :effects="gameObj.effects"
           :in_cross_enemy_index="inCrossEnemyIndex"
           :multi_locked_indices="multiLockedIndices"
           @exec_damage_ai_card="exec_damage_enemy_card"
@@ -478,7 +479,7 @@ export default defineComponent({
       return this.myRedrawDone && !this.opponentRedrawDone
     },
     health(): number {
-      return this.$store.state.game.health
+      return this.$store.getters["health"]
     },
     armor(): number {
       return this.$store.state.game.armor
@@ -793,7 +794,7 @@ export default defineComponent({
       this.draw = true // открываем окно редро
       this.gameInitialized = true
       this.myTurn = true // хост ходит первым
-      this.lastSentHealth = this.$store.state.game.health
+      this.lastSentHealth = this.$store.getters["health"]
       this.lastSentArmor = this.$store.state.game.armor
       this.sendPlayerState() // сразу отправляем наш стейт гостю
     },
@@ -841,7 +842,7 @@ export default defineComponent({
       this.draw = true
       this.gameInitialized = true
       this.myTurn = false // гость ждёт TURN_END от хоста
-      this.lastSentHealth = this.$store.state.game.health
+      this.lastSentHealth = this.$store.getters["health"]
       this.lastSentArmor = this.$store.state.game.armor
       this.sendPlayerState()
     },
@@ -924,7 +925,7 @@ export default defineComponent({
     sendGameState(includeHealth = true): void {
       const ws: WebSocket | null = this.$store.state.multi.ws
       if (!ws || ws.readyState !== WebSocket.OPEN) return
-      const currentHealth = this.$store.state.game.health
+      const currentHealth = this.$store.getters["health"]
       const currentArmor = this.$store.state.game.armor
 
       // Забираем накопленный лог атак и сразу очищаем его в сторе.
@@ -1019,7 +1020,7 @@ export default defineComponent({
           setTimeout(() => this.sendGameState(), timeout + 100)
 
           // Шаг 2: ход врагов (AI)
-          ai_move(this.gameObj.field, timeout)
+          ai_move(this.gameObj, timeout)
 
           const await_ai = setInterval(() => {
             if (!this.$store.state.game.ai_move) {
@@ -1036,8 +1037,8 @@ export default defineComponent({
                   this.sendGameState()
 
                   // Шаг 4: выходит новый враг из очереди (если есть)
-                  appear_new_enemy(this.gameObj.field, this.gameObj.enemies)
-                  appear_new_enemy(this.gameObj.field, this.gameObj.enemies)
+                  appear_new_enemy(this.gameObj, timeout)
+                  appear_new_enemy(this.gameObj, timeout)
 
                   // Шаг 5: ждём пока все таймеры удаления мёртвых врагов сработают,
                   // затем шлём финальный стейт и передаём ход напарник
@@ -1075,7 +1076,7 @@ export default defineComponent({
             faction: c.faction ?? "",
           })),
           leader_faction: (this.gameObj.leader as any)?.faction ?? "",
-          health: this.$store.state.game.health,
+          health: this.$store.getters["health"],
           max_hp: this.$store.getters["maxHp"],
           armor: this.$store.state.game.armor,
           max_armor: this.$store.getters["maxArmor"],
