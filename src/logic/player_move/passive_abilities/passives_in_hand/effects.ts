@@ -70,3 +70,21 @@ export function spawn_effect_random(card: Card | Leader, gameObj: GameObj) {
   effects[randomIndex] = copyObj(realEffect)
   effectsSounds(realEffect)
 }
+
+export function incr_effect(card: Card | Leader, gameObj: GameObj) {
+  const { effects } = gameObj
+  const value = card.data.passive?.value
+
+  if (!value) return
+
+  const emptyEffectIndexes = get_effects_indexes(effects)
+  const randomIndex = choice_element(emptyEffectIndexes)
+
+  if (!randomIndex) return
+
+  const effectObject = effects[randomIndex] as EffectObject
+  if (!effectObject) return
+
+  if (effectObject.turns) effectObject.turns += value
+  if (effectObject.times_count) effectObject.times_count += value
+}
