@@ -52,6 +52,8 @@
           :effects="gameObj.effects"
           :in_cross_enemy_index="inCrossEnemyIndex"
           :multi_locked_indices="multiLockedIndices"
+          :in_cross_cell_index="inCrossCellIndex"
+          :multi_locked_cell_indices="multiLockedCellIndices"
           @exec_damage_ai_card="exec_damage_enemy_card"
         />
 
@@ -152,6 +154,10 @@
             @enemy_in_cross="switch_enemy_in_cross"
             @enemy_in_cross_locked="switch_enemy_in_cross_locked"
             @target_enemy_multi="exec_damage_enemy_card_multi"
+            @target_empty_cell="target_empty_cell"
+            @target_empty_cell_multi="target_empty_cell_multi"
+            @cell_in_cross="switch_cell_in_cross"
+            @cell_in_cross_locked="switch_cell_in_cross_locked"
           />
 
           <!-- HP и броня своего игрока.
@@ -182,6 +188,10 @@
         @enemy_in_cross="switch_enemy_in_cross"
         @enemy_in_cross_locked="switch_enemy_in_cross_locked"
         @target_enemy_multi="exec_damage_enemy_card_multi"
+        @target_empty_cell="target_empty_cell"
+        @target_empty_cell_multi="target_empty_cell_multi"
+        @cell_in_cross="switch_cell_in_cross"
+        @cell_in_cross_locked="switch_cell_in_cross_locked"
       />
 
       <!-- ── SpecialCaseAbilities — оверлей особых способностей карт ────────
@@ -203,6 +213,10 @@
         @enemy_in_cross="switch_enemy_in_cross"
         @enemy_in_cross_locked="switch_enemy_in_cross_locked"
         @target_enemy_multi="exec_damage_enemy_card_multi"
+        @target_empty_cell="target_empty_cell"
+        @target_empty_cell_multi="target_empty_cell_multi"
+        @cell_in_cross="switch_cell_in_cross"
+        @cell_in_cross_locked="switch_cell_in_cross_locked"
       />
 
       <!-- ── Редро — замена карт в начале игры ─────────────────────────────
@@ -296,6 +310,7 @@ import { remove_dead_card } from "@/logic/player_move/service/service_for_player
 import { random_level_generator_by_number } from "@/logic/random_level"
 import draw from "@/mixins/GamePage/draw"
 import execaimove from "@/mixins/GamePage/execaimove"
+import fieldinteraction from "@/mixins/GamePage/fieldinteraction"
 import specialcaseabilities from "@/mixins/GamePage/specialcaseabilities"
 import type {
   Card,
@@ -330,7 +345,7 @@ export default defineComponent({
     SpecialCaseAbilities,
     UseSpecialItemsComponent,
   },
-  mixins: [draw, specialcaseabilities, execaimove],
+  mixins: [draw, specialcaseabilities, execaimove, fieldinteraction],
 
   // ── Перехват навигации при завершении игры ───────────────────────────────
   // Срабатывает когда check_lose() или check_win() делают router.push("/lose") / router.push("/win").
@@ -360,6 +375,7 @@ export default defineComponent({
           | Enemy
           | ""
         )[],
+        effects: ["", "", "", "", "", "", "", "", "", "", "", ""],
         enemy_leader: null as EnemyLeaderType | null,
         enemies: [] as Enemy[], // очередь врагов (ещё не вышли на поле)
         enemies_grave: [] as Enemy[], // убитые враги
@@ -638,6 +654,7 @@ export default defineComponent({
           enemies: msg.enemies,
           field: msg.field,
           enemy_leader: msg.enemy_leader,
+          effects: msg.effects,
         })
         this.initFromStore()
       } else if (msg.event === "REDRAW_DONE") {
@@ -654,6 +671,9 @@ export default defineComponent({
         this.gameObj.enemy_leader = JSON.parse(JSON.stringify(msg.enemy_leader))
         this.gameObj.enemies_grave = JSON.parse(
           JSON.stringify(msg.enemies_grave)
+        )
+        this.gameObj.effects = JSON.parse(
+          JSON.stringify(msg.effects ?? Array(12).fill(""))
         )
         const attackLog = (msg.attack_log as number[]) ?? []
         if (attackLog.length > 0) {
@@ -810,6 +830,7 @@ export default defineComponent({
             enemies: this.gameObj.enemies,
             field: this.gameObj.field,
             enemy_leader: this.gameObj.enemy_leader,
+            effects: this.gameObj.effects,
           })
         )
       }
@@ -835,6 +856,9 @@ export default defineComponent({
       )
       this.gameObj.field = JSON.parse(
         JSON.stringify(this.$store.state.multi.initial_field)
+      )
+      this.gameObj.effects = JSON.parse(
+        JSON.stringify(this.$store.state.multi.initial_effects)
       )
 
       draw_hand(this.gameObj.hand, this.gameObj.deck)
@@ -943,6 +967,7 @@ export default defineComponent({
           enemies: JSON.parse(JSON.stringify(this.gameObj.enemies)),
           enemy_leader: JSON.parse(JSON.stringify(this.gameObj.enemy_leader)),
           enemies_grave: JSON.parse(JSON.stringify(this.gameObj.enemies_grave)),
+          effects: JSON.parse(JSON.stringify(this.gameObj.effects)),
           // Если есть атаки — передаём их список; дельты не нужны (напарник сам всё посчитает).
           // Если атак нет — можем передать дельту для пассивных HP-изменений (не урон от врагов).
           attack_log: hasAttacks ? attackLog : [],
@@ -1248,6 +1273,17 @@ export default defineComponent({
         if (!this.multiLockedIndices.includes(indexOrNull)) {
           this.multiLockedIndices.push(indexOrNull)
         }
+      }
+    },
+
+    switch_cell_in_cross(index: number | null): void {
+      this.inCrossCellIndex = index
+    },
+    switch_cell_in_cross_locked(indexOrNull: number | null): void {
+      if (indexOrNull === null) {
+        this.multiLockedCellIndices = []
+      } else if (!this.multiLockedCellIndices.includes(indexOrNull)) {
+        this.multiLockedCellIndices.push(indexOrNull)
       }
     },
 

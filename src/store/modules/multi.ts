@@ -1,4 +1,4 @@
-import type { Enemy, EnemyLeader } from "@/types"
+import type { EffectObject, Enemy, EnemyLeader } from "@/types"
 
 export interface MultiState {
   room_id: string
@@ -7,6 +7,7 @@ export interface MultiState {
   initial_enemies: Enemy[]
   initial_field: (Enemy | "")[]
   initial_enemy_leader: EnemyLeader | null
+  initial_effects: (EffectObject | "")[]
   ws: WebSocket | null
 
   maxEnemies: Record<string, number>
@@ -19,6 +20,7 @@ const state: MultiState = {
   initial_enemies: [],
   initial_field: Array(12).fill("") as (Enemy | "")[],
   initial_enemy_leader: null,
+  initial_effects: Array(12).fill("") as (EffectObject | "")[],
   ws: null,
   maxEnemies: { min: 0, max: 0 },
 }
@@ -38,11 +40,13 @@ const mutations = {
       enemies: Enemy[]
       field: (Enemy | "")[]
       enemy_leader: EnemyLeader
+      effects?: (EffectObject | "")[]
     }
   ) {
     state.initial_enemies = payload.enemies
     state.initial_field = payload.field
     state.initial_enemy_leader = payload.enemy_leader
+    state.initial_effects = payload.effects ?? Array(12).fill("")
   },
   multi_set_ws(state: MultiState, ws: WebSocket | null) {
     state.ws = ws
@@ -57,6 +61,7 @@ const mutations = {
     state.initial_enemies = []
     state.initial_field = Array(12).fill("")
     state.initial_enemy_leader = null
+    state.initial_effects = Array(12).fill("")
     state.ws = null
   },
   setMaxEnemies(state: MultiState, payload: Record<string, number>) {
