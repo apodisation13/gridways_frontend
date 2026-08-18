@@ -175,6 +175,8 @@ export enum EnemyMove {
   Random = "random",
   Down = "down",
   Right = "right",
+  Row = "row",
+  Column = "column",
   // enemy leader abilities (enemy_leader_ai_move_once)
   DamageOnce = "damage-once",
   DecreaseAllPlayerDamage = "decrease-all-player-damage",

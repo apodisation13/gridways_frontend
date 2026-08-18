@@ -1,7 +1,9 @@
 import { decrementEffectTurns } from "@/logic/ai_move/effects_interaction"
+import { move_column } from "@/logic/ai_move/moves/move_column"
 import { down_move } from "@/logic/ai_move/moves/move_down"
 import { random_move } from "@/logic/ai_move/moves/move_random"
 import { right_move } from "@/logic/ai_move/moves/move_right"
+import { move_row } from "@/logic/ai_move/moves/move_row"
 import { stand_still } from "@/logic/ai_move/moves/move_stand_still"
 import { check_lose } from "@/logic/ai_move/service/check_lose"
 import { set_already_jumped } from "@/logic/ai_move/service/service_for_ai_move"
@@ -39,6 +41,10 @@ export function ai_move(gameObj: GameObj, timeout = 1000): void {
         down_move(field, idx, gameObj, timeout)
       } else if (move === EnemyMove.Right) {
         right_move(field, idx, gameObj, timeout)
+      } else if (move === EnemyMove.Row) {
+        move_row(field, idx, gameObj, timeout)
+      } else if (move === EnemyMove.Column) {
+        move_column(field, idx, gameObj, timeout)
       }
 
       i += 1

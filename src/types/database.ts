@@ -185,9 +185,12 @@ export interface Enemy {
   data: EnemyData
   image: string
   token?: boolean
+  // move fields
+  already_jumped?: boolean
+  direction_row?: string
+  direction_row_up?: boolean
   // animation fields
   hp_delta?: number | null
-  already_jumped?: boolean
   locked?: boolean
   dmg_delta?: number | null
   p_dmg_delta?: number | null
