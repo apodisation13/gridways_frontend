@@ -63,7 +63,7 @@ export default defineComponent({
   top: 62%;
   left: 50%;
   transform: translateX(-50%);
-  width: 65%;
+  width: 55%;
   height: 15cqmin;
   border-radius: 3cqmin;
   overflow: hidden;

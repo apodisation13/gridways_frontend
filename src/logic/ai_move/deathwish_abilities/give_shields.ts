@@ -6,7 +6,7 @@ export function give_shields_to_all(gameObj: GameObj): void {
   const { field } = gameObj
 
   field.forEach(e => {
-    if (e) e.data.shield = true
+    if (e && !e.locked) e.data.shield = true
   })
   sound_enemy_regain_shield()
 }

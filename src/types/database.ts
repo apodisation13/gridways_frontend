@@ -80,6 +80,7 @@ export interface EnemyData {
     default_timer?: number
     reset_timer?: boolean
     each_tick?: boolean
+    field_interaction?: EffectObject
   }
   deathwish?: { value?: number }
   value?: number
@@ -93,6 +94,8 @@ export interface EnemyLeaderData {
     timer?: number
     default_timer?: number
     reset_timer?: boolean
+    field_interaction?: EffectObject
+    value?: number
   }
   shield?: boolean | string
   armor?: number

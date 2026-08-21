@@ -1,5 +1,11 @@
 import { decrease_player_damage } from "@/logic/ai_move/passive_abilities/passives_in_field/decrease_player_damage"
 import {
+  decr_effect,
+  remove_effect,
+  spawn_effect,
+  spawn_effect_random,
+} from "@/logic/ai_move/passive_abilities/passives_in_field/effects_passives"
+import {
   heal_all,
   heal_column,
   heal_enemy_leader,
@@ -86,5 +92,13 @@ export function field_passives(
     give_shield(field, enemy_leader)
   } else if (pea === EnemyPassive.SpawnFactionUnit) {
     spawn_faction_unit(enemy, gameObj, true, timeout)
+  } else if (pea === EnemyPassive.SpawnEffectRandom) {
+    spawn_effect_random(enemy, gameObj)
+  } else if (pea === EnemyPassive.SpawnEffect) {
+    spawn_effect(enemy, gameObj)
+  } else if (pea === EnemyPassive.DecreaseEffect) {
+    decr_effect(enemy, gameObj)
+  } else if (pea === EnemyPassive.RemoveEffect) {
+    remove_effect(gameObj)
   }
 }

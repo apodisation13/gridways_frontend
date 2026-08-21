@@ -217,6 +217,11 @@ export enum EnemyPassive {
   SpawnRandomToken = "spawn-random-token",
   GiveShield = "give-shield",
   SpawnFactionUnit = "spawn-faction-unit",
+  // effects
+  SpawnEffectRandom = "spawn-effect-random",
+  SpawnEffect = "spawn-effect",
+  DecreaseEffect = "decrease-effect",
+  RemoveEffect = "remove-effect",
 }
 
 export enum EnemyDeathwish {

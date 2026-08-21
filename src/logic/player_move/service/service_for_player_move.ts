@@ -73,6 +73,30 @@ export function get_effects_indexes(effects: (EffectObject | "")[]): number[] {
   return effectsIndexesArray
 }
 
+export function get_negative_effects_indexes(
+  effects: (EffectObject | "")[]
+): number[] {
+  let effectsIndexesArray: number[] = []
+  for (let i = 0; i < effects.length; i++) {
+    if (effects[i] && (effects[i] as EffectObject).negative) {
+      effectsIndexesArray.push(i)
+    }
+  }
+  return effectsIndexesArray
+}
+
+export function get_positive_effects_indexes(
+  effects: (EffectObject | "")[]
+): number[] {
+  let effectsIndexesArray: number[] = []
+  for (let i = 0; i < effects.length; i++) {
+    if (effects[i] && !(effects[i] as EffectObject).negative) {
+      effectsIndexesArray.push(i)
+    }
+  }
+  return effectsIndexesArray
+}
+
 export function change_card_charges(
   card: Card | Leader,
   value: number,

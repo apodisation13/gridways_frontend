@@ -6,6 +6,7 @@ import { destroy_with_passive } from "@/logic/player_move/passive_abilities/pass
 import { passive_destroy_with_status } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_with_status"
 import {
   incr_effect,
+  remove_effect,
   spawn_effect,
   spawn_effect_random,
 } from "@/logic/player_move/passive_abilities/passives_in_hand/effects"
@@ -94,5 +95,7 @@ export function hand_passives(
     spawn_effect_random(card, gameObj)
   } else if (pa === CardPassiveAbility.IncrEffect) {
     incr_effect(card, gameObj)
+  } else if (pa === CardPassiveAbility.RemoveEffect) {
+    remove_effect(gameObj)
   }
 }

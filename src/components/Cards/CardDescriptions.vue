@@ -200,13 +200,13 @@ export default defineComponent({
         )
         .replace(
           /{value}/g,
-          card.data.passive?.value !== undefined
-            ? `{{ ${card.data.passive.value} }}`
-            : "{value}"
+          card.data.value !== undefined ? `{{ ${card.data.value} }}` : "{value}"
         )
         .replace(
           /{value}/g,
-          card.data.value !== undefined ? `{{ ${card.data.value} }}` : "{value}"
+          card.data.passive?.value !== undefined
+            ? `{{ ${card.data.passive.value} }}`
+            : "{value}"
         )
     },
     formatEffect(card: any, ability_description: string): string {
