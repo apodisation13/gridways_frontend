@@ -28,7 +28,7 @@ export function move_row(
 
     if (field[i + 1]) {
       const killed = applyEffectAtCell(i, gameObj, timeout * 0.75)
-      if (!killed) damage_player(field, i, timeout)
+      if (!killed) damage_player(field[i] as Enemy, timeout)
       return
     }
 
@@ -63,7 +63,7 @@ export function move_row(
       const newI = newRow * 3
       if (field[newI]) {
         const killed = applyEffectAtCell(i, gameObj, timeout * 0.75)
-        if (!killed) damage_player(field, i, timeout)
+        if (!killed) damage_player(field[i] as Enemy, timeout)
         return
       }
 
@@ -78,7 +78,7 @@ export function move_row(
 
     if (field[i - 1]) {
       const killed = applyEffectAtCell(i, gameObj, timeout * 0.75)
-      if (!killed) damage_player(field, i, timeout)
+      if (!killed) damage_player(field[i] as Enemy, timeout)
       return
     }
 

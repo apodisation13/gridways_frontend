@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Спики оранжевые -->
+  <line x1="50" y1="18" x2="50" y2="6"  stroke="#ee8833" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="71" y1="24" x2="79" y2="14" stroke="#ee8833" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="82" y1="45" x2="94" y2="43" stroke="#ee8833" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="76" y1="67" x2="85" y2="75" stroke="#ee8833" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="50" y1="79" x2="50" y2="91" stroke="#ee8833" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="24" y1="67" x2="15" y2="75" stroke="#ee8833" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="18" y1="45" x2="6"  y2="43" stroke="#ee8833" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="29" y1="24" x2="21" y2="14" stroke="#ee8833" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- Тело мины -->
+  <circle cx="50" cy="50" r="32" fill="#1f0e06" stroke="#7a3a1a" stroke-width="2"/>
+
+  <!-- Блик -->
+  <circle cx="39" cy="39" r="9" fill="rgba(255,160,60,0.07)"/>
+
+  <!-- Полоски -->
+  <path d="M20 45 Q50 41 80 45" stroke="#5a2a0a" stroke-width="1.5" fill="none"/>
+  <path d="M20 55 Q50 59 80 55" stroke="#5a2a0a" stroke-width="1.5" fill="none"/>
+
+  <!-- Детонатор -->
+  <rect x="44" y="13" width="12" height="8" rx="2" fill="#3a1a0a" stroke="#7a3a1a" stroke-width="1.5"/>
+  <circle cx="50" cy="17" r="3.5" fill="#dd6600" stroke="#aa4400" stroke-width="1"/>
+
+  <!-- Меч (острие вверх) -->
+  <polygon points="50,34 45.5,56 54.5,56" fill="#d4d4d4"/>
+  <rect x="43" y="55.5" width="14" height="2.5" rx="0.8" fill="#9a6028"/>
+  <rect x="47.5" y="58" width="5" height="8" rx="0.8" fill="#7a4020"/>
+  <circle cx="50" cy="67.5" r="2.5" fill="#b07828"/>
+</svg>

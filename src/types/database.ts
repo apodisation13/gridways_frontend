@@ -69,6 +69,7 @@ export interface EnemyData {
     base_damage?: number
   }
   shield?: boolean | string
+  armor?: number
   status?: string | null
   passive: {
     value?: number
@@ -94,6 +95,7 @@ export interface EnemyLeaderData {
     reset_timer?: boolean
   }
   shield?: boolean | string
+  armor?: number
 }
 
 export interface Ability {

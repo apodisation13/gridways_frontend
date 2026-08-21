@@ -9,7 +9,7 @@ import { check_lose } from "@/logic/ai_move/service/check_lose"
 import { set_already_jumped } from "@/logic/ai_move/service/service_for_ai_move"
 import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
 import store from "@/store"
-import type { Enemy, GameObj } from "@/types"
+import { Enemy, EnemyLeaderAbilityEnum, GameObj } from "@/types"
 import { EnemyMove } from "@/types"
 
 export function ai_move(gameObj: GameObj, timeout = 1000): void {
@@ -59,11 +59,11 @@ export function enemy_leader_ai_move_once(gameObj: GameObj): void {
 
   if (!ela) return // есть лидеры у кого абилки нет
 
-  if (ela === EnemyMove.DamageOnce) {
+  if (ela === EnemyLeaderAbilityEnum.DamageOnce) {
     const value = enemy_leader.data?.value || 0
     store.commit("change_health", -value)
     check_lose()
-  } else if (ela === EnemyMove.DecreaseAllPlayerDamage) {
+  } else if (ela === EnemyLeaderAbilityEnum.DecreaseAllPlayerDamage) {
     const value = enemy_leader.data?.value || 0
     deck.forEach(card => {
       card.data.damage -= value

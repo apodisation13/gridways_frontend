@@ -57,7 +57,7 @@ export function field_passives(
   } else if (pea === EnemyPassive.IncrRandomDmg) {
     incr_random_dmg(enemy, field, timeout)
   } else if (pea === EnemyPassive.DecrPlayerDmg) {
-    decrease_player_damage(enemy, hand, timeout)
+    decrease_player_damage(enemy.data?.passive?.value || 0, hand, timeout)
   } else if (pea === EnemyPassive.SetHpRandomGrave) {
     set_hp_random_grave(enemy, gameObj, timeout)
   } else if (pea === EnemyPassive.SetDmgAsHighestHand) {

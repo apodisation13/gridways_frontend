@@ -27,7 +27,7 @@ export function move_column(
 
     if (field[i + 3]) {
       const killed = applyEffectAtCell(i, gameObj, timeout * 0.75)
-      if (!killed) damage_player(field, i, timeout)
+      if (!killed) damage_player(field[i] as Enemy, timeout)
       return
     }
 
@@ -54,7 +54,7 @@ export function move_column(
 
     if (field[i - 3]) {
       const killed = applyEffectAtCell(i, gameObj, timeout * 0.75)
-      if (!killed) damage_player(field, i, timeout)
+      if (!killed) damage_player(field[i] as Enemy, timeout)
       return
     }
 

@@ -1,8 +1,16 @@
+import { choice_element } from "@/lib/utils"
+import { give_shields_to_all } from "@/logic/ai_move/deathwish_abilities/give_shields"
+import { damage_player } from "@/logic/ai_move/moves/damage"
+import { decrease_player_damage } from "@/logic/ai_move/passive_abilities/passives_in_field/decrease_player_damage"
+import { applyHeal } from "@/logic/ai_move/passive_abilities/passives_in_field/heal"
+import { applyIncrDmg } from "@/logic/ai_move/passive_abilities/passives_in_field/increase_damage"
+import { regain_shield } from "@/logic/ai_move/passive_abilities/passives_in_field/regain_shield"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import {
   frost_sound,
   mine_triggerred,
   rain_triggerred,
+  sound_enemy_heal,
   sound_passive_increase_damage,
   spikes,
   veil_triggerred,
@@ -12,7 +20,8 @@ import { poison_one_enemy } from "@/logic/player_move/abilities/ability_poison"
 import { purify } from "@/logic/player_move/abilities/ability_purify"
 import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
 import { hit_one_enemy } from "@/logic/player_move/abilities/hit_one_enemy"
-import { EffectObject, Enemy, EnemyStatus, GameObj } from "@/types"
+import store from "@/store"
+import { EffectObject, Enemy, EnemyMove, EnemyStatus, GameObj } from "@/types"
 import { EffectType } from "@/types"
 
 // Apply the cell effect at index after an enemy has landed there.
@@ -111,6 +120,66 @@ export function applyEffectAtCell(
       enemyKilled = true
       effectDecrement(index, effect, gameObj)
     }
+  } else if (
+    effect.type === EffectType.Heal ||
+    effect.type === EffectType.HealMine
+  ) {
+    let effectValue = effect.value || 0
+    if (effectValue <= 0) return false
+    applyHeal(enemy, effectValue, timeout * 0.5)
+    timeoutAnimationFlag(enemy, "healing", sound_enemy_heal, timeout * 0.5)
+    if (effect.type === EffectType.HealMine) {
+      effectDecrement(index, effect, gameObj)
+    }
+  } else if (
+    effect.type === EffectType.IncrDmg ||
+    effect.type === EffectType.IncrDmgMine
+  ) {
+    let effectValue = effect.value || 0
+    if (effectValue <= 0) return false
+    applyIncrDmg(enemy, effectValue, timeout * 0.5)
+    timeoutAnimationFlag(
+      enemy,
+      "incr_dmg",
+      sound_passive_increase_damage,
+      timeout * 0.5
+    )
+    if (effect.type === EffectType.IncrDmgMine) {
+      effectDecrement(index, effect, gameObj)
+    }
+  } else if (effect.type === EffectType.GainShield) {
+    regain_shield(enemy)
+  } else if (effect.type === EffectType.ShieldMine) {
+    give_shields_to_all(gameObj)
+    effectDecrement(index, effect, gameObj)
+  } else if (effect.type === EffectType.IncrPassiveValue) {
+    const effectValue = effect.value || 0
+    if (effectValue <= 0) return false
+    if (!enemy.data?.passive?.value) return false
+    enemy.data.passive.value += effectValue
+    effectDecrement(index, effect, gameObj)
+  } else if (effect.type === EffectType.IncrArmor) {
+    const effectValue = effect.value || 0
+    if (effectValue <= 0) return false
+    if (enemy.data.armor) {
+      enemy.data.armor += effectValue
+    } else {
+      enemy.data.armor = effectValue
+    }
+    effectDecrement(index, effect, gameObj)
+  } else if (effect.type === EffectType.GainVeil) {
+    enemy.data.status = EnemyStatus.Veil
+  } else if (effect.type === EffectType.ChangeMove) {
+    const randomMove = choice_element(Object.values(EnemyMove))
+    const enemyWithDesiredMove: Enemy = (
+      store.getters["all_enemies"] as Enemy[]
+    ).find(e => e.move.name === randomMove)!
+    e.move = enemyWithDesiredMove.move
+    effectDecrement(index, effect, gameObj)
+  } else if (effect.type === EffectType.DamagePlayer) {
+    damage_player({ data: { damage: effect.value ?? 0 } }, timeout * 0.5)
+  } else if (effect.type === EffectType.DecrPlayerRandomDmg) {
+    decrease_player_damage(effect.value || 0, gameObj.hand, timeout)
   }
 
   return enemyKilled

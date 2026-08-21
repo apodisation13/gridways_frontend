@@ -13,7 +13,7 @@ export function random_move(
   if (field[random]) {
     console.log(`враг c ${i}, хотел на ${random}, а там враг`)
     const killed = applyEffectAtCell(i, gameObj, timeout * 0.75)
-    if (!killed) damage_player(field, i, timeout)
+    if (!killed) damage_player(field[i] as Enemy, timeout)
   } else {
     console.log(`враг c ${i}, хотел на ${random}, и прыгнул`)
     ;(field[i] as Enemy).already_jumped = true

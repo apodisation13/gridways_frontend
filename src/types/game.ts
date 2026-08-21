@@ -14,8 +14,18 @@ export enum EffectType {
   MiddleMine = "middle_mine", // times_count
   Poison = "poison", // times_count
   // negative effects
-  Heal = "heal", //
-  IncrDmg = "incr_dmg", //
+  Heal = "heal", // turns
+  IncrDmg = "incr_dmg", // turns
+  HealMine = "heal_mine", // times_count
+  IncrDmgMine = "incr_dmg_mine", // times_count
+  GainShield = "gain_shield", // turns
+  ShieldMine = "shield_mine", // times_count
+  IncrPassiveValue = "incr_passive_value", // times_count
+  IncrArmor = "incr_armor", // times_count
+  GainVeil = "gain_veil", // turns
+  ChangeMove = "change_move", // times_count
+  DamagePlayer = "damage_player", // turns
+  DecrPlayerRandomDmg = "decr_player_random_dmg", // turns
 }
 
 export type EffectObject = {
@@ -177,7 +187,9 @@ export enum EnemyMove {
   Right = "right",
   Row = "row",
   Column = "column",
-  // enemy leader abilities (enemy_leader_ai_move_once)
+}
+
+export enum EnemyLeaderAbilityEnum {
   DamageOnce = "damage-once",
   DecreaseAllPlayerDamage = "decrease-all-player-damage",
 }

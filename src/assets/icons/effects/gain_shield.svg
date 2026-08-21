@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+  <rect width="100" height="100" fill="rgba(4,14,38,0.30)"/>
+
+  <!-- Три расширяющихся кольца защиты -->
+  <circle cx="50" cy="50" r="6" fill="none" stroke="rgba(60,140,255,0.78)" stroke-width="2.5">
+    <animate attributeName="r" values="6;46" dur="2.8s" begin="0s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.88;0" dur="2.8s" begin="0s" repeatCount="indefinite"/>
+    <animate attributeName="stroke-width" values="2.5;0.4" dur="2.8s" begin="0s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="50" cy="50" r="6" fill="none" stroke="rgba(60,140,255,0.78)" stroke-width="2.5">
+    <animate attributeName="r" values="6;46" dur="2.8s" begin="-0.93s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.88;0" dur="2.8s" begin="-0.93s" repeatCount="indefinite"/>
+    <animate attributeName="stroke-width" values="2.5;0.4" dur="2.8s" begin="-0.93s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="50" cy="50" r="6" fill="none" stroke="rgba(60,140,255,0.78)" stroke-width="2.5">
+    <animate attributeName="r" values="6;46" dur="2.8s" begin="-1.87s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.88;0" dur="2.8s" begin="-1.87s" repeatCount="indefinite"/>
+    <animate attributeName="stroke-width" values="2.5;0.4" dur="2.8s" begin="-1.87s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Вращающийся шестиугольник -->
+  <polygon points="50,22 72,35 72,65 50,78 28,65 28,35"
+           fill="none" stroke="rgba(100,180,255,0.16)" stroke-width="1.2">
+    <animateTransform attributeName="transform" type="rotate" values="0 50 50;360 50 50" dur="14s" repeatCount="indefinite"/>
+  </polygon>
+
+  <!-- Щит в центре с пульсацией -->
+  <path d="M50 34 L65 41 L65 54 Q65 66 50 72 Q35 66 35 54 L35 41 Z"
+        fill="rgba(35,110,215,0.55)" stroke="rgba(110,185,255,0.70)" stroke-width="1.8">
+    <animate attributeName="opacity" values="0.45;0.85;0.45" dur="2.4s" repeatCount="indefinite"/>
+  </path>
+  <!-- Внутренняя линия щита -->
+  <path d="M50 39 L60 45 L60 54 Q60 63 50 68"
+        fill="none" stroke="rgba(180,225,255,0.25)" stroke-width="1"/>
+</svg>

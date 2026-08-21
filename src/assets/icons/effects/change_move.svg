@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Спики фиолетовые -->
+  <line x1="50" y1="18" x2="50" y2="6"  stroke="#aa88ee" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="71" y1="24" x2="79" y2="14" stroke="#aa88ee" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="82" y1="45" x2="94" y2="43" stroke="#aa88ee" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="76" y1="67" x2="85" y2="75" stroke="#aa88ee" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="50" y1="79" x2="50" y2="91" stroke="#aa88ee" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="24" y1="67" x2="15" y2="75" stroke="#aa88ee" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="18" y1="45" x2="6"  y2="43" stroke="#aa88ee" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="29" y1="24" x2="21" y2="14" stroke="#aa88ee" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- Тело мины -->
+  <circle cx="50" cy="50" r="32" fill="#120e1f" stroke="#6a3a9a" stroke-width="2"/>
+
+  <!-- Блик -->
+  <circle cx="39" cy="39" r="9" fill="rgba(180,130,255,0.07)"/>
+
+  <!-- Полоски -->
+  <path d="M20 45 Q50 41 80 45" stroke="#3a1a6a" stroke-width="1.5" fill="none"/>
+  <path d="M20 55 Q50 59 80 55" stroke="#3a1a6a" stroke-width="1.5" fill="none"/>
+
+  <!-- Детонатор -->
+  <rect x="44" y="13" width="12" height="8" rx="2" fill="#1a0a2a" stroke="#6a3a9a" stroke-width="1.5"/>
+  <circle cx="50" cy="17" r="3.5" fill="#8833cc" stroke="#661199" stroke-width="1"/>
+
+  <!-- Круговые стрелки (цикл/смена) -->
+  <!-- Верхняя дуга слева направо -->
+  <path d="M40,44 Q50,35 60,44" fill="none" stroke="rgba(180,130,255,0.88)" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Наконечник вправо-вниз у (60,44) -->
+  <polygon points="57,40 63,43 58,49" fill="rgba(180,130,255,0.88)"/>
+
+  <!-- Нижняя дуга справа налево -->
+  <path d="M60,56 Q50,65 40,56" fill="none" stroke="rgba(180,130,255,0.88)" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Наконечник влево-вверх у (40,56) -->
+  <polygon points="43,60 37,57 42,51" fill="rgba(180,130,255,0.88)"/>
+</svg>
