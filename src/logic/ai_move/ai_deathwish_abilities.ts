@@ -1,5 +1,10 @@
 import { destroy_player_card_in_deck } from "@/logic/ai_move/deathwish_abilities/destroy_player_card"
 import {
+  spawn_effect,
+  spawn_effect_everywhere,
+  spawn_effect_random,
+} from "@/logic/ai_move/deathwish_abilities/effects_deathwish"
+import {
   give_shield_to_all_deck,
   give_shields_to_all,
 } from "@/logic/ai_move/deathwish_abilities/give_shields"
@@ -29,6 +34,7 @@ import { EnemyDeathwish } from "@/types"
 // ДИСПЕТЧЕР абилок deathwish у врага
 export function deathwish(
   deathwish_enemy: Enemy | EnemyLeader,
+  deathwish_enemy_index: number | null = null,
   gameObj: GameObj,
   timeout = 1000
 ): void {
@@ -68,5 +74,15 @@ export function deathwish(
   } else if (d === EnemyDeathwish.SpawnUnit) {
     sound_deathwish()
     spawn_faction_unit(deathwish_enemy as Enemy, gameObj, false, timeout) // передаем false, чтобы взять вообще любого врага
+  } else if (d === EnemyDeathwish.SpawnEffectRandom) {
+    spawn_effect_random(
+      deathwish_enemy as Enemy,
+      deathwish_enemy_index,
+      gameObj
+    )
+  } else if (d === EnemyDeathwish.SpawnEffect) {
+    spawn_effect(deathwish_enemy as Enemy, deathwish_enemy_index, gameObj)
+  } else if (d === EnemyDeathwish.SpawnEffectEverywhere) {
+    spawn_effect_everywhere(deathwish_enemy as Enemy, gameObj)
   }
 }

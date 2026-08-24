@@ -104,7 +104,7 @@ export default defineComponent({
     },
     get_description(): string {
       return this.effectsInfo[this.effectObject.type].description.replace(
-        /{{ value }}/g,
+        /{value}/g,
         `{{ ${this.effectObject.value} }}`
       )
     },

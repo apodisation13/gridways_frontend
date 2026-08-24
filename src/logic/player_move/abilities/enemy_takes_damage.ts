@@ -33,15 +33,18 @@ export function remove_dead_enemy(
     enemy_leader.data.hp = 0
     enemy_leader.data.status = null
     console.log("умер лидер врагов")
-    if (enemy_leader.deathwish?.name) deathwish(enemy_leader, gameObj, timeout)
+    if (enemy_leader.deathwish?.name) {
+      deathwish(enemy_leader, null, gameObj, timeout)
+    }
   } else {
-    field[field.indexOf(enemy as Enemy)] = ""
+    const enemyIndex = field.indexOf(enemy as Enemy)
+    field[enemyIndex] = ""
     console.log("враг умер")
     ;(enemy as Enemy).data.hp = (enemy as Enemy).data.base.base_hp
     if ((enemy as Enemy).data.status !== EnemyStatus.Doomed)
       enemies_grave.push(enemy as Enemy)
     if ((enemy as Enemy).deathwish?.name)
-      deathwish(enemy as Enemy, gameObj, timeout)
+      deathwish(enemy as Enemy, enemyIndex, gameObj, timeout)
   }
   check_win(field, enemies, enemy_leader, enemies_grave)
 }

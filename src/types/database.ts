@@ -82,7 +82,10 @@ export interface EnemyData {
     each_tick?: boolean
     field_interaction?: EffectObject
   }
-  deathwish?: { value?: number }
+  deathwish?: {
+    value?: number
+    field_interaction?: EffectObject
+  }
   value?: number
 }
 
@@ -99,6 +102,10 @@ export interface EnemyLeaderData {
   }
   shield?: boolean | string
   armor?: number
+  deathwish?: {
+    value?: number
+    field_interaction?: EffectObject
+  }
 }
 
 export interface Ability {

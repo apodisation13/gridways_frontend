@@ -240,4 +240,8 @@ export enum EnemyDeathwish {
   SpawnFactionUnit = "spawn-faction-unit",
   SpawnFactionUnitAtDeck = "spawn-faction-unit-at-deck",
   SpawnUnit = "spawn-unit",
+  // effects
+  SpawnEffectRandom = "spawn-effect-random",
+  SpawnEffect = "spawn-effect",
+  SpawnEffectEverywhere = "spawn-effect-everywhere",
 }
