@@ -201,7 +201,14 @@ export function damage_ai_card(
   change_card_charges(card, -1, timeout)
 
   // пассивные абилки от хода
-  leader_passive_abilities_upon_playing_a_card(card, leader, enemy)
+  leader_passive_abilities_upon_playing_a_card(
+    card,
+    leader,
+    enemy,
+    [],
+    gameObj,
+    timeout
+  )
   // пассивные абилки от хода для ДРУГИХ карт в руке/колоде/сбросе
   passives_upon_playing_a_card(card, enemy_before, enemy, gameObj, timeout)
 }
@@ -245,7 +252,10 @@ export function damage_ai_card_multi(
   leader_passive_abilities_upon_playing_a_card(
     card,
     gameObj.leader,
-    gameObj.enemy_leader
+    gameObj.enemy_leader,
+    targets,
+    gameObj,
+    timeout
   )
 
   for (let i = 0; i < targets.length; i++) {

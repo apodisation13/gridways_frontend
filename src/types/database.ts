@@ -178,6 +178,7 @@ export interface Leader {
   newly_added: boolean
   // animation fields
   dmg_delta?: number | null
+  p_dmg_delta?: number | null
   charges_delta?: number | null
   damages_enemy?: boolean | null
   p_damages_enemy?: boolean | null
