@@ -38,7 +38,9 @@
         card.ability.name === CardAbility.DestroyWithStatus ||
         card.ability.name === CardAbility.DestroyWithDeathwish ||
         card.ability.name === CardAbility.DestroyWithPassive ||
-        card.ability.name === CardAbility.DestroyAllWithDeathwish
+        card.ability.name === CardAbility.DestroyAllWithDeathwish ||
+        card.ability.name === CardAbility.DestroyWithArmor ||
+        card.ability.name === CardAbility.DestroyAllWithArmor
       "
       :icon="require('@/assets/icons/card/destroy.svg')"
     />
@@ -54,13 +56,16 @@
         card.ability.name === CardAbility.PlayEnemyFromGrave ||
         card.ability.name === CardAbility.PlaySpecialFromDeck ||
         card.ability.name === CardAbility.PlaySpecialFromGrave ||
+        card.ability.name === CardAbility.MoveEnemyFromDeckToGrave ||
         card.ability.name === CardAbility.DecrDmgToHandIncrToRandomHand ||
         card.ability.name === CardAbility.IncrDmgByNCharges ||
         card.ability.name === CardAbility.CreateSpecial ||
         card.ability.name === CardAbility.CreateAnyUnit ||
         card.ability.name === CardAbility.CreateAndPutToDeck ||
         card.ability.name === CardAbility.DrawExact ||
-        card.ability.name === CardAbility.MoveEnemyFromDeckToHand
+        card.ability.name === CardAbility.MoveEnemyFromDeckToHand ||
+        card.ability.name === CardAbility.DrainArmorFromEnemyInGrave ||
+        card.ability.name === CardAbility.DrainArmorFromEnemyInDeck
       "
       :icon="require('@/assets/icons/card/additional_card.svg')"
     />

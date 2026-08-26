@@ -15,12 +15,20 @@ import { destroy_highest_hp } from "@/logic/player_move/abilities/ability_destro
 import { destroy_with_passive } from "@/logic/player_move/abilities/ability_destroy_passive"
 import { destroy_random } from "@/logic/player_move/abilities/ability_destroy_random"
 import { destroy_random_enemy_in_deck } from "@/logic/player_move/abilities/ability_destroy_random_enemy_in_deck"
+import {
+  destroy_all_with_armor,
+  destroy_with_armor,
+} from "@/logic/player_move/abilities/ability_destroy_with_armor"
 import { destroy_with_deathwish } from "@/logic/player_move/abilities/ability_destroy_with_deathwish"
 import { destroy_with_status } from "@/logic/player_move/abilities/ability_destroy_with_status"
 import {
   incr_effects,
   remove_effects,
 } from "@/logic/player_move/abilities/ability_effects"
+import {
+  remove_all_enemies_armor,
+  remove_enemy_armor,
+} from "@/logic/player_move/abilities/ability_enemy_armor"
 import { give_charges_to_all } from "@/logic/player_move/abilities/ability_give_charges_to_all"
 import { incr_dmg_to_all_grave } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_grave"
 import { incr_dmg_to_all_hand } from "@/logic/player_move/abilities/ability_incr_dmg_to_all_hand"
@@ -167,6 +175,23 @@ export function damage_ai_card(
     damage_one(enemy, card, gameObj, timeout)
   } else if (ability === CardAbility.RemoveEffects) {
     remove_effects(gameObj)
+    damage_one(enemy, card, gameObj, timeout)
+  } else if (ability === CardAbility.RemoveAllArmor) {
+    remove_enemy_armor(enemy)
+    damage_one(enemy, card, gameObj, timeout)
+  } else if (ability === CardAbility.RemoveArmorFromAll) {
+    remove_all_enemies_armor(gameObj)
+    damage_one(enemy, card, gameObj, timeout)
+  } else if (ability === CardAbility.DestroyWithArmor) {
+    destroy_with_armor(enemy, gameObj, timeout)
+  } else if (ability === CardAbility.DestroyAllWithArmor) {
+    destroy_all_with_armor(gameObj, timeout)
+  } else if (ability === CardAbility.DrainArmorFromEnemy) {
+    const armor_value = enemy.data?.armor || 0
+    if (armor_value) {
+      remove_enemy_armor(enemy)
+      add_armor(armor_value, timeout)
+    }
     damage_one(enemy, card, gameObj, timeout)
   } else damage_one(enemy, card, gameObj, timeout)
 

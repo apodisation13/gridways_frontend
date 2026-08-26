@@ -1,4 +1,5 @@
 import { allowActionTimer } from "@/logic/game_logic/timers"
+import { add_armor } from "@/logic/player_move/abilities/ability_armor"
 import { add_armor_passive } from "@/logic/player_move/passive_abilities/passives_in_hand/armor"
 import { damage_random_enemy } from "@/logic/player_move/passive_abilities/passives_in_hand/damage_random_enemy"
 import { destroy_2_enemies } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_2_enemies"
@@ -10,6 +11,10 @@ import {
   spawn_effect,
   spawn_effect_random,
 } from "@/logic/player_move/passive_abilities/passives_in_hand/effects"
+import {
+  destroy_random_enemy_with_armor,
+  remove_random_enemy_armor,
+} from "@/logic/player_move/passive_abilities/passives_in_hand/enemy_armor"
 import { heal_leader } from "@/logic/player_move/passive_abilities/passives_in_hand/heal_leader"
 import {
   inc_dmg_by_len_grave,
@@ -97,5 +102,12 @@ export function hand_passives(
     incr_effect(card, gameObj)
   } else if (pa === CardPassiveAbility.RemoveEffect) {
     remove_effect(gameObj)
+  } else if (pa === CardPassiveAbility.RemoveArmor) {
+    remove_random_enemy_armor(card, gameObj)
+  } else if (pa === CardPassiveAbility.DestroyWithArmor) {
+    destroy_random_enemy_with_armor(gameObj, timeout)
+  } else if (pa === CardPassiveAbility.DrainEnemyArmor) {
+    const armorValueDrained = remove_random_enemy_armor(card, gameObj)
+    if (armorValueDrained > 0) add_armor(armorValueDrained, timeout)
   }
 }

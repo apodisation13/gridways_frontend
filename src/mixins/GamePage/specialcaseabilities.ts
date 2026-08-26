@@ -3,6 +3,8 @@ import { defineComponent } from "vue"
 import { choice_element, copyObj } from "@/lib/utils"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import { sound_passive_increase_damage } from "@/logic/play_sounds"
+import { add_armor } from "@/logic/player_move/abilities/ability_armor"
+import { remove_enemy_armor } from "@/logic/player_move/abilities/ability_enemy_armor"
 import {
   change_card_charges,
   enemy_as_card,
@@ -171,8 +173,20 @@ export default defineComponent({
         }
         // сколько зарядов установить той карте врага, которую мы возьмем
         this.special_case_value = this.selected_card?.data?.value || 0
+      } else if (ability === CardAbility.DrainArmorFromEnemyInDeck) {
+        this.enemyView = true
+        this.cards_pool = this.gameObj.enemies.filter(
+          (e: Enemy) => e.data?.armor || 0 > 0
+        )
+      } else if (ability === CardAbility.DrainArmorFromEnemyInGrave) {
+        this.enemyView = true
+        this.cards_pool = this.gameObj.enemies_grave.filter(
+          (e: Enemy) => e.data?.armor || 0 > 0
+        )
       }
+
       this.ability = this.selected_card!.ability.name
+
       if (this.cards_pool.length) {
         this.selectedCardAbilityDescription =
           this.selected_card!.ability.description
@@ -273,6 +287,15 @@ export default defineComponent({
         this.gameObj.deck.push(
           enemy_as_card(card as Enemy, this.special_case_value!)
         )
+      } else if (
+        this.ability === CardAbility.DrainArmorFromEnemyInDeck ||
+        this.ability === CardAbility.DrainArmorFromEnemyInGrave
+      ) {
+        const selectedCardArmor: number = (card as Enemy).data?.armor || 0
+        if (selectedCardArmor) {
+          remove_enemy_armor(card as Enemy)
+          add_armor(selectedCardArmor)
+        }
       }
 
       // сбрасываем ИСХОДНУЮ карту, которой 1й раз играли
