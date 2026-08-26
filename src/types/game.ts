@@ -14,18 +14,18 @@ export enum EffectType {
   MiddleMine = "middle_mine", // times_count
   Poison = "poison", // times_count
   // negative effects
-  Heal = "heal", // turns
-  IncrDmg = "incr_dmg", // turns
-  HealMine = "heal_mine", // times_count
-  IncrDmgMine = "incr_dmg_mine", // times_count
-  GainShield = "gain_shield", // turns
-  ShieldMine = "shield_mine", // times_count
-  IncrPassiveValue = "incr_passive_value", // times_count
-  IncrArmor = "incr_armor", // times_count
-  GainVeil = "gain_veil", // turns
-  ChangeMove = "change_move", // times_count
-  DamagePlayer = "damage_player", // turns
-  DecrPlayerRandomDmg = "decr_player_random_dmg", // turns
+  Heal = "heal", // turns, AM
+  IncrDmg = "incr_dmg", // turns, A
+  HealMine = "heal_mine", // times_count, MA
+  IncrDmgMine = "incr_dmg_mine", // times_count, SM
+  GainShield = "gain_shield", // turns, S
+  ShieldMine = "shield_mine", // times_count, S
+  IncrPassiveValue = "incr_passive_value", // times_count, A
+  IncrArmor = "incr_armor", // times_count, AM
+  GainVeil = "gain_veil", // turns, M
+  ChangeMove = "change_move", // times_count, A
+  DamagePlayer = "damage_player", // turns, M
+  DecrPlayerRandomDmg = "decr_player_random_dmg", // turns, M
 }
 
 export type EffectObject = {
@@ -111,6 +111,11 @@ export enum CardAbility {
   TakeEnemyToHand = "take-enemy-to-hand",
   IncrEffects = "incr-effects",
   RemoveEffects = "remove-effects",
+  RemoveAllArmor = "remove-all-armor",
+  RemoveArmorFromAll = "remove-armor-from-all",
+  DestroyWithArmor = "destroy-with-armor",
+  DestroyAllWithArmor = "destroy-all-with-armor",
+  DrainArmorFromEnemy = "drain-armor-from-enemy",
   // special case abilities
   Resurrect = "resurrect",
   DrawTwoCards = "draw-two-cards",
@@ -134,6 +139,8 @@ export enum CardAbility {
   CreateEnemyAndPutToDeck = "create-enemy-and-put-to-deck",
   MoveEnemyFromGraveToDeck = "move-enemy-from-grave-to-deck",
   MoveEnemyFromDeckToHand = "move-enemy-from-deck-to-hand",
+  DrainArmorFromEnemyInDeck = "drain-armor-from-enemy-in-deck",
+  DrainArmorFromEnemyInGrave = "drain-armor-from-enemy-in-grave",
   // Effects
   SpawnEffect = "spawn-effect",
   SpawnEffectRow = "spawn-effect-row",
@@ -162,6 +169,9 @@ export enum CardPassiveAbility {
   SpawnRandomEnemyInDeck = "spawn-random-enemy-in-deck",
   RemoveDeathwish = "remove-deathwish",
   RemoveShield = "remove-shield",
+  RemoveArmor = "remove-armor",
+  DestroyWithArmor = "destroy-with-armor",
+  DrainEnemyArmor = "drain-enemy-armor",
   // effects
   SpawnEffect = "spawn-effect",
   SpawnEffectRandom = "spawn-effect-random",
@@ -178,6 +188,7 @@ export enum CardPassiveAbility {
   AddChargesToLeaderIfPlaySpecial = "add-charges-to-leader-if-play-special",
   AddChargesToLeaderIfOverkill = "add-charges-to-leader-if-overkill",
   AddChargesToLeaderIfGoldEntersGrave = "add-charges-to-leader-if-gold-enters-grave",
+  AddDmgOfLeaderWhenKillGold = "add-dmg-of-leader-when-kill-gold",
 }
 
 export enum EnemyMove {
@@ -217,11 +228,26 @@ export enum EnemyPassive {
   SpawnRandomToken = "spawn-random-token",
   GiveShield = "give-shield",
   SpawnFactionUnit = "spawn-faction-unit",
+  ResurrectRandomBronze = "resurrect-random-bronze",
+  LoseArmor = "lose-armor",
+  GiveVeil = "give-veil",
   // effects
   SpawnEffectRandom = "spawn-effect-random",
   SpawnEffect = "spawn-effect",
   DecreaseEffect = "decrease-effect",
   RemoveEffect = "remove-effect",
+  IncreaseEffect = "increase-effect",
+  // armor
+  AddArmorSelf = "add-armor-self",
+  AddArmorRandomField = "add-armor-random-field",
+  HealByArmor = "heal-by-armor",
+  TransformArmorToHealth = "transform-armor-to-health",
+  AddArmorRandomGrave = "add-armor-random-grave",
+  AddArmorRandomDeck = "add-armor-random-deck",
+  AddArmorAll = "add-armor-all",
+  AddArmorToLeader = "add-armor-to-leader",
+  // NOT DONE YET
+  SpawnRandomPassive = "spawn-random-passive",
 }
 
 export enum EnemyDeathwish {
@@ -240,8 +266,21 @@ export enum EnemyDeathwish {
   SpawnFactionUnit = "spawn-faction-unit",
   SpawnFactionUnitAtDeck = "spawn-faction-unit-at-deck",
   SpawnUnit = "spawn-unit",
+  SetDmgToHand = "set-dmg-to-hand",
+  ResurrectRandom = "resurrect-random",
+  SpawnRandomFactionLeader = "spawn-random-faction-leader",
   // effects
   SpawnEffectRandom = "spawn-effect-random",
   SpawnEffect = "spawn-effect",
   SpawnEffectEverywhere = "spawn-effect-everywhere",
+  // armor
+  AddArmorToAllField = "add-armor-to-all-field",
+  AddArmorField = "add-armor-field",
+  AddArmorToAllWithArmorDeck = "add-armor-to-all-with-armor-deck",
+  AddArmorToLeader = "add-armor-to-leader",
+  AddArmorToRandomField = "add-armor-to-random-field",
+  AddArmorToAllGrave = "add-armor-to-all-grave",
+  AddArmorToAllDeck = "add-armor-to-all-deck",
+  // NOT DONE YET
+  SpawnRandomDeathwish = "spawn-random-deathwish",
 }
