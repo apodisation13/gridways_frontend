@@ -1,6 +1,6 @@
 import { defineComponent } from "vue"
 
-import { enemy_leader_ai_move_once } from "@/logic/ai_move/ai_move"
+import { enemy_leader_ai_move_once } from "@/logic/ai_move/ai_leader_move_once"
 import { draw_hand } from "@/logic/game_logic/draw_hand"
 import { place_enemies } from "@/logic/game_logic/place_enemies"
 import { passives_upon_beginning } from "@/logic/player_move/passive_abilities/passives_upon_beginning"
@@ -27,10 +27,10 @@ export default defineComponent({
         JSON.stringify(this.$store.state.game.level.enemies)
       )
 
-      // рандомно расставит врагов по полю, изменяет поле и врагов
-      place_enemies(this.gameObj.field, this.gameObj.enemies)
       // АБИЛКИ ЛИДЕРА врага в самом начале
       enemy_leader_ai_move_once(this.gameObj)
+      // рандомно расставит врагов по полю, изменяет поле и врагов
+      place_enemies(this.gameObj.field, this.gameObj.enemies)
       // пассивные способности карт, которые должны срабатывать 1 раз в начале игры
       passives_upon_beginning(this.gameObj)
       // вытянет руку, остальное оставит в деке, изменяет руку и деку
