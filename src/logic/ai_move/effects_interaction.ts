@@ -1,10 +1,10 @@
 import { choice_element } from "@/lib/utils"
 import { give_shields_to_all } from "@/logic/ai_move/deathwish_abilities/give_shields"
 import { damage_player } from "@/logic/ai_move/moves/damage"
-import { decrease_player_damage } from "@/logic/ai_move/passive_abilities/passives_in_field/decrease_player_damage"
-import { applyHeal } from "@/logic/ai_move/passive_abilities/passives_in_field/heal"
-import { applyIncrDmg } from "@/logic/ai_move/passive_abilities/passives_in_field/increase_damage"
-import { regain_shield } from "@/logic/ai_move/passive_abilities/passives_in_field/regain_shield"
+import { decrease_player_damage } from "@/logic/ai_move/passive_abilities/passives/decrease_player_damage"
+import { applyHeal } from "@/logic/ai_move/passive_abilities/passives/heal"
+import { applyIncrDmg } from "@/logic/ai_move/passive_abilities/passives/increase_damage"
+import { regain_shield } from "@/logic/ai_move/passive_abilities/passives/regain_shield"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import {
   frost_sound,

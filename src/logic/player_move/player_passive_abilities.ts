@@ -1,6 +1,4 @@
-import { deck_passives } from "@/logic/player_move/passive_abilities/passives_deck"
-import { grave_passives } from "@/logic/player_move/passive_abilities/passives_graves"
-import { hand_passives } from "@/logic/player_move/passive_abilities/passives_hand"
+import { run_passive } from "@/logic/player_move/passive_abilities/passives_dispatcher"
 import store from "@/store"
 import type { GameObj } from "@/types"
 
@@ -29,11 +27,11 @@ export function player_passive_abilities_end_turn(
       // МЕНЕДЖЕР пассивных абилок карт: рука, лидер, колода, сброс
       console.log("Выполняем пассивку номер", i)
       if (pool[i].data.passive?.has_passive_in_hand || !pool[i].color)
-        hand_passives(pool[i], gameObj, timeOut)
+        run_passive(pool[i], gameObj, "hand", timeOut)
       else if (pool[i].data.passive?.has_passive_in_deck)
-        deck_passives(pool[i], gameObj, timeOut)
+        run_passive(pool[i], gameObj, "deck", timeOut)
       else if (pool[i].data.passive?.has_passive_in_grave)
-        grave_passives(pool[i], gameObj, timeOut)
+        run_passive(pool[i], gameObj, "grave", timeOut)
       i += 1
     }
   }, timeOut)

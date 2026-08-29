@@ -203,6 +203,11 @@ export enum EnemyMove {
 export enum EnemyLeaderAbilityEnum {
   DamageOnce = "damage-once",
   DecreaseAllPlayerDamage = "decrease-all-player-damage",
+  HealOnce = "heal-once",
+  IncrDmgOnce = "incr-dmg-once",
+  AddArmorOnce = "add-armor-once",
+  AddShieldsOnce = "add-shields-once",
+  AddEnemiesToDeckOnce = "add-enemies-to-deck-once",
 }
 
 export enum EnemyPassive {

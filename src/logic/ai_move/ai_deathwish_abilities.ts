@@ -26,7 +26,7 @@ import {
 import {
   spawn_faction_unit,
   spawn_faction_unit_at_deck,
-} from "@/logic/ai_move/passive_abilities/passives_in_field/spawns"
+} from "@/logic/ai_move/passive_abilities/passives/spawns"
 import { sound_deathwish } from "@/logic/play_sounds"
 import type { Enemy, EnemyLeader, GameObj } from "@/types"
 import { EnemyDeathwish } from "@/types"

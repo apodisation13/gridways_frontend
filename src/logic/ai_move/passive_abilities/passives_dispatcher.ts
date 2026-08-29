@@ -1,10 +1,10 @@
-import { decrease_player_damage } from "@/logic/ai_move/passive_abilities/passives_in_field/decrease_player_damage"
+import { decrease_player_damage } from "@/logic/ai_move/passive_abilities/passives/decrease_player_damage"
 import {
   decr_effect,
   remove_effect,
   spawn_effect,
   spawn_effect_random,
-} from "@/logic/ai_move/passive_abilities/passives_in_field/effects_passives"
+} from "@/logic/ai_move/passive_abilities/passives/effects_passives"
 import {
   heal_all,
   heal_column,
@@ -13,27 +13,27 @@ import {
   heal_row,
   heal_self,
   heal_self_by_highest_hp,
-} from "@/logic/ai_move/passive_abilities/passives_in_field/heal"
+} from "@/logic/ai_move/passive_abilities/passives/heal"
 import {
   incr_dmg_column,
   incr_dmg_row,
   incr_random_dmg,
   incr_self_dmg,
-} from "@/logic/ai_move/passive_abilities/passives_in_field/increase_damage"
+} from "@/logic/ai_move/passive_abilities/passives/increase_damage"
 import {
   give_shield,
   regain_shield,
-} from "@/logic/ai_move/passive_abilities/passives_in_field/regain_shield"
-import { set_dmg_as_highest_hand } from "@/logic/ai_move/passive_abilities/passives_in_field/set_dmg_as_highest_hand"
-import { set_dmg_random_grave } from "@/logic/ai_move/passive_abilities/passives_in_field/set_dmg_random_grave"
-import { set_hp_random_grave } from "@/logic/ai_move/passive_abilities/passives_in_field/set_hp_random_grave"
+} from "@/logic/ai_move/passive_abilities/passives/regain_shield"
+import { set_dmg_as_highest_hand } from "@/logic/ai_move/passive_abilities/passives/set_dmg_as_highest_hand"
+import { set_dmg_random_grave } from "@/logic/ai_move/passive_abilities/passives/set_dmg_random_grave"
+import { set_hp_random_grave } from "@/logic/ai_move/passive_abilities/passives/set_hp_random_grave"
 import {
   spawn_faction_unit,
   spawn_random_token,
   spawn_self_at_deck,
   spawn_token,
   spawn_tokens_in_deck,
-} from "@/logic/ai_move/passive_abilities/passives_in_field/spawns"
+} from "@/logic/ai_move/passive_abilities/passives/spawns"
 import type { Enemy, GameObj } from "@/types"
 import { EnemyPassive } from "@/types"
 

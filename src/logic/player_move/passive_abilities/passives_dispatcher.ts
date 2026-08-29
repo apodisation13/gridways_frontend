@@ -1,63 +1,76 @@
-import { allowActionTimer } from "@/logic/game_logic/timers"
+import {
+  allowActionTimer,
+  timeoutAnimationFlag,
+} from "@/logic/game_logic/timers"
 import { add_armor } from "@/logic/player_move/abilities/ability_armor"
-import { add_armor_passive } from "@/logic/player_move/passive_abilities/passives_in_hand/armor"
-import { damage_random_enemy } from "@/logic/player_move/passive_abilities/passives_in_hand/damage_random_enemy"
-import { destroy_2_enemies } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_2_enemies"
-import { destroy_with_passive } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_with_passive"
-import { passive_destroy_with_status } from "@/logic/player_move/passive_abilities/passives_in_hand/destroy_with_status"
+import { add_armor_passive } from "@/logic/player_move/passive_abilities/passives_card/armor"
+import { damage_random_enemy } from "@/logic/player_move/passive_abilities/passives_card/damage_random_enemy"
+import { destroy_2_enemies } from "@/logic/player_move/passive_abilities/passives_card/destroy_2_enemies"
+import { destroy_with_passive } from "@/logic/player_move/passive_abilities/passives_card/destroy_with_passive"
+import { passive_destroy_with_status } from "@/logic/player_move/passive_abilities/passives_card/destroy_with_status"
 import {
   incr_effect,
   remove_effect,
   spawn_effect,
   spawn_effect_random,
-} from "@/logic/player_move/passive_abilities/passives_in_hand/effects"
+} from "@/logic/player_move/passive_abilities/passives_card/effects"
 import {
   destroy_random_enemy_with_armor,
   remove_random_enemy_armor,
-} from "@/logic/player_move/passive_abilities/passives_in_hand/enemy_armor"
-import { heal_leader } from "@/logic/player_move/passive_abilities/passives_in_hand/heal_leader"
+} from "@/logic/player_move/passive_abilities/passives_card/enemy_armor"
+import { heal_leader } from "@/logic/player_move/passive_abilities/passives_card/heal_leader"
+import { if_in_grave_spawn_self_in_enemy_grave } from "@/logic/player_move/passive_abilities/passives_card/if_in_grave_spawn_self_in_enemy_grave"
 import {
   inc_dmg_by_len_grave,
   incr_dmg_by_len_deck,
   incr_dmg_by_n_enemies_grave,
   incr_dmg_to_random,
   incr_self_dmg,
-} from "@/logic/player_move/passive_abilities/passives_in_hand/incr_dmg"
-import { lock_random } from "@/logic/player_move/passive_abilities/passives_in_hand/lock_random"
+} from "@/logic/player_move/passive_abilities/passives_card/incr_dmg"
+import { lock_random } from "@/logic/player_move/passive_abilities/passives_card/lock_random"
 import {
   poison_all_enemies_passive,
   poison_random_enemy_passive,
-} from "@/logic/player_move/passive_abilities/passives_in_hand/poison"
-import { remove_deathwish } from "@/logic/player_move/passive_abilities/passives_in_hand/remove_deathwish"
-import { remove_passive } from "@/logic/player_move/passive_abilities/passives_in_hand/remove_passive"
-import { remove_shield } from "@/logic/player_move/passive_abilities/passives_in_hand/remove_shield"
-import { set_dmg_as_random_enemy_grave } from "@/logic/player_move/passive_abilities/passives_in_hand/set_dmg_as_random_enemy_grave"
+} from "@/logic/player_move/passive_abilities/passives_card/poison"
+import { remove_deathwish } from "@/logic/player_move/passive_abilities/passives_card/remove_deathwish"
+import { remove_passive } from "@/logic/player_move/passive_abilities/passives_card/remove_passive"
+import { remove_shield } from "@/logic/player_move/passive_abilities/passives_card/remove_shield"
+import { set_dmg_as_random_enemy_grave } from "@/logic/player_move/passive_abilities/passives_card/set_dmg_as_random_enemy_grave"
 import {
   spawn_random_enemy_in_deck,
   spawn_random_enemy_in_hand,
-} from "@/logic/player_move/passive_abilities/passives_in_hand/spawn_enemy"
-import { spawn_random_in_hand } from "@/logic/player_move/passive_abilities/passives_in_hand/spawn_random_in_hand"
+} from "@/logic/player_move/passive_abilities/passives_card/spawn_enemy"
+import { spawn_random_in_hand } from "@/logic/player_move/passive_abilities/passives_card/spawn_random_in_hand"
 import { add_charges_if_playing_d_all } from "@/logic/player_move/passive_abilities/passives_leader/add-charges-if-playing-d-all"
 import type { Card, GameObj } from "@/types"
 import { CardPassiveAbility } from "@/types"
 
-export function hand_passives(
+export type PassiveLocation = "hand" | "deck" | "grave"
+
+export function run_passive(
   card: Card,
   gameObj: GameObj,
+  location: PassiveLocation,
   timeout = 1000
 ): void {
   if (!allowActionTimer(card)) return
 
-  // ДИСПЕТЧЕР ПАССИВНЫХ АБИЛОК В РУКЕ!
-  const pa = card.passive_ability.name
+  if (location === "deck")
+    timeoutAnimationFlag(card, "trigger_deck_passive", null, timeout * 0.5)
+  else if (location === "grave")
+    timeoutAnimationFlag(card, "trigger_grave_passive", null, timeout * 0.5)
+
+  const fromHand = location === "hand"
+  const pa = card?.passive_ability?.name
+
   if (pa === CardPassiveAbility.DamageRandomEnemy) {
     damage_random_enemy(card, gameObj, timeout)
   } else if (pa === CardPassiveAbility.IncrDmgTo) {
-    incr_dmg_to_random(card, gameObj, "hand", false, timeout)
+    incr_dmg_to_random(card, gameObj, location, !fromHand, timeout)
   } else if (pa === CardPassiveAbility.HealLeader) {
     heal_leader(card, timeout)
   } else if (pa === CardPassiveAbility.IncrSelfDmg) {
-    incr_self_dmg(card, false, timeout)
+    incr_self_dmg(card, !fromHand, timeout)
   } else if (pa === CardPassiveAbility.DestroyTwoEnemies) {
     destroy_2_enemies(card, gameObj, timeout)
   } else if (pa === CardPassiveAbility.AddChargesToLeaderIfPlayDAll) {
@@ -109,5 +122,7 @@ export function hand_passives(
   } else if (pa === CardPassiveAbility.DrainEnemyArmor) {
     const armorValueDrained = remove_random_enemy_armor(card, gameObj)
     if (armorValueDrained > 0) add_armor(armorValueDrained, timeout)
+  } else if (pa === CardPassiveAbility.IfInGraveSpawnSelfInEnemyGrave) {
+    if_in_grave_spawn_self_in_enemy_grave(card, gameObj, timeout)
   }
 }
