@@ -227,6 +227,7 @@ export interface EnemyLeader {
   locked?: boolean
   // animation fields
   hp_delta?: number | null
+  spawning?: boolean | null
 }
 
 export interface Deck {

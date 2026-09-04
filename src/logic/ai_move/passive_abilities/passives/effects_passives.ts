@@ -3,6 +3,7 @@ import { effectsSounds } from "@/logic/game_logic/effects"
 import {
   get_effects_indexes,
   get_empty_field_indexes,
+  get_negative_effects_indexes,
   get_positive_effects_indexes,
 } from "@/logic/player_move/service/service_for_player_move"
 import store from "@/store"
@@ -77,6 +78,7 @@ export function spawn_effect(enemy: Enemy | EnemyLeader, gameObj: GameObj) {
 }
 
 export function decr_effect(enemy: Enemy | EnemyLeader, gameObj: GameObj) {
+  // пассивка врага - уменьшает случайный позитивный эффект
   const { effects } = gameObj
 
   const value = enemy.data.passive?.value
@@ -100,7 +102,7 @@ export function decr_effect(enemy: Enemy | EnemyLeader, gameObj: GameObj) {
 }
 
 export function remove_effect(gameObj: GameObj) {
-  // пассивка врага - убиарет слуайный позитивный эффект
+  // пассивка врага - убирает случайный позитивный эффект
   const { effects } = gameObj
 
   const emptyEffectPositiveIndexes = get_positive_effects_indexes(effects)
@@ -111,4 +113,26 @@ export function remove_effect(gameObj: GameObj) {
   if (!effectObject) return
 
   effects[randomIndex] = ""
+}
+
+export function incr_effect(enemy: Enemy | EnemyLeader, gameObj: GameObj) {
+  // пассивка врага - увеличивает случайный негативный эффект
+  const { effects } = gameObj
+
+  const value = enemy.data.passive?.value
+  if (!value) return
+
+  const emptyEffectNegativeIndexes = get_negative_effects_indexes(effects)
+  const randomIndex = choice_element(emptyEffectNegativeIndexes)
+  if (!randomIndex) return
+
+  const effectObject = effects[randomIndex] as EffectObject
+  if (!effectObject) return
+
+  if (effectObject.turns) {
+    effectObject.turns += value
+  }
+  if (effectObject.times_count) {
+    effectObject.times_count += value
+  }
 }

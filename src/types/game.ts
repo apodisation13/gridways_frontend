@@ -234,7 +234,6 @@ export enum EnemyPassive {
   GiveShield = "give-shield",
   SpawnFactionUnit = "spawn-faction-unit",
   ResurrectRandomBronze = "resurrect-random-bronze",
-  LoseArmor = "lose-armor",
   GiveVeil = "give-veil",
   // effects
   SpawnEffectRandom = "spawn-effect-random",
@@ -251,6 +250,7 @@ export enum EnemyPassive {
   AddArmorRandomDeck = "add-armor-random-deck",
   AddArmorAll = "add-armor-all",
   AddArmorToLeader = "add-armor-to-leader",
+  LoseArmor = "lose-armor",
   // NOT DONE YET
   SpawnRandomPassive = "spawn-random-passive",
 }
