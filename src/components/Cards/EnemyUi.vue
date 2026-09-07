@@ -47,6 +47,9 @@
           :card="e"
           :location="location"
         />
+        <transition name="enemy-armor">
+          <enemy-armor v-if="enemy.data.armor" :armor="enemy.data.armor" />
+        </transition>
         <enemy-shield v-if="enemy.data.shield" />
         <enemy-locked v-if="enemy.locked" />
         <deathwish-ability v-if="enemy.deathwish?.name" />
@@ -68,6 +71,7 @@ import CardDamageIcon from "@/components/UI/CardsUI/CardDamageIcon.vue"
 import CardPassive from "@/components/UI/CardsUI/CardPassive.vue"
 import AbilityCircleEnemy from "@/components/UI/CardsUI/Enemies/AbilityCircleEnemy.vue"
 import DeathwishAbility from "@/components/UI/CardsUI/Enemies/DeathwishAbility.vue"
+import EnemyArmor from "@/components/UI/CardsUI/Enemies/EnemyArmor.vue"
 import EnemyLocked from "@/components/UI/CardsUI/Enemies/EnemyLocked.vue"
 import EnemyShield from "@/components/UI/CardsUI/Enemies/EnemyShield.vue"
 import EnemyStatus from "@/components/UI/CardsUI/Enemies/EnemyStatus.vue"
@@ -86,6 +90,7 @@ export default defineComponent({
     DeathwishAbility,
     HeartIcon,
     CardDamageIcon,
+    EnemyArmor,
     EnemyLocked,
     AbilityCircleEnemy,
     EnemyShield,
@@ -439,6 +444,47 @@ export default defineComponent({
     opacity: 0;
     transform: rotate(-45deg) scale(0.9);
     box-shadow: none;
+  }
+}
+
+/* ── EnemyArmor enter/leave transitions ─────────────────────────── */
+/* Animate .armor-wrap (root element) directly — Vue adds transition
+   classes there, no descendant selector needed */
+
+.enemy-armor-enter-active {
+  animation: enemy-armor-appear 0.5s ease-out forwards;
+}
+
+.enemy-armor-leave-active {
+  animation: enemy-armor-destroy 0.4s ease-in forwards;
+}
+
+@keyframes enemy-armor-appear {
+  0% {
+    opacity: 0;
+    filter: brightness(4) saturate(3);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.6) saturate(2);
+  }
+  100% {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+@keyframes enemy-armor-destroy {
+  0% {
+    opacity: 1;
+    filter: none;
+  }
+  35% {
+    filter: brightness(2) sepia(1) saturate(4) hue-rotate(-30deg);
+  }
+  100% {
+    opacity: 0;
+    filter: brightness(0);
   }
 }
 </style>

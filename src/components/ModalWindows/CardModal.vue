@@ -1,5 +1,5 @@
 <template>
-  <modal-window v-touch:swipe="close_self">
+  <modal-window>
     <button-close @close_self="close_self" />
 
     <!--Имя у карты есть всегда-->

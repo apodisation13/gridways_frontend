@@ -69,6 +69,7 @@ export interface EnemyData {
     base_damage?: number
   }
   shield?: boolean | string
+  armor?: number
   status?: string | null
   passive: {
     value?: number
@@ -79,8 +80,12 @@ export interface EnemyData {
     default_timer?: number
     reset_timer?: boolean
     each_tick?: boolean
+    field_interaction?: EffectObject
   }
-  deathwish?: { value?: number }
+  deathwish?: {
+    value?: number
+    field_interaction?: EffectObject
+  }
   value?: number
 }
 
@@ -92,8 +97,15 @@ export interface EnemyLeaderData {
     timer?: number
     default_timer?: number
     reset_timer?: boolean
+    field_interaction?: EffectObject
+    value?: number
   }
   shield?: boolean | string
+  armor?: number
+  deathwish?: {
+    value?: number
+    field_interaction?: EffectObject
+  }
 }
 
 export interface Ability {
@@ -166,6 +178,7 @@ export interface Leader {
   newly_added: boolean
   // animation fields
   dmg_delta?: number | null
+  p_dmg_delta?: number | null
   charges_delta?: number | null
   damages_enemy?: boolean | null
   p_damages_enemy?: boolean | null
@@ -185,9 +198,12 @@ export interface Enemy {
   data: EnemyData
   image: string
   token?: boolean
+  // move fields
+  already_jumped?: boolean
+  direction_row?: string
+  direction_row_up?: boolean
   // animation fields
   hp_delta?: number | null
-  already_jumped?: boolean
   locked?: boolean
   dmg_delta?: number | null
   p_dmg_delta?: number | null
@@ -211,6 +227,7 @@ export interface EnemyLeader {
   locked?: boolean
   // animation fields
   hp_delta?: number | null
+  spawning?: boolean | null
 }
 
 export interface Deck {

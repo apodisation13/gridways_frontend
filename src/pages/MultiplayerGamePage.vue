@@ -294,7 +294,8 @@ import RedrawComp from "@/components/Pages/GamePage/RedrawComp.vue"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities.vue"
 import UseSpecialItemsComponent from "@/components/Pages/GamePage/UseSpecialItemsComponent.vue"
 import { randInt } from "@/lib/utils"
-import { ai_move, enemy_leader_ai_move_once } from "@/logic/ai_move/ai_move"
+import { enemy_leader_ai_move_once } from "@/logic/ai_move/ai_leader_move_once"
+import { ai_move } from "@/logic/ai_move/ai_move"
 import { enemy_passive_abilities_end_turn } from "@/logic/ai_move/ai_passive_abilties"
 import { draw_hand } from "@/logic/game_logic/draw_hand"
 import {
@@ -796,8 +797,8 @@ export default defineComponent({
       this.gameObj.enemies = enemies
 
       // Расставляем первую волну врагов на поле и применяем способность лидера
-      place_enemies(this.gameObj.field, this.gameObj.enemies)
       enemy_leader_ai_move_once(this.gameObj)
+      place_enemies(this.gameObj.field, this.gameObj.enemies)
 
       draw_hand(this.gameObj.hand, this.gameObj.deck)
       this.can_draw = this.calc_can_draw()

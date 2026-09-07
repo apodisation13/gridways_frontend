@@ -1,4 +1,17 @@
+import {
+  deathwish_add_armor_all,
+  deathwish_add_armor_to_all_deck,
+  deathwish_add_armor_to_all_grave,
+  deathwish_add_armor_to_all_with_armor_deck,
+  deathwish_add_armor_to_leader,
+  deathwish_add_armor_to_random_enemy,
+} from "@/logic/ai_move/deathwish_abilities/armors"
 import { destroy_player_card_in_deck } from "@/logic/ai_move/deathwish_abilities/destroy_player_card"
+import {
+  spawn_effect,
+  spawn_effect_everywhere,
+  spawn_effect_random,
+} from "@/logic/ai_move/deathwish_abilities/effects_deathwish"
 import {
   give_shield_to_all_deck,
   give_shields_to_all,
@@ -21,7 +34,7 @@ import {
 import {
   spawn_faction_unit,
   spawn_faction_unit_at_deck,
-} from "@/logic/ai_move/passive_abilities/passives_in_field/spawns"
+} from "@/logic/ai_move/passive_abilities/passives/spawns"
 import { sound_deathwish } from "@/logic/play_sounds"
 import type { Enemy, EnemyLeader, GameObj } from "@/types"
 import { EnemyDeathwish } from "@/types"
@@ -29,6 +42,7 @@ import { EnemyDeathwish } from "@/types"
 // ДИСПЕТЧЕР абилок deathwish у врага
 export function deathwish(
   deathwish_enemy: Enemy | EnemyLeader,
+  deathwish_enemy_index: number | null = null,
   gameObj: GameObj,
   timeout = 1000
 ): void {
@@ -68,5 +82,34 @@ export function deathwish(
   } else if (d === EnemyDeathwish.SpawnUnit) {
     sound_deathwish()
     spawn_faction_unit(deathwish_enemy as Enemy, gameObj, false, timeout) // передаем false, чтобы взять вообще любого врага
+  } else if (d === EnemyDeathwish.SpawnEffectRandom) {
+    spawn_effect_random(
+      deathwish_enemy as Enemy,
+      deathwish_enemy_index,
+      gameObj
+    )
+  } else if (d === EnemyDeathwish.SpawnEffect) {
+    spawn_effect(deathwish_enemy as Enemy, deathwish_enemy_index, gameObj)
+  } else if (d === EnemyDeathwish.SpawnEffectEverywhere) {
+    spawn_effect_everywhere(deathwish_enemy as Enemy, gameObj)
+  } else if (d === EnemyDeathwish.AddArmorToAllField) {
+    deathwish_add_armor_all(deathwish_enemy as Enemy, gameObj)
+  } else if (d === EnemyDeathwish.AddArmorToAllWithArmorDeck) {
+    deathwish_add_armor_to_all_with_armor_deck(
+      deathwish_enemy as Enemy,
+      gameObj
+    )
+  } else if (d === EnemyDeathwish.AddArmorToLeader) {
+    deathwish_add_armor_to_leader(deathwish_enemy as Enemy, gameObj)
+  } else if (d === EnemyDeathwish.AddArmorToRandomField) {
+    deathwish_add_armor_to_random_enemy(
+      deathwish_enemy as Enemy,
+      gameObj,
+      "field"
+    )
+  } else if (d === EnemyDeathwish.AddArmorToAllDeck) {
+    deathwish_add_armor_to_all_deck(deathwish_enemy as Enemy, gameObj)
+  } else if (d === EnemyDeathwish.AddArmorToAllGrave) {
+    deathwish_add_armor_to_all_grave(deathwish_enemy as Enemy, gameObj)
   }
 }

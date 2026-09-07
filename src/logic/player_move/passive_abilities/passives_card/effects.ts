@@ -3,6 +3,8 @@ import { effectsSounds } from "@/logic/game_logic/effects"
 import {
   get_effects_indexes,
   get_empty_field_indexes,
+  get_negative_effects_indexes,
+  get_positive_effects_indexes,
 } from "@/logic/player_move/service/service_for_player_move"
 import store from "@/store"
 import {
@@ -77,7 +79,7 @@ export function incr_effect(card: Card | Leader, gameObj: GameObj) {
 
   if (!value) return
 
-  const emptyEffectIndexes = get_effects_indexes(effects)
+  const emptyEffectIndexes = get_positive_effects_indexes(effects)
   const randomIndex = choice_element(emptyEffectIndexes)
 
   if (!randomIndex) return
@@ -87,4 +89,18 @@ export function incr_effect(card: Card | Leader, gameObj: GameObj) {
 
   if (effectObject.turns) effectObject.turns += value
   if (effectObject.times_count) effectObject.times_count += value
+}
+
+export function remove_effect(gameObj: GameObj) {
+  // пассивка игрока - убиарет слуайный негативный эффект
+  const { effects } = gameObj
+
+  const emptyEffectPositiveIndexes = get_negative_effects_indexes(effects)
+  const randomIndex = choice_element(emptyEffectPositiveIndexes)
+  if (!randomIndex) return
+
+  const effectObject = effects[randomIndex] as EffectObject
+  if (!effectObject) return
+
+  effects[randomIndex] = ""
 }

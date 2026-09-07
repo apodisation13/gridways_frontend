@@ -2,6 +2,7 @@
 /node_modules
 /dist
 /android
+/data
 
 
 # local env files

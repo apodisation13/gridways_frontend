@@ -25,9 +25,18 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
 
+import changMoveSrc from "@/assets/icons/effects/change_move.svg"
+import damagePlayerSrc from "@/assets/icons/effects/damage_player.svg"
+import decrPlayerRandomDmgSrc from "@/assets/icons/effects/decr_player_random_dmg.svg"
 import frostSrc from "@/assets/icons/effects/frost.svg"
+import gainShieldSrc from "@/assets/icons/effects/gain_shield.svg"
+import gainVeilSrc from "@/assets/icons/effects/gain_veil.svg"
 import healSrc from "@/assets/icons/effects/heal.svg"
+import healMineSrc from "@/assets/icons/effects/heal_mine.svg"
+import incrArmorSrc from "@/assets/icons/effects/incr_armor.svg"
 import incrDmgSrc from "@/assets/icons/effects/incr_dmg.svg"
+import incrDmgMineSrc from "@/assets/icons/effects/incr_dmg_mine.svg"
+import incrPassiveValueSrc from "@/assets/icons/effects/incr_passive_value.svg"
 import lightMineSrc from "@/assets/icons/effects/light_mine.svg"
 import lockSrc from "@/assets/icons/effects/lock.svg"
 import middleMineSrc from "@/assets/icons/effects/middle_mine.svg"
@@ -35,6 +44,7 @@ import mineSrc from "@/assets/icons/effects/mine.svg"
 import poisonSrc from "@/assets/icons/effects/poison.svg"
 import purifySrc from "@/assets/icons/effects/purify.svg"
 import rainSrc from "@/assets/icons/effects/rain.svg"
+import shieldMineSrc from "@/assets/icons/effects/shield_mine.svg"
 import spikesSrc from "@/assets/icons/effects/spikes.svg"
 import veilSrc from "@/assets/icons/effects/veil.svg"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
@@ -55,6 +65,16 @@ const EFFECT_SRCS: Partial<Record<EffectType, string>> = {
   [EffectType.IncrDmg]: incrDmgSrc,
   [EffectType.MiddleMine]: middleMineSrc,
   [EffectType.Poison]: poisonSrc,
+  [EffectType.HealMine]: healMineSrc,
+  [EffectType.IncrDmgMine]: incrDmgMineSrc,
+  [EffectType.ShieldMine]: shieldMineSrc,
+  [EffectType.IncrPassiveValue]: incrPassiveValueSrc,
+  [EffectType.IncrArmor]: incrArmorSrc,
+  [EffectType.ChangeMove]: changMoveSrc,
+  [EffectType.GainShield]: gainShieldSrc,
+  [EffectType.GainVeil]: gainVeilSrc,
+  [EffectType.DamagePlayer]: damagePlayerSrc,
+  [EffectType.DecrPlayerRandomDmg]: decrPlayerRandomDmgSrc,
 }
 
 export default defineComponent({
@@ -84,7 +104,7 @@ export default defineComponent({
     },
     get_description(): string {
       return this.effectsInfo[this.effectObject.type].description.replace(
-        /{{ value }}/g,
+        /{value}/g,
         `{{ ${this.effectObject.value} }}`
       )
     },

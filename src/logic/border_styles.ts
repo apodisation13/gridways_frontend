@@ -167,7 +167,9 @@ export function ability_icon(ability: string): string {
     ability === CardAbility.DestroyWithStatus ||
     ability === CardAbility.DestroyWithDeathwish ||
     ability === CardAbility.DestroyWithPassive ||
-    ability === CardAbility.DestroyAllWithDeathwish
+    ability === CardAbility.DestroyAllWithDeathwish ||
+    ability === CardAbility.DestroyWithArmor ||
+    ability === CardAbility.DestroyAllWithArmor
   )
     return `url(${require("@/assets/icons/card/destroy.svg")})`
   else if (
@@ -187,7 +189,9 @@ export function ability_icon(ability: string): string {
     ability === CardAbility.CreateAnyUnit ||
     ability === CardAbility.CreateAndPutToDeck ||
     ability === CardAbility.DrawExact ||
-    ability === CardAbility.MoveEnemyFromDeckToHand
+    ability === CardAbility.MoveEnemyFromDeckToHand ||
+    ability === CardAbility.DrainArmorFromEnemyInDeck ||
+    ability === CardAbility.DrainArmorFromEnemyInGrave
   )
     return `url(${require("@/assets/icons/card/additional_card.svg")})`
   else if (
