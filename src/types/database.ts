@@ -1,6 +1,7 @@
 import Upgrades from "@/store/modules/upgrades"
 
 import { EffectObject, EffectType } from "./game"
+import { Helps } from "./help"
 
 export interface CardData {
   damage: number
@@ -397,6 +398,7 @@ export interface GameConst {
   arena_params: ArenaParams
   multiplayer: Multiplayer
   effects: Record<EffectType, EffectInfo>
+  helps: Helps
 }
 
 export interface Faction {

@@ -21,6 +21,7 @@ import {
   EnemyLeader,
   Faction,
   GameConst,
+  Helps,
   Leader,
   LeaderEntry,
   SeasonEntry,
@@ -65,6 +66,7 @@ interface DatabaseState {
   enemyleadersdb: Record<number, EnemyLeader>
 
   effectsInfo: Partial<Record<EffectType, EffectInfo>>
+  helpsInfo: Helps
 }
 
 const state: DatabaseState = {
@@ -91,6 +93,7 @@ const state: DatabaseState = {
   enemyleadersdb: {},
 
   effectsInfo: {},
+  helpsInfo: {},
 }
 
 const getters = {
@@ -168,6 +171,7 @@ const getters = {
   all_enemy_leaders: (state: DatabaseState) => state.enemy_leaders,
 
   effectsInfo: (state: DatabaseState) => state.effectsInfo,
+  helpsInfo: (state: DatabaseState) => state.helpsInfo,
 }
 
 const mutations = {
@@ -272,6 +276,9 @@ const mutations = {
   ) {
     state.effectsInfo = effects_info
   },
+  setHelpsInfo(state: DatabaseState, helps: Helps) {
+    state.helpsInfo = helps
+  },
 }
 
 const actions = {
@@ -331,6 +338,7 @@ const actions = {
         max_random_n_enemies: game_const.max_random_n_enemies,
       }) // распределение рандомных врагов
       commit("setEffectsInfo", game_const.effects)
+      commit("setHelpsInfo", game_const.helps ?? {})
       commit("set_resources_transitions", game_const.resources_transitions) // покупка/продажа ресурсов
       commit("set_keys_rewards", game_const.keys_rewards) // награды за открытие ключей
       commit("set_win_level_rewards", game_const.win_level_rewards) // награды за прохождение уровня

@@ -13,6 +13,9 @@
 
         <!--нижняя часть меню, в футере, показываем только авторизованному-->
         <menu-footer v-if="isLoggedIn" />
+
+        <!--подсказка по странице, если она задана в мете роута-->
+        <page-help v-if="isLoggedIn" />
       </div>
     </div>
   </app-wrapper-fullscreen>
@@ -21,6 +24,7 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 
+import PageHelp from "@/components/PageHelp.vue"
 import PageImage from "@/components/PageImage.vue"
 import AppWrapperFullscreen from "@/components/Pages/AppWrapperFullscreen/AppWrapperFullscreen.vue"
 import MenuFooter from "@/components/UI/Menu/MenuFooter.vue"
@@ -29,6 +33,7 @@ import MenuHeader from "@/components/UI/Menu/MenuHeader.vue"
 export default defineComponent({
   components: {
     PageImage,
+    PageHelp,
     MenuHeader,
     MenuFooter,
     AppWrapperFullscreen,
