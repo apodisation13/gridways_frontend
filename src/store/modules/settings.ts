@@ -12,6 +12,7 @@ export interface SettingsState {
   field: string
   soundOn: boolean
   animationOn: boolean
+  helpOn: boolean
   moveTimeout: number
 }
 
@@ -21,6 +22,7 @@ const state: SettingsState = {
   field: "",
   soundOn: true,
   animationOn: true,
+  helpOn: true,
   moveTimeout: 1000,
 }
 
@@ -31,6 +33,7 @@ const getters = {
   selectedMoveTimeout: (state: SettingsState) => state.moveTimeout,
   soundOn: (state: SettingsState) => state.soundOn,
   animationOn: (state: SettingsState) => state.animationOn,
+  helpOn: (state: SettingsState) => state.helpOn,
 }
 
 const mutations = {
@@ -49,6 +52,12 @@ const mutations = {
   switchAnimation(state: SettingsState) {
     state.animationOn = !state.animationOn
   },
+  switchHelp(state: SettingsState) {
+    state.helpOn = !state.helpOn
+  },
+  setHelpOn(state: SettingsState, helpOn: boolean) {
+    state.helpOn = helpOn
+  },
   setMoveTimeout(state: SettingsState, timeout: number) {
     state.moveTimeout = timeout
   },
@@ -58,6 +67,7 @@ const mutations = {
     state.field = payload.data.field || ""
     state.soundOn = payload.data.sound_on
     state.animationOn = payload.data.animation_on
+    state.helpOn = payload.data.help_on ?? true
     state.moveTimeout = payload.data.move_timeout
   },
 }
@@ -82,6 +92,7 @@ const actions = {
       data: {
         sound_on: getters.soundOn,
         animation_on: getters.animationOn,
+        help_on: getters.helpOn,
         move_timeout: getters.selectedMoveTimeout,
         avatar: getters.selectedAvatar,
         field: getters.selectedField,

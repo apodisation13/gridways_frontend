@@ -4,6 +4,7 @@ export interface UserPreferences {
   field?: string
   sound_on: boolean
   animation_on: boolean
+  help_on: boolean
   move_timeout: number
 }
 

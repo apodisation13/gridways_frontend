@@ -26,6 +26,8 @@
       <setting-sound v-if="activeTab === 'sound'" />
       <!-- Анимации -->
       <setting-animation v-if="activeTab === 'animation'" />
+      <!-- Подсказки -->
+      <setting-help v-if="activeTab === 'help'" />
       <!-- Таймаут хода -->
       <setting-move-timeout v-if="activeTab === 'timeout'" />
       <!-- Язык -->
@@ -55,6 +57,7 @@ import SettingAnimation from "@/components/Pages/SettingsPage/SettingAnimation.v
 import SettingAvatar from "@/components/Pages/SettingsPage/SettingAvatar.vue"
 import SettingChooseTheme from "@/components/Pages/SettingsPage/SettingChooseTheme.vue"
 import SettingField from "@/components/Pages/SettingsPage/SettingField.vue"
+import SettingHelp from "@/components/Pages/SettingsPage/SettingHelp.vue"
 import SettingLogout from "@/components/Pages/SettingsPage/SettingLogout.vue"
 import SettingMoveTimeout from "@/components/Pages/SettingsPage/SettingMoveTimeout.vue"
 import SettingSound from "@/components/Pages/SettingsPage/SettingSound.vue"
@@ -68,6 +71,7 @@ export default defineComponent({
     SettingChooseTheme,
     SettingLogout,
     SettingAnimation,
+    SettingHelp,
     SettingSound,
     SettingMoveTimeout,
     BaseButton,
@@ -88,6 +92,11 @@ export default defineComponent({
           id: "animation",
           label: "Анимации",
           icon: require("@/assets/icons/settings/setting_animation.svg"),
+        },
+        {
+          id: "help",
+          label: "Подсказки",
+          icon: require("@/assets/icons/settings/setting_help.svg"),
         },
         {
           id: "timeout",
