@@ -149,9 +149,9 @@ export function applyEffectAtCell(
     }
   } else if (effect.type === EffectType.GainShield) {
     regain_shield(enemy)
+    effectDecrement(index, effect, gameObj)
   } else if (effect.type === EffectType.ShieldMine) {
     give_shields_to_all(gameObj)
-    effectDecrement(index, effect, gameObj)
   } else if (effect.type === EffectType.IncrPassiveValue) {
     const effectValue = effect.value || 0
     if (effectValue <= 0) return false

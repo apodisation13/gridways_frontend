@@ -18,8 +18,8 @@ export enum EffectType {
   IncrDmg = "incr_dmg", // turns, A
   HealMine = "heal_mine", // times_count, MA
   IncrDmgMine = "incr_dmg_mine", // times_count, SM
-  GainShield = "gain_shield", // turns, S
-  ShieldMine = "shield_mine", // times_count, S
+  GainShield = "gain_shield", // times_count, S
+  ShieldMine = "shield_mine", // turns, S
   IncrPassiveValue = "incr_passive_value", // times_count, A
   IncrArmor = "incr_armor", // times_count, AM
   GainVeil = "gain_veil", // turns, M
