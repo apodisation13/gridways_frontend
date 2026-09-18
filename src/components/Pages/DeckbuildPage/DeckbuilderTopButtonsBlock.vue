@@ -15,7 +15,7 @@
       <button-toggle-card-list
         :isActive="showingList === 'pool'"
         @click="showList('pool')"
-        >Основные</button-toggle-card-list
+        >Карты</button-toggle-card-list
       >
       <button-icon
         class="filter_btn"
