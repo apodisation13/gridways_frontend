@@ -9,6 +9,7 @@
       @pointermove="doPan"
       @pointerup="endPan"
       @pointercancel="endPan"
+      @pointerleave="endPan"
     >
       <v-stage :config="configKonva">
         <v-layer :config="layerCfg">
@@ -278,21 +279,6 @@ export default defineComponent({
           this.calc_line(ch, season)
         })
       })
-      this.resizeCanvas()
-    },
-    resizeCanvas(): void {
-      const maxX = Math.max(
-        0,
-        ...this.seasonTree.map(season => season.season.x + this.w)
-      )
-      const maxY = Math.max(
-        0,
-        ...this.seasonTree.map(season => season.season.y + this.w)
-      )
-      this.configKonva = {
-        width: Math.max(1000, maxX + this.w),
-        height: Math.max(1000, maxY + this.w),
-      }
     },
     openInitialSeason(): void {
       if (!this.initialSeasonId) return
@@ -468,17 +454,14 @@ export default defineComponent({
       this.isPanning = true
       this.panStart = { x: e.clientX, y: e.clientY }
       this.panLayerStart = { x: this.layerCfg.x, y: this.layerCfg.y }
-      ;(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId)
     },
     doPan(e: PointerEvent): void {
       if (!this.isPanning) return
-      e.preventDefault()
       this.layerCfg.x = this.panLayerStart.x + (e.clientX - this.panStart.x)
       this.layerCfg.y = this.panLayerStart.y + (e.clientY - this.panStart.y)
     },
-    endPan(e: PointerEvent): void {
+    endPan(): void {
       this.isPanning = false
-      ;(e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId)
     },
   },
 })
