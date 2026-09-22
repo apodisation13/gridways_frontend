@@ -3,10 +3,12 @@
     <div
       v-if="!showSeasonLevelsTree"
       :style="{ cursor: isPanning ? 'grabbing' : 'grab', userSelect: 'none' }"
-      @mousedown="startPan"
-      @mousemove="doPan"
-      @mouseup="endPan"
-      @mouseleave="endPan"
+      class="tree-pan-surface"
+      @wheel.prevent
+      @pointerdown="startPan"
+      @pointermove="doPan"
+      @pointerup="endPan"
+      @pointercancel="endPan"
     >
       <v-stage :config="configKonva">
         <v-layer :config="layerCfg">
@@ -214,6 +216,7 @@ export default defineComponent({
   props: {
     seasons: { type: Array as PropType<SeasonEntry[]>, required: true },
     seasonLevelsTreeOpened: { type: Boolean, required: true },
+    initialSeasonId: { type: Number, default: null },
   },
   emits: ["level_selected"],
   setup() {
@@ -246,17 +249,24 @@ export default defineComponent({
   },
   watch: {
     seasons(oldVal, newVal) {
-      if (oldVal !== newVal) this.init()
+      if (oldVal !== newVal) {
+        this.init()
+        this.openInitialSeason()
+      }
     },
     seasonLevelsTreeOpened(oldVal, newVal) {
       if (oldVal !== newVal) {
         this.showSeasonLevelsTree = this.seasonLevelsTreeOpened
       }
     },
+    initialSeasonId() {
+      this.openInitialSeason()
+    },
   },
   created() {
     this.init()
     this.showSeasonLevelsTree = this.seasonLevelsTreeOpened
+    this.openInitialSeason()
   },
   methods: {
     init(): void {
@@ -268,6 +278,29 @@ export default defineComponent({
           this.calc_line(ch, season)
         })
       })
+      this.resizeCanvas()
+    },
+    resizeCanvas(): void {
+      const maxX = Math.max(
+        0,
+        ...this.seasonTree.map(season => season.season.x + this.w)
+      )
+      const maxY = Math.max(
+        0,
+        ...this.seasonTree.map(season => season.season.y + this.w)
+      )
+      this.configKonva = {
+        width: Math.max(1000, maxX + this.w),
+        height: Math.max(1000, maxY + this.w),
+      }
+    },
+    openInitialSeason(): void {
+      if (!this.initialSeasonId) return
+
+      const season = this.seasons.find(
+        entry => entry.season.id === this.initialSeasonId
+      )
+      if (season) this.setSeason(season)
     },
     // Только для touch устройств
     handleDoubleTap(event: TouchEvent, season: any): void {
@@ -430,19 +463,22 @@ export default defineComponent({
     closeStats(): void {
       this.activeStats = null
     },
-    startPan(e: MouseEvent): void {
-      if (e.button !== 0) return
+    startPan(e: PointerEvent): void {
+      if (!e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return
       this.isPanning = true
       this.panStart = { x: e.clientX, y: e.clientY }
       this.panLayerStart = { x: this.layerCfg.x, y: this.layerCfg.y }
+      ;(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId)
     },
-    doPan(e: MouseEvent): void {
+    doPan(e: PointerEvent): void {
       if (!this.isPanning) return
+      e.preventDefault()
       this.layerCfg.x = this.panLayerStart.x + (e.clientX - this.panStart.x)
       this.layerCfg.y = this.panLayerStart.y + (e.clientY - this.panStart.y)
     },
-    endPan(): void {
+    endPan(e: PointerEvent): void {
       this.isPanning = false
+      ;(e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId)
     },
   },
 })
@@ -450,6 +486,11 @@ export default defineComponent({
 <style scoped>
 .stage-container {
   position: relative;
+  overflow: hidden;
+}
+
+.tree-pan-surface {
+  touch-action: none;
 }
 
 .html-overlay {

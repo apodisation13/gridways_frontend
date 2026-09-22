@@ -216,7 +216,6 @@ export default defineComponent({
         this.ability === CardAbility.PlayEnemyFromGrave ||
         this.ability === CardAbility.PlaySpecialFromDeck ||
         this.ability === CardAbility.PlaySpecialFromGrave ||
-        this.ability === CardAbility.PlayFromGrave ||
         this.ability === CardAbility.CreateSpecial ||
         this.ability === CardAbility.CreateAnyUnit
       ) {
