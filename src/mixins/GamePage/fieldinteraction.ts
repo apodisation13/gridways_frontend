@@ -50,6 +50,7 @@ export default defineComponent({
       this.after_cells_interaction(fi)
     },
     after_cells_interaction(fi: EffectObject): void {
+      this.can_draw = false
       const card: Card | Leader = this.selected_card!
       effectsSounds(fi)
       change_card_charges(card, -1, this.$store.getters["selectedMoveTimeout"])

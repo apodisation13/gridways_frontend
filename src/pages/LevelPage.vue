@@ -33,6 +33,7 @@
           <SeasonTree
             :seasons="seasons"
             :seasonLevelsTreeOpened="seasonLevelsTreeOpened"
+            :initialSeasonId="initialSeasonId"
             @level_selected="configureBackButton"
           />
         </div>
@@ -245,6 +246,10 @@ export default defineComponent({
     seasons(): SeasonEntry[] {
       return this.$store.getters["all_seasons"]
     },
+    initialSeasonId(): number | undefined {
+      const seasonId = Number(this.$route.query.seasonId)
+      return Number.isInteger(seasonId) && seasonId > 0 ? seasonId : undefined
+    },
     random_levels_easy(): MappedUserLevel[] {
       return this.random_levels.filter(l => l.level.difficulty === "easy")
     },
@@ -280,10 +285,20 @@ export default defineComponent({
       return ""
     },
   },
+  watch: {
+    initialSeasonId(): void {
+      this.openSeasonFromQuery()
+    },
+  },
   async created() {
     this.random_levels = random_level_generator()
+    this.openSeasonFromQuery()
   },
   methods: {
+    openSeasonFromQuery(): void {
+      if (!this.initialSeasonId) return
+      this.gameMod = this.game_types.find(mode => mode.name === "seasons")!
+    },
     selectGameMode(mode: GameType): void {
       this.gameMod = mode
     },

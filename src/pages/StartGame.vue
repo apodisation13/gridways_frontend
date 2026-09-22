@@ -5,7 +5,10 @@
       <div class="battle-section">
         <div class="battle-side">
           <span class="global_text battle-label">Уровень</span>
-          <level-preview-comp :level="selectedLevel" />
+          <level-preview-comp
+            :level="selectedLevel"
+            @dblclick="openSelectedLevelInSeasons"
+          />
         </div>
 
         <div class="battle-vs">
@@ -80,7 +83,7 @@ import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
 import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
-import { GameStatsRecordType, PayResourcesSubtype } from "@/types"
+import { GameStatsRecordType, MappedSeason, PayResourcesSubtype } from "@/types"
 
 export default defineComponent({
   name: "StartGame",
@@ -138,6 +141,9 @@ export default defineComponent({
     selectedDeck(): any {
       return this.$store.state.game.whole_deck
     },
+    selectedSeason(): MappedSeason | null {
+      return this.$store.state.game.season
+    },
     insufficientResources(): boolean {
       const userResources = this.$store.getters["resource"]
       return Object.entries(this.play_price).some(
@@ -178,6 +184,17 @@ export default defineComponent({
     },
     trigger_decks_list_modal(value: boolean): void {
       this.show_decks_list_modal = value
+    },
+    openSelectedLevelInSeasons(): void {
+      if (!this.selectedSeason || !this.selectedLevel?.level?.id) return
+
+      this.$router.push({
+        path: "/levelselect",
+        query: {
+          seasonId: String(this.selectedSeason.id),
+          levelId: String(this.selectedLevel.level.id),
+        },
+      })
     },
   },
 })
