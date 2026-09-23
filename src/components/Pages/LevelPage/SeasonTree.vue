@@ -11,7 +11,7 @@
       @pointercancel="endPan"
       @pointerleave="endPan"
     >
-      <v-stage :config="configKonva">
+      <v-stage ref="konvaStage" :config="configKonva">
         <v-layer :config="layerCfg">
           <!--для каждого сезона из списка всех сезонов-->
           <div v-for="season in seasonTree" :key="season.season.id">
@@ -37,11 +37,7 @@
       :userSeasonUnlocked="userSeasonUnlocked"
     />
     <!-- HTML слой поверх canvas -->
-    <div
-      v-if="!showSeasonLevelsTree"
-      class="html-overlay"
-      :style="{ transform: `translate(${layerCfg.x}px, ${layerCfg.y}px)` }"
-    >
+    <div v-if="!showSeasonLevelsTree" ref="htmlOverlay" class="html-overlay">
       <div
         v-for="season in seasonTree"
         :key="'label-' + season.season.id"
@@ -232,6 +228,7 @@ export default defineComponent({
       isPanning: false,
       panStart: { x: 0, y: 0 },
       panLayerStart: { x: 0, y: 0 },
+      panOffset: { x: 0, y: 0 },
       seasonTree: [] as any[],
       seasonName: "",
       seasonLevels: [] as MappedUserLevel[],
@@ -272,6 +269,7 @@ export default defineComponent({
   methods: {
     init(): void {
       this.layerCfg = { x: 0, y: 0 }
+      this.panOffset = { x: 0, y: 0 }
       this.seasonTree = [...this.seasons]
       this.seasonTree.forEach((season: any) => {
         season.season.lines = [] // добавляем такой ключ, чтобы потом положить туда линии
@@ -279,6 +277,7 @@ export default defineComponent({
           this.calc_line(ch, season)
         })
       })
+      this.$nextTick(() => this.setLayerPosition(0, 0))
     },
     openInitialSeason(): void {
       if (!this.initialSeasonId) return
@@ -453,15 +452,28 @@ export default defineComponent({
       if (!e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return
       this.isPanning = true
       this.panStart = { x: e.clientX, y: e.clientY }
-      this.panLayerStart = { x: this.layerCfg.x, y: this.layerCfg.y }
+      this.panLayerStart = { ...this.panOffset }
     },
     doPan(e: PointerEvent): void {
       if (!this.isPanning) return
-      this.layerCfg.x = this.panLayerStart.x + (e.clientX - this.panStart.x)
-      this.layerCfg.y = this.panLayerStart.y + (e.clientY - this.panStart.y)
+      this.setLayerPosition(
+        this.panLayerStart.x + (e.clientX - this.panStart.x),
+        this.panLayerStart.y + (e.clientY - this.panStart.y)
+      )
     },
     endPan(): void {
       this.isPanning = false
+    },
+    setLayerPosition(x: number, y: number): void {
+      this.panOffset = { x, y }
+
+      const stage = (this.$refs.konvaStage as any)?.getNode?.()
+      const stageContainer = stage?.container?.() as HTMLElement | undefined
+      if (stageContainer)
+        stageContainer.style.transform = `translate(${x}px, ${y}px)`
+
+      const overlay = this.$refs.htmlOverlay as HTMLElement | undefined
+      if (overlay) overlay.style.transform = `translate(${x}px, ${y}px)`
     },
   },
 })

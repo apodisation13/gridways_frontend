@@ -1,7 +1,10 @@
 <template>
   <div class="container">
     <div class="gradient"></div>
-    <div class="levels">
+    <div
+      :class="{ 'levels--tree': gameMod?.name === 'seasons' }"
+      class="levels"
+    >
       <div v-if="!gameMod">
         <div
           v-for="mode in game_types"
@@ -450,6 +453,10 @@ div {
   width: 100%;
   height: 78vh;
   overflow: scroll;
+}
+.levels--tree {
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 .levels-row {
   display: flex;
