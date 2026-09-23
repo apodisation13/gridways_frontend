@@ -11,7 +11,7 @@
       @pointercancel="endPan"
       @pointerleave="endPan"
     >
-      <v-stage :config="configKonva">
+      <v-stage ref="konvaStage" :config="configKonva">
         <v-layer :config="layerCfg">
           <!--для каждого уровня из списка уровней текущего сезона-->
           <div v-for="(lev, index) in levs" :key="lev.id">
@@ -104,6 +104,8 @@ export default defineComponent({
       isPanning: false,
       panStart: { x: 0, y: 0 },
       panLayerStart: { x: 0, y: 0 },
+      panOffset: { x: 0, y: 0 },
+      lockedLevelImage: new Image(),
     }
   },
   watch: {
@@ -112,11 +114,13 @@ export default defineComponent({
     },
   },
   created() {
+    this.lockedLevelImage.src = require("@/assets/icons/locked_level.png")
     this.init()
   },
   methods: {
     init(): void {
       this.layerCfg = { x: 0, y: 0 }
+      this.panOffset = { x: 0, y: 0 }
       this.levs = [...this.levels]
       this.levs.forEach((level: any) => {
         level.level.lines = [] // добавляем такой ключ, чтобы потом положить туда линии
@@ -124,6 +128,23 @@ export default defineComponent({
           this.calc_line(ch, level)
         })
       })
+      this.resizeCanvas()
+      this.$nextTick(() => this.setLayerPosition(0, 0))
+    },
+    resizeCanvas(): void {
+      const maxX = Math.max(
+        0,
+        ...this.levs.map(level => level.level.x + this.w)
+      )
+      const maxY = Math.max(
+        0,
+        ...this.levs.map(level => level.level.y + this.w)
+      )
+
+      this.configKonva = {
+        width: Math.max(1000, maxX + this.w),
+        height: Math.max(1000, maxY + this.w),
+      }
     },
     squareConfig(item: any): Record<string, unknown> {
       const unlocked = this.userSeasonUnlocked
@@ -174,14 +195,12 @@ export default defineComponent({
       }
     },
     imageConfig(item: any): Record<string, unknown> {
-      const image = new Image()
-      image.src = require("@/assets/icons/locked_level.png")
       return {
         x: item.level.x + this.w / 4,
         y: item.level.y + this.w / 4,
         width: this.w / 2,
         height: this.w / 2,
-        image: image,
+        image: this.lockedLevelImage,
       }
     },
     lineConfig(arrow: any): Record<string, unknown> {
@@ -317,7 +336,7 @@ export default defineComponent({
       if (!e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return
       this.isPanning = true
       this.panStart = { x: e.clientX, y: e.clientY }
-      this.panLayerStart = { x: this.layerCfg.x, y: this.layerCfg.y }
+      this.panLayerStart = { ...this.panOffset }
     },
     doPan(e: PointerEvent): void {
       if (!this.isPanning) return
@@ -326,11 +345,21 @@ export default defineComponent({
       if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
         this.end()
       }
-      this.layerCfg.x = this.panLayerStart.x + dx
-      this.layerCfg.y = this.panLayerStart.y + dy
+      this.setLayerPosition(
+        this.panLayerStart.x + dx,
+        this.panLayerStart.y + dy
+      )
     },
     endPan(): void {
       this.isPanning = false
+    },
+    setLayerPosition(x: number, y: number): void {
+      this.panOffset = { x, y }
+
+      const stage = (this.$refs.konvaStage as any)?.getNode?.()
+      const stageContainer = stage?.container?.() as HTMLElement | undefined
+      if (stageContainer)
+        stageContainer.style.transform = `translate(${x}px, ${y}px)`
     },
   },
 })
