@@ -86,7 +86,11 @@
               style="transform: scale(1.4)"
             />
           </div>
-          <button class="arena-entry__btn" @click="enter_arena">
+          <button
+            :disabled="insufficientArenaResources"
+            class="arena-entry__btn"
+            @click="enter_arena"
+          >
             <themed-button title="НАЧАТЬ" />
           </button>
         </div>
@@ -243,6 +247,12 @@ export default defineComponent({
           .map(([k, v]) => [k, Math.abs(v)])
       )
     },
+    insufficientArenaResources(): boolean {
+      const userResources = this.$store.getters["resource"]
+      return Object.entries(this.arena_enter_price_real ?? {}).some(
+        ([resource, cost]) => (userResources[resource] ?? 0) < Math.abs(cost)
+      )
+    },
     selectedDeck(): any {
       return this.$store.state.game.whole_deck
     },
@@ -362,6 +372,8 @@ export default defineComponent({
       )
     },
     async enter_arena(): Promise<void> {
+      if (this.insufficientArenaResources) return
+
       await this.$store.dispatch("processResources", {
         subtype: PayResourcesSubtype.enterArena,
         data: this.arena_enter_price_real,
@@ -614,6 +626,12 @@ div {
   width: 200px;
   height: 60px;
   margin-top: 10px;
+}
+
+.arena-entry__btn:disabled {
+  cursor: not-allowed;
+  filter: grayscale(1) brightness(0.7);
+  opacity: 0.65;
 }
 
 .multi-deck-label {

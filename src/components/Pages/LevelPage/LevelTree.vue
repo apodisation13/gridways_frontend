@@ -298,7 +298,7 @@ export default defineComponent({
       level.lines.push({
         x: x2,
         y: y2,
-        fill: "rgba(74, 66, 55, 1)",
+        fill: "rgba(28, 24, 20, 1)",
         points: [0, 0, x1, y1],
       })
     },
