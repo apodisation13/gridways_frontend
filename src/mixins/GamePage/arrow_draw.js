@@ -15,6 +15,7 @@ export const arrowMixin = {
       _handleMouseUp: null,
       _handleTouchMove: null,
       _handleTouchEnd: null,
+      onArrowDrawingEnd: null,
       // multi-target state
       multiMode: false,
       multiCount: 0,
@@ -65,7 +66,8 @@ export const arrowMixin = {
       clientY,
       faction,
       multiCount = 0,
-      isFieldInteraction = false
+      isFieldInteraction = false,
+      onEnd = null
     ) {
       const rect = startElement.getBoundingClientRect()
       this.arrowStartX = rect.left + rect.width / 2
@@ -78,6 +80,7 @@ export const arrowMixin = {
       this.multiCount = multiCount
       this.multiLockedTargets = []
       this.isFieldInteraction = isFieldInteraction
+      this.onArrowDrawingEnd = onEnd
       this._clearMultiHoverTimer()
       this.addArrowEventListeners()
       this.drawArrow()
@@ -211,6 +214,8 @@ export const arrowMixin = {
       this.isDrawingArrow = false
       this._clearMultiHoverTimer()
       this.removeArrowEventListeners()
+      if (this.onArrowDrawingEnd) this.onArrowDrawingEnd()
+      this.onArrowDrawingEnd = null
       if (this.ctx && this.canvas) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
       }

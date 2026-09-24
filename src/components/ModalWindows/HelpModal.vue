@@ -1,5 +1,5 @@
 <template>
-  <base-modal @close-modal="close">
+  <base-modal style="z-index: 100000" @close-modal="close">
     <div class="help">
       <button-close-img @handle_close="close" />
 

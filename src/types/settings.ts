@@ -5,6 +5,7 @@ export interface UserPreferences {
   sound_on: boolean
   animation_on: boolean
   help_on: boolean
+  help_game_on?: boolean
   move_timeout: number
 }
 

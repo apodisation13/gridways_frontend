@@ -14,8 +14,8 @@
         <!--нижняя часть меню, в футере, показываем только авторизованному-->
         <menu-footer v-if="isLoggedIn" />
 
-        <!--подсказка по странице, если она задана в мете роута-->
-        <page-help v-if="isLoggedIn" />
+        <!-- В игре ключ подсказки выбирается внутри GamePage по этапу. -->
+        <page-help v-if="isLoggedIn && $route.path !== '/game'" />
       </div>
     </div>
   </app-wrapper-fullscreen>
@@ -121,14 +121,10 @@ export default defineComponent({
       )
     }
 
+    const authCheck = this.$store.dispatch("checkAuth")
     await this.$store.dispatch("fetchNews")
     await this.$router.push("/")
-    try {
-      await this.$store.dispatch("checkAuth") // пытаемся послать запрос на логин с данными из локалсторадж
-    } catch (err) {
-      console.log(err)
-      throw err
-    }
+    await authCheck
   },
 })
 </script>

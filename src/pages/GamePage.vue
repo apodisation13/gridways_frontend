@@ -130,6 +130,7 @@
       v-if="show_special_items"
       @close="show_special_items = false"
     />
+    <page-help :help-id="draw ? 'game_draw' : 'game_game'" />
   </div>
 </template>
 
@@ -137,6 +138,7 @@
 import { defineComponent } from "vue"
 
 import EnemyLeader from "@/components/Cards/EnemyLeader.vue"
+import PageHelp from "@/components/PageHelp.vue"
 import DeckComp from "@/components/Pages/GamePage/DeckComp.vue"
 import DrawComp from "@/components/Pages/GamePage/DrawComp.vue"
 import EnemiesGrave from "@/components/Pages/GamePage/EnemiesGrave.vue"
@@ -171,6 +173,7 @@ import {
 
 export default defineComponent({
   components: {
+    PageHelp,
     RedrawComp,
     FieldComp,
     EnemyLeader,

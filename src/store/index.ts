@@ -3,9 +3,12 @@ import { createStore } from "vuex"
 import type { ArenaState } from "@/store/modules/arena"
 import arena from "@/store/modules/arena"
 import database from "@/store/modules/database"
+import errors from "@/store/modules/errors"
 import fullscreen from "@/store/modules/fullscreen"
 import type { GameState } from "@/store/modules/game"
 import game from "@/store/modules/game"
+import type { LoadingState } from "@/store/modules/loading"
+import loading from "@/store/modules/loading"
 import login from "@/store/modules/login"
 import type { MultiState } from "@/store/modules/multi"
 import multi from "@/store/modules/multi"
@@ -22,6 +25,7 @@ export interface RootState {
   settings: SettingsState
   arena: ArenaState
   multi: MultiState
+  loading: LoadingState
 }
 
 // ИНСТРУКЦИЯ:
@@ -32,7 +36,9 @@ export interface RootState {
 const store = createStore({
   modules: {
     login,
+    loading,
     database,
+    errors,
     game,
     arena,
     multi,

@@ -29,7 +29,7 @@ export const images = {
     morning: `${path}/bonus_day.webp`,
   },
   levels: {
-    default: `${path}/levels_default.jpeg`,
+    default: `${path}/map.webp`,
   },
   start_game: {
     day: `${path}/start_game_day.webp`,

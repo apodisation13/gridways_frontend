@@ -5,6 +5,7 @@
         v-for="(card, index) in displayedHand"
         :key="card.id || index"
         class="card_wrap"
+        :class="{ 'card_wrap--dragging': draggedCardIndex === index }"
         :style="cardStyle(index)"
         @mousedown="handleCardMouseDown($event, index)"
         @touchstart="handleCardTouchStart($event, index)"
@@ -73,6 +74,7 @@ export default defineComponent({
   data() {
     return {
       effectiveInitialSize: 0,
+      draggedCardIndex: null as number | null,
     }
   },
   computed: {
@@ -101,6 +103,7 @@ export default defineComponent({
         "--z": 10 - index,
         "--rot": `${offset}deg`,
         "--arc": `${-Math.abs(offset) * 3}px`,
+        "--drag-glow": this.dragGlow(this.displayedHand[index].color),
       }
 
       if (count > 6) {
@@ -114,6 +117,15 @@ export default defineComponent({
       }
 
       return style
+    },
+
+    dragGlow(color: Card["color"]): string {
+      const glowByColor: Record<string, string> = {
+        Bronze: "rgba(231, 157, 74, 1)",
+        Silver: "rgba(225, 241, 255, 1)",
+        Gold: "rgba(255, 214, 66, 1)",
+      }
+      return glowByColor[color] ?? "rgba(255, 255, 255, 1)"
     },
 
     effectiveMultiCount(rawCount: number): number {
@@ -155,8 +167,12 @@ export default defineComponent({
         e.clientY,
         card.faction,
         multiCount,
-        isFieldInteraction
+        isFieldInteraction,
+        () => {
+          this.draggedCardIndex = null
+        }
       )
+      this.draggedCardIndex = index
     },
     handleCardTouchStart(e: TouchEvent, index: number): void {
       e.preventDefault()
@@ -174,8 +190,12 @@ export default defineComponent({
         touch.clientY,
         card.faction,
         multiCount,
-        isFieldInteraction
+        isFieldInteraction,
+        () => {
+          this.draggedCardIndex = null
+        }
       )
+      this.draggedCardIndex = index
     },
   },
 })
@@ -221,6 +241,13 @@ export default defineComponent({
 .card_wrap:hover {
   transform: rotate(var(--rot)) translateY(calc(var(--arc) - 18px)) scale(1.12);
   z-index: 999;
+}
+
+.card_wrap.card_wrap--dragging {
+  transform: rotate(var(--rot)) translateY(calc(var(--arc) - 28px)) scale(1.12);
+  z-index: 1000;
+  filter: brightness(1.15) drop-shadow(0 0 8px var(--drag-glow))
+    drop-shadow(0 0 20px var(--drag-glow));
 }
 
 .card_in_hand {
