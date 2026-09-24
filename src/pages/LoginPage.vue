@@ -23,7 +23,7 @@
     </div>
 
     <!-- Форма, включая поле с дополнительными функциями -->
-    <form class="form" autocomplete="off" @submit.prevent>
+    <form class="form" autocomplete="off" novalidate @submit.prevent>
       <div class="form__content">
         <div class="inputs">
           <div class="form__auth">
@@ -33,7 +33,10 @@
               v-model="email"
               :class="email_valid ? '' : 'form__data_error'"
               class="form__data"
-              autocomplete="off"
+              type="email"
+              autocomplete="email"
+              @focus="clearFieldError('email')"
+              @input="clearFieldError('email')"
             />
           </div>
           <div v-if="!formLogin" class="form__auth">
@@ -43,8 +46,11 @@
             <input
               id="username"
               v-model="username"
+              :class="username_valid ? '' : 'form__data_error'"
               class="form__data"
               autocomplete="off"
+              @focus="clearFieldError('username')"
+              @input="clearFieldError('username')"
             />
           </div>
           <div class="form__auth form__auth_pass">
@@ -56,6 +62,8 @@
               class="form__data"
               type="password"
               :autocomplete="formLogin ? 'current-password' : 'new-password'"
+              @focus="clearPasswordErrors"
+              @input="clearPasswordErrors"
               @keyup.enter="login"
             />
             <div class="eye" @click="toggle_pass_visibility">
@@ -73,6 +81,8 @@
               class="form__data"
               type="password"
               autocomplete="new-password"
+              @focus="clearPasswordErrors"
+              @input="clearPasswordErrors"
               @keyup.enter="userRegister"
             />
             <div class="eye" @click="toggle_pass_visibility">
@@ -84,12 +94,6 @@
         <!-- Поле с дополнительными функциями -->
         <div v-if="formLogin" class="form__additional">
           <div class="form__login-with">
-            <a
-              class="login-with__btn login-with__google"
-              @click="toast.info('Пока не реализовано')"
-            >
-              <img src="@/assets/icons/buttons/login_google.svg" alt="" />
-            </a>
             <a
               class="login-with__btn login-with__vk"
               @click="toast.info('Пока не реализовано')"
@@ -310,23 +314,38 @@ export default defineComponent({
       this.confirm_password_valid = true
     },
 
+    clearFieldError(field: "username" | "email"): void {
+      this.error = ""
+      this[`${field}_valid`] = true
+    },
+
+    clearPasswordErrors(): void {
+      this.error = ""
+      this.password_valid = true
+      this.confirm_password_valid = true
+    },
+
     validate_form(register: boolean): string {
       if (register && !this.username) {
         this.username_valid = false
         return "Поле имя не может быть пустым"
+      }
+      if (register && (this.username.length < 5 || this.username.length > 30)) {
+        this.username_valid = false
+        return "Имя пользователя должно быть от 5 до 30 символов"
       }
 
       if (!this.email) {
         this.email_valid = false
         return "Поле почта не может быть пустым"
       }
-      if (!this.email.includes("@")) {
+      if (!this.isValidEmail()) {
         this.email_valid = false
         return "Почта некорректна"
       }
-      if (this.password.length < 8) {
+      if (this.password.length < 5 || this.password.length > 30) {
         this.password_valid = false
-        return "Пароль должен быть не менее 8 символов!"
+        return "Пароль должен быть от 5 до 30 символов"
       }
       if (register && this.password !== this.confirm_password) {
         this.password_valid = false
@@ -334,6 +353,11 @@ export default defineComponent({
         return "Пароли не совпадают!"
       }
       return ""
+    },
+
+    isValidEmail(): boolean {
+      const emailPattern = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/u
+      return emailPattern.test(this.normalizedEmail)
     },
   },
 })
@@ -343,7 +367,10 @@ export default defineComponent({
 .container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100dvh;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  overflow-y: auto;
   padding: 20px;
   background: url("~@/assets/page_images/login-background.png");
   background-size: cover;

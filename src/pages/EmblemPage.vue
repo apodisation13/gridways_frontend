@@ -59,6 +59,7 @@ export default defineComponent({
     async goFullScreen(): Promise<void> {
       // если в локалсторадже нет данных входа, или вход не прошел, по кнопке начать пойдем на главную страницу
       if (!this.$store.getters["isLoggedIn"]) {
+        this.$store.commit("setGuestWelcomeState", true)
         this.$router.push("/main")
         return
       }

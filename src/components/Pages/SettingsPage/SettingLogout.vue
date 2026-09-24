@@ -1,6 +1,6 @@
 <template>
   <div @click.stop="toggleVisibleDialog">
-    <base-button>logout</base-button>
+    <base-button>Выход из аккаунта</base-button>
     <confirm-modal
       v-if="show_dialog"
       @confirm="logoutProcess"

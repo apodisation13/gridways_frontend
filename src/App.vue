@@ -121,14 +121,10 @@ export default defineComponent({
       )
     }
 
+    const authCheck = this.$store.dispatch("checkAuth")
     await this.$store.dispatch("fetchNews")
     await this.$router.push("/")
-    try {
-      await this.$store.dispatch("checkAuth") // пытаемся послать запрос на логин с данными из локалсторадж
-    } catch (err) {
-      console.log(err)
-      throw err
-    }
+    await authCheck
   },
 })
 </script>

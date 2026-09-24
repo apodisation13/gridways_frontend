@@ -53,22 +53,12 @@
         <div class="expand-menu__content">
           <div class="expand-menu__top">
             <button
-              v-for="button in routes"
+              v-for="button in visibleRoutes"
               :key="button.path"
               class="menu-btn"
               @click="push(button.path)"
             >
-              <span
-                v-if="!button.requireAuth"
-                class="global_text menu-btn__text"
-              >
-                {{ button.title }}
-              </span>
-              <span
-                v-if="button.requireAuth && isLoggedIn"
-                class="global_text menu-btn__text"
-                >{{ button.title }}</span
-              >
+              <span class="global_text menu-btn__text">{{ button.title }}</span>
             </button>
           </div>
           <div class="expand-menu__footer" @click="showExpandedMenu">
@@ -223,6 +213,11 @@ export default defineComponent({
     },
     isLoggedIn(): boolean {
       return this.$store.getters["isLoggedIn"]
+    },
+    visibleRoutes(): { title: string; path: string; requireAuth?: boolean }[] {
+      return this.routes.filter(
+        button => !button.requireAuth || this.isLoggedIn
+      )
     },
     path_to_icon(): string {
       return this.$store.getters["selectedAvatar"]

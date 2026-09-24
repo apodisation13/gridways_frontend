@@ -33,15 +33,6 @@ import { UserUpgrades } from "@/types/upgrades"
 
 const toast = useToast()
 
-interface ApiError {
-  error?:
-    | string
-    | {
-        error?: { message?: string }
-        detail?: string
-      }
-}
-
 interface ResourceDelta {
   amount: number
   ts: number
@@ -367,61 +358,6 @@ const actions = {
       dispatch("error_action", err)
       throw new Error("Ошибка загрузки базы данных!")
     }
-  },
-
-  error_action(_: ActionContext, err: ApiError) {
-    let message = "Неизвестная ошибка"
-
-    if (typeof err.error === "string") {
-      // Сетевая ошибка или наше кастомное сообщение
-      message = err.error
-    } else if (err.error?.error?.message) {
-      // Структура от бэка: { error: { code, message, details } }
-      message = err.error.error.message
-    } else if (err.error?.detail) {
-      // FastAPI HTTPException стиль
-      message = err.error.detail
-    }
-
-    toast.error(`Ошибка при загрузке базы данных: ${message}`)
-  },
-
-  async render_all_images({ getters, commit }: ActionContext) {
-    const cards: CardEntry[] = getters["all_cards"]
-    const leaders: LeaderEntry[] = getters["all_leaders"]
-    const enemies: Enemy[] = getters["all_enemies"]
-    const enemy_leaders: EnemyLeader[] = getters["all_enemy_leaders"]
-
-    const all_cards = (
-      cards as Array<CardEntry | Enemy | EnemyLeader | LeaderEntry>
-    )
-      .concat(leaders)
-      .concat(enemies)
-      .concat(enemy_leaders)
-    if (all_cards.length === 0) {
-      commit("set_images_rendered", true)
-      return
-    }
-    const images = all_cards.map(item => {
-      return new Promise<void>((resolve, reject) => {
-        const img = new Image()
-        img.src = (item as any).card
-          ? (item as any).card.image
-          : (item as any).image
-        img.onload = () => resolve()
-        img.onerror = reject
-      })
-    })
-
-    Promise.all(images) // TODO: await все решает
-      .then(() => {
-        console.log("Images loaded!")
-        toast.success("Успешно отрендерили картинки")
-      })
-      .catch(error => {
-        console.error("Some image(s) failed loading!")
-        console.error(error.message)
-      })
   },
 }
 

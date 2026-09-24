@@ -275,6 +275,6 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-top: -7vh;
+  margin-top: -1vh;
 }
 </style>

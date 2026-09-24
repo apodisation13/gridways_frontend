@@ -18,13 +18,15 @@ interface LoginState {
   is_logged_in: boolean
   header: { headers: { Authorization: string } } | string
   authorization: boolean
+  show_guest_welcome: boolean
 }
 
 const state: LoginState = {
   user: JSON.parse(localStorage.getItem("user") || "{}"),
   is_logged_in: false,
   header: "",
-  authorization: false, // флаг процесса авторизации, нужен для кнопки НАЧАТЬ на экране эмблемы
+  authorization: true, // до завершения проверки сохранённой авторизации кнопку НАЧАТЬ блокируем
+  show_guest_welcome: false,
 }
 
 const getters = {
@@ -32,6 +34,7 @@ const getters = {
   isLoggedIn: (state: LoginState) => state.is_logged_in,
   getHeader: (state: LoginState) => state.header,
   getAuthState: (state: LoginState) => state.authorization,
+  getGuestWelcomeState: (state: LoginState) => state.show_guest_welcome,
 }
 
 const mutations = {
@@ -60,11 +63,17 @@ const mutations = {
   set_auth_state(state: LoginState, payload: boolean) {
     state.authorization = payload
   },
+  setGuestWelcomeState(state: LoginState, payload: boolean) {
+    state.show_guest_welcome = payload
+  },
 }
 
 const actions = {
   async checkAuth({ getters, dispatch, commit }: ActionContext) {
     const user = getters["getUser"] as StoredUser | Record<string, never>
+
+    // вначале мы проверяем возможность авторизации - есть там данные или нет
+    // если нету - мы отсюда выйдем и из EmblemPage нас кинет на MainPage
     if (
       !("email" in user) ||
       !user.email ||
@@ -72,13 +81,10 @@ const actions = {
       !user.password
     ) {
       commit("logOut")
-      toast.warning(
-        "По сохранённым ранее данным юзера не получилось авторизоваться, попробуйте вручную!"
-      )
-      throw new Error(
-        "По сохранённым ранее данным юзера не получилось авторизоваться, попробуйте вручную"
-      )
+      commit("set_auth_state", false)
+      return
     }
+
     try {
       await dispatch("userLogin", {
         email: user.email,
@@ -89,9 +95,6 @@ const actions = {
       commit("logOut")
       toast.warning(
         "По сохранённым ранее данным юзера не получилось авторизоваться, попробуйте вручную!"
-      )
-      throw new Error(
-        "По сохранённым ранее данным юзера не получилось авторизоваться, попробуйте вручную"
       )
     } finally {
       commit("set_auth_state", false) // не важно, каков итог, в любом случае флаг снимем
@@ -142,7 +145,7 @@ const actions = {
       } else if (apiError?.code === "VALIDATION_ERROR") {
         message = apiError.message
       }
-      toast.error(message)
+      toast.error(message, { timeout: 7000 })
       throw new Error(message)
     }
   },
