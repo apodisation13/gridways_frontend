@@ -14,8 +14,8 @@
         <!--нижняя часть меню, в футере, показываем только авторизованному-->
         <menu-footer v-if="isLoggedIn" />
 
-        <!--подсказка по странице, если она задана в мете роута-->
-        <page-help v-if="isLoggedIn" />
+        <!-- В игре ключ подсказки выбирается внутри GamePage по этапу. -->
+        <page-help v-if="isLoggedIn && $route.path !== '/game'" />
       </div>
     </div>
   </app-wrapper-fullscreen>

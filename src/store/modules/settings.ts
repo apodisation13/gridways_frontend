@@ -13,6 +13,7 @@ export interface SettingsState {
   soundOn: boolean
   animationOn: boolean
   helpOn: boolean
+  helpGameOn: boolean
   moveTimeout: number
 }
 
@@ -23,6 +24,7 @@ const state: SettingsState = {
   soundOn: true,
   animationOn: true,
   helpOn: true,
+  helpGameOn: true,
   moveTimeout: 1000,
 }
 
@@ -34,6 +36,7 @@ const getters = {
   soundOn: (state: SettingsState) => state.soundOn,
   animationOn: (state: SettingsState) => state.animationOn,
   helpOn: (state: SettingsState) => state.helpOn,
+  helpGameOn: (state: SettingsState) => state.helpGameOn,
 }
 
 const mutations = {
@@ -55,8 +58,14 @@ const mutations = {
   switchHelp(state: SettingsState) {
     state.helpOn = !state.helpOn
   },
+  switchGameHelp(state: SettingsState) {
+    state.helpGameOn = !state.helpGameOn
+  },
   setHelpOn(state: SettingsState, helpOn: boolean) {
     state.helpOn = helpOn
+  },
+  setHelpGameOn(state: SettingsState, helpGameOn: boolean) {
+    state.helpGameOn = helpGameOn
   },
   setMoveTimeout(state: SettingsState, timeout: number) {
     state.moveTimeout = timeout
@@ -68,6 +77,7 @@ const mutations = {
     state.soundOn = payload.data.sound_on
     state.animationOn = payload.data.animation_on
     state.helpOn = payload.data.help_on ?? true
+    state.helpGameOn = payload.data.help_game_on ?? true
     state.moveTimeout = payload.data.move_timeout
   },
 }
@@ -93,6 +103,7 @@ const actions = {
         sound_on: getters.soundOn,
         animation_on: getters.animationOn,
         help_on: getters.helpOn,
+        help_game_on: getters.helpGameOn,
         move_timeout: getters.selectedMoveTimeout,
         avatar: getters.selectedAvatar,
         field: getters.selectedField,

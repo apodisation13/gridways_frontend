@@ -1,6 +1,10 @@
 <template>
-  <!-- подсказка страницы по ключу текущего пути в game_const.helps -->
-  <help-modal v-if="isVisible && content" :content="content" @close="close" />
+  <help-modal
+    v-if="isVisible && content"
+    :key="resolvedHelpId"
+    :content="content"
+    @close="close"
+  />
 </template>
 
 <script lang="ts">
@@ -12,6 +16,9 @@ import type { HelpContent, Helps } from "@/types"
 export default defineComponent({
   name: "PageHelp",
   components: { HelpModal },
+  props: {
+    helpId: { type: String, default: undefined },
+  },
 
   data() {
     return {
@@ -20,11 +27,20 @@ export default defineComponent({
   },
 
   computed: {
+    resolvedHelpId(): string {
+      return this.helpId ?? this.$route.path.replace(/^\/+/, "")
+    },
+    isGameHelp(): boolean {
+      return this.$route.path === "/game"
+    },
     content(): HelpContent | undefined {
-      if (!this.$store.getters["helpOn"]) return undefined
-
-      const helpId = this.$route.path.replace(/^\/+/, "") || undefined
+      const helpId = this.resolvedHelpId
       if (!helpId) return undefined
+
+      const isHelpEnabled = this.isGameHelp
+        ? this.$store.getters["helpGameOn"]
+        : this.$store.getters["helpOn"]
+      if (!isHelpEnabled) return undefined
 
       const helps = this.$store.getters["helpsInfo"] as Helps
       return helps[helpId] ?? undefined
@@ -32,11 +48,13 @@ export default defineComponent({
   },
 
   watch: {
-    // открываем при переходе на страницу, у которой в мете есть help
+    // Новый ключ открывает подсказку даже при общем объекте контента.
+    resolvedHelpId(): void {
+      this.isVisible = Boolean(this.content)
+    },
     content: {
       immediate: true,
       handler(content: HelpContent | undefined): void {
-        // TODO: не показывать, если id уже в списке скрытых подсказок с бэка
         this.isVisible = Boolean(content)
       },
     },
@@ -46,7 +64,10 @@ export default defineComponent({
     async close(dontShowAgain: boolean): Promise<void> {
       this.isVisible = false
       if (dontShowAgain && this.content) {
-        this.$store.commit("setHelpOn", false)
+        this.$store.commit(
+          this.isGameHelp ? "setHelpGameOn" : "setHelpOn",
+          false
+        )
         await this.$store.dispatch("updateUserPreferences")
       }
     },
