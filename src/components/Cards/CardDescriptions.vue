@@ -32,7 +32,7 @@
 
       <!--Описание абилки deathwish - для карт врагов-->
       <div
-        v-if="forEnemy && c.deathwish?.name"
+        v-if="c.deathwish?.name"
         class="inlines"
         :style="{
           'background-image':
@@ -43,59 +43,56 @@
     </div>
 
     <!--А дальше сами описания!!!-->
+
     <!--Описание абилки для карты игрока и для лидера врагов у которого она есть вообще-->
     <div v-if="show_ability && !forEnemy && c?.ability?.name" class="text">
       {{ formatCardAbility(c) }} <br />
     </div>
+
+    <!--Для карты игрока и лидера игрока - случай multi-->
     <div v-if="show_ability && !forEnemy && c.data?.multi" class="text">
       Карта бьет по {{ c.data.multi.value }} целям <br />
     </div>
-    <div
-      v-if="show_ability && !forEnemy && c.data?.field_interaction"
-      class="text"
-    >
-      Эффект
-      {{
-        formatEffect(c, effectsInfo[c.data.field_interaction.type].description)
-      }}
+
+    <!--Если в абилке (по сути карта игрока или карта лидера игрока) есть эффекты-->
+    <div v-if="show_ability && c.data?.field_interaction" class="text">
+      Эффект: {{ formatEffect(c.data.field_interaction) }}
       <br />
       Эффект длится
       {{
         c.data.field_interaction?.times_count || c.data.field_interaction?.turns
       }}
-      <p v-if="c.data.field_interaction?.times_count">раз</p>
-      <p v-if="c.data.field_interaction?.turns">ходов</p>
+      <span v-if="c.data.field_interaction?.times_count">раз</span>
+      <span v-if="c.data.field_interaction?.turns">ходов</span>
+      <br />
     </div>
+
     <!--Описание абилки для карты врага-->
     <div v-if="show_ability && forEnemy" class="text">
       {{ formatEnemyMove(c) }} <br />
     </div>
+
     <!--Описание пассивной абилки, разделение для карты или для лидера врагов-->
     <div v-if="show_passive && card.passive_ability?.name" class="text">
       {{ formatCardPassiveAbility(c) }} <br />
       <br />
       <div
-        v-if="
-          show_passive && !forEnemy && c.data?.passive?.field_interaction?.type
-        "
+        v-if="show_passive && c.data?.passive?.field_interaction?.type"
         class="text"
       >
-        Эффект
-        {{
-          formatEffect(
-            c,
-            effectsInfo[c.data.passive.field_interaction?.type]?.description
-          )
-        }}
+        Эффект: {{ formatEffect(c.data.passive.field_interaction) }}
         <br />
         Эффект длится
         {{
           c.data.passive.field_interaction?.times_count ||
           c.data.passive.field_interaction?.turns
         }}
-        <p v-if="c.data.field_interaction?.times_count">раз</p>
-        <p v-if="c.data.field_interaction?.turns">ходов</p>
+        <span v-if="c.data.passive.field_interaction?.times_count">раз</span>
+        <span v-if="c.data.passive.field_interaction?.turns">ходов</span>
+        <br />
+        <br />
       </div>
+
       <span v-if="c.data.passive?.has_passive_in_field">
         Срабатывает когда карта <b>НА ПОЛЕ</b>
       </span>
@@ -118,9 +115,21 @@
         {{ c.data.passive.default_timer }}
       </span>
     </div>
+
     <!--Описание абилки deathwish, только для врага-->
-    <div v-if="show_deathwish && forEnemy && c?.deathwish?.name" class="text">
-      {{ formatEnemyDeathwish(c) }} <br />
+    <div v-if="show_deathwish && c?.deathwish?.name" class="text">
+      {{ formatEnemyDeathwish(c) }} <br /><br />
+      <div v-if="c.data?.deathwish?.field_interaction?.type" class="text">
+        Эффект: {{ formatEffect(c.data.deathwish.field_interaction) }}
+        <br />
+        Эффект длится
+        {{
+          c.data.deathwish.field_interaction.times_count ||
+          c.data.deathwish.field_interaction.turns
+        }}
+        <span v-if="c.data.deathwish.field_interaction.times_count">раз</span>
+        <span v-if="c.data.deathwish.field_interaction.turns">ходов</span>
+      </div>
     </div>
   </div>
 </template>
@@ -209,12 +218,11 @@ export default defineComponent({
             : "{value}"
         )
     },
-    formatEffect(card: any, ability_description: string): string {
-      return ability_description.replace(
+    formatEffect(effect: { type: string; value?: number }): string {
+      const description = this.effectsInfo[effect.type]?.description ?? ""
+      return description.replace(
         /{value}/g,
-        card.data?.field_interaction?.value !== undefined
-          ? `{{ ${card.data.field_interaction.value} }}`
-          : "{value}"
+        effect.value !== undefined ? `{{ ${effect.value} }}` : "{value}"
       )
     },
     formatEnemyMove(enemy: any): string {
@@ -226,20 +234,46 @@ export default defineComponent({
       )
     },
     formatCardPassiveAbility(card: any): string {
-      return card.passive_ability.description.replace(
-        /{value}/g,
-        card.data.passive?.value !== undefined
-          ? `{{ ${card.data.passive.value} }}`
-          : "{value}"
-      )
+      return card.passive_ability.description
+        .replace(
+          /{value}/g,
+          card.data.passive?.value !== undefined
+            ? `{{ ${card.data.passive.value} }}`
+            : "{value}"
+        )
+        .replace(
+          /{value}/g,
+          card.data.passive?.field_interaction?.turns !== undefined
+            ? `{{ ${card.data.passive.field_interaction.turns} }}`
+            : "{value}"
+        )
+        .replace(
+          /{value}/g,
+          card.data.passive?.field_interaction?.times_count !== undefined
+            ? `{{ ${card.data.passive?.field_interaction.times_count} }}`
+            : "{value}"
+        )
     },
     formatEnemyDeathwish(enemy: any): string {
-      return enemy.deathwish.description.replace(
-        /{deathwish_value}/g,
-        enemy.data.deathwish?.value !== undefined
-          ? `{{ ${enemy.data.deathwish.value} }}`
-          : "{deathwish_value}"
-      )
+      return enemy.deathwish.description
+        .replace(
+          /{deathwish_value}/g,
+          enemy.data.deathwish?.value !== undefined
+            ? `{{ ${enemy.data.deathwish.value} }}`
+            : "{deathwish_value}"
+        )
+        .replace(
+          /{deathwish_value}/g,
+          enemy.data.deathwish?.field_interaction?.turns !== undefined
+            ? `{{ ${enemy.data.deathwish.field_interaction.turns} }}`
+            : "{deathwish_value}"
+        )
+        .replace(
+          /{deathwish_value}/g,
+          enemy.data.deathwish?.field_interaction?.times_count !== undefined
+            ? `{{ ${enemy.data.deathwish.field_interaction.times_count} }}`
+            : "{deathwish_value}"
+        )
     },
     showMainAbility(): void {
       this.show_ability = true

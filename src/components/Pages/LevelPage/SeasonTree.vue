@@ -1,7 +1,7 @@
 <template>
   <div class="stage-container">
     <div
-      v-if="!showSeasonLevelsTree"
+      v-show="!showSeasonLevelsTree"
       :style="{ cursor: isPanning ? 'grabbing' : 'grab', userSelect: 'none' }"
       class="tree-pan-surface"
       @wheel.prevent
@@ -37,7 +37,7 @@
       :userSeasonUnlocked="userSeasonUnlocked"
     />
     <!-- HTML слой поверх canvas -->
-    <div v-if="!showSeasonLevelsTree" ref="htmlOverlay" class="html-overlay">
+    <div v-show="!showSeasonLevelsTree" ref="htmlOverlay" class="html-overlay">
       <div
         v-for="season in seasonTree"
         :key="'label-' + season.season.id"
@@ -256,6 +256,10 @@ export default defineComponent({
       if (oldVal !== newVal) {
         this.showSeasonLevelsTree = this.seasonLevelsTreeOpened
       }
+    },
+    showSeasonLevelsTree(): void {
+      // Слои сохраняются через v-show вместе со своим transform.
+      this.endPan()
     },
     initialSeasonId() {
       this.openInitialSeason()
