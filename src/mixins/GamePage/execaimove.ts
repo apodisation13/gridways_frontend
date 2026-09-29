@@ -10,7 +10,12 @@ export default defineComponent({
   methods: {
     // нажал ПАС - переход хода компу
     exec_ai_move(): void {
+      if (!this.$store.state.game.player_turn) return
       this.$store.commit("set_player_turn", false) // кнопка пас сразу пропала и дро тоже
+      this.isActive.player_cards = false
+      this.isActive.player_leader = false
+      this.isActive.enemy_cards = false
+      this.isActive.enemy_leader = false
 
       const timeout: number = store.getters["selectedMoveTimeout"]
 

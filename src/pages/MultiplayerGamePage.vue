@@ -147,6 +147,7 @@
             :leader="gameObj.leader"
             :field="gameObj.field"
             :enemy_leader="gameObj.enemy_leader"
+            :player_turn="myTurn && $store.state.game.player_turn"
             @exec_leader="chose_leader"
             @target_enemy="exec_damage_enemy_card"
             @target_enemy_leader="exec_damage_enemy_leader"
@@ -178,7 +179,9 @@
         :hand="gameObj.hand"
         :field="gameObj.field"
         :enemy_leader="gameObj.enemy_leader"
-        :player_cards_active="isActive.player_cards"
+        :player_cards_active="
+          isActive.player_cards && myTurn && $store.state.game.player_turn
+        "
         :drawing="draw"
         :initial-hand-size="initialHandSize"
         @chose_player_card="chose_player_card"
@@ -1029,9 +1032,12 @@ export default defineComponent({
     //   Если отправить GAME_STATE до этого — напарник увидит врага с отрицательными HP.
     //   +100 мс — небольшой буфер поверх анимационного таймаута.
     exec_ai_move(): void {
-      if (!this.myTurn) return
+      if (!this.myTurn || !this.$store.state.game.player_turn) return
       this.stopTurnTimer()
       this.$store.commit("set_player_turn", false)
+      this.isActive.player_cards = false
+      this.isActive.player_leader = false
+      this.setNotActive()
       const timeout: number = 500
 
       // Шаг 1: пассивки игрока конца хода

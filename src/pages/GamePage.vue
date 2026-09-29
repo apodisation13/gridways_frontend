@@ -55,6 +55,7 @@
           :leader="gameObj.leader"
           :field="gameObj.field"
           :enemy_leader="gameObj.enemy_leader"
+          :player_turn="$store.state.game.player_turn"
           @exec_leader="chose_leader"
           @target_enemy="exec_damage_enemy_card"
           @target_enemy_leader="exec_damage_enemy_leader"
@@ -80,7 +81,9 @@
       :hand="gameObj.hand"
       :field="gameObj.field"
       :enemy_leader="gameObj.enemy_leader"
-      :player_cards_active="isActive.player_cards"
+      :player_cards_active="
+        isActive.player_cards && $store.state.game.player_turn
+      "
       :drawing="draw"
       :initial-hand-size="initialHandSize"
       @chose_player_card="chose_player_card"
@@ -280,7 +283,8 @@ export default defineComponent({
     // по нажатию на карту игрока, из hand-comp, card - вся карта целиком
     chose_player_card(card: Card): void {
       this.sca = false // как только потянули за карту из руки сразу скинули этот признак игры доп карты
-      if (!this.isActive.player_cards) return
+      if (!this.$store.state.game.player_turn || !this.isActive.player_cards)
+        return
       this.selected_card = card // ВОТ ЗДЕСЬ МЫ ЗАПОМНИЛИ КАРТУ ИЗ РУКИ НА КОТОРУЮ ТКНУЛИ
       this.isActive.player_leader = false // лидер игрока теперь неактивен
       this.setActive()
@@ -290,6 +294,7 @@ export default defineComponent({
     chose_leader(): void {
       this.sca = false // или если потянули за лидера сразу скинули этот признак игры доп карты
       if (this.gameObj.leader.data.charges <= 0) return
+      if (!this.$store.state.game.player_turn) return
       this.selected_card = this.gameObj.leader // ВОТ ЗДЕСЬ МЫ ЗАПОМНИЛИ ЛИДЕРА ДЛЯ special_case
       this.isActive.player_leader = true
       this.setActive()
