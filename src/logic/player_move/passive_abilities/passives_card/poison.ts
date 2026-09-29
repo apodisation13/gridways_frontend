@@ -19,7 +19,7 @@ export function poison_random_enemy_passive(
   setTimeout(() => {
     card.passive_poisoning = null
   }, timeout * 0.5)
-  poison_one_enemy(target, gameObj, timeout)
+  poison_one_enemy(target, gameObj, false, timeout)
 }
 
 export function poison_all_enemies_passive(

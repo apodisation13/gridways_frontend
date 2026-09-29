@@ -104,8 +104,8 @@ export function applyEffectAtCell(
     if (e.data.hp <= 0) enemyKilled = true
     effectDecrement(index, effect, gameObj)
   } else if (effect.type === EffectType.Poison) {
-    poison_one_enemy(e, gameObj, timeout)
-    if (e?.data?.status === EnemyStatus.Poison) {
+    enemyKilled = poison_one_enemy(e, gameObj, true, timeout)
+    if (enemyKilled || e.data.status === EnemyStatus.Poison) {
       effectDecrement(index, effect, gameObj)
     }
   } else if (effect.type === EffectType.MiddleMine) {

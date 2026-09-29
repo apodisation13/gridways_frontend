@@ -131,7 +131,7 @@ export function damage_ai_card(
     incr_dmg_to_all_grave(card as Card, gameObj, timeout)
   } else if (ability === CardAbility.Poison) {
     damage_one(enemy, card, gameObj, timeout)
-    poison_one_enemy(enemy as Enemy, gameObj, timeout)
+    poison_one_enemy(enemy as Enemy, gameObj, false, timeout)
   } else if (ability === CardAbility.PoisonAll) {
     damage_one(enemy, card, gameObj, timeout)
     poison_all_enemies(gameObj, timeout)
