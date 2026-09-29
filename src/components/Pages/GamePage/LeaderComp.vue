@@ -41,6 +41,10 @@ export default defineComponent({
       default: null,
       type: Object as PropType<EnemyLeader | null>,
     },
+    player_turn: {
+      required: true,
+      type: Boolean,
+    },
   },
 
   emits: [
@@ -89,7 +93,7 @@ export default defineComponent({
     handleCardMouseDown(e: MouseEvent): void {
       e.preventDefault()
       e.stopPropagation()
-      if (this.leader.data.charges === 0) return
+      if (!this.player_turn || this.leader.data.charges <= 0) return
       const el = document.querySelector(".leader-comp")
       if (!el) return
       this.$emit("exec_leader")
@@ -106,7 +110,7 @@ export default defineComponent({
     handleCardTouchStart(e: TouchEvent): void {
       e.preventDefault()
       e.stopPropagation()
-      if (this.leader.data.charges === 0) return
+      if (!this.player_turn || this.leader.data.charges <= 0) return
       const el = document.querySelector(".leader-comp")
       if (!el) return
       const touch = e.touches[0]

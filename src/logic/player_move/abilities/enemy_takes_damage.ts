@@ -41,8 +41,10 @@ export function remove_dead_enemy(
     field[enemyIndex] = ""
     console.log("враг умер")
     ;(enemy as Enemy).data.hp = (enemy as Enemy).data.base.base_hp
-    if ((enemy as Enemy).data.status !== EnemyStatus.Doomed)
+    if ((enemy as Enemy).data.status !== EnemyStatus.Doomed) {
+      enemy.data.status = null
       enemies_grave.push(enemy as Enemy)
+    }
     if ((enemy as Enemy).deathwish?.name)
       deathwish(enemy as Enemy, enemyIndex, gameObj, timeout)
   }
