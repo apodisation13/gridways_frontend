@@ -51,14 +51,19 @@
 import type { Component } from "vue"
 import { defineComponent } from "vue"
 
+import ArenaDeck from "@/components/Pages/RulesPage/ArenaDeck.vue"
+import ArenaUpgrades from "@/components/Pages/RulesPage/ArenaUpgrades.vue"
 import BasicsGeneral from "@/components/Pages/RulesPage/BasicsGeneral.vue"
 import BasicsRoadmap from "@/components/Pages/RulesPage/BasicsRoadmap.vue"
 import CardsEnemyCards from "@/components/Pages/RulesPage/CardsEnemyCards.vue"
 import CardsPlayerCards from "@/components/Pages/RulesPage/CardsPlayerCards.vue"
 import GameAdditionalCards from "@/components/Pages/RulesPage/GameAdditionalCards.vue"
 import GameAfterMove from "@/components/Pages/RulesPage/GameAfterMove.vue"
+import GameEffects from "@/components/Pages/RulesPage/GameEffects.vue"
+import GameEffectsEnemy from "@/components/Pages/RulesPage/GameEffectsEnemy.vue"
 import GameEnemyMove from "@/components/Pages/RulesPage/GameEnemyMove.vue"
 import GameGeneral from "@/components/Pages/RulesPage/GameGeneral.vue"
+import GameItems from "@/components/Pages/RulesPage/GameItems.vue"
 import GameMove from "@/components/Pages/RulesPage/GameMove.vue"
 import GamePassives from "@/components/Pages/RulesPage/GamePassives.vue"
 import GamePassivesEnemy from "@/components/Pages/RulesPage/GamePassivesEnemy.vue"
@@ -178,7 +183,8 @@ const RULES: RulesCategory[] = [
       {
         id: "modes-arena",
         label: "Арена",
-        content: "Арена пока не реализована, обновим правила позже",
+        content:
+          "На арене вы собираете колоду из случайных карт на выбор и проходите уровни со случайными врагами. Подробнее — во вкладке «Арена».",
       },
       {
         id: "modes-start-game",
@@ -203,6 +209,15 @@ const RULES: RulesCategory[] = [
         id: "game-after-move",
         label: "Переход хода",
         component: GameAfterMove,
+      },
+      {
+        id: "game-multi-targets",
+        label: "Несколько целей",
+        content:
+          "Некоторые способности карт игрока и лидера могут наносить урон сразу нескольким целям на поле. " +
+          "У таких карт в описании будет написано - карта бьет по 2 (3 и более) целям. " +
+          "Для хода такой картой последовательно выберете нужное количество целей. При выборе целей " +
+          "они будут мигать",
       },
       { id: "game-enemy-move", label: "Ход врага", component: GameEnemyMove },
       { id: "game-passives", label: "Пассивки", component: GamePassives },
@@ -232,9 +247,33 @@ const RULES: RulesCategory[] = [
           "который наносят враги - вначале будет сбивать 1 единицу брони за каждое попадание урона от врага",
       },
       {
+        id: "game-player-invulnerability",
+        label: "Неуязвимость игрока",
+        content:
+          "Некоторые способности карт игрока и лидера добавляют колоде (лидеру) - неуязвимость. Неуязвимость отображается " +
+          "поверх здоровья и брони - и число, сколько ходов она действует. Максимальный размер неуязвимости - " +
+          "определяется прокачкой раздела неуязвимости. Враги вообще не будут наносить вам урон! Счетчик ходов " +
+          "уменьшается на 1 каждое окончание хода врагов ",
+      },
+      {
         id: "game-additional-cards",
         label: "Доп карты",
         component: GameAdditionalCards,
+      },
+      {
+        id: "game-effects",
+        label: "Эффекты",
+        component: GameEffects,
+      },
+      {
+        id: "game-enemy-effects",
+        label: "Эффекты у врагов",
+        component: GameEffectsEnemy,
+      },
+      {
+        id: "game-items",
+        label: "Меню предметов",
+        component: GameItems,
       },
       {
         id: "game-win-lose",
@@ -244,6 +283,87 @@ const RULES: RulesCategory[] = [
           "за нормальный - 2, за сложный 3. Ключи можно открыть на странице бонусов. " +
           "За проигрыш - ничего :) При выигрыше - вам открываются следующие уровни за текущим по стрелкам." +
           "Если весь сезон завешен - открываются новые сезоны по стрелкам.",
+      },
+    ],
+  },
+  {
+    id: "arena",
+    label: "Арена",
+    subs: [
+      {
+        id: "arena-general",
+        label: "Общее",
+        content:
+          "Арена — режим, в котором вы собираете колоду из случайных карт на выбор. Враги тоже случайные, а их количество растёт с каждым уровнем арены.",
+      },
+      {
+        id: "arena-entry",
+        label: "Оплата арены",
+        content:
+          "Вход на арену оплачивается ресурсами. Для начала нового прохождения нужно внести плату за вход.",
+      },
+      {
+        id: "arena-deck",
+        label: "Сбор колоды",
+        component: ArenaDeck,
+      },
+      {
+        id: "arena-leader",
+        label: "Лидер",
+        content:
+          "После сбора колоды вы выбираете лидера: вам предлагают трёх лидеров, из которых нужно взять одного.",
+      },
+      {
+        id: "arena-enemies",
+        label: "Враги",
+        content:
+          "На первом уровне арены всего 8 врагов. На каждом следующем уровне их становится на 3 больше: 8, 11, 14, 17 и так далее.",
+      },
+      {
+        id: "arena-upgrades",
+        label: "Прокачки",
+        component: ArenaUpgrades,
+      },
+      {
+        id: "arena-rewards",
+        label: "Награды",
+        content:
+          "У арены свои награды за победы — они значительно увеличены по сравнению с обычной игрой.",
+      },
+      {
+        id: "arena-defeat",
+        label: "Поражение",
+        content:
+          "Первое поражение завершает текущее прохождение арены. Чтобы попробовать снова, нужно начать новый заход.",
+      },
+    ],
+  },
+  {
+    id: "multiplayer",
+    label: "Мультиплеер",
+    subs: [
+      {
+        id: "multiplayer-general",
+        label: "Общее",
+        content:
+          "В мультиплеере два игрока вместе проходят один случайный уровень, сражаясь против общих врагов.",
+      },
+      {
+        id: "multiplayer-turns",
+        label: "Ходы",
+        content:
+          "Сначала ходит первый игрок, затем компьютер. После этого ходит второй игрок, затем снова компьютер. Далее порядок повторяется. Во время хода компьютера урон наносится обоим игрокам.",
+      },
+      {
+        id: "multiplayer-enemies",
+        label: "Враги",
+        content:
+          "В мультиплеере новые враги появляются по двое за ход компьютера, если на поле есть место для их появления.",
+      },
+      {
+        id: "multiplayer-rewards",
+        label: "Награда",
+        content: "За победу оба игрока получают одинаковую награду.",
       },
     ],
   },
@@ -320,6 +440,40 @@ const RULES: RulesCategory[] = [
           "Зеленая коробка - содержит в себе 3 карты, и все 3 эти карты становятся доступны игроку!",
       },
       {
+        id: "res-flowers",
+        label: "Магический флакон",
+        content:
+          "Флакон - промежуточный ресурс для создания многих других. Выигрывается в уровнях " +
+          "или покупается за монетки",
+      },
+      {
+        id: "res-first-aid-kits",
+        label: "Аптечки",
+        content:
+          "Аптечки - лечат вас прям во время игры в любой момент! Максимальный запас аптечек, " +
+          "на сколько лечит аптечка - прокачивается в разделе Прокачки -> Игровые. Атпечка - " +
+          "разовый ресурс! Каждый раз их нужно создавать заново. Редкий и дорогой ресурс, может " +
+          "помочь вам в трудную минуту во время сложного боя",
+      },
+      {
+        id: "res-shield-armors",
+        label: "Боевые щитки",
+        content:
+          "Щиток - дает вам броню прям во время игры в любой момент! Максимальный запас щитков, " +
+          "сколько брони дает щиток - прокачивается в разделе Прокачки -> Игровые. Щиток - " +
+          "разовый ресурс! Каждый раз его нужно создавать заново. Редкий и дорогой ресурс, может " +
+          "помочь вам в трудную минуту во время сложного боя",
+      },
+      {
+        id: "res-immune-magics",
+        label: "Магическая неуязвимость",
+        content:
+          "Дает вам полную неуязвимость прям во время игры в любой момент! Максимальный запас, " +
+          "сколько ходов будет действовать - прокачивается в разделе Прокачки -> Игровые. Тоже " +
+          "разовый ресурс! Каждый раз его нужно создавать заново. Редкий и дорогой ресурс, может " +
+          "помочь вам в трудную минуту во время сложного боя",
+      },
+      {
         id: "res-gem",
         label: "Редкий камень",
         content:
@@ -377,7 +531,7 @@ const RULES: RulesCategory[] = [
         id: "shop-general",
         label: "Общее",
         content:
-          "Наша игра - является абсолютно бесплатной!" +
+          "Наша игра - является абсолютно бесплатной! " +
           "Мы не принуждаем вас к покупке! Всё можно пройти и собрать бесплатно. Если же вы хотите ускорить " +
           "этот процесс, или просто хотите поблагодарить нас, милости просим в раздел покупки :)",
       },
