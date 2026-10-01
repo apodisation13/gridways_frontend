@@ -291,12 +291,11 @@ export default defineComponent({
       this.deck.deck_name = value
     },
 
-    async save_deck(): Promise<void> {
+    validate_deck(): boolean {
       if (!this.deck.leader) {
         this.toast.warning("Необходимо выбрать лидера")
-        return
+        return false
       }
-      // карт ровно 12 и лидер выбран
       if (this.cant_save_deck) {
         if (this.maxCardsInDeck == 10) {
           this.toast.warning("Соберите колоду из 10 карт")
@@ -305,16 +304,26 @@ export default defineComponent({
             `Соберите колоду из 10-${this.maxCardsInDeck} карт`
           )
         }
-        return
+        return false
       }
-      if (this.deck.deck_name.trim() === "") {
+      const name = this.deck.deck_name.trim()
+      if (name === "") {
         this.toast.warning("Введите имя колоды")
-        return
+        return false
       }
+      if (Array.from(name).length < 3 || Array.from(name).length > 50) {
+        this.toast.warning("Имя колоды должно содержать от 3 до 50 символов")
+        return false
+      }
+      return true
+    },
+
+    async save_deck(): Promise<void> {
+      if (!this.validate_deck()) return
       await this.send_data_to_store("createUserDeck", {
-        deck_name: this.deck.deck_name,
+        deck_name: this.deck.deck_name.trim(),
         cards: this.deck.deck_body,
-        leader_id: this.deck.leader.id,
+        leader_id: this.deck.leader!.id,
       })
     },
 
@@ -359,8 +368,9 @@ export default defineComponent({
     },
 
     async patch_deck(): Promise<void> {
+      if (!this.validate_deck()) return
       await this.send_data_to_store("patchUserDeck", {
-        deck_name: this.deck.deck_name,
+        deck_name: this.deck.deck_name.trim(),
         cards: this.deck.deck_body,
         leader_id: this.deck.leader?.id,
         deck_id: this.deck.deck_id,
