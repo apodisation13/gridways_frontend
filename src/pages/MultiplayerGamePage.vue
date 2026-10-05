@@ -296,7 +296,7 @@ import PassComp from "@/components/Pages/GamePage/PassComp.vue"
 import RedrawComp from "@/components/Pages/GamePage/RedrawComp.vue"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities.vue"
 import UseSpecialItemsComponent from "@/components/Pages/GamePage/UseSpecialItemsComponent.vue"
-import { randInt } from "@/lib/utils"
+import { copyObj, randInt } from "@/lib/utils"
 import { enemy_leader_ai_move_once } from "@/logic/ai_move/ai_leader_move_once"
 import { ai_move } from "@/logic/ai_move/ai_move"
 import { enemy_passive_abilities_end_turn } from "@/logic/ai_move/ai_passive_abilties"
@@ -568,7 +568,7 @@ export default defineComponent({
         ws.send(
           JSON.stringify({
             event: "SCA_SHOW",
-            card: JSON.parse(JSON.stringify(this.selected_card)),
+            card: copyObj(this.selected_card),
           })
         )
       } else if (!val) {
@@ -670,14 +670,16 @@ export default defineComponent({
       } else if (msg.event === "GAME_STATE") {
         // Активный игрок прислал текущее состояние поля и урон.
         // Обновляем поле/врагов/могилу, затем применяем HP-изменения.
-        this.gameObj.field = JSON.parse(JSON.stringify(msg.field))
-        this.gameObj.enemies = JSON.parse(JSON.stringify(msg.enemies))
-        this.gameObj.enemy_leader = JSON.parse(JSON.stringify(msg.enemy_leader))
-        this.gameObj.enemies_grave = JSON.parse(
-          JSON.stringify(msg.enemies_grave)
+        this.gameObj.field = copyObj(msg.field as GameObj["field"])
+        this.gameObj.enemies = copyObj(msg.enemies as GameObj["enemies"])
+        this.gameObj.enemy_leader = copyObj(
+          msg.enemy_leader as GameObj["enemy_leader"]
         )
-        this.gameObj.effects = JSON.parse(
-          JSON.stringify(msg.effects ?? Array(12).fill(""))
+        this.gameObj.enemies_grave = copyObj(
+          msg.enemies_grave as GameObj["enemies_grave"]
+        )
+        this.gameObj.effects = copyObj(
+          (msg.effects ?? Array(12).fill("")) as GameObj["effects"]
         )
         const attackLog = (msg.attack_log as number[]) ?? []
         if (attackLog.length > 0) {
@@ -780,22 +782,16 @@ export default defineComponent({
           this.$store.getters["maxEnemies"].max
         )
       )
-      const enemies: Enemy[] = JSON.parse(
-        JSON.stringify(generated.level.enemies)
-      )
-      const enemy_leader: EnemyLeaderType = JSON.parse(
-        JSON.stringify(generated.level.enemy_leader)
+      const enemies: Enemy[] = copyObj(generated.level.enemies)
+      const enemy_leader: EnemyLeaderType = copyObj(
+        generated.level.enemy_leader
       )
 
       // Берём колоду и лидера из стора (выбраны игроком на экране старта игры)
-      this.gameObj.deck = JSON.parse(
-        JSON.stringify(
-          this.$store.state.game.current_deck.map((c: { card: Card }) => c.card)
-        )
+      this.gameObj.deck = copyObj(
+        this.$store.state.game.current_deck.map((c: { card: Card }) => c.card)
       )
-      this.gameObj.leader = JSON.parse(
-        JSON.stringify(this.$store.state.game.leader)
-      )
+      this.gameObj.leader = copyObj(this.$store.state.game.leader)
       this.gameObj.enemy_leader = enemy_leader
       this.gameObj.enemies = enemies
 
@@ -809,9 +805,9 @@ export default defineComponent({
       // Сохраняем начальный стейт в стор (пригодится если понадобится переинициализация)
       // и сразу отправляем гостю
       this.$store.commit("multi_set_initial_state", {
-        enemies: JSON.parse(JSON.stringify(this.gameObj.enemies)),
-        field: JSON.parse(JSON.stringify(this.gameObj.field)),
-        enemy_leader: JSON.parse(JSON.stringify(this.gameObj.enemy_leader)),
+        enemies: copyObj(this.gameObj.enemies),
+        field: copyObj(this.gameObj.field),
+        enemy_leader: copyObj(this.gameObj.enemy_leader),
       })
       this.sendGameInit()
 
@@ -843,27 +839,17 @@ export default defineComponent({
     // Только гость: берёт начальный стейт из стора (куда он попал из GAME_INIT),
     // инициализирует свою колоду/лидера независимо (своя рука, не хостовая).
     initFromStore(): void {
-      this.gameObj.deck = JSON.parse(
-        JSON.stringify(
-          this.$store.state.game.current_deck.map((c: { card: Card }) => c.card)
-        )
+      this.gameObj.deck = copyObj(
+        this.$store.state.game.current_deck.map((c: { card: Card }) => c.card)
       )
-      this.gameObj.leader = JSON.parse(
-        JSON.stringify(this.$store.state.game.leader)
-      )
+      this.gameObj.leader = copyObj(this.$store.state.game.leader)
       // Поле, враги, лидер врагов — копия того, что прислал хост
-      this.gameObj.enemy_leader = JSON.parse(
-        JSON.stringify(this.$store.state.multi.initial_enemy_leader)
+      this.gameObj.enemy_leader = copyObj(
+        this.$store.state.multi.initial_enemy_leader
       )
-      this.gameObj.enemies = JSON.parse(
-        JSON.stringify(this.$store.state.multi.initial_enemies)
-      )
-      this.gameObj.field = JSON.parse(
-        JSON.stringify(this.$store.state.multi.initial_field)
-      )
-      this.gameObj.effects = JSON.parse(
-        JSON.stringify(this.$store.state.multi.initial_effects)
-      )
+      this.gameObj.enemies = copyObj(this.$store.state.multi.initial_enemies)
+      this.gameObj.field = copyObj(this.$store.state.multi.initial_field)
+      this.gameObj.effects = copyObj(this.$store.state.multi.initial_effects)
 
       draw_hand(this.gameObj.hand, this.gameObj.deck)
       this.can_draw = this.calc_can_draw()
@@ -967,11 +953,11 @@ export default defineComponent({
       ws.send(
         JSON.stringify({
           event: "GAME_STATE",
-          field: JSON.parse(JSON.stringify(this.gameObj.field)),
-          enemies: JSON.parse(JSON.stringify(this.gameObj.enemies)),
-          enemy_leader: JSON.parse(JSON.stringify(this.gameObj.enemy_leader)),
-          enemies_grave: JSON.parse(JSON.stringify(this.gameObj.enemies_grave)),
-          effects: JSON.parse(JSON.stringify(this.gameObj.effects)),
+          field: copyObj(this.gameObj.field),
+          enemies: copyObj(this.gameObj.enemies),
+          enemy_leader: copyObj(this.gameObj.enemy_leader),
+          enemies_grave: copyObj(this.gameObj.enemies_grave),
+          effects: copyObj(this.gameObj.effects),
           // Если есть атаки — передаём их список; дельты не нужны (напарник сам всё посчитает).
           // Если атак нет — можем передать дельту для пассивных HP-изменений (не урон от врагов).
           attack_log: hasAttacks ? attackLog : [],
@@ -1000,7 +986,7 @@ export default defineComponent({
         JSON.stringify({
           event: "GAME_END",
           result,
-          enemies_grave: JSON.parse(JSON.stringify(this.gameObj.enemies_grave)),
+          enemies_grave: copyObj(this.gameObj.enemies_grave),
         })
       )
     },

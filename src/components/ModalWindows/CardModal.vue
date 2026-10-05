@@ -84,6 +84,7 @@ import {
   type Card,
   type CardEntry,
   CraftMillCardActionSubtype,
+  type DeckEntry,
   type Enemy,
   type EnemyLeader,
   type Leader,
@@ -194,14 +195,40 @@ export default defineComponent({
         ? background_color_leader(this.card.faction)
         : background_color_hp(color)
     },
-    mill(): void {
+    can_mill(): boolean {
       const c = this.card as any
-      if (this.count === 0 || (this.count === 1 && c.unlocked)) {
+      if (this.count <= 0 || (this.count === 1 && c.unlocked)) {
         this.toast.warning(
           "Нельзя размиллить карту из стартового набора или ту, которой и так 0"
         )
-        return
+        return false
       }
+
+      if (this.count > 1) return true
+
+      // сюда приходим по сути только если count === 1
+      const card = this.user_card?.card
+      if (!card) return false
+
+      const isCard = (card as Card).color !== undefined
+      const decks: DeckEntry[] = this.$store.getters["all_decks"]
+      const inDeck = decks.some(({ deck }) =>
+        isCard
+          ? deck.cards.some(entry => entry.card?.id === card.id)
+          : deck.leader?.id === card.id
+      )
+      if (inDeck) {
+        this.toast.warning(
+          isCard
+            ? "Нельзя уничтожить карту — она в колоде"
+            : "Нельзя уничтожить лидера — он в колоде"
+        )
+        return false
+      }
+      return true
+    },
+    mill(): void {
+      if (!this.can_mill()) return
       this.show_modal_mill = true
     },
     craft(): void {
@@ -209,6 +236,7 @@ export default defineComponent({
     },
     async confirm_mill(): Promise<void> {
       this.show_modal_mill = false
+      if (!this.can_mill()) return
       const subtypeCardAction =
         (this.user_card?.card as any)?.color !== undefined
           ? CraftMillCardActionSubtype.millCard

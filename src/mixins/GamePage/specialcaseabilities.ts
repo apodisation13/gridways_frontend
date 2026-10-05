@@ -224,6 +224,11 @@ export default defineComponent({
           this.ability === CardAbility.PlaySpecialFromGrave
         ) {
           ;(card as Card).data.charges = 1
+        } else if (this.ability === CardAbility.PlayEnemyFromGrave) {
+          const index = this.gameObj.enemies_grave.indexOf(card as Enemy)
+          if (index !== -1) {
+            this.gameObj.enemies_grave.splice(index, 1)
+          }
         }
 
         // Показать эту выбранную для игры карту. А снимаем этот ФЛАГ уже в самом GamePage!
