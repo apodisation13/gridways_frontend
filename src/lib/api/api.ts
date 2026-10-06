@@ -51,7 +51,7 @@ const processQueue = (error: unknown, token: string | null = null): void => {
   failedQueue = []
 }
 
-const tryRefreshToken = async (): Promise<string> => {
+export const tryRefreshToken = async (): Promise<string> => {
   const user = JSON.parse(localStorage.getItem("user") || "{}")
   const refreshToken = user.refreshToken
 

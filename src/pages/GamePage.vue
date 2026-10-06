@@ -155,6 +155,7 @@ import PassComp from "@/components/Pages/GamePage/PassComp.vue"
 import RedrawComp from "@/components/Pages/GamePage/RedrawComp.vue"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities.vue"
 import UseSpecialItemsComponent from "@/components/Pages/GamePage/UseSpecialItemsComponent.vue"
+import frontendLogContext from "@/lib/frontend-logs/context"
 import {
   damage_ai_card,
   damage_ai_card_multi,
@@ -192,7 +193,14 @@ export default defineComponent({
     SpecialCaseAbilities,
     UseSpecialItemsComponent,
   },
-  mixins: [draw, specialcaseabilities, execaimove, startgame, fieldinteraction],
+  mixins: [
+    frontendLogContext,
+    draw,
+    specialcaseabilities,
+    execaimove,
+    startgame,
+    fieldinteraction,
+  ],
 
   data() {
     return {
