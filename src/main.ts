@@ -8,10 +8,12 @@ import Toast from "vue-toastification"
 import Vue3TouchEvents from "vue3-touch-events"
 
 import App from "@/App.vue"
+import { installFrontendLogs } from "@/lib/frontend-logs"
 import router from "@/router/router"
 import store from "@/store"
 
 const app = createApp(App)
+installFrontendLogs(app)
 
 const toastOptions = {
   timeout: 2000,

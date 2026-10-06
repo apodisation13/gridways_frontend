@@ -296,6 +296,7 @@ import PassComp from "@/components/Pages/GamePage/PassComp.vue"
 import RedrawComp from "@/components/Pages/GamePage/RedrawComp.vue"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities.vue"
 import UseSpecialItemsComponent from "@/components/Pages/GamePage/UseSpecialItemsComponent.vue"
+import frontendLogContext from "@/lib/frontend-logs/context"
 import { copyObj, randInt } from "@/lib/utils"
 import { enemy_leader_ai_move_once } from "@/logic/ai_move/ai_leader_move_once"
 import { ai_move } from "@/logic/ai_move/ai_move"
@@ -349,7 +350,13 @@ export default defineComponent({
     SpecialCaseAbilities,
     UseSpecialItemsComponent,
   },
-  mixins: [draw, specialcaseabilities, execaimove, fieldinteraction],
+  mixins: [
+    frontendLogContext,
+    draw,
+    specialcaseabilities,
+    execaimove,
+    fieldinteraction,
+  ],
 
   // ── Перехват навигации при завершении игры ───────────────────────────────
   // Срабатывает когда check_lose() или check_win() делают router.push("/lose") / router.push("/win").
