@@ -46,32 +46,8 @@ export default defineComponent({
   },
 
   async created() {
-    const isMobile =
-      /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
-      navigator.maxTouchPoints > 1
-
-    if (isMobile) {
-      try {
-        const tg = await Promise.race([
-          new Promise<any>(resolve => {
-            const poll = setInterval(() => {
-              const obj = (window as any).Telegram?.WebApp
-              if (obj) {
-                clearInterval(poll)
-                resolve(obj)
-              }
-            }, 100)
-          }),
-          new Promise<null>(resolve => setTimeout(() => resolve(null), 3000)),
-        ])
-        if (tg) {
-          tg.ready()
-          tg.expand()
-        }
-      } catch {
-        // skip if Telegram unavailable
-      }
-    }
+    // Telegram initialization must not delay authentication or news loading.
+    void this.initializeTelegram()
 
     // iOS WKWebView suppresses dblclick when touch-action: manipulation is active.
     // Polyfill: detect double-tap via pointerup and dispatch synthetic dblclick.
@@ -125,6 +101,40 @@ export default defineComponent({
     await this.$store.dispatch("fetchNews")
     await this.$router.push("/")
     await authCheck
+  },
+  methods: {
+    async initializeTelegram() {
+      const isMobile =
+        /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+        navigator.maxTouchPoints > 1
+      if (!isMobile) return
+
+      let poll: ReturnType<typeof setInterval> | undefined
+      let timeout: ReturnType<typeof setTimeout> | undefined
+      try {
+        const tg = await new Promise<any>(resolve => {
+          const current = (window as any).Telegram?.WebApp
+          if (current) {
+            resolve(current)
+            return
+          }
+          poll = setInterval(() => {
+            const obj = (window as any).Telegram?.WebApp
+            if (obj) resolve(obj)
+          }, 100)
+          timeout = setTimeout(() => resolve(null), 3000)
+        })
+        if (tg) {
+          tg.ready()
+          tg.expand()
+        }
+      } catch {
+        // skip if Telegram unavailable
+      } finally {
+        clearInterval(poll)
+        clearTimeout(timeout)
+      }
+    },
   },
 })
 </script>
