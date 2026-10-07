@@ -98,7 +98,7 @@ export default defineComponent({
       this.selectedMode = null
     },
     setFaction(_prop: string, value: string) {
-      this.selectedFaction = value
+      this.selectedFaction = this.selectedFaction === value ? null : value
     },
   },
 })

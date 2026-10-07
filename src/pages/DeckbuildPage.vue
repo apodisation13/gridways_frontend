@@ -68,6 +68,8 @@
       <deckbuilder-filters
         v-if="showFilters"
         :deckBuilding="deckBuilding"
+        :query="query"
+        :for-leaders="showingList === 'leaders'"
         @close-modal="showFilters = false"
         @reset-filters="resetFilters"
         @set-filter="setFilter"
@@ -88,16 +90,13 @@ import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vu
 import DeckbuilderFilters from "@/components/Pages/DeckbuildPage/DeckbuilderFilters.vue"
 import DeckbuilderTopButtonsBlock from "@/components/Pages/DeckbuildPage/DeckbuilderTopButtonsBlock.vue"
 import { copyObj } from "@/lib/utils"
-import type { CardEntry, DeckCardEntry, Leader, LeaderEntry } from "@/types"
-
-interface Query {
-  faction: string
-  type: string
-  color: string
-  has_passive: boolean | null
-  count: number | null
-  newly_added: boolean | null
-}
+import type {
+  CardEntry,
+  CardFilterQuery,
+  DeckCardEntry,
+  Leader,
+  LeaderEntry,
+} from "@/types"
 
 interface ActiveDeck {
   deck_id: number | null
@@ -141,20 +140,20 @@ export default defineComponent({
         faction: "",
         type: "",
         color: "",
-        has_passive: null,
         count: null,
         newly_added: null,
-      } as Query,
+        search: "",
+      } as CardFilterQuery,
       cardsPool: [] as CardEntry[],
     }
   },
 
   computed: {
     pool(): CardEntry[] {
-      return this.$store.getters.filtered_cards(this.query, this.query.count)
+      return this.$store.getters.filtered_cards(this.query)
     },
     leaders(): LeaderEntry[] {
-      return this.$store.getters.filtered_leaders(this.query.faction)
+      return this.$store.getters.filtered_leaders(this.query)
     },
     maxCardsInDeck(): number {
       return this.$store.getters["maxCardsInDeck"]
@@ -217,14 +216,14 @@ export default defineComponent({
       this.deck = this.resetDeck()
     },
 
-    default_query_param(): Query {
+    default_query_param(): CardFilterQuery {
       return {
         faction: "",
         type: "",
         color: "",
-        has_passive: null,
         count: null,
         newly_added: null,
+        search: "",
       }
     },
 

@@ -5,8 +5,11 @@
       <div
         v-for="faction in factions"
         :key="faction.name"
-        class="faction-wrap"
-        :class="{ 'faction-wrap--active': selectedFaction === faction.name }"
+        class="faction-wrap filter-option"
+        :class="{
+          'faction-wrap--active': selectedFaction === faction.name,
+          'filter-option--selected': selectedFaction === faction.name,
+        }"
         @click="filtering(faction)"
       >
         <faction-item :faction="faction" />
@@ -39,11 +42,18 @@ export default defineComponent({
       type: String,
       default: null,
     },
+    excludeNeutral: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ["set-filter"],
   computed: {
     factions(): Faction[] {
-      return this.$store.getters["all_factions"]
+      const factions: Faction[] = this.$store.getters["all_factions"]
+      return this.excludeNeutral
+        ? factions.filter(faction => faction.name !== "Neutral")
+        : factions
     },
   },
   methods: {

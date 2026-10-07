@@ -13,12 +13,15 @@
         <div class="lb-filters__options">
           <button
             v-for="mode in modes"
-            :key="mode"
+            :key="mode.value"
             class="lb-filters__option"
-            :class="{ 'lb-filters__option--active': selectedMode === mode }"
-            @click="$emit('set-mode', mode)"
+            :class="{
+              'lb-filters__option--active': selectedMode === mode.value,
+            }"
+            :aria-pressed="selectedMode === mode.value"
+            @click="$emit('set-mode', mode.value)"
           >
-            {{ mode }}
+            {{ mode.label }}
           </button>
         </div>
       </div>
@@ -47,7 +50,12 @@ export default defineComponent({
   emits: ["close-modal", "reset-filters", "set-faction", "set-mode"],
   data() {
     return {
-      modes: ["arena", "season", "random", "random_n"] as string[],
+      modes: [
+        { value: "season", label: "Сезоны" },
+        { value: "random", label: "Рандом" },
+        { value: "random_n", label: "Рандом N" },
+        { value: "arena", label: "Арена" },
+      ],
     }
   },
   methods: {
@@ -74,11 +82,18 @@ export default defineComponent({
   -webkit-text-fill-color: transparent;
 }
 .lb-filters__options {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
   gap: 8px;
 }
 .lb-filters__option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  text-align: center;
   background: linear-gradient(#1d252d, #000000, #282d33);
   border: 1px solid #facf5d44;
   border-radius: 6px;
@@ -93,6 +108,32 @@ export default defineComponent({
 .lb-filters__option--active {
   border-color: #facf5d;
   color: #facf5d;
+}
+:deep(.filter-option) {
+  position: relative;
+}
+:deep(.filter-option--selected),
+.lb-filters__option--active {
+  outline: 2px solid #facf5d;
+  outline-offset: 2px;
+}
+:deep(.filter-option--selected::after),
+.lb-filters__option--active::after {
+  content: "✓";
+  position: absolute;
+  top: -8px;
+  right: -5px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #161b22;
+  color: #facf5d;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
 }
 .cancel {
   margin: auto;

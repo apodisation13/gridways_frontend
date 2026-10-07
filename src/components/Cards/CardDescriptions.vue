@@ -42,95 +42,9 @@
       ></div>
     </div>
 
-    <!--А дальше сами описания!!!-->
-
-    <!--Описание абилки для карты игрока и для лидера врагов у которого она есть вообще-->
-    <div v-if="show_ability && !forEnemy && c?.ability?.name" class="text">
-      {{ formatCardAbility(c) }} <br />
-    </div>
-
-    <!--Для карты игрока и лидера игрока - случай multi-->
-    <div v-if="show_ability && !forEnemy && c.data?.multi" class="text">
-      Карта бьет по {{ c.data.multi.value }} целям <br />
-    </div>
-
-    <!--Если в абилке (по сути карта игрока или карта лидера игрока) есть эффекты-->
-    <div v-if="show_ability && c.data?.field_interaction" class="text">
-      Эффект: {{ formatEffect(c.data.field_interaction) }}
-      <br />
-      Эффект длится
-      {{
-        c.data.field_interaction?.times_count || c.data.field_interaction?.turns
-      }}
-      <span v-if="c.data.field_interaction?.times_count">раз</span>
-      <span v-if="c.data.field_interaction?.turns">ходов</span>
-      <br />
-    </div>
-
-    <!--Описание абилки для карты врага-->
-    <div v-if="show_ability && forEnemy" class="text">
-      {{ formatEnemyMove(c) }} <br />
-    </div>
-
-    <!--Описание пассивной абилки, разделение для карты или для лидера врагов-->
-    <div v-if="show_passive && card.passive_ability?.name" class="text">
-      {{ formatCardPassiveAbility(c) }} <br />
-      <br />
-      <div
-        v-if="show_passive && c.data?.passive?.field_interaction?.type"
-        class="text"
-      >
-        Эффект: {{ formatEffect(c.data.passive.field_interaction) }}
-        <br />
-        Эффект длится
-        {{
-          c.data.passive.field_interaction?.times_count ||
-          c.data.passive.field_interaction?.turns
-        }}
-        <span v-if="c.data.passive.field_interaction?.times_count">раз</span>
-        <span v-if="c.data.passive.field_interaction?.turns">ходов</span>
-        <br />
-        <br />
-      </div>
-
-      <span v-if="c.data.passive?.has_passive_in_field">
-        Срабатывает когда карта <b>НА ПОЛЕ</b>
-      </span>
-      <span v-else-if="c.data.passive?.has_passive_in_hand">
-        Срабатывает когда карта <b>В РУКЕ</b>
-      </span>
-      <span v-else-if="c.data.passive?.has_passive_in_deck">
-        Срабатывает когда карта <b>В КОЛОДЕ</b>
-      </span>
-      <span v-else-if="c.data.passive?.has_passive_in_grave">
-        Срабатывает когда карта <b>В СБРОСЕ</b>
-      </span>
-      <br />
-      <span v-if="c.data?.passive?.each_tick">
-        <b>Срабатывает каждый ход пока таймер не равен 0</b>
-      </span>
-      <br />
-      <span v-if="c.data?.passive?.reset_timer">
-        Восстанавливает таймер. Значение таймера
-        {{ c.data.passive.default_timer }}
-      </span>
-    </div>
-
-    <!--Описание абилки deathwish, только для врага-->
-    <div v-if="show_deathwish && c?.deathwish?.name" class="text">
-      {{ formatEnemyDeathwish(c) }} <br /><br />
-      <div v-if="c.data?.deathwish?.field_interaction?.type" class="text">
-        Эффект: {{ formatEffect(c.data.deathwish.field_interaction) }}
-        <br />
-        Эффект длится
-        {{
-          c.data.deathwish.field_interaction.times_count ||
-          c.data.deathwish.field_interaction.turns
-        }}
-        <span v-if="c.data.deathwish.field_interaction.times_count">раз</span>
-        <span v-if="c.data.deathwish.field_interaction.turns">ходов</span>
-      </div>
-    </div>
+    <div v-if="show_ability" class="text">{{ abilityDescription }}</div>
+    <div v-if="show_passive" class="text">{{ passiveDescription }}</div>
+    <div v-if="show_deathwish" class="text">{{ deathwishDescription }}</div>
   </div>
 </template>
 
@@ -139,6 +53,12 @@ import { defineComponent, type PropType } from "vue"
 
 import CardPassive from "@/components/UI/CardsUI/CardPassive.vue"
 import { ability_icon } from "@/logic/border_styles"
+import {
+  describeCardAbility,
+  describeCardPassiveAbility,
+  describeEnemyDeathwish,
+  describeEnemyMove,
+} from "@/logic/card_descriptions"
 import type { Card, Enemy, EnemyLeader, Leader } from "@/types"
 
 export default defineComponent({
@@ -159,7 +79,6 @@ export default defineComponent({
   data() {
     return {
       show_ability: true,
-      show_move: true,
       show_passive: false,
       show_deathwish: false,
     }
@@ -170,6 +89,17 @@ export default defineComponent({
     },
     icon(): string {
       return ability_icon((this.card as any)?.ability?.name)
+    },
+    abilityDescription(): string {
+      return this.forEnemy
+        ? describeEnemyMove(this.card)
+        : describeCardAbility(this.card, this.effectsInfo)
+    },
+    passiveDescription(): string {
+      return describeCardPassiveAbility(this.card, this.effectsInfo)
+    },
+    deathwishDescription(): string {
+      return describeEnemyDeathwish(this.card, this.effectsInfo)
     },
     effectsInfo() {
       return this.$store.getters["effectsInfo"]
@@ -183,113 +113,18 @@ export default defineComponent({
     }
   },
   methods: {
-    formatCardAbility(card: any): string {
-      return card.ability.description
-        .replace(
-          /{damage}/g,
-          card.data?.damage !== undefined
-            ? `{{ ${card.data.damage} }}`
-            : "{damage}"
-        )
-        .replace(
-          /{armor}/g,
-          card.data?.armor !== undefined
-            ? `{{ ${card.data.armor} }}`
-            : "{armor}"
-        )
-        .replace(
-          /{heal}/g,
-          card.data?.heal !== undefined ? `{{ ${card.data.heal} }}` : "{heal}"
-        )
-        .replace(
-          /{damage_once}/g,
-          card.data?.value !== undefined
-            ? `{{ ${card.data.value} }}`
-            : "{damage_once}"
-        )
-        .replace(
-          /{value}/g,
-          card.data.value !== undefined ? `{{ ${card.data.value} }}` : "{value}"
-        )
-        .replace(
-          /{value}/g,
-          card.data.passive?.value !== undefined
-            ? `{{ ${card.data.passive.value} }}`
-            : "{value}"
-        )
-    },
-    formatEffect(effect: { type: string; value?: number }): string {
-      const description = this.effectsInfo[effect.type]?.description ?? ""
-      return description.replace(
-        /{value}/g,
-        effect.value !== undefined ? `{{ ${effect.value} }}` : "{value}"
-      )
-    },
-    formatEnemyMove(enemy: any): string {
-      return enemy.move.description.replace(
-        /{damage}/g,
-        enemy.data.damage !== undefined
-          ? `{{ ${enemy.data.damage} }}`
-          : "{damage}"
-      )
-    },
-    formatCardPassiveAbility(card: any): string {
-      return card.passive_ability.description
-        .replace(
-          /{value}/g,
-          card.data.passive?.value !== undefined
-            ? `{{ ${card.data.passive.value} }}`
-            : "{value}"
-        )
-        .replace(
-          /{value}/g,
-          card.data.passive?.field_interaction?.turns !== undefined
-            ? `{{ ${card.data.passive.field_interaction.turns} }}`
-            : "{value}"
-        )
-        .replace(
-          /{value}/g,
-          card.data.passive?.field_interaction?.times_count !== undefined
-            ? `{{ ${card.data.passive?.field_interaction.times_count} }}`
-            : "{value}"
-        )
-    },
-    formatEnemyDeathwish(enemy: any): string {
-      return enemy.deathwish.description
-        .replace(
-          /{deathwish_value}/g,
-          enemy.data.deathwish?.value !== undefined
-            ? `{{ ${enemy.data.deathwish.value} }}`
-            : "{deathwish_value}"
-        )
-        .replace(
-          /{deathwish_value}/g,
-          enemy.data.deathwish?.field_interaction?.turns !== undefined
-            ? `{{ ${enemy.data.deathwish.field_interaction.turns} }}`
-            : "{deathwish_value}"
-        )
-        .replace(
-          /{deathwish_value}/g,
-          enemy.data.deathwish?.field_interaction?.times_count !== undefined
-            ? `{{ ${enemy.data.deathwish.field_interaction.times_count} }}`
-            : "{deathwish_value}"
-        )
-    },
     showMainAbility(): void {
       this.show_ability = true
-      this.show_move = true
       this.show_passive = false
       this.show_deathwish = false
     },
     showPassiveAbility(): void {
       this.show_ability = false
-      this.show_move = false
       this.show_passive = true
       this.show_deathwish = false
     },
     showDeathwishAbility(): void {
       this.show_ability = false
-      this.show_move = false
       this.show_passive = false
       this.show_deathwish = true
     },
@@ -318,6 +153,7 @@ export default defineComponent({
 }
 
 .text {
+  white-space: pre-line;
   margin-bottom: 1%;
   font-size: 12pt;
 }

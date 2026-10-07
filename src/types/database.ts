@@ -97,6 +97,7 @@ export interface EnemyLeaderData {
   passive?: {
     timer?: number
     default_timer?: number
+    each_tick?: boolean
     reset_timer?: boolean
     field_interaction?: EffectObject
     value?: number
@@ -403,6 +404,15 @@ export interface GameConst {
 
 export interface Faction {
   name: string
+}
+
+export interface CardFilterQuery {
+  faction: string
+  type: string
+  color: string
+  count: number | null
+  newly_added: boolean | null
+  search: string
 }
 
 export interface CardEntry {
