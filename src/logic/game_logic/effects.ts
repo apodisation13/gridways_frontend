@@ -1,4 +1,5 @@
 import {
+  fire_sound,
   frost_sound,
   lock_placed,
   mine_placed,
@@ -14,6 +15,7 @@ export function effectsSounds(fi: EffectObject) {
   if (
     fi.type === EffectType.Mine ||
     fi.type === EffectType.LightMine ||
+    fi.type === EffectType.FireMine ||
     fi.type === EffectType.MiddleMine
   ) {
     mine_placed()
@@ -31,5 +33,7 @@ export function effectsSounds(fi: EffectObject) {
     poison_sound()
   } else if (fi.type === EffectType.Frost) {
     frost_sound()
+  } else if (fi.type === EffectType.Fire) {
+    fire_sound()
   }
 }

@@ -61,6 +61,8 @@ import { defineComponent, type PropType } from "vue"
 import changMoveSrc from "@/assets/icons/effects/change_move.svg"
 import damagePlayerSrc from "@/assets/icons/effects/damage_player.svg"
 import decrPlayerRandomDmgSrc from "@/assets/icons/effects/decr_player_random_dmg.svg"
+import fireSrc from "@/assets/icons/effects/fire.svg"
+import fireMineSrc from "@/assets/icons/effects/fire_mine.svg"
 import frostSrc from "@/assets/icons/effects/frost.svg"
 import gainShieldSrc from "@/assets/icons/effects/gain_shield.svg"
 import gainVeilSrc from "@/assets/icons/effects/gain_veil.svg"
@@ -87,6 +89,7 @@ import { EffectType } from "@/types"
 const CARD_SIZE_SRCS: Partial<Record<EffectType, string>> = {
   [EffectType.Mine]: mineSrc,
   [EffectType.LightMine]: lightMineSrc,
+  [EffectType.FireMine]: fireMineSrc,
   [EffectType.MiddleMine]: middleMineSrc,
   [EffectType.Poison]: poisonSrc,
   [EffectType.HealMine]: healMineSrc,
@@ -99,6 +102,7 @@ const CARD_SIZE_SRCS: Partial<Record<EffectType, string>> = {
 
 const FULL_CELL_SRCS: Partial<Record<EffectType, string>> = {
   [EffectType.Rain]: rainSrc,
+  [EffectType.Fire]: fireSrc,
   [EffectType.Frost]: frostSrc,
   [EffectType.Spikes]: spikesSrc,
   [EffectType.Veil]: veilSrc,

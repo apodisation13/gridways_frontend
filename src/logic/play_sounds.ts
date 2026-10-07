@@ -135,3 +135,7 @@ export function spikes(): void {
 export function frost_sound(): void {
   sound("./../../audio/sounds/frost.mp3")
 }
+
+export function fire_sound(): void {
+  sound("./../../audio/sounds/fire.mp3")
+}

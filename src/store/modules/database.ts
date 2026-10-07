@@ -127,9 +127,10 @@ const getters = {
         return (
           !search ||
           [
+            card.name,
             describeCardAbility(card, state.effectsInfo),
             describeCardPassiveAbility(card, state.effectsInfo),
-          ].some(description => description.toLowerCase().includes(search))
+          ].some(text => text.toLowerCase().includes(search))
         )
       })
     },
@@ -152,9 +153,10 @@ const getters = {
         return (
           !search ||
           [
+            card.name,
             describeCardAbility(card, state.effectsInfo),
             describeCardPassiveAbility(card, state.effectsInfo),
-          ].some(description => description.toLowerCase().includes(search))
+          ].some(text => text.toLowerCase().includes(search))
         )
       })
     },
