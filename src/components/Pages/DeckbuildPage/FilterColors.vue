@@ -5,7 +5,9 @@
     </div>
     <div v-for="color in colors" :key="color[0]" class="colors">
       <button
-        class="color"
+        class="color filter-option"
+        :class="{ 'filter-option--selected': selected === color[0] }"
+        :aria-pressed="selected === color[0]"
         :style="{ backgroundColor: color[1] }"
         @click="filtering(color)"
       >
@@ -19,6 +21,12 @@
 import { defineComponent } from "vue"
 export default defineComponent({
   name: "FilterColors",
+  props: {
+    selected: {
+      type: String,
+      default: "",
+    },
+  },
   emits: ["set-filter", "reset-filter-colors"],
   data() {
     return {

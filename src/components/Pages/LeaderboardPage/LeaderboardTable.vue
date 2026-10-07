@@ -14,7 +14,7 @@
       <tbody class="leaderboard__table-body">
         <tr
           v-for="(entry, index) in filteredLeaderboard"
-          :key="entry.leader_id + entry.mode"
+          :key="`${entry.user_id}:${entry.leader_id}:${entry.mode}`"
           :class="{
             'leaderboard__row--mine': is_world && entry.username === username,
           }"

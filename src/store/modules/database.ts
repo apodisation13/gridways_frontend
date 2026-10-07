@@ -2,6 +2,10 @@ import { useToast } from "vue-toastification"
 
 import { callApi, HttpMethod } from "@/lib/api/api"
 import {
+  describeCardAbility,
+  describeCardPassiveAbility,
+} from "@/logic/card_descriptions"
+import {
   CARDS_DATABASE,
   GAME_CONST,
   UPGRADES,
@@ -12,6 +16,7 @@ import {
   ActionContext,
   Card,
   CardEntry,
+  CardFilterQuery,
   CardsResponse,
   Deck,
   DeckEntry,
@@ -98,58 +103,61 @@ const getters = {
   maxResourcesValue: (state: DatabaseState) => state.maxResourcesValue,
   resourceDeltas: (state: DatabaseState) => state.resourceDeltas,
 
-  // TODO: has_passive фильтр — баг, типизация query временно any
-  filtered_cards: (state: DatabaseState) => (query: any) => {
-    const applyFilter = (data: CardEntry[], query: any) =>
-      data.filter(obj =>
-        Object.entries(query).every(([prop, find]) => {
-          if ("count" === prop) {
-            return true
-          }
-          if ("has_passive" === prop && find === null) {
-            return true
-          }
-          if ("has_passive" === prop) {
-            return (obj.card as any)[prop] === find
-          }
-          if ("newly_added" === prop && find === null) {
-            return true
-          }
-          if ("newly_added" === prop) {
-            return obj.card[prop] === find
-          }
-          if ("faction" === prop) {
-            return (
-              (obj.card[prop] as string).includes(find as string) ||
-              obj.card[prop] === "Neutral"
-            )
-          }
-          return (obj.card[prop as keyof Card] as string).includes(
-            find as string
-          )
-        })
-      )
-    if (query.count === null) {
-      return applyFilter(state.cards, query)
-    }
+  filtered_cards:
+    (state: DatabaseState) =>
+    (query: CardFilterQuery): CardEntry[] => {
+      const search = query.search.trim().toLowerCase()
+      return state.cards.filter(({ card, count }) => {
+        if (!card.faction.includes(query.faction) && card.faction !== "Neutral")
+          return false
+        if (
+          !card.type.includes(query.type) ||
+          !card.color.includes(query.color)
+        )
+          return false
+        if (query.count !== null) {
+          if (query.count === 0 ? count !== 0 : count < query.count)
+            return false
+        }
+        if (
+          query.newly_added !== null &&
+          card.newly_added !== query.newly_added
+        )
+          return false
+        return (
+          !search ||
+          [
+            describeCardAbility(card, state.effectsInfo),
+            describeCardPassiveAbility(card, state.effectsInfo),
+          ].some(description => description.toLowerCase().includes(search))
+        )
+      })
+    },
 
-    if (query.count === 0) {
-      return applyFilter(
-        state.cards.filter(card => card.count === 0),
-        query
-      )
-    }
-
-    return applyFilter(
-      state.cards.filter(card => card.count >= query.count),
-      query
-    )
-  },
-  filtered_leaders: (state: DatabaseState) => (selected_faction: string) => {
-    return state.leaders.filter(leader =>
-      leader.card.faction.includes(selected_faction)
-    )
-  },
+  filtered_leaders:
+    (state: DatabaseState) =>
+    (query: CardFilterQuery): LeaderEntry[] => {
+      const search = query.search.trim().toLowerCase()
+      return state.leaders.filter(({ card, count }) => {
+        if (!card.faction.includes(query.faction)) return false
+        if (query.count !== null) {
+          if (query.count === 0 ? count !== 0 : count < query.count)
+            return false
+        }
+        if (
+          query.newly_added !== null &&
+          card.newly_added !== query.newly_added
+        )
+          return false
+        return (
+          !search ||
+          [
+            describeCardAbility(card, state.effectsInfo),
+            describeCardPassiveAbility(card, state.effectsInfo),
+          ].some(description => description.toLowerCase().includes(search))
+        )
+      })
+    },
 
   all_enemies: (state: DatabaseState) => state.enemies,
   all_enemies_db: (state: DatabaseState) => state.enemiesdb,

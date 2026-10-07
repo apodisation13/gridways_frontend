@@ -3,19 +3,39 @@
     <div class="global_text filter_title" @click="reset_filter_types">
       Наличие
     </div>
-    <div v-for="count in [1, 2, 0]" :key="count" class="types">
-      <button class="type" @click="filtering(count)">
-        {{ count }}
+    <div v-for="option in options" :key="option.value" class="types">
+      <button
+        class="type filter-option"
+        :class="{ 'filter-option--selected': selected === option.value }"
+        :aria-pressed="selected === option.value"
+        @click="filtering(option.value)"
+      >
+        {{ option.label }}
       </button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue"
+import { defineComponent, type PropType } from "vue"
 export default defineComponent({
   name: "FilterUnlocked",
+  props: {
+    selected: {
+      type: Number as PropType<number | null>,
+      default: null,
+    },
+  },
   emits: ["set-filter", "reset-filter-unlocked"],
+  data() {
+    return {
+      options: [
+        { value: 1, label: "1" },
+        { value: 2, label: "2 и более" },
+        { value: 0, label: "0" },
+      ],
+    }
+  },
   methods: {
     filtering(count: number): void {
       this.$emit("set-filter", "count", count)

@@ -1,3 +1,8 @@
+/* Toasts must remain visible above teleported card dialogs (z-index: 10000). */
+body .Vue-Toastification__container {
+  z-index: 1000000;
+}
+
 :root {
   --primary-gold-gradient: linear-gradient(
     183.6deg,

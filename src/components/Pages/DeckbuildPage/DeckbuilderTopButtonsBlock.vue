@@ -34,7 +34,11 @@
       v-if="showNewDeckFactionSelect"
       @close-modal="showNewDeckFactionSelect = false"
     >
-      <filter-factions title="Выберите фракцию" @set-filter="setFilter" />
+      <filter-factions
+        title="Выберите фракцию"
+        exclude-neutral
+        @set-filter="setFilter"
+      />
     </base-modal>
   </div>
 </template>
