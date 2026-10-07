@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0">
+      <stop stop-color="#ff500c" stop-opacity=".65"/>
+      <stop offset=".6" stop-color="#ffad32" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#ffe5a0" stop-opacity=".1"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" fill="#ff621c" fill-opacity=".1"/>
+  <path d="M0 100V66Q10 79 8 48Q26 65 22 84Q37 66 31 38Q53 57 48 82Q63 64 59 29Q81 53 74 81Q94 63 89 45Q105 63 100 100Z" fill="url(#flame)">
+    <animate attributeName="d" values="M0 100V66Q10 79 8 48Q26 65 22 84Q37 66 31 38Q53 57 48 82Q63 64 59 29Q81 53 74 81Q94 63 89 45Q105 63 100 100Z;M0 100V75Q10 84 13 39Q29 62 22 80Q39 61 36 49Q54 68 48 86Q65 59 66 37Q82 64 74 86Q90 71 86 34Q105 59 100 100Z;M0 100V66Q10 79 8 48Q26 65 22 84Q37 66 31 38Q53 57 48 82Q63 64 59 29Q81 53 74 81Q94 63 89 45Q105 63 100 100Z" dur="1.8s" repeatCount="indefinite"/>
+  </path>
+  <g fill="#ffd67d">
+    <circle r="1.4"><animateTransform attributeName="transform" type="translate" values="12 105;19 -5" dur="2.6s" begin="-1s" repeatCount="indefinite"/></circle>
+    <circle r="1"><animateTransform attributeName="transform" type="translate" values="31 105;24 -5" dur="3.1s" begin="-2s" repeatCount="indefinite"/></circle>
+    <circle r="1.7"><animateTransform attributeName="transform" type="translate" values="49 105;56 -5" dur="2.9s" begin="-.4s" repeatCount="indefinite"/></circle>
+    <circle r="1.1"><animateTransform attributeName="transform" type="translate" values="73 105;66 -5" dur="2.4s" begin="-1.7s" repeatCount="indefinite"/></circle>
+    <circle r="1.4"><animateTransform attributeName="transform" type="translate" values="88 105;94 -5" dur="3.3s" begin="-2.7s" repeatCount="indefinite"/></circle>
+  </g>
+</svg>

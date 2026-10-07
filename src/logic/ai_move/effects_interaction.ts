@@ -7,6 +7,7 @@ import { applyIncrDmg } from "@/logic/ai_move/passive_abilities/passives/increas
 import { regain_shield } from "@/logic/ai_move/passive_abilities/passives/regain_shield"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import {
+  fire_sound,
   frost_sound,
   mine_triggerred,
   rain_triggerred,
@@ -86,8 +87,21 @@ export function applyEffectAtCell(
   } else if (effect.type === EffectType.Lock) {
     lock_enemy(e)
     effectDecrement(index, effect, gameObj)
-  } else if (effect.type === EffectType.LightMine) {
-    if (enemy.data.shield || enemy.data.status) {
+  } else if (effect.type === EffectType.Fire) {
+    if (enemy.data.shield || (enemy.data.armor ?? 0) > 0) {
+      enemy.data.shield = false
+      enemy.data.armor = 0
+      fire_sound()
+    }
+  } else if (
+    effect.type === EffectType.LightMine ||
+    effect.type === EffectType.FireMine
+  ) {
+    const shouldTrigger =
+      effect.type === EffectType.FireMine
+        ? enemy.data.shield || (enemy.data.armor ?? 0) > 0
+        : enemy.data.shield || enemy.data.status
+    if (shouldTrigger) {
       mine_triggerred()
       enemy_takes_damage(
         enemy,

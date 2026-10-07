@@ -28,6 +28,8 @@ import { defineComponent, type PropType } from "vue"
 import changMoveSrc from "@/assets/icons/effects/change_move.svg"
 import damagePlayerSrc from "@/assets/icons/effects/damage_player.svg"
 import decrPlayerRandomDmgSrc from "@/assets/icons/effects/decr_player_random_dmg.svg"
+import fireSrc from "@/assets/icons/effects/fire.svg"
+import fireMineSrc from "@/assets/icons/effects/fire_mine.svg"
 import frostSrc from "@/assets/icons/effects/frost.svg"
 import gainShieldSrc from "@/assets/icons/effects/gain_shield.svg"
 import gainVeilSrc from "@/assets/icons/effects/gain_veil.svg"
@@ -55,6 +57,8 @@ import { EffectType } from "@/types"
 const EFFECT_SRCS: Partial<Record<EffectType, string>> = {
   [EffectType.Mine]: mineSrc,
   [EffectType.LightMine]: lightMineSrc,
+  [EffectType.FireMine]: fireMineSrc,
+  [EffectType.Fire]: fireSrc,
   [EffectType.Rain]: rainSrc,
   [EffectType.Frost]: frostSrc,
   [EffectType.Spikes]: spikesSrc,

@@ -5,6 +5,8 @@ export type CardLocation = "hand" | "deck" | "grave" | "field" | null
 export enum EffectType {
   Mine = "mine", // times_count
   LightMine = "light_mine", // times_count
+  FireMine = "fire_mine", // times_count
+  Fire = "fire", // turns
   Rain = "rain", // turns
   Frost = "frost", // times_count
   Spikes = "spikes", // turns

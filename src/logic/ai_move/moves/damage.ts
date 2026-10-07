@@ -37,6 +37,8 @@ export function damage_player(source: DamageSource, timeout = 1000): void {
     return
   }
 
+  if (source.data.damage <= 0) return
+
   sound_enemy_damage_player()
   store.commit("change_health", -source.data.damage)
   timeoutAnimationFlag(source, "damages_player", null, timeout * 0.5)
