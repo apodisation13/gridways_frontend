@@ -1,5 +1,14 @@
 <template>
-  <div class="pass" @touchstart="handleTouchStart">
+  <div
+    class="pass"
+    @touchstart="handleTouchStart"
+    @pointerdown="startHold"
+    @pointerup="cancelHold"
+    @pointerleave="cancelHold"
+    @pointercancel="cancelHold"
+    @contextmenu.prevent
+    @dblclick.capture="guardDoubleClick"
+  >
     <button
       v-if="$store.state.game.player_turn"
       class="pass-btn"
@@ -16,16 +25,26 @@
     <button v-else class="pass-btn" :disabled="!$store.state.game.player_turn">
       ХОД 🔄
     </button>
+    <teleport to="body">
+      <yesno-modal
+        v-if="showSurrenderConfirm"
+        question="Сдаться?"
+        @cancel="showSurrenderConfirm = false"
+        @confirm="surrender"
+      />
+    </teleport>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue"
 
+import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
 import { styleWrapper } from "@/logic/border_styles"
 
 export default defineComponent({
   name: "PassComp",
+  components: { YesnoModal },
   props: {
     timer: {
       type: Number,
@@ -35,6 +54,9 @@ export default defineComponent({
   data() {
     return {
       lastTapTime: 0,
+      holdTimer: null as ReturnType<typeof setTimeout> | null,
+      holdTriggered: false,
+      showSurrenderConfirm: false,
     }
   },
   computed: {
@@ -47,7 +69,33 @@ export default defineComponent({
       return "#ef4444"
     },
   },
+  beforeUnmount() {
+    this.cancelHold()
+  },
   methods: {
+    surrender(): void {
+      this.showSurrenderConfirm = false
+      this.$router.push("/lose")
+    },
+    startHold(e: PointerEvent): void {
+      if (!e.isPrimary || e.button !== 0) return
+      this.cancelHold()
+      this.holdTriggered = false
+      this.holdTimer = setTimeout(() => {
+        this.holdTimer = null
+        this.holdTriggered = true
+        this.lastTapTime = 0
+        this.showSurrenderConfirm = true
+      }, 2000)
+    },
+    cancelHold(): void {
+      if (this.holdTimer !== null) clearTimeout(this.holdTimer)
+      this.holdTimer = null
+    },
+    guardDoubleClick(e: MouseEvent): void {
+      if (this.holdTriggered || this.showSurrenderConfirm)
+        e.stopImmediatePropagation()
+    },
     handleTouchStart(e: TouchEvent): void {
       const isIOS =
         /iPhone|iPad|iPod/.test(navigator.userAgent) ||
@@ -95,5 +143,14 @@ export default defineComponent({
   font-size: 25px;
   color: white;
   touch-action: manipulation;
+}
+
+.pass {
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.pass-btn:disabled {
+  pointer-events: none;
 }
 </style>

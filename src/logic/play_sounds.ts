@@ -1,7 +1,14 @@
 import store from "@/store"
 
 function sound(src: string): void {
-  if (store.state.settings.soundOn) new Audio(src).play()
+  if (!store.state.settings.soundOn) return
+
+  new Audio(src).play().catch((error: unknown) => {
+    // Browser playback restrictions are expected, not application errors.
+    if (error instanceof DOMException && error.name === "NotAllowedError")
+      return
+    throw error
+  })
 }
 
 export function sound_hit_shield(): void {

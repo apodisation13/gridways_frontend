@@ -4,7 +4,7 @@
     <div class="yes_no_modal" :style="styleWrapper">
       <!--По дефолту если мы не передали item_price, покажем просто вы уверены, да\нет-->
       <div v-if="!item_price && !bonus" class="global_text text text-confirm">
-        <span>Вы уверены?</span>
+        <span>{{ question }}</span>
       </div>
 
       <!--Вот это показывает нам кнопки +- для режима бонуса, для покупки ресурсов!-->
@@ -63,6 +63,10 @@ export default defineComponent({
   name: "YesnoModal",
   components: { ResourceItem },
   props: {
+    question: {
+      type: String,
+      default: "Вы уверены?",
+    },
     // для бонусной страницы мы будем показывать в окне ещё кнопки +-
     bonus: {
       type: Boolean,
@@ -150,6 +154,7 @@ export default defineComponent({
   align-items: center;
   justify-content: space-evenly;
   width: 350px;
+  max-width: calc(100vw - 24px);
   height: 210px;
   border-radius: 12px;
   text-align: center;

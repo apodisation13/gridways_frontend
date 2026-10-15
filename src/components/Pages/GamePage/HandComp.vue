@@ -210,6 +210,8 @@ export default defineComponent({
 
 .hand-list {
   display: flex;
+  /* Сохраняем высоту карты (11.5vh × 1.43), даже когда рука пуста. */
+  min-height: calc(var(--vh, 1vh) * 16.445);
   justify-content: space-around;
   align-items: flex-end;
   flex-shrink: 1;
