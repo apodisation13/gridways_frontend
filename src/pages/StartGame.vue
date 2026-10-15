@@ -83,7 +83,11 @@ import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
 import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
-import { GameStatsRecordType, MappedSeason, PayResourcesSubtype } from "@/types"
+import {
+  GameStatsRecordType,
+  PayResourcesSubtype,
+  ResolvedSeason,
+} from "@/types"
 
 export default defineComponent({
   name: "StartGame",
@@ -141,7 +145,7 @@ export default defineComponent({
     selectedDeck(): any {
       return this.$store.state.game.whole_deck
     },
-    selectedSeason(): MappedSeason | null {
+    selectedSeason(): ResolvedSeason | null {
       return this.$store.state.game.season
     },
     insufficientResources(): boolean {

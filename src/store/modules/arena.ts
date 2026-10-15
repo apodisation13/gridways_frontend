@@ -1,4 +1,4 @@
-import type { DeckCardEntry, Leader, MappedUserLevel } from "@/types"
+import type { DeckCardEntry, Leader, LevelEntry } from "@/types"
 import type { ArenaParams } from "@/types/database"
 import type { UpgradeCategory } from "@/types/upgrades"
 
@@ -9,7 +9,7 @@ export interface ArenaState {
   leader: Leader | null
   health: number
   armor: number
-  level: MappedUserLevel | null
+  level: LevelEntry | null
   arenaUpgrades: UpgradeCategory | null
   user_upgrades: Record<string, number>
   arena_params: ArenaParams | null
@@ -51,7 +51,7 @@ const mutations = {
       payload.deck.reduce((acc, c) => acc + (c.card?.data.hp ?? 0), 0) +
       (payload.leader?.data.hp ?? 0)
   },
-  arena_set_level(state: ArenaState, level: MappedUserLevel) {
+  arena_set_level(state: ArenaState, level: LevelEntry) {
     state.level = level
   },
   arena_advance_level(state: ArenaState) {

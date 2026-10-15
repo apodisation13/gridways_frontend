@@ -17,7 +17,6 @@ import {
   Card,
   CardEntry,
   CardFilterQuery,
-  CardsResponse,
   Deck,
   DeckEntry,
   EffectInfo,
@@ -25,14 +24,18 @@ import {
   Enemy,
   EnemyLeader,
   Faction,
+  GameCatalogResponse,
   GameConst,
   Helps,
   Leader,
   LeaderEntry,
+  LevelEntry,
+  SeasonDefinition,
   SeasonEntry,
+  SeasonStats,
   UserProgressResponse,
   UserResources,
-  UserSeason,
+  UserSeasonsProgress,
 } from "@/types"
 import { UserUpgrades } from "@/types/upgrades"
 
@@ -60,6 +63,7 @@ interface DatabaseState {
   leadersdb: Map<number, Leader>
   enemiesdb: Record<number, Enemy>
   enemyleadersdb: Record<number, EnemyLeader>
+  seasonsdb: Record<number, SeasonDefinition>
 
   effectsInfo: Partial<Record<EffectType, EffectInfo>>
   helpsInfo: Helps
@@ -87,6 +91,7 @@ const state: DatabaseState = {
   leadersdb: new Map<number, Leader>(),
   enemiesdb: {},
   enemyleadersdb: {},
+  seasonsdb: {},
 
   effectsInfo: {},
   helpsInfo: {},
@@ -194,13 +199,14 @@ const mutations = {
     state.maxResourcesValue = payload
   },
 
-  set_cardsdb(state: DatabaseState, result: CardsResponse) {
+  set_cardsdb(state: DatabaseState, result: GameCatalogResponse) {
     state.cardsdb = new Map(result.cards.map(card => [card.id, card]))
     state.leadersdb = new Map(result.leaders.map(card => [card.id, card]))
     state.enemiesdb = result.enemies
     state.enemies = Object.values(result.enemies)
     state.enemyleadersdb = result.enemy_leaders
     state.enemy_leaders = Object.values(result.enemy_leaders)
+    state.seasonsdb = result.seasons
   },
 
   set_cards(
@@ -250,25 +256,63 @@ const mutations = {
       },
     }))
   },
-  set_seasons(state: DatabaseState, user_seasons: UserSeason[]) {
-    state.seasons = user_seasons.map(userSeason => ({
-      id: userSeason.id,
-      finished: userSeason.finished,
-      season: {
-        ...userSeason.season,
-        levels: userSeason.season.levels.map(userLevel => ({
-          ...userLevel,
-          level: {
-            ...userLevel.level,
-            enemy_leader: state.enemyleadersdb[userLevel.level.enemy_leader],
-            enemies: userLevel.level.enemies.map(
-              enemyId => state.enemiesdb[enemyId]
-            ),
+  set_seasons(state: DatabaseState, user_seasons: UserSeasonsProgress) {
+    state.seasons = Object.values(state.seasonsdb).map(
+      (season): SeasonEntry => {
+        const userSeason = user_seasons[season.id]
+
+        const stats: SeasonStats = {
+          total_levels: season.levels.length,
+          finished_levels: 0,
+          unlocked_levels: 0,
+          easy_levels: 0,
+          normal_levels: 0,
+          hard_levels: 0,
+        }
+
+        const levels = season.levels.map((level): LevelEntry => {
+          const userLevel = userSeason?.levels[level.id]
+          const unlocked = userLevel != null
+          const finished = userLevel?.finished ?? null
+
+          if (unlocked) stats.unlocked_levels += 1
+          if (finished) stats.finished_levels += 1
+
+          switch (level.difficulty) {
+            case "easy":
+              stats.easy_levels += 1
+              break
+            case "normal":
+              stats.normal_levels += 1
+              break
+            case "hard":
+              stats.hard_levels += 1
+              break
+          }
+
+          return {
+            id: userLevel?.user_level_id ?? null,
+            unlocked,
+            finished,
+            level: {
+              ...level,
+              enemy_leader: state.enemyleadersdb[level.enemy_leader],
+              enemies: level.enemies.map(id => state.enemiesdb[id]),
+            },
+          }
+        })
+
+        return {
+          id: userSeason?.user_season_id ?? null,
+          finished: userSeason?.finished ?? null,
+          season: {
+            ...season,
+            levels,
           },
-        })),
-      },
-      stats: userSeason.stats,
-    }))
+          stats,
+        }
+      }
+    )
   },
 
   setEffectsInfo(
@@ -288,7 +332,7 @@ const actions = {
     const userId = getters["getUser"].user_id
 
     try {
-      const cards_response = await callApi<CardsResponse>({
+      const cards_response = await callApi<GameCatalogResponse>({
         method: HttpMethod.GET,
         url: CARDS_DATABASE,
       })

@@ -166,7 +166,7 @@ import {
   random_level_generator,
   random_level_generator_by_number,
 } from "@/logic/random_level"
-import { MappedUserLevel, PayResourcesSubtype, SeasonEntry } from "@/types"
+import { LevelEntry, PayResourcesSubtype, SeasonEntry } from "@/types"
 import type { UserResources } from "@/types/database"
 
 interface GameType {
@@ -189,9 +189,9 @@ export default defineComponent({
   },
   data() {
     return {
-      selectedLevel: undefined as MappedUserLevel | undefined, // для подсветки выбранного уровня
-      selectedRandomLevel: undefined as MappedUserLevel | undefined,
-      random_levels: [] as MappedUserLevel[],
+      selectedLevel: undefined as LevelEntry | undefined, // для подсветки выбранного уровня
+      selectedRandomLevel: undefined as LevelEntry | undefined,
+      random_levels: [] as LevelEntry[],
       game_types: [
         {
           name: "seasons",
@@ -217,7 +217,7 @@ export default defineComponent({
       gameMod: null as GameType | null,
       seasonLevelsTreeOpened: false,
       show_decks_list_modal: false,
-      randomLevelByNumber: null as MappedUserLevel | null,
+      randomLevelByNumber: null as LevelEntry | null,
       inputNumberEnemiesRandomLevel: 5 as number | null | "",
     }
   },
@@ -263,13 +263,13 @@ export default defineComponent({
       const seasonId = Number(this.$route.query.seasonId)
       return Number.isInteger(seasonId) && seasonId > 0 ? seasonId : undefined
     },
-    random_levels_easy(): MappedUserLevel[] {
+    random_levels_easy(): LevelEntry[] {
       return this.random_levels.filter(l => l.level.difficulty === "easy")
     },
-    random_levels_normal(): MappedUserLevel[] {
+    random_levels_normal(): LevelEntry[] {
       return this.random_levels.filter(l => l.level.difficulty === "normal")
     },
-    random_levels_hard(): MappedUserLevel[] {
+    random_levels_hard(): LevelEntry[] {
       return this.random_levels.filter(l => l.level.difficulty === "hard")
     },
     isValid(): boolean {
@@ -341,7 +341,7 @@ export default defineComponent({
         }
       )
 
-      let levelsToChoseFrom: MappedUserLevel[] = []
+      let levelsToChoseFrom: LevelEntry[] = []
       if (difficulty === "easy") levelsToChoseFrom = this.random_levels_easy
       else if (difficulty === "normal")
         levelsToChoseFrom = this.random_levels_normal
@@ -356,9 +356,7 @@ export default defineComponent({
       this.selectedRandomLevel = levelsToChoseFrom[index]
       this.selectedLevel = undefined
     },
-    difficultyBorder(
-      level: MappedUserLevel
-    ): Record<string, string> | undefined {
+    difficultyBorder(level: LevelEntry): Record<string, string> | undefined {
       if (level.level.difficulty === "easy")
         return { border: "1px solid lightgreen" }
       else if (level.level.difficulty === "normal")

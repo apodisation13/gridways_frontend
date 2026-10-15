@@ -78,14 +78,14 @@ import { defineComponent, type PropType } from "vue"
 import { useToast } from "vue-toastification"
 
 import LevelModal from "@/components/ModalWindows/LevelModal.vue"
-import type { LevelRelatedLevel, MappedUserLevel } from "@/types"
+import type { LevelEntry, LevelRelatedLevel } from "@/types"
 
 export default defineComponent({
   name: "LevelTree",
   components: { LevelModal },
   props: {
     seasonName: { type: String, required: true },
-    levels: { type: Array as PropType<MappedUserLevel[]>, required: true },
+    levels: { type: Array as PropType<LevelEntry[]>, required: true },
     userSeasonUnlocked: { type: Boolean, required: true },
   },
   setup() {
@@ -99,7 +99,7 @@ export default defineComponent({
       layerCfg: { x: 0, y: 0 },
       levs: [] as any[],
       timer: 0 as ReturnType<typeof setTimeout> | 0,
-      level: null as MappedUserLevel | null,
+      level: null as LevelEntry | null,
       show_level_modal: false,
       isPanning: false,
       panStart: { x: 0, y: 0 },
@@ -328,7 +328,7 @@ export default defineComponent({
       clearTimeout(this.timer as ReturnType<typeof setTimeout>)
       this.timer = 0
     },
-    longTap(level: MappedUserLevel): void {
+    longTap(level: LevelEntry): void {
       this.level = level
       this.show_level_modal = true
     },

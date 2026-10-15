@@ -5,9 +5,9 @@ import type {
   Enemy,
   EnemyLeader,
   Leader,
-  MappedLevel,
-  MappedSeason,
-  MappedUserLevel,
+  LevelEntry,
+  ResolvedLevel,
+  ResolvedSeason,
 } from "@/types"
 
 export interface GameState {
@@ -39,9 +39,9 @@ export interface GameState {
   armor_delta: number | null
   leader: Leader | undefined | null
 
-  whole_level: MappedUserLevel | Record<string, never>
-  level: MappedLevel | null
-  season: MappedSeason | null
+  whole_level: LevelEntry | Record<string, never>
+  level: ResolvedLevel | null
+  season: ResolvedSeason | null
   enemy_leader: EnemyLeader | undefined | null
 
   enemies_grave: Enemy[]
@@ -226,10 +226,10 @@ const mutations = {
     state.leader = leader
   },
 
-  set_season(state: GameState, season: MappedSeason) {
+  set_season(state: GameState, season: ResolvedSeason) {
     state.season = season
   },
-  set_level(state: GameState, level: MappedUserLevel) {
+  set_level(state: GameState, level: LevelEntry) {
     state.level = level.level
     state.whole_level = level
   },
@@ -344,7 +344,7 @@ const actions = {
     commit("set_leader", deck.deck.leader)
     commit("set_whole_deck", deck)
   },
-  set_level_in_play({ commit }: ActionContext, level: MappedUserLevel) {
+  set_level_in_play({ commit }: ActionContext, level: LevelEntry) {
     commit("set_level", level)
     commit("set_enemy_leader", level.level.enemy_leader)
   },

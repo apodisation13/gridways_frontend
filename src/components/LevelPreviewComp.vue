@@ -40,7 +40,7 @@ import { defineComponent, type PropType } from "vue"
 
 import LevelModal from "@/components/ModalWindows/LevelModal.vue"
 import { background_color_leader } from "@/logic/border_styles"
-import type { MappedUserLevel } from "@/types"
+import type { LevelEntry } from "@/types"
 
 export default defineComponent({
   name: "LevelPreviewComp",
@@ -48,7 +48,7 @@ export default defineComponent({
   props: {
     level: {
       required: true,
-      type: Object as PropType<MappedUserLevel>,
+      type: Object as PropType<LevelEntry>,
     },
   },
   data() {

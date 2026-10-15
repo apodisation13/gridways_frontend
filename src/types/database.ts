@@ -263,7 +263,7 @@ export interface LevelRelatedLevel {
   connection: string | null
 }
 
-export interface Level {
+export interface LevelDefinition {
   id: number
   name: string
   starting_enemies_number: number
@@ -275,43 +275,29 @@ export interface Level {
   children: LevelRelatedLevel[]
 }
 
-export interface UserLevel {
-  id: number | null
-  unlocked: boolean
-  finished: boolean | null
-  level: Level
-}
-
 export interface SeasonRelatedSeason {
   related_season_id: number | null
   line: string | null
   connection: string | null
 }
 
-export interface Season {
+export interface SeasonDefinition {
   id: number
   name: string
   description: string
   x: number
   y: number
-  levels: UserLevel[]
+  levels: LevelDefinition[]
   children: SeasonRelatedSeason[]
 }
 
-export interface Stats {
+export interface SeasonStats {
   total_levels: number
   finished_levels: number
   unlocked_levels: number
   easy_levels: number
   normal_levels: number
   hard_levels: number
-}
-
-export interface UserSeason {
-  id: number | null
-  finished: boolean | null
-  season: Season
-  stats: Stats
 }
 
 export interface UserResources {
@@ -337,11 +323,12 @@ export interface UserResources {
   immune_magics: number
 }
 
-export interface CardsResponse {
+export interface GameCatalogResponse {
   cards: Card[]
   leaders: Leader[]
   enemies: Record<number, Enemy>
   enemy_leaders: Record<number, EnemyLeader>
+  seasons: Record<number, SeasonDefinition>
 }
 
 export interface UserProgressResponse {
@@ -349,7 +336,7 @@ export interface UserProgressResponse {
   user_cards: Record<number, UserCard>
   user_leaders: Record<number, UserLeader>
   user_decks: UserDeck[]
-  user_seasons: UserSeason[]
+  user_seasons: UserSeasonsProgress
 }
 
 export interface ListDecksResponse {
@@ -366,7 +353,7 @@ export interface CardCraftBonusResponse {
 }
 
 export interface OpenRelatedLevelsResponse {
-  seasons: UserSeason[]
+  seasons: UserSeasonsProgress
 }
 
 export interface ArenaRewardMultiply {
@@ -445,24 +432,30 @@ export interface DeckEntry {
   deck: MappedDeck
 }
 
-export interface MappedLevel extends Omit<Level, "enemy_leader" | "enemies"> {
+export interface ResolvedLevel extends Omit<
+  LevelDefinition,
+  "enemy_leader" | "enemies"
+> {
   enemy_leader: EnemyLeader | undefined
   enemies: (Enemy | undefined)[]
 }
 
-export interface MappedUserLevel extends Omit<UserLevel, "level"> {
-  level: MappedLevel
+export interface LevelEntry {
+  id: number | null
+  unlocked: boolean
+  finished: boolean | null
+  level: ResolvedLevel
 }
 
-export interface MappedSeason extends Omit<Season, "levels"> {
-  levels: MappedUserLevel[]
+export interface ResolvedSeason extends Omit<SeasonDefinition, "levels"> {
+  levels: LevelEntry[]
 }
 
 export interface SeasonEntry {
   id: number | null
   finished: boolean | null
-  season: MappedSeason
-  stats: Stats
+  season: ResolvedSeason
+  stats: SeasonStats
 }
 
 export interface EffectInfo {
@@ -471,3 +464,16 @@ export interface EffectInfo {
   turn_type: "turns" | "times_count"
   negative?: boolean
 }
+
+export interface UserLevelProgress {
+  user_level_id: number
+  finished: boolean
+}
+
+export interface UserSeasonProgress {
+  user_season_id: number
+  finished: boolean
+  levels: Record<number, UserLevelProgress>
+}
+
+export type UserSeasonsProgress = Record<number, UserSeasonProgress>

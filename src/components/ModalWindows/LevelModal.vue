@@ -17,14 +17,14 @@ import EnemyLeader from "@/components/Cards/EnemyLeader.vue"
 import EnemyList from "@/components/Cards/EnemyList.vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
-import type { Enemy, MappedLevel } from "@/types"
+import type { Enemy, ResolvedLevel } from "@/types"
 
 export default defineComponent({
   name: "LevelModal",
   components: { EnemyList, EnemyLeader, ButtonClose, ModalWindow },
   props: {
     level: {
-      type: Object as PropType<MappedLevel>,
+      type: Object as PropType<ResolvedLevel>,
       required: true,
     },
   },

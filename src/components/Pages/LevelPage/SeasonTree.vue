@@ -205,7 +205,7 @@ import { useToast } from "vue-toastification"
 import LevelTree from "@/components/Pages/LevelPage/LevelTree.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import { styleWrapper } from "@/logic/border_styles"
-import type { MappedUserLevel, SeasonEntry, SeasonRelatedSeason } from "@/types"
+import type { LevelEntry, SeasonEntry, SeasonRelatedSeason } from "@/types"
 
 export default defineComponent({
   name: "SeasonTree",
@@ -231,7 +231,7 @@ export default defineComponent({
       panOffset: { x: 0, y: 0 },
       seasonTree: [] as any[],
       seasonName: "",
-      seasonLevels: [] as MappedUserLevel[],
+      seasonLevels: [] as LevelEntry[],
       showSeasonLevelsTree: false,
       userSeasonUnlocked: false,
       lastTap: 0,
