@@ -118,9 +118,9 @@ export enum CardAbility {
   DestroyWithArmor = "destroy-with-armor",
   DestroyAllWithArmor = "destroy-all-with-armor",
   DrainArmorFromEnemy = "drain-armor-from-enemy",
+  DrawTwoCards = "draw-two-cards",
   // special case abilities
   Resurrect = "resurrect",
-  DrawTwoCards = "draw-two-cards",
   GiveChargesToCardInHand1 = "give-charges-to-card-in-hand-1",
   PlayFromDeck = "play-from-deck",
   PlayFromGrave = "play-from-grave",

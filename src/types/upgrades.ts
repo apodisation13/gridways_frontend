@@ -45,6 +45,8 @@ export enum UpgradeSubtype {
   CARDS_DRAWN = "cards_drawn",
   MAX_IMMUNE_TURNS = "max_immune_turns",
   IMMUNE_MAGICS_TURNS = "immune_magics_turns",
+  MAX_EMPTY_PASSES = "max_empty_passes",
+  FULL_HAND_REDRAW = "full_hand_redraw",
 
   AVATAR = "avatar",
   THEME = "theme",

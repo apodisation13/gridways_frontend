@@ -152,6 +152,18 @@ const actions = {
         UpgradeType.GAME,
         UpgradeSubtype.IMMUNE_MAGICS_TURNS
       ),
+      max_empty_passes: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.MAX_EMPTY_PASSES
+      ),
+      full_hand_redraw: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.GAME,
+        UpgradeSubtype.FULL_HAND_REDRAW
+      ),
     })
 
     // Создаем новый объект с теми же ключами
