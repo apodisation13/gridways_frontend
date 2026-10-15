@@ -102,6 +102,8 @@
           <div class="draw">
             <draw-comp
               v-show="can_draw && $store.state.game.player_turn"
+              :full-hand-redraws-remaining="fullHandRedrawsRemaining"
+              :hand-length="gameObj.hand.length"
               @click="draw_one_card"
             />
           </div>
@@ -120,7 +122,10 @@
           <pass-comp
             v-if="myTurn"
             :timer="turnTimeLeft"
-            @dblclick="exec_ai_move"
+            :empty-passes-remaining="
+              emptyPassApply ? currentEmptyPassesCount : null
+            "
+            @dblclick="exec_ai_move()"
           />
           <div v-else-if="opponentSCACard" class="opponent-sca-slot">
             <card-item
@@ -279,6 +284,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+import { useToast } from "vue-toastification"
 
 import CardItem from "@/components/Cards/CardItem.vue"
 import EnemyComp from "@/components/Cards/EnemyComp.vue"
@@ -729,6 +735,7 @@ export default defineComponent({
           this.$store.commit("set_invulnerability", invulnerability - 1)
         }
         this.myTurn = true
+        this.emptyPassApply = true
         this.isActive.player_cards = true
         this.$store.commit("set_player_turn", true)
         this.can_draw = this.calc_can_draw()
@@ -1024,8 +1031,21 @@ export default defineComponent({
     //   enemy_takes_damage() удаляет мёртвого врага через setTimeout(timeout).
     //   Если отправить GAME_STATE до этого — напарник увидит врага с отрицательными HP.
     //   +100 мс — небольшой буфер поверх анимационного таймаута.
-    exec_ai_move(): void {
+    exec_ai_move(forcedByTimer = false): void {
       if (!this.myTurn || !this.$store.state.game.player_turn) return
+      if (!forcedByTimer && this.draw) return
+      if (this.emptyPassApply) {
+        if (this.currentEmptyPassesCount <= 0 && !forcedByTimer) {
+          useToast().warning(
+            "Вы исчерпали пустые пасы — походите картой, лидером или сделайте добор."
+          )
+          return
+        }
+        this.currentEmptyPassesCount = Math.max(
+          0,
+          this.currentEmptyPassesCount - 1
+        )
+      }
       this.stopTurnTimer()
       this.$store.commit("set_player_turn", false)
       this.isActive.player_cards = false
@@ -1181,6 +1201,7 @@ export default defineComponent({
     // 3. Шлём GAME_STATE с небольшой задержкой (чтоб enemy removal timeout уже сработал).
     //    includeHealth=false: урон от карты игрока НЕ передаём напарнику (это урон врагам, а не нам).
     afterDamage(): void {
+      this.emptyPassApply = false
       this.special_case_abilities() // из миксина specialcaseabilities
       if (!this.show_pick_a_card_selection) {
         remove_dead_card(
@@ -1294,7 +1315,7 @@ export default defineComponent({
         this.turnTimeLeft -= 1
         if (this.turnTimeLeft <= 0) {
           this.stopTurnTimer()
-          this.exec_ai_move()
+          this.exec_ai_move(true)
         }
       }, 1000)
     },

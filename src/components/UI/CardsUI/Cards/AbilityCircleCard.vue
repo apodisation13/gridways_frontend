@@ -47,7 +47,6 @@
     <ability-icon
       v-else-if="
         card.ability.name === CardAbility.Resurrect ||
-        card.ability.name === CardAbility.DrawTwoCards ||
         card.ability.name === CardAbility.GiveChargesToCardInHand1 ||
         card.ability.name === CardAbility.PlayFromDeck ||
         card.ability.name === CardAbility.DiscardDraw2 ||

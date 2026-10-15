@@ -37,12 +37,19 @@
         <div class="draw">
           <draw-comp
             v-show="can_draw && $store.state.game.player_turn"
+            :full-hand-redraws-remaining="fullHandRedrawsRemaining"
+            :hand-length="gameObj.hand.length"
             @click="draw_one_card"
           />
         </div>
 
         <!-- чисто кнопка пас -->
-        <pass-comp @dblclick="exec_ai_move" />
+        <pass-comp
+          :empty-passes-remaining="
+            emptyPassApply ? currentEmptyPassesCount : null
+          "
+          @dblclick="exec_ai_move"
+        />
 
         <!-- кнопки кладбища и колоды -->
         <div class="div-two-buttons">
@@ -320,6 +327,8 @@ export default defineComponent({
 
     // после хода картой или лидером, открываем sp-case-abilities, обнуляем карту которой изначально играли
     afterDamage(): void {
+      // если мы походили картой или лидером, emptyPass уже не надо считать
+      this.emptyPassApply = false
       // особые абилки, которые требуют открытия окон
       this.special_case_abilities()
       // если не надо играть особые абилки, сбрасываем карту в сброс СРАЗУ тут же

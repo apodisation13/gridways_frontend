@@ -1,5 +1,8 @@
 <template>
   <div class="draw-btn" :style="themedStyle">
+    <span v-if="isHandFull" class="draw-count">
+      {{ fullHandRedrawsRemaining }}
+    </span>
     <svg
       class="draw-icon"
       viewBox="0 0 100 100"
@@ -44,7 +47,20 @@ import { styleWrapper } from "@/logic/border_styles"
 
 export default defineComponent({
   name: "DrawComp",
+  props: {
+    fullHandRedrawsRemaining: {
+      type: Number,
+      required: true,
+    },
+    handLength: {
+      type: Number,
+      required: true,
+    },
+  },
   computed: {
+    isHandFull(): boolean {
+      return this.handLength >= this.$store.getters["handSize"]
+    },
     themedStyle(): Record<string, string> | undefined {
       return styleWrapper(this.$store.getters["selectedTheme"])
     },
@@ -77,5 +93,21 @@ export default defineComponent({
 .draw-icon {
   width: 85%;
   height: 85%;
+}
+
+.draw-count {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  pointer-events: none;
+  color: #4ade80;
+  text-shadow:
+    0 1px 3px #000,
+    0 0 4px #000;
+  font-size: min(26px, calc(var(--vh, 1vh) * 3.5));
+  font-weight: 700;
+  line-height: 1;
 }
 </style>

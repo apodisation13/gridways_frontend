@@ -1,16 +1,37 @@
 import { defineComponent } from "vue"
+import { useToast } from "vue-toastification"
 
 import { ai_move } from "@/logic/ai_move/ai_move"
 import { enemy_passive_abilities_end_turn } from "@/logic/ai_move/ai_passive_abilties"
 import { appear_new_enemy } from "@/logic/game_logic/place_enemies"
 import { player_passive_abilities_end_turn } from "@/logic/player_move/player_passive_abilities"
+import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
 import store from "@/store"
 
 export default defineComponent({
+  data() {
+    return {
+      currentEmptyPassesCount: Number(this.$store.getters["maxEmptyPasses"]),
+      emptyPassApply: true,
+    }
+  },
   methods: {
     // нажал ПАС - переход хода компу
     exec_ai_move(): void {
-      if (!this.$store.state.game.player_turn) return
+      if (!this.$store.state.game.player_turn || this.draw) return
+      if (
+        this.emptyPassApply &&
+        get_all_enemies(this.gameObj.field, this.gameObj.enemy_leader).length >
+          0
+      ) {
+        if (this.currentEmptyPassesCount <= 0) {
+          useToast().warning(
+            "Вы исчерпали пустые пасы — походите картой, лидером или сделайте добор."
+          )
+          return
+        }
+        this.currentEmptyPassesCount -= 1
+      }
       this.$store.commit("set_player_turn", false) // кнопка пас сразу пропала и дро тоже
       this.isActive.player_cards = false
       this.isActive.player_leader = false
@@ -46,6 +67,7 @@ export default defineComponent({
                   )
                   clearInterval(await_epa_end_turn)
                   appear_new_enemy(this.gameObj, timeout)
+                  this.emptyPassApply = true
                   this.isActive.player_cards = true
                   this.can_draw = this.calc_can_draw()
                   this.$store.commit("set_player_turn", true)

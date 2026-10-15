@@ -24,6 +24,8 @@ export interface GameState {
   cards_drawn: number
   max_immune_turns: number
   immune_magics_turns: number
+  max_empty_passes: number
+  full_hand_redraw: number
 
   arena_mode: boolean
 
@@ -83,6 +85,8 @@ const state: GameState = {
   cards_drawn: 1,
   max_immune_turns: 0,
   immune_magics_turns: 0,
+  max_empty_passes: 3,
+  full_hand_redraw: 0,
 
   random_level_enemies_count: {},
   max_random_n_enemies: 0,
@@ -150,6 +154,8 @@ const getters = {
   maxHp: (state: GameState) => state.max_hp,
   maxArmor: (state: GameState) => state.max_armor,
   maxImmuneTurns: (state: GameState) => state.max_immune_turns,
+  maxEmptyPasses: (state: GameState) => state.max_empty_passes,
+  fullHandRedraw: (state: GameState) => state.full_hand_redraw,
 
   get_season: (state: GameState) => state.season,
   currentLevel: (state: GameState) => state.level,
@@ -172,6 +178,8 @@ const mutations = {
       cards_drawn: number
       max_immune_turns: number
       immune_magics_turns: number
+      max_empty_passes: number
+      full_hand_redraw: number
     }
   ) {
     state.hand_size = payload.hand_size ?? state.hand_size
@@ -189,6 +197,8 @@ const mutations = {
     state.max_immune_turns = payload.max_immune_turns ?? state.max_immune_turns
     state.immune_magics_turns =
       payload.immune_magics_turns ?? state.immune_magics_turns
+    state.max_empty_passes = payload.max_empty_passes ?? state.max_empty_passes
+    state.full_hand_redraw = payload.full_hand_redraw ?? state.full_hand_redraw
   },
 
   set_game_const(

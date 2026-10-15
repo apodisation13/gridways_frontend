@@ -21,6 +21,7 @@ import {
 } from "@/logic/player_move/abilities/ability_destroy_with_armor"
 import { destroy_with_deathwish } from "@/logic/player_move/abilities/ability_destroy_with_deathwish"
 import { destroy_with_status } from "@/logic/player_move/abilities/ability_destroy_with_status"
+import { draw_two_cards } from "@/logic/player_move/abilities/ability_draw_two_cards"
 import {
   incr_effects,
   remove_effects,
@@ -192,6 +193,9 @@ export function damage_ai_card(
       remove_enemy_armor(enemy)
       add_armor(armor_value, timeout)
     }
+    damage_one(enemy, card, gameObj, timeout)
+  } else if (ability === CardAbility.DrawTwoCards) {
+    draw_two_cards(card as Card, gameObj)
     damage_one(enemy, card, gameObj, timeout)
   } else damage_one(enemy, card, gameObj, timeout)
 

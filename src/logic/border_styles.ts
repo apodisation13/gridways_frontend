@@ -174,7 +174,6 @@ export function ability_icon(ability: string): string {
     return `url(${require("@/assets/icons/card/destroy.svg")})`
   else if (
     ability === CardAbility.Resurrect ||
-    ability === CardAbility.DrawTwoCards ||
     ability === CardAbility.GiveChargesToCardInHand1 ||
     ability === CardAbility.PlayFromDeck ||
     ability === CardAbility.DiscardDraw2 ||

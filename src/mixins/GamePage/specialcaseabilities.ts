@@ -41,8 +41,6 @@ export default defineComponent({
           (card: Card) =>
             card.type === CardType.Unit && card.id !== this.selected_card!.id
         )
-      } else if (ability === CardAbility.DrawTwoCards) {
-        this.draw_one_card()
       } else if (ability === CardAbility.GiveChargesToCardInHand1) {
         // прибавляем 1 заряд бронзовой карте в руке
         this.cards_pool = this.gameObj.hand.filter(
@@ -150,7 +148,17 @@ export default defineComponent({
         }
       } else if (ability === CardAbility.DrawExact) {
         // берем из колоды ЛЮБУЮ КАРТУ!
-        if (this.calc_can_draw()) this.cards_pool = this.gameObj.deck
+        // тут почему такое - у текущей карты на данный момент 0 зарядов, но она еще в руке,
+        // поэтому тут мы и смотрим на ее заряды (там анимация сброса карты играется после закрытия окна
+        // а вдруг откуда-то зарядов не 1, а 2 - и вот тогда надо уже на всю руку смотреть, включая эту карту
+        const handSizeForDraw =
+          this.gameObj.hand.length -
+          (this.selected_card!.data.charges == 0 ? 1 : 0)
+        if (
+          this.gameObj.deck.length > 0 &&
+          handSizeForDraw < this.$store.getters["handSize"]
+        )
+          this.cards_pool = this.gameObj.deck
       } else if (
         ability === CardAbility.MoveEnemyFromDeckToHand ||
         ability === CardAbility.MoveEnemyFromDeckToDeck
