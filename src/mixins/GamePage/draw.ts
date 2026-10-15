@@ -74,6 +74,7 @@ export default defineComponent({
         this.gameObj.hand.push(choice_pop(this.gameObj.deck) as Card)
       }
       if (this.redraws !== 0) this.draw = true // показать окно редро, если не 0 там
+      this.emptyPassApply = false
       this.isActive.player_cards = false
       this.can_draw = false
     },
