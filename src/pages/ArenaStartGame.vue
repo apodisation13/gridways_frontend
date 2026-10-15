@@ -93,7 +93,7 @@ import {
   DeckCardEntry,
   DeckEntry,
   Leader,
-  MappedUserLevel,
+  LevelEntry,
   PayResourcesSubtype,
 } from "@/types"
 
@@ -120,7 +120,7 @@ export default defineComponent({
         ARENA_RESOURCE_KEYS.filter(k => (all[k] ?? 0) > 0).map(k => [k, all[k]])
       )
     },
-    arena_level(): MappedUserLevel | null {
+    arena_level(): LevelEntry | null {
       return this.$store.getters["arena_level"]
     },
     arena_deck(): DeckCardEntry[] {

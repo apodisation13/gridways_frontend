@@ -105,8 +105,8 @@ import { getRewardForLevel } from "@/logic/random_rewards"
 import {
   GameStatsRecordType,
   LeaderboardGameMode,
+  LevelEntry,
   PayResourcesSubtype,
-  UserLevel,
 } from "@/types"
 
 export default defineComponent({
@@ -161,7 +161,7 @@ export default defineComponent({
 
       // ищем уровень из списка уровней сезона
       const userLevel = season.levels.find(
-        (lev: UserLevel) => lev.level.id === currentLevel.id
+        (lev: LevelEntry) => lev.level.id === currentLevel.id
       )
 
       // если уровень УЖЕ пройден, то нет смысла открывать его детей
