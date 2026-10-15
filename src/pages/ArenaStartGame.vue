@@ -60,7 +60,11 @@
           />
         </div>
 
-        <button class="btn-start" :disabled="loading" @click="start_game">
+        <button
+          class="btn-start"
+          :disabled="loading || insufficientResources"
+          @click="start_game"
+        >
           <themed-button title="НАЧАТЬ" />
         </button>
       </div>
@@ -114,6 +118,12 @@ export default defineComponent({
     }
   },
   computed: {
+    insufficientResources(): boolean {
+      const resources = this.$store.getters["resource"]
+      return Object.entries(this.play_price).some(
+        ([resource, cost]) => (resources[resource] ?? 0) < Math.abs(cost)
+      )
+    },
     arena_resources(): Record<string, number> {
       const all = this.$store.getters["resource"]
       return Object.fromEntries(
@@ -186,6 +196,7 @@ export default defineComponent({
       this.$router.push("/main")
     },
     async start_game(): Promise<void> {
+      if (this.loading || this.insufficientResources) return
       this.loading = true
 
       const level = this.arena_level!

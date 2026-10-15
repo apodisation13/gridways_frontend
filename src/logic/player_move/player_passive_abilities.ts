@@ -1,6 +1,26 @@
 import { run_passive } from "@/logic/player_move/passive_abilities/passives_dispatcher"
 import store from "@/store"
-import type { GameObj } from "@/types"
+import type { Card, GameObj } from "@/types"
+
+function hasActivePassive(card: Card, place: "hand" | "deck" | "grave") {
+  const p = card.data?.passive
+  if (!p) return false
+
+  const flag =
+    place === "hand"
+      ? p.has_passive_in_hand
+      : place === "deck"
+        ? p.has_passive_in_deck
+        : p.has_passive_in_grave
+
+  if (!flag) return false
+
+  const hasTimer = p.timer !== undefined || p.default_timer !== undefined
+  if (!hasTimer) return true
+
+  if (p.timer !== undefined && p.default_timer === undefined) return false
+  return !(p.timer === 0 && !p.reset_timer)
+}
 
 export function player_passive_abilities_end_turn(
   gameObj: GameObj,
@@ -11,10 +31,10 @@ export function player_passive_abilities_end_turn(
   const { hand, deck, grave, leader } = gameObj
 
   // здесь мы создаем пул карт, для которых нужны пассивки!
-  let pool: any[] = hand.filter(c => c.data.passive?.has_passive_in_hand) // собрали пассивные карты из руки
+  let pool: any[] = hand.filter(c => hasActivePassive(c, "hand")) // собрали пассивные карты из руки
   if (leader.passive_ability?.name) pool.push(leader) // добавили туда ещё и лидера если у него есть пассивка
-  pool = pool.concat(deck.filter(c => c.data.passive?.has_passive_in_deck)) // собрали пассивные карты из колоды
-  pool = pool.concat(grave.filter(c => c.data.passive?.has_passive_in_grave)) // собрали пассивные карты из сброса
+  pool = pool.concat(deck.filter(c => hasActivePassive(c, "deck"))) // собрали пассивные карты из колоды
+  pool = pool.concat(grave.filter(c => hasActivePassive(c, "grave"))) // собрали пассивные карты из сброса
 
   let i = 0
   // вот именно в такой последовательности они и будут работать: рука, лидер, колода, сброс

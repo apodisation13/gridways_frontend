@@ -71,8 +71,9 @@ export default defineComponent({
       }
     },
     leaderBg(): Record<string, string> {
+      const image = this.deck.deck.leader?.image
       return {
-        backgroundImage: `url(${this.deck.deck.leader?.image})`,
+        backgroundImage: image ? `url(${image})` : "none",
       }
     },
     isSelected(): boolean {

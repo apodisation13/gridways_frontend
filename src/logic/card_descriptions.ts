@@ -88,8 +88,10 @@ export function describeCardPassiveAbility(
       parts.push("\nСрабатывает когда карта В КОЛОДЕ")
     else if ("has_passive_in_grave" in passive && passive.has_passive_in_grave)
       parts.push("\nСрабатывает когда карта В СБРОСЕ")
-    if (passive.each_tick)
+    if (passive.each_tick && !passive.reset_timer)
       parts.push("\nСрабатывает каждый ход пока таймер не равен 0")
+    if (!passive.reset_timer && !passive.each_tick && passive.default_timer)
+      parts.push("\nСработает один раз тогда, когда таймер станет равен 0")
     if (passive.reset_timer)
       parts.push(
         `\nВосстанавливает таймер. Значение таймера ${passive.default_timer ?? ""}`

@@ -42,6 +42,13 @@ export default defineComponent({
 
       const passive = (this.card.data?.passive ?? {}) as Record<string, unknown>
 
+      if (
+        "type" in this.card &&
+        passive.upon_beginning &&
+        ["hand", "deck", "grave"].includes(this.location)
+      )
+        return false
+
       const hasHand = !!passive.has_passive_in_hand
       const hasDeck = !!passive.has_passive_in_deck
       const hasGrave = !!passive.has_passive_in_grave

@@ -86,6 +86,9 @@
               style="transform: scale(1.4)"
             />
           </div>
+          <p class="arena-entry__hint">
+            Рекомендуем иметь минимум 5000 ресурсов и 5000 денег.
+          </p>
           <button
             :disabled="insufficientArenaResources"
             class="arena-entry__btn"
@@ -624,6 +627,15 @@ div {
   width: 200px;
   height: 60px;
   margin-top: 10px;
+}
+
+.arena-entry__hint {
+  max-width: 300px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .arena-entry__btn:disabled {
