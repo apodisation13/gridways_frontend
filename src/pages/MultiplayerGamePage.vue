@@ -102,6 +102,8 @@
           <div class="draw">
             <draw-comp
               v-show="can_draw && $store.state.game.player_turn"
+              :full-hand-redraws-remaining="fullHandRedrawsRemaining"
+              :hand-length="gameObj.hand.length"
               @click="draw_one_card"
             />
           </div>
