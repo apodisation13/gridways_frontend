@@ -87,10 +87,59 @@
             >
               📊
             </button>
+            <button
+              v-if="
+                season.season.data?.rewards &&
+                Object.keys(season.season.data.rewards).length
+              "
+              class="action-btn"
+              title="Награды"
+              aria-label="Награды"
+              @click.stop="activeRewards = season"
+              @dblclick.stop
+              @touchend.stop
+            >
+              <img
+                src="@/assets/icons/rewards.svg"
+                width="20"
+                height="20"
+                alt=""
+              />
+            </button>
           </div>
         </div>
       </div>
     </div>
+
+    <Teleport to="body">
+      <div
+        v-if="activeRewards?.season.data?.rewards"
+        class="popup-overlay"
+        @click="activeRewards = null"
+        @touchend="activeRewards = null"
+      >
+        <div
+          class="popup-content popup-content--rewards"
+          @click.stop
+          @touchend.stop
+        >
+          <div class="popup-header" :style="styleWrapper">
+            <h3>Награды — {{ activeRewards.season.name }}</h3>
+            <ThemedButton
+              class="close-btn"
+              title="✕"
+              @click="activeRewards = null"
+            />
+          </div>
+          <div class="popup-body">
+            <LevelSeasonReward
+              :key="activeRewards.season.id"
+              :rewards="activeRewards.season.data.rewards"
+            />
+          </div>
+        </div>
+      </div>
+    </Teleport>
 
     <!-- Попап с описанием -->
     <Teleport to="body">
@@ -202,6 +251,7 @@
 import { defineComponent, type PropType } from "vue"
 import { useToast } from "vue-toastification"
 
+import LevelSeasonReward from "@/components/Pages/LevelPage/LevelSeasonReward.vue"
 import LevelTree from "@/components/Pages/LevelPage/LevelTree.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import { styleWrapper } from "@/logic/border_styles"
@@ -209,7 +259,7 @@ import type { LevelEntry, SeasonEntry, SeasonRelatedSeason } from "@/types"
 
 export default defineComponent({
   name: "SeasonTree",
-  components: { ThemedButton, LevelTree },
+  components: { ThemedButton, LevelTree, LevelSeasonReward },
   props: {
     seasons: { type: Array as PropType<SeasonEntry[]>, required: true },
     seasonLevelsTreeOpened: { type: Boolean, required: true },
@@ -238,6 +288,7 @@ export default defineComponent({
       lastTappedId: null as number | null,
       activeDescription: null as SeasonEntry | null, // хранит сезон с открытым описанием
       activeStats: null as SeasonEntry | null, // хранит статистику сезона для попапа
+      activeRewards: null as SeasonEntry | null,
     }
   },
   computed: {
@@ -651,6 +702,24 @@ export default defineComponent({
   overflow-y: auto;
 }
 
+.popup-content--rewards {
+  display: flex;
+  flex-direction: column;
+  height: calc(var(--vh, 1vh) * 40);
+}
+
+.popup-content--rewards .popup-header {
+  flex-shrink: 0;
+}
+
+.popup-content--rewards .popup-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  overflow: hidden;
+}
+
 .popup-body p {
   margin: 0;
   font-size: 15px;
@@ -764,18 +833,26 @@ export default defineComponent({
 
 .season-actions {
   display: flex;
+  align-items: center;
   gap: 5px;
   margin-top: 2px;
 }
 
 .action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 28px;
+  height: 26px;
+  flex-shrink: 0;
   background: rgba(255, 255, 255, 0.3);
   border: none;
   border-radius: 8px;
-  padding: 2px 6px;
+  padding: 0;
   cursor: pointer;
-  font-size: 12px;
-  line-height: 1.4;
+  font-size: 16px;
+  line-height: 1;
   transition:
     background 0.15s ease,
     transform 0.1s ease;

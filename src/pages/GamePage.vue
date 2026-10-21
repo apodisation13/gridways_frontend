@@ -46,7 +46,7 @@
         <!-- чисто кнопка пас -->
         <pass-comp
           :empty-passes-remaining="
-            emptyPassApply ? currentEmptyPassesCount : null
+            shouldCountEmptyPass ? currentEmptyPassesCount : null
           "
           @dblclick="exec_ai_move"
         />
