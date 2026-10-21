@@ -1,6 +1,55 @@
 <template>
   <div class="win-section" @click="$router.push('/bonus')">
     <span class="global_text price-label">ВАШ ВЫИГРЫШ</span>
+    <Teleport to="body">
+      <div
+        v-if="levelRewards || seasonRewards"
+        class="rewards-overlay"
+        @click.stop="closeRewards"
+      >
+        <section
+          class="level-rewards"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="level-rewards-title"
+          @click.stop
+        >
+          <div class="rewards-header">
+            <button-close @close_self="closeRewards" />
+            <h2 id="level-rewards-title" class="global_text price-label">
+              Награды за первое прохождение
+            </h2>
+          </div>
+          <div v-if="levelRewards && seasonRewards" class="reward-sources">
+            <button
+              :class="{ active: !showSeasonRewards }"
+              @click="showSeasonRewards = false"
+            >
+              За уровень
+            </button>
+            <button
+              :class="{ active: showSeasonRewards }"
+              @click="showSeasonRewards = true"
+            >
+              За сезон
+            </button>
+          </div>
+          <h3 v-else class="reward-source-title">
+            {{ seasonRewards ? "За сезон" : "За уровень" }}
+          </h3>
+          <level-season-reward
+            v-if="seasonRewards && (showSeasonRewards || !levelRewards)"
+            key="season"
+            :rewards="seasonRewards"
+          />
+          <level-season-reward
+            v-else-if="levelRewards"
+            key="level"
+            :rewards="levelRewards"
+          />
+        </section>
+      </div>
+    </Teleport>
     <div class="play-price">
       <resource-item
         v-if="pay_data.raw_bronze"
@@ -100,21 +149,28 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 
+import LevelSeasonReward from "@/components/Pages/LevelPage/LevelSeasonReward.vue"
+import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
 import { getRewardForLevel } from "@/logic/random_rewards"
 import {
   GameStatsRecordType,
   LeaderboardGameMode,
   LevelEntry,
+  LevelSeasonRewards,
   PayResourcesSubtype,
+  SeasonEntry,
 } from "@/types"
 
 export default defineComponent({
   name: "WinPage",
-  components: { ResourceItem },
+  components: { ResourceItem, LevelSeasonReward, ButtonClose },
   data() {
     return {
       pay_data: {} as Record<string, number>,
+      levelRewards: null as LevelSeasonRewards | null,
+      seasonRewards: null as LevelSeasonRewards | null,
+      showSeasonRewards: false,
     }
   },
   async created() {
@@ -139,6 +195,11 @@ export default defineComponent({
     this.$store.commit("set_win_redirect", false)
   },
   methods: {
+    closeRewards(): void {
+      this.levelRewards = null
+      this.seasonRewards = null
+      this.showSeasonRewards = false
+    },
     // награда ресурсов за прохождение уровня
     async pay_resources(): Promise<void> {
       const difficulty = this.$store.state.game.level.difficulty
@@ -156,11 +217,16 @@ export default defineComponent({
       // при рандомном уровне сразу выходим отсюда
       if (currentLevel.random) return
 
-      // выбранный сезон из стора, выбирается по открытию дерева
-      const season = this.$store.getters["get_season"]
+      // Берём актуальный прогресс: выбранный сезон может хранить старый объект.
+      const seasonId = this.$store.getters["get_season"]?.id
+      const season = this.$store.getters["all_seasons"].find(
+        (entry: SeasonEntry) => entry.season.id === seasonId
+      ) as SeasonEntry | undefined
+      if (!season) return
+      const wasSeasonFinished = season.finished
 
       // ищем уровень из списка уровней сезона
-      const userLevel = season.levels.find(
+      const userLevel = season.season.levels.find(
         (lev: LevelEntry) => lev.level.id === currentLevel.id
       )
 
@@ -168,6 +234,19 @@ export default defineComponent({
       if (!userLevel || userLevel.finished) return
 
       await this.$store.dispatch("openRelatedLevels", userLevel.id)
+      const rewards = userLevel.level.data?.rewards
+      if (rewards && Object.keys(rewards).length) {
+        this.levelRewards = rewards
+      }
+      const updatedSeason = this.$store.getters["all_seasons"].find(
+        (entry: SeasonEntry) => entry.season.id === seasonId
+      ) as SeasonEntry | undefined
+      if (wasSeasonFinished === false && updatedSeason?.finished === true) {
+        const seasonRewards = updatedSeason.season.data?.rewards
+        if (seasonRewards && Object.keys(seasonRewards).length) {
+          this.seasonRewards = seasonRewards
+        }
+      }
     },
   },
 })
@@ -189,6 +268,73 @@ export default defineComponent({
   justify-content: center;
   gap: clamp(8px, 4vw, 30px);
   flex-wrap: wrap;
+}
+
+.rewards-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.level-rewards {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: min(100%, 400px);
+  height: calc(var(--vh, 1vh) * 70);
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid #c5a87e;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #1e2834 0%, #0a0b0c 100%);
+}
+
+.rewards-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.rewards-header h2 {
+  text-align: center;
+  font-size: 18px;
+}
+
+.reward-sources {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.reward-sources button {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #c5a87e;
+  border-radius: 6px;
+  background: transparent;
+  color: #c5a87e;
+  cursor: pointer;
+}
+
+.reward-sources button.active {
+  background: #c5a87e;
+  color: #0a0b0c;
+}
+
+.reward-source-title {
+  margin: 0;
+  flex-shrink: 0;
+  text-align: center;
+  color: #c5a87e;
 }
 
 .price-label {

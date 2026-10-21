@@ -276,8 +276,11 @@ const actions = {
         ),
         data: {},
       })
-      const seasons = response.data.seasons
+      const { seasons, resources, cards, leaders } = response.data
       commit("set_seasons", seasons)
+      if (resources != null) commit("set_resource", resources)
+      if (cards != null) commit("set_cards", cards)
+      if (leaders != null) commit("set_leaders", leaders)
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при открытии уровней")

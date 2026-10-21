@@ -270,6 +270,7 @@ export interface LevelDefinition {
   difficulty: LevelDifficulty
   x: number
   y: number
+  data: LevelSeasonData | null
   enemy_leader: number
   enemies: number[]
   children: LevelRelatedLevel[]
@@ -287,8 +288,20 @@ export interface SeasonDefinition {
   description: string
   x: number
   y: number
+  data: LevelSeasonData | null
   levels: LevelDefinition[]
   children: SeasonRelatedSeason[]
+}
+
+export interface LevelSeasonData {
+  rewards?: LevelSeasonRewards | null
+  [key: string]: unknown
+}
+
+export interface LevelSeasonRewards {
+  resources?: Record<string, number>
+  cards?: number[]
+  leaders?: number[]
 }
 
 export interface SeasonStats {
@@ -354,6 +367,9 @@ export interface CardCraftBonusResponse {
 
 export interface OpenRelatedLevelsResponse {
   seasons: UserSeasonsProgress
+  resources?: UserResources | null
+  cards?: Record<number, UserCard> | null
+  leaders?: Record<number, UserLeader> | null
 }
 
 export interface ArenaRewardMultiply {

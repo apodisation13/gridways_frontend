@@ -14,7 +14,7 @@
       <v-stage ref="konvaStage" :config="configKonva">
         <v-layer :config="layerCfg">
           <!--для каждого уровня из списка уровней текущего сезона-->
-          <div v-for="(lev, index) in levs" :key="lev.id">
+          <div v-for="(lev, index) in levs" :key="lev.level.id">
             <!--рисуем звезды сложности, 1,2 или 3-->
             <v-star :config="starConfig(lev, 0)"></v-star>
             <v-star
@@ -61,6 +61,22 @@
               :key="line"
               :config="lineConfig(line)"
             ></v-line>
+            <!-- Маркер наград не перехватывает нажатия на сам уровень. -->
+            <v-image
+              v-if="
+                rewardImageLoaded &&
+                lev.level.data?.rewards &&
+                Object.keys(lev.level.data.rewards).length
+              "
+              :config="{
+                image: rewardImage,
+                x: lev.level.x + w - 9,
+                y: lev.level.y + w - 9,
+                width: 16,
+                height: 16,
+                listening: false,
+              }"
+            />
           </div>
         </v-layer>
       </v-stage>
@@ -106,6 +122,8 @@ export default defineComponent({
       panLayerStart: { x: 0, y: 0 },
       panOffset: { x: 0, y: 0 },
       lockedLevelImage: new Image(),
+      rewardImage: new Image(),
+      rewardImageLoaded: false,
     }
   },
   watch: {
@@ -115,6 +133,10 @@ export default defineComponent({
   },
   created() {
     this.lockedLevelImage.src = require("@/assets/icons/locked_level.png")
+    this.rewardImage.onload = () => {
+      this.rewardImageLoaded = true
+    }
+    this.rewardImage.src = require("@/assets/icons/rewards.svg")
     this.init()
   },
   methods: {

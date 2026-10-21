@@ -15,15 +15,20 @@ export default defineComponent({
       emptyPassApply: true,
     }
   },
+  computed: {
+    shouldCountEmptyPass(): boolean {
+      return (
+        this.emptyPassApply &&
+        get_all_enemies(this.gameObj.field, this.gameObj.enemy_leader).length >
+          0
+      )
+    },
+  },
   methods: {
     // нажал ПАС - переход хода компу
     exec_ai_move(): void {
       if (!this.$store.state.game.player_turn || this.draw) return
-      if (
-        this.emptyPassApply &&
-        get_all_enemies(this.gameObj.field, this.gameObj.enemy_leader).length >
-          0
-      ) {
+      if (this.shouldCountEmptyPass) {
         if (this.currentEmptyPassesCount <= 0) {
           useToast().warning(
             "Вы исчерпали пустые пасы — походите картой, лидером или сделайте добор."
