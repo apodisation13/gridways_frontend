@@ -18,6 +18,7 @@ import {
 } from "@/logic/ai_move/deathwish_abilities/give_shields"
 import { deathwish_heal_all } from "@/logic/ai_move/deathwish_abilities/heal"
 import { deathwish_incr_dmg_to_all_hand } from "@/logic/ai_move/deathwish_abilities/incr_dmg_to_all_hand"
+import { resurrect_random_enemy } from "@/logic/ai_move/deathwish_abilities/resurrects"
 import {
   set_hp,
   set_weakest_hp_as_highest,
@@ -111,5 +112,7 @@ export function deathwish(
     deathwish_add_armor_to_all_deck(deathwish_enemy as Enemy, gameObj)
   } else if (d === EnemyDeathwish.AddArmorToAllGrave) {
     deathwish_add_armor_to_all_grave(deathwish_enemy as Enemy, gameObj)
+  } else if (d === EnemyDeathwish.ResurrectRandom) {
+    resurrect_random_enemy(gameObj, timeout)
   }
 }
