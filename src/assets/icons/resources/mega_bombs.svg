@@ -1,0 +1,16 @@
+<svg width="29" height="31" viewBox="0 0 29 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bomb_mb" cx="35%" cy="25%" r="80%">
+      <stop stop-color="#785269"/><stop offset=".55" stop-color="#382638"/><stop offset="1" stop-color="#140F20"/>
+    </radialGradient>
+  </defs>
+  <path d="m3 15-2-5 6 2L6 5l6 4 4-7 3 8 7-4-2 8 4 3-4 7H5Z" fill="#CC5734" fill-opacity=".65"/>
+  <path d="M17 9c-1-5 6-2 6-6" stroke="#E8BA68" stroke-width="2"/>
+  <path d="m24 0 1 3 3 1-3 1-1 3-1-3-3-1 3-1Z" fill="#FFE39A"/>
+  <path d="m11 8 8-1 1 5-8 1Z" fill="#C68D49" stroke="#482C26"/>
+  <circle cx="14.5" cy="19" r="11" fill="url(#bomb_mb)" stroke="#D8A251" stroke-width="1.5"/>
+  <path d="m7 13 3 3-2 4m14-6-3 3 2 4M12 27l2-3 3 3" stroke="#FF784F" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M10 18a4.5 4.5 0 0 1 9 0v3l-2 1v3h-5v-3l-2-1Z" fill="#FFE0A0"/>
+  <path d="m11 18 3 1-2 2Zm7 0-3 1 2 2Z" fill="#6E2937"/>
+  <path d="M14.5 23v2" stroke="#6E2937"/>
+</svg>
