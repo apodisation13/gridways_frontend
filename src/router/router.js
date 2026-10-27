@@ -8,6 +8,7 @@ import BonusPage from "@/pages/BonusPage"
 import DeckbuildPage from "@/pages/DeckbuildPage"
 import EmblemPage from "@/pages/EmblemPage.vue"
 import GamePage from "@/pages/GamePage"
+import InventoryPage from "@/pages/InventoryPage.vue"
 import LeaderboardPage from "@/pages/LeaderboardPage.vue"
 import LevelPage from "@/pages/LevelPage"
 import LoadingPage from "@/pages/LoadingPage"
@@ -164,7 +165,17 @@ const routes = [
     component: BonusPage,
     meta: {
       requireAuth: true,
-      image: images.bonus,
+      image: images.deckbuild,
+      withGradient: true,
+    },
+  },
+  {
+    path: "/inventory",
+    component: InventoryPage,
+    meta: {
+      requireAuth: true,
+      image: images.deckbuild,
+      withGradient: true,
     },
   },
   {
@@ -172,7 +183,8 @@ const routes = [
     component: UpgradesPage,
     meta: {
       requireAuth: true,
-      image: images.bonus,
+      image: images.deckbuild,
+      withGradient: true,
     },
   },
   {
