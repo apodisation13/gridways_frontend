@@ -24,6 +24,9 @@
         class="upgrade-item"
         :class="{
           'upgrade-item--dim': userLevel(activeCategoryKey, upgrade.key) === 0,
+          'upgrade-item--affordable':
+            userLevel(activeCategoryKey, upgrade.key) === 0 &&
+            canAffordUpgrade(activeCategoryKey, upgrade.key, upgrade.item),
         }"
         @click="openModal(activeCategoryKey, upgrade.key, upgrade.item)"
       >
@@ -542,7 +545,7 @@ div {
 }
 
 .upgrade-item {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 215, 0, 0.08);
   border-radius: 12px;
   padding: 12px 14px;
   cursor: pointer;
@@ -554,7 +557,7 @@ div {
 }
 
 .upgrade-item--dim {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .upgrade-item--dim .upgrade-item__title {
@@ -563,6 +566,18 @@ div {
 
 .upgrade-item--dim .upgrade-item__value {
   color: rgba(255, 255, 255, 0.3);
+}
+
+.upgrade-item--affordable {
+  background: rgba(100, 220, 100, 0.1);
+}
+
+.upgrade-item--affordable .upgrade-item__title {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.upgrade-item--affordable .upgrade-item__value {
+  color: rgba(170, 235, 170, 0.85);
 }
 
 .upgrade-item__header {
