@@ -8,9 +8,7 @@ export enum PayResourcesSubtype {
   startArenaLevel = "start_arena_level",
   winArenaLevel = "win_arena_level",
   upgradeInArena = "upgrade_in_arena",
-  useFirstAidKit = "use_first_aid_kit",
-  useShields = "use_shields",
-  useImmuneMagics = "use_immune_magics",
+  useInventoryItem = "use_inventory_item",
 }
 
 export enum CraftMillCardActionSubtype {
