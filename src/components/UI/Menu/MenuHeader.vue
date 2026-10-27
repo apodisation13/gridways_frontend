@@ -143,23 +143,6 @@
                 show_delta
               />
               <resource-item
-                name="first_aid_kits"
-                :count="resources.first_aid_kits"
-                show_delta
-              />
-              <resource-item
-                name="shields"
-                :count="resources.shields"
-                show_delta
-              />
-              <resource-item
-                name="immune_magics"
-                :count="resources.immune_magics"
-                show_delta
-              />
-            </div>
-            <div class="expand-menu-right__resources-row">
-              <resource-item
                 name="rare_gem"
                 :count="resources.rare_gem"
                 show_delta
@@ -197,6 +180,7 @@ export default defineComponent({
         { title: "Правила", path: "/rules" },
         { title: "Магазин", path: "/shop", requireAuth: true },
         { title: "Прокачка", path: "/upgrades", requireAuth: true },
+        { title: "Инвентарь", path: "/inventory", requireAuth: true },
         { title: "Статистика", path: "/stats", requireAuth: true },
         { title: "Доска лидеров", path: "/leaderboard", requireAuth: true },
         { title: "О нас", path: "/about" },
@@ -455,7 +439,7 @@ export default defineComponent({
 .expand-menu-right__wrapper {
   background-image: url("~@/assets/header-menu-background.png");
   width: 207px;
-  height: 387px;
+  height: 350px;
   border-radius: 8px;
   margin-right: 10px;
   z-index: 8;
