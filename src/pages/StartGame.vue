@@ -13,6 +13,7 @@
 
         <div class="battle-vs">
           <span class="vs-icon">⚔</span>
+          <inventory-preview />
         </div>
 
         <div class="battle-side">
@@ -81,6 +82,7 @@ import DeckPreviewComp from "@/components/DeckPreviewComp.vue"
 import LevelPreviewComp from "@/components/LevelPreviewComp.vue"
 import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
 import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vue"
+import InventoryPreview from "@/components/Pages/InventoryPage/InventoryPreview.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
 import {
@@ -98,6 +100,7 @@ export default defineComponent({
     DecksListModal,
     ThemedButton,
     ButtonDecks,
+    InventoryPreview,
   },
   data() {
     return {
@@ -248,6 +251,8 @@ export default defineComponent({
 
 .battle-vs {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
   align-items: center;
   justify-content: center;
   padding-bottom: 22px; /* компенсация label сверху */

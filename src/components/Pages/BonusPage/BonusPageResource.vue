@@ -30,8 +30,9 @@
           title="Инвентарь"
           aria-label="Инвентарь"
           @dblclick.stop="openInventory"
-          >🎒</span
         >
+          <img src="@/assets/icons/inventory.svg" alt="" draggable="false" />
+        </span>
         <span v-else class="open-arrow">▼</span>
       </resource-count-rombus>
     </div>
@@ -274,6 +275,10 @@ export default defineComponent({
   cursor: pointer;
   font-size: 14px;
   line-height: 1;
+}
+.inventory-marker img {
+  width: 22px;
+  height: 22px;
 }
 
 .action-grid {
