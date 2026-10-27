@@ -27,7 +27,12 @@ export default defineComponent({
   methods: {
     // нажал ПАС - переход хода компу
     exec_ai_move(): void {
-      if (!this.$store.state.game.player_turn || this.draw) return
+      if (
+        this.inventoryBusy ||
+        !this.$store.state.game.player_turn ||
+        this.draw
+      )
+        return
       if (this.shouldCountEmptyPass) {
         if (this.currentEmptyPassesCount <= 0) {
           useToast().warning(

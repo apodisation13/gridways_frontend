@@ -11,21 +11,26 @@ import type {
 } from "@/types"
 
 export interface GameState {
-  // параметры из UpgradesConfig[UpgradeType.GAME]
+  // параметры из конфигурации игровых апгрейдов и инвентаря
   cards_in_deck: number
   hand_size: number
   max_decks: number
   max_hp: number
   max_armor: number
-  first_aid_kit_heal: number
-  shield_armor: number
   draws_initial: number
   draws_after_redraw: number
   cards_drawn: number
   max_immune_turns: number
-  immune_magics_turns: number
   max_empty_passes: number
   full_hand_redraw: number
+  // inventory
+  inventory_slots: number
+  first_aid_kit_heal: number
+  shield_armor: number
+  immune_magics_turns: number
+  inventory_cards_drawn: number
+  purifies_targets: number
+  random_effects_turns: number
 
   arena_mode: boolean
 
@@ -87,6 +92,10 @@ const state: GameState = {
   immune_magics_turns: 0,
   max_empty_passes: 3,
   full_hand_redraw: 0,
+  inventory_slots: 1,
+  inventory_cards_drawn: 0,
+  purifies_targets: 0,
+  random_effects_turns: 0,
 
   random_level_enemies_count: {},
   max_random_n_enemies: 0,
@@ -157,6 +166,11 @@ const getters = {
   maxEmptyPasses: (state: GameState) => state.max_empty_passes,
   fullHandRedraw: (state: GameState) => state.full_hand_redraw,
 
+  inventorySlots: (state: GameState) => state.inventory_slots,
+  inventoryCardsDrawn: (state: GameState) => state.inventory_cards_drawn,
+  purifiesTargets: (state: GameState) => state.purifies_targets,
+  randomEffectsTurns: (state: GameState) => state.random_effects_turns,
+
   get_season: (state: GameState) => state.season,
   currentLevel: (state: GameState) => state.level,
   enemies_grave: (state: GameState) => state.enemies_grave,
@@ -180,6 +194,10 @@ const mutations = {
       immune_magics_turns: number
       max_empty_passes: number
       full_hand_redraw: number
+      inventory_slots?: number
+      inventory_cards_drawn?: number
+      purifies_targets?: number
+      random_effects_turns?: number
     }
   ) {
     state.hand_size = payload.hand_size ?? state.hand_size
@@ -199,6 +217,12 @@ const mutations = {
       payload.immune_magics_turns ?? state.immune_magics_turns
     state.max_empty_passes = payload.max_empty_passes ?? state.max_empty_passes
     state.full_hand_redraw = payload.full_hand_redraw ?? state.full_hand_redraw
+    state.inventory_slots = payload.inventory_slots ?? state.inventory_slots
+    state.inventory_cards_drawn =
+      payload.inventory_cards_drawn ?? state.inventory_cards_drawn
+    state.purifies_targets = payload.purifies_targets ?? state.purifies_targets
+    state.random_effects_turns =
+      payload.random_effects_turns ?? state.random_effects_turns
   },
 
   set_game_const(

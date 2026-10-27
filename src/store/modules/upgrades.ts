@@ -110,18 +110,6 @@ const actions = {
         UpgradeType.GAME,
         UpgradeSubtype.MAX_ARMOR
       ),
-      first_aid_kits_heal: get_value_from_upgrades(
-        upgradesConfig,
-        userUpgrades,
-        UpgradeType.GAME,
-        UpgradeSubtype.FIRST_AID_KIT_HEAL
-      ),
-      shield_armor: get_value_from_upgrades(
-        upgradesConfig,
-        userUpgrades,
-        UpgradeType.GAME,
-        UpgradeSubtype.SHIELD_ARMOR
-      ),
       draws_initial: get_value_from_upgrades(
         upgradesConfig,
         userUpgrades,
@@ -146,12 +134,6 @@ const actions = {
         UpgradeType.GAME,
         UpgradeSubtype.MAX_IMMUNE_TURNS
       ),
-      immune_magics_turns: get_value_from_upgrades(
-        upgradesConfig,
-        userUpgrades,
-        UpgradeType.GAME,
-        UpgradeSubtype.IMMUNE_MAGICS_TURNS
-      ),
       max_empty_passes: get_value_from_upgrades(
         upgradesConfig,
         userUpgrades,
@@ -163,6 +145,49 @@ const actions = {
         userUpgrades,
         UpgradeType.GAME,
         UpgradeSubtype.FULL_HAND_REDRAW
+      ),
+      // inventory upgrades
+      inventory_slots: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.INVENTORY,
+        UpgradeSubtype.INVENTORY_SLOTS
+      ),
+      first_aid_kit_heal: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.INVENTORY,
+        UpgradeSubtype.FIRST_AID_KIT_HEAL
+      ),
+      shield_armor: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.INVENTORY,
+        UpgradeSubtype.SHIELD_ARMOR
+      ),
+      immune_magics_turns: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.INVENTORY,
+        UpgradeSubtype.IMMUNE_MAGICS_TURNS
+      ),
+      inventory_cards_drawn: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.INVENTORY,
+        UpgradeSubtype.INVENTORY_CARDS_DRAWN
+      ),
+      purifies_targets: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.INVENTORY,
+        UpgradeSubtype.PURIFIES_TARGETS
+      ),
+      random_effects_turns: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.INVENTORY,
+        UpgradeSubtype.RANDOM_EFFECTS_TURNS
       ),
     })
 
@@ -265,23 +290,60 @@ const actions = {
       UpgradeType.RESOURCES,
       UpgradeSubtype.FLOWERS
     )
+    // inventory items
     upgrades["first_aid_kits"] = get_value_from_upgrades(
       upgradesConfig,
       userUpgrades,
-      UpgradeType.RESOURCES,
+      UpgradeType.INVENTORY,
       UpgradeSubtype.FIRST_AID_KITS
     )
     upgrades["shields"] = get_value_from_upgrades(
       upgradesConfig,
       userUpgrades,
-      UpgradeType.RESOURCES,
+      UpgradeType.INVENTORY,
       UpgradeSubtype.SHIELDS
     )
     upgrades["immune_magics"] = get_value_from_upgrades(
       upgradesConfig,
       userUpgrades,
-      UpgradeType.RESOURCES,
+      UpgradeType.INVENTORY,
       UpgradeSubtype.IMMUNE_MAGICS
+    )
+    upgrades["draw_cards"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.INVENTORY,
+      UpgradeSubtype.DRAW_CARDS
+    )
+    upgrades["mega_bombs"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.INVENTORY,
+      UpgradeSubtype.MEGA_BOMBS
+    )
+    upgrades["random_bombs"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.INVENTORY,
+      UpgradeSubtype.RANDOM_BOMBS
+    )
+    upgrades["clears"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.INVENTORY,
+      UpgradeSubtype.CLEARS
+    )
+    upgrades["purifies"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.INVENTORY,
+      UpgradeSubtype.PURIFIES
+    )
+    upgrades["random_effects"] = get_value_from_upgrades(
+      upgradesConfig,
+      userUpgrades,
+      UpgradeType.INVENTORY,
+      UpgradeSubtype.RANDOM_EFFECTS
     )
     commit("setMaxResourcesValues", upgrades)
   },

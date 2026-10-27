@@ -39,6 +39,7 @@
             v-show="can_draw && $store.state.game.player_turn"
             :full-hand-redraws-remaining="fullHandRedrawsRemaining"
             :hand-length="gameObj.hand.length"
+            :deck-length="gameObj.deck.length"
             @click="draw_one_card"
           />
         </div>
@@ -136,8 +137,15 @@
       />
     </transition>
 
-    <use-special-items-component
-      v-if="show_special_items"
+    <use-inventory
+      :visible="show_special_items"
+      :hand-count="gameObj.hand.length"
+      :empty-passes-remaining="currentEmptyPassesCount"
+      :full-hand-redraws-remaining="fullHandRedrawsRemaining"
+      :busy="inventoryBusy"
+      :item-values="inventoryItemValues"
+      :unavailable-items="unavailableInventoryItems"
+      @use-item="useInventoryItem"
       @close="show_special_items = false"
     />
     <page-help :help-id="draw ? 'game_draw' : 'game_game'" />
@@ -161,7 +169,7 @@ import LeaderComp from "@/components/Pages/GamePage/LeaderComp.vue"
 import PassComp from "@/components/Pages/GamePage/PassComp.vue"
 import RedrawComp from "@/components/Pages/GamePage/RedrawComp.vue"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities.vue"
-import UseSpecialItemsComponent from "@/components/Pages/GamePage/UseSpecialItemsComponent.vue"
+import UseInventory from "@/components/Pages/GamePage/UseInventory.vue"
 import frontendLogContext from "@/lib/frontend-logs/context"
 import {
   damage_ai_card,
@@ -173,6 +181,7 @@ import execaimove from "@/mixins/GamePage/execaimove"
 import fieldinteraction from "@/mixins/GamePage/fieldinteraction"
 import specialcaseabilities from "@/mixins/GamePage/specialcaseabilities"
 import startgame from "@/mixins/GamePage/startgame"
+import useInventory from "@/mixins/GamePage/useInventory"
 import {
   Card,
   Enemy,
@@ -198,9 +207,10 @@ export default defineComponent({
     HealthComp,
     HandComp,
     SpecialCaseAbilities,
-    UseSpecialItemsComponent,
+    UseInventory,
   },
   mixins: [
+    useInventory,
     frontendLogContext,
     draw,
     specialcaseabilities,

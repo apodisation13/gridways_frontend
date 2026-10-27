@@ -30,6 +30,7 @@ export enum UpgradeType {
   RESOURCES = "resources",
   SETTINGS = "settings",
   GAME = "game",
+  INVENTORY = "inventory",
 }
 
 export enum UpgradeSubtype {
@@ -38,13 +39,10 @@ export enum UpgradeSubtype {
   MAX_ARMOR = "max_armor",
   MAX_HP = "max_hp",
   MAX_DECKS = "max_decks",
-  FIRST_AID_KIT_HEAL = "first_aid_kit_heal",
-  SHIELD_ARMOR = "shield_armor",
   REDRAWS_INITIAL = "redraws_initial",
   REDRAWS_DRAWN = "redraws_drawn",
   CARDS_DRAWN = "cards_drawn",
   MAX_IMMUNE_TURNS = "max_immune_turns",
-  IMMUNE_MAGICS_TURNS = "immune_magics_turns",
   MAX_EMPTY_PASSES = "max_empty_passes",
   FULL_HAND_REDRAW = "full_hand_redraw",
 
@@ -61,9 +59,25 @@ export enum UpgradeSubtype {
   INGOTS = "ingots",
   RAW = "raw",
   FLOWERS = "flowers",
+
   FIRST_AID_KITS = "first_aid_kits",
   SHIELDS = "shields",
   IMMUNE_MAGICS = "immune_magics",
+  DRAW_CARDS = "draw_cards",
+  MEGA_BOMBS = "mega_bombs",
+  RANDOM_BOMBS = "random_bombs",
+  CLEARS = "clears",
+  PURIFIES = "purifies",
+  RANDOM_EFFECTS = "random_effects",
+
+  INVENTORY_SLOTS = "inventory_slots",
+
+  FIRST_AID_KIT_HEAL = "first_aid_kit_heal",
+  SHIELD_ARMOR = "shield_armor",
+  IMMUNE_MAGICS_TURNS = "immune_magics_turns",
+  INVENTORY_CARDS_DRAWN = "inventory_cards_drawn",
+  PURIFIES_TARGETS = "purifies_targets",
+  RANDOM_EFFECTS_TURNS = "random_effects_turns",
 }
 
 export interface UpgradesResponse {

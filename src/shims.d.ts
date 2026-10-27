@@ -11,6 +11,7 @@ declare module '@vue/runtime-core' {
     gameObj: GameObj
     isActive: IsActive
     selected_card: Card | Leader | null
+    inventoryBusy: boolean
     emptyPassApply: boolean
     can_draw: boolean
     draw: boolean
