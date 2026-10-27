@@ -2,6 +2,7 @@ import Upgrades from "@/store/modules/upgrades"
 
 import { EffectObject, EffectType } from "./game"
 import { Helps } from "./help"
+import type { InventoryItem } from "./inventory"
 
 export interface CardData {
   damage: number
@@ -313,7 +314,7 @@ export interface SeasonStats {
   hard_levels: number
 }
 
-export interface UserResources {
+export interface UserResources extends Record<InventoryItem, number> {
   scraps: number
   raw_bronze: number
   raw_silver: number
@@ -331,9 +332,6 @@ export interface UserResources {
   rare_gem: number
   money: number
   flowers: number
-  first_aid_kits: number
-  shields: number
-  immune_magics: number
 }
 
 export interface GameCatalogResponse {
