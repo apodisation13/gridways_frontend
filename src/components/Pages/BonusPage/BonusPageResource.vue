@@ -200,7 +200,10 @@ export default defineComponent({
     async openResource(): Promise<void> {
       if (this.descriptionVisible || Date.now() < this.suppressDoubleClickUntil)
         return
-      if (this.actions.inventory) return
+      if (this.actions.inventory) {
+        this.openInventory()
+        return
+      }
       if (this.resource_count <= 0) return
       // ресурсы, которые можно открыть, в конфиге имеют флаг open: true
       if (this.actions.open) this.open_item_visible = true
