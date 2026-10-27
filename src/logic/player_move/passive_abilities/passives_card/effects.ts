@@ -73,6 +73,37 @@ export function spawn_effect_random(card: Card | Leader, gameObj: GameObj) {
   effectsSounds(realEffect)
 }
 
+export function spawn_random_positive_effects_everywhere(
+  gameObj: GameObj,
+  turns: number,
+  value: number
+): void {
+  const effectsInfo = store.getters["effectsInfo"] as Partial<
+    Record<EffectType, EffectInfo>
+  >
+  const positiveEffects = Object.entries(effectsInfo).filter(
+    ([, info]) => !info.negative
+  ) as [EffectType, EffectInfo][]
+  if (turns <= 0 || !positiveEffects.length) return
+
+  const soundedTypes = new Set<EffectType>()
+  for (let index = 0; index < gameObj.field.length; index++) {
+    const [type, info] = choice_element(positiveEffects)
+    const effect: EffectObject = {
+      type,
+      value,
+      negative: false,
+      [info.turn_type]: turns,
+    }
+    gameObj.effects[index] = effect
+    // Одинаковый звук не накладывается несколько раз при заполнении поля.
+    if (!soundedTypes.has(type)) {
+      effectsSounds(effect)
+      soundedTypes.add(type)
+    }
+  }
+}
+
 export function incr_effect(card: Card | Leader, gameObj: GameObj) {
   const { effects } = gameObj
   const value = card.data.passive?.value

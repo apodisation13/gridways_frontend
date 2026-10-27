@@ -31,6 +31,7 @@ export interface GameState {
   inventory_cards_drawn: number
   purifies_targets: number
   random_effects_turns: number
+  random_effects_value: number
 
   arena_mode: boolean
 
@@ -95,7 +96,8 @@ const state: GameState = {
   inventory_slots: 1,
   inventory_cards_drawn: 0,
   purifies_targets: 0,
-  random_effects_turns: 0,
+  random_effects_turns: 1,
+  random_effects_value: 1,
 
   random_level_enemies_count: {},
   max_random_n_enemies: 0,
@@ -170,6 +172,7 @@ const getters = {
   inventoryCardsDrawn: (state: GameState) => state.inventory_cards_drawn,
   purifiesTargets: (state: GameState) => state.purifies_targets,
   randomEffectsTurns: (state: GameState) => state.random_effects_turns,
+  randomEffectsValue: (state: GameState) => state.random_effects_value,
 
   get_season: (state: GameState) => state.season,
   currentLevel: (state: GameState) => state.level,
@@ -198,6 +201,7 @@ const mutations = {
       inventory_cards_drawn?: number
       purifies_targets?: number
       random_effects_turns?: number
+      random_effects_value?: number
     }
   ) {
     state.hand_size = payload.hand_size ?? state.hand_size
@@ -223,6 +227,8 @@ const mutations = {
     state.purifies_targets = payload.purifies_targets ?? state.purifies_targets
     state.random_effects_turns =
       payload.random_effects_turns ?? state.random_effects_turns
+    state.random_effects_value =
+      payload.random_effects_value ?? state.random_effects_value
   },
 
   set_game_const(

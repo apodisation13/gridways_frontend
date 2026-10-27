@@ -78,6 +78,7 @@ export enum UpgradeSubtype {
   INVENTORY_CARDS_DRAWN = "inventory_cards_drawn",
   PURIFIES_TARGETS = "purifies_targets",
   RANDOM_EFFECTS_TURNS = "random_effects_turns",
+  RANDOM_EFFECTS_VALUE = "random_effects_value",
 }
 
 export interface UpgradesResponse {

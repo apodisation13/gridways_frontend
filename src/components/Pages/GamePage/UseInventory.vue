@@ -180,7 +180,7 @@ export default defineComponent({
         case InventoryItem.PURIFIES:
           return `Целей: ${value}`
         case InventoryItem.RANDOM_EFFECTS:
-          return `Ходов: ${value}`
+          return `Ходов: ${value}\nСила: ${this.$store.getters["randomEffectsValue"]}`
         default:
           return ""
       }
@@ -304,6 +304,7 @@ export default defineComponent({
 }
 .effect-value {
   display: block;
+  white-space: pre-line;
   margin-top: 6px;
   font-size: 12px;
   color: #b9ead2;

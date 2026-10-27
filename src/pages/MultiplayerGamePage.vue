@@ -960,6 +960,12 @@ export default defineComponent({
     //
     // lastSentHealth/Armor всегда обновляем до текущего значения — следующая
     // дельта будет вычислена от актуальной базы.
+    afterInventoryItemApplied(): void {
+      if (!this.gameInitialized || !this.myTurn || this.gameOver) return
+      this.sendPlayerState()
+      this.sendGameState()
+    },
+
     sendGameState(includeHealth = true): void {
       const ws: WebSocket | null = this.$store.state.multi.ws
       if (!ws || ws.readyState !== WebSocket.OPEN) return

@@ -189,6 +189,12 @@ const actions = {
         UpgradeType.INVENTORY,
         UpgradeSubtype.RANDOM_EFFECTS_TURNS
       ),
+      random_effects_value: get_value_from_upgrades(
+        upgradesConfig,
+        userUpgrades,
+        UpgradeType.INVENTORY,
+        UpgradeSubtype.RANDOM_EFFECTS_VALUE
+      ),
     })
 
     // Создаем новый объект с теми же ключами
