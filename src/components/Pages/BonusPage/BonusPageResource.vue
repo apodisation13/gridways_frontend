@@ -1,20 +1,39 @@
 <template>
   <div class="resource-card">
     <!-- Иконка + ромб с количеством -->
-    <div class="resource-icon-wrap" @dblclick="openResource">
+    <div
+      class="resource-icon-wrap"
+      @dblclick="openResource"
+      @contextmenu.prevent="showDescription"
+      @pointerdown="startDescriptionHold"
+      @pointermove="moveDescriptionHold"
+      @pointerup="cancelDescriptionHold"
+      @pointercancel="cancelDescriptionHold"
+      @pointerleave="cancelDescriptionHold"
+    >
       <img
         :src="require(`@/assets/icons/resources/${resource_name}.svg`)"
         :alt="resource_name"
         class="resource-icon"
+        draggable="false"
       />
       <span class="resource-count">{{ resource_count }}</span>
 
       <resource-count-rombus
-        v-if="actions.open"
+        v-if="actions.open || actions.inventory"
         :isZero="false"
         class="open-rombus-small"
       >
-        <span class="open-arrow">▼</span>
+        <span
+          v-if="actions.inventory"
+          class="inventory-marker"
+          title="Инвентарь"
+          aria-label="Инвентарь"
+          @dblclick.stop="openInventory"
+        >
+          <img src="@/assets/icons/inventory.svg" alt="" draggable="false" />
+        </span>
+        <span v-else class="open-arrow">▼</span>
       </resource-count-rombus>
     </div>
     <!-- 4 кнопки действий сеткой 2x2 -->
@@ -54,6 +73,14 @@
       </button>
     </div>
 
+    <resource-description-modal
+      v-if="descriptionVisible && actions.description"
+      :name="resource_name"
+      :count="resource_count"
+      :description="actions.description"
+      @close="descriptionVisible = false"
+    />
+
     <!-- Модальное окно действия -->
     <resources-action-modal
       v-if="active_action"
@@ -79,13 +106,19 @@
 import { defineComponent, type PropType } from "vue"
 
 import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
+import ResourceDescriptionModal from "@/components/Pages/BonusPage/ResourceDescriptionModal.vue"
 import ResourcesActionModal from "@/components/Pages/BonusPage/ResourcesActionModal.vue"
 import ResourceCountRombus from "@/components/UI/ResourceCountRombus.vue"
 import type { ResourceActions } from "@/types"
 
 export default defineComponent({
   name: "BonusPageResource",
-  components: { YesnoModal, ResourceCountRombus, ResourcesActionModal },
+  components: {
+    YesnoModal,
+    ResourceCountRombus,
+    ResourcesActionModal,
+    ResourceDescriptionModal,
+  },
   props: {
     resource_name: { type: String, required: true },
     resource_count: { type: Number, default: 0 },
@@ -97,6 +130,10 @@ export default defineComponent({
     return {
       active_action: null as "buy" | "sell" | "craft" | "mill" | null,
       open_item_visible: false,
+      descriptionVisible: false,
+      descriptionTimer: null as ReturnType<typeof setTimeout> | null,
+      holdStart: { x: 0, y: 0 },
+      suppressDoubleClickUntil: 0,
     }
   },
   computed: {
@@ -109,7 +146,41 @@ export default defineComponent({
       )
     },
   },
+  beforeUnmount() {
+    this.cancelDescriptionHold()
+  },
   methods: {
+    showDescription(): void {
+      this.cancelDescriptionHold()
+      if (!this.actions.description?.trim()) return
+      this.suppressDoubleClickUntil = Date.now() + 800
+      this.descriptionVisible = true
+    },
+    startDescriptionHold(event: PointerEvent): void {
+      this.cancelDescriptionHold()
+      if (
+        event.pointerType !== "touch" ||
+        !event.isPrimary ||
+        !this.actions.description?.trim()
+      )
+        return
+      this.holdStart = { x: event.clientX, y: event.clientY }
+      this.descriptionTimer = setTimeout(() => this.showDescription(), 600)
+    },
+    moveDescriptionHold(event: PointerEvent): void {
+      if (
+        Math.hypot(
+          event.clientX - this.holdStart.x,
+          event.clientY - this.holdStart.y
+        ) > 10
+      ) {
+        this.cancelDescriptionHold()
+      }
+    },
+    cancelDescriptionHold(): void {
+      if (this.descriptionTimer !== null) clearTimeout(this.descriptionTimer)
+      this.descriptionTimer = null
+    },
     openModal(action: "buy" | "sell" | "craft" | "mill"): void {
       this.active_action = action
     },
@@ -122,7 +193,18 @@ export default defineComponent({
         ...payload,
       })
     },
+    openInventory(): void {
+      if (this.descriptionVisible || Date.now() < this.suppressDoubleClickUntil)
+        return
+      this.$router.push("/inventory")
+    },
     async openResource(): Promise<void> {
+      if (this.descriptionVisible || Date.now() < this.suppressDoubleClickUntil)
+        return
+      if (this.actions.inventory) {
+        this.openInventory()
+        return
+      }
       if (this.resource_count <= 0) return
       // ресурсы, которые можно открыть, в конфиге имеют флаг open: true
       if (this.actions.open) this.open_item_visible = true
@@ -144,12 +226,15 @@ export default defineComponent({
   align-items: center;
   justify-content: space-between;
   padding: 5px 6px;
-  background: rgba(255, 215, 0, 0.04);
+  background: rgba(255, 215, 0, 0.08);
   border: 1px solid rgba(139, 105, 20, 0.35);
   border-radius: 10px;
 }
 
 .resource-icon-wrap {
+  -webkit-touch-callout: none;
+  user-select: none;
+  touch-action: pan-y;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -177,6 +262,23 @@ export default defineComponent({
   -webkit-text-fill-color: #4caf50;
   font-size: 0.9rem;
   line-height: 1;
+}
+
+.inventory-marker {
+  color: #5d4228;
+  -webkit-text-fill-color: #5d4228;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+.inventory-marker img {
+  width: 22px;
+  height: 22px;
 }
 
 .action-grid {

@@ -104,6 +104,7 @@
               v-show="can_draw && $store.state.game.player_turn"
               :full-hand-redraws-remaining="fullHandRedrawsRemaining"
               :hand-length="gameObj.hand.length"
+              :deck-length="gameObj.deck.length"
               @click="draw_one_card"
             />
           </div>
@@ -241,8 +242,15 @@
       </transition>
 
       <!-- Оверлей инвентаря предметов (открывается кликом по health-comp) -->
-      <use-special-items-component
-        v-if="show_special_items"
+      <use-inventory
+        :visible="show_special_items"
+        :hand-count="gameObj.hand.length"
+        :empty-passes-remaining="currentEmptyPassesCount"
+        :full-hand-redraws-remaining="fullHandRedrawsRemaining"
+        :busy="inventoryBusy"
+        :item-values="inventoryItemValues"
+        :unavailable-items="unavailableInventoryItems"
+        @use-item="useInventoryItem"
         @close="show_special_items = false"
       />
     </template>
@@ -301,7 +309,7 @@ import LeaderComp from "@/components/Pages/GamePage/LeaderComp.vue"
 import PassComp from "@/components/Pages/GamePage/PassComp.vue"
 import RedrawComp from "@/components/Pages/GamePage/RedrawComp.vue"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities.vue"
-import UseSpecialItemsComponent from "@/components/Pages/GamePage/UseSpecialItemsComponent.vue"
+import UseInventory from "@/components/Pages/GamePage/UseInventory.vue"
 import frontendLogContext from "@/lib/frontend-logs/context"
 import { copyObj, randInt } from "@/lib/utils"
 import { enemy_leader_ai_move_once } from "@/logic/ai_move/ai_leader_move_once"
@@ -323,6 +331,7 @@ import draw from "@/mixins/GamePage/draw"
 import execaimove from "@/mixins/GamePage/execaimove"
 import fieldinteraction from "@/mixins/GamePage/fieldinteraction"
 import specialcaseabilities from "@/mixins/GamePage/specialcaseabilities"
+import useInventory from "@/mixins/GamePage/useInventory"
 import type {
   Card,
   Enemy,
@@ -354,9 +363,10 @@ export default defineComponent({
     HealthComp,
     HandComp,
     SpecialCaseAbilities,
-    UseSpecialItemsComponent,
+    UseInventory,
   },
   mixins: [
+    useInventory,
     frontendLogContext,
     draw,
     specialcaseabilities,
@@ -950,6 +960,12 @@ export default defineComponent({
     //
     // lastSentHealth/Armor всегда обновляем до текущего значения — следующая
     // дельта будет вычислена от актуальной базы.
+    afterInventoryItemApplied(): void {
+      if (!this.gameInitialized || !this.myTurn || this.gameOver) return
+      this.sendPlayerState()
+      this.sendGameState()
+    },
+
     sendGameState(includeHealth = true): void {
       const ws: WebSocket | null = this.$store.state.multi.ws
       if (!ws || ws.readyState !== WebSocket.OPEN) return
@@ -1032,7 +1048,12 @@ export default defineComponent({
     //   Если отправить GAME_STATE до этого — напарник увидит врага с отрицательными HP.
     //   +100 мс — небольшой буфер поверх анимационного таймаута.
     exec_ai_move(forcedByTimer = false): void {
-      if (!this.myTurn || !this.$store.state.game.player_turn) return
+      if (
+        this.inventoryBusy ||
+        !this.myTurn ||
+        !this.$store.state.game.player_turn
+      )
+        return
       if (!forcedByTimer && this.draw) return
       if (this.emptyPassApply) {
         if (this.currentEmptyPassesCount <= 0 && !forcedByTimer) {
@@ -1313,7 +1334,7 @@ export default defineComponent({
       this.turnTimeLeft = 30
       this.turnTimer = setInterval(() => {
         this.turnTimeLeft -= 1
-        if (this.turnTimeLeft <= 0) {
+        if (this.turnTimeLeft <= 0 && !this.inventoryBusy) {
           this.stopTurnTimer()
           this.exec_ai_move(true)
         }

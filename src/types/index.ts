@@ -1,6 +1,7 @@
 export * from "./database"
 export * from "./game"
 export * from "./help"
+export * from "./inventory"
 export * from "./login"
 export * from "./news"
 export * from "./resources"

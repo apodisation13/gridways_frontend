@@ -60,3 +60,6 @@ export const PURCHASE_STATUS = `${getDomain()}/purchase-status/{purchaseId}`
 
 // upgrades
 export const UPGRADES = `${getDomain()}/user-upgrades/{userId}`
+
+// inventory
+export const INVENTORY = `${getDomain()}/user-inventory/{userId}`

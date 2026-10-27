@@ -7,6 +7,8 @@ import errors from "@/store/modules/errors"
 import fullscreen from "@/store/modules/fullscreen"
 import type { GameState } from "@/store/modules/game"
 import game from "@/store/modules/game"
+import type { InventoryState } from "@/store/modules/inventory"
+import inventory from "@/store/modules/inventory"
 import type { LoadingState } from "@/store/modules/loading"
 import loading from "@/store/modules/loading"
 import login from "@/store/modules/login"
@@ -21,6 +23,7 @@ import upgrades from "@/store/modules/upgrades"
 import user_actions from "@/store/modules/user_actions"
 
 export interface RootState {
+  inventory: InventoryState
   game: GameState
   settings: SettingsState
   arena: ArenaState
@@ -49,6 +52,7 @@ const store = createStore({
     fullscreen,
     statistics,
     upgrades,
+    inventory,
   },
   state: {},
   getters: {},

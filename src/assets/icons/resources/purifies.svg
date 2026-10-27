@@ -1,0 +1,13 @@
+<svg width="29" height="31" viewBox="0 0 29 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky_pu" x1="14" y1="3" x2="14" y2="29" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3F91D3"/><stop offset="1" stop-color="#C3F5FF"/>
+    </linearGradient>
+  </defs>
+  <path d="M14.5 2C7 2 2 8 2 16c0 7 5 12 12.5 14C22 28 27 23 27 16c0-8-5-14-12.5-14Z" fill="url(#sky_pu)" stroke="#B9DEED"/>
+  <path d="M15 4v3m0 12v3M6 13h3m12 0h3M8.5 6.5l2 2m9 9 2 2m0-13-2 2m-9 9-2 2" stroke="#FFE9A4" stroke-width="1.7" stroke-linecap="round"/>
+  <circle cx="15" cy="13" r="5" fill="#FFD36D" stroke="#FFF3C4" stroke-width="1.5"/>
+  <path d="M2 22a4 4 0 0 1 3-4 4 4 0 0 1 8 1 3 3 0 0 1 2 5H5a3 3 0 0 1-3-2Z" fill="#EFFBFF"/>
+  <path d="M17 23a3 3 0 0 1 2-3 4 4 0 0 1 7 1 3 3 0 0 1 1 5h-8a2 2 0 0 1-2-3Z" fill="#FFF"/>
+  <path d="M6 27h5m5 1h4" stroke="#F2FFFF" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

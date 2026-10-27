@@ -392,6 +392,9 @@ const actions = {
 
       dispatch("syncGameUpgrades")
 
+      dispatch("getUserInventory")
+      dispatch("getUserPreferences")
+
       toast.success("Успешно загрузили всю вашу базу данных")
     } catch (err) {
       dispatch("error_action", err)

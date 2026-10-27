@@ -4,7 +4,7 @@ import store from "@/store"
 import type { Card, CardEntry, GameObj } from "@/types"
 
 export function spawn_random_in_hand(
-  card: Card,
+  card: Card | null,
   gameObj: GameObj,
   timeout = 1000
 ): void {
@@ -14,7 +14,8 @@ export function spawn_random_in_hand(
   const pool = (store.getters["all_cards"] as CardEntry[]).filter(
     c => c.card.faction === leader.faction
   )
+  if (!pool.length) return
   const random_card = choice_element(pool)
   hand.push(copyObj(random_card.card))
-  timeoutAnimationFlag(card, "spawning", null, timeout * 0.5)
+  if (card) timeoutAnimationFlag(card, "spawning", null, timeout * 0.5)
 }

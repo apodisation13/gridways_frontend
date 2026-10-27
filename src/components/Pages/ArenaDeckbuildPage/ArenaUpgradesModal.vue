@@ -409,7 +409,7 @@ export default defineComponent({
 
 /* -- upgrade item (same as UpgradesPage) -- */
 .upgrade-item {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 215, 0, 0.08);
   border-radius: 12px;
   padding: 12px 14px;
   cursor: pointer;
@@ -421,7 +421,7 @@ export default defineComponent({
 }
 
 .upgrade-item--dim {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .upgrade-item--dim .upgrade-item__title {

@@ -234,7 +234,6 @@ export default defineComponent({
           password: this.password,
         })
         await this.$router.push("/loading")
-        await this.$store.dispatch("getUserPreferences")
         await this.$store.dispatch("getUserDatabase")
         await this.$store.dispatch("render_all_images")
         await this.$router.push("/main")
