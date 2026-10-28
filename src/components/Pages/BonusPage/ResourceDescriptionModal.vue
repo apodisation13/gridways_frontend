@@ -23,7 +23,7 @@
           :count="count"
           :highlight_max_count="false"
         />
-        <p>{{ description }}</p>
+        <p>{{ formattedDescription }}</p>
       </section>
     </div>
   </Teleport>
@@ -34,6 +34,7 @@ import { defineComponent } from "vue"
 
 import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { describeInventoryItem } from "@/logic/inventory_description"
 
 export default defineComponent({
   components: { ButtonCloseImg, ResourceItem },
@@ -43,6 +44,16 @@ export default defineComponent({
     description: { type: String, required: true },
   },
   emits: ["close"],
+  computed: {
+    formattedDescription(): string {
+      return describeInventoryItem(
+        this.name,
+        this.description,
+        this.$store.getters["upgradesConfig"],
+        this.$store.getters["userUpgrades"]
+      )
+    },
+  },
 })
 </script>
 
