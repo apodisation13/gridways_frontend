@@ -7,6 +7,7 @@ import { purify } from "@/logic/player_move/abilities/ability_purify"
 import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
 import { spawn_random_positive_effects_everywhere } from "@/logic/player_move/passive_abilities/passives_card/effects"
 import { spawn_random_in_hand } from "@/logic/player_move/passive_abilities/passives_card/spawn_random_in_hand"
+import { check_win } from "@/logic/player_move/service/check_win"
 import {
   get_all_enemies,
   get_negative_effects_indexes,
@@ -160,6 +161,12 @@ export default defineComponent({
           )
           // Дожидаемся удаления погибших и завещаний до передачи хода/синхронизации.
           await new Promise(resolve => setTimeout(resolve, timeout + 100))
+          check_win(
+            this.gameObj.field,
+            this.gameObj.enemies,
+            this.gameObj.enemy_leader,
+            this.gameObj.enemies_grave
+          )
         } else if (item === InventoryItem.CLEARS) {
           remove_effects(this.gameObj)
         } else if (item === InventoryItem.PURIFIES) {
