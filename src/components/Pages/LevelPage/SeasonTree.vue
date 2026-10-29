@@ -425,8 +425,7 @@ export default defineComponent({
     },
     calc_line(ch: SeasonRelatedSeason, item: any): void {
       const { season } = item
-      const connections = ch.connection?.split("-")
-      if (!connections || !ch.line) return
+      if (!ch.line) return
       let x1: number | undefined
       let y1: number | undefined
       let x2: number | undefined
@@ -434,6 +433,8 @@ export default defineComponent({
       const seasonIndex = this.seasons.findIndex(
         seas => seas.season.id === ch.related_season_id
       )
+      if (seasonIndex === -1) return
+
       if (ch.line === "right") {
         x1 = this.seasonTree[seasonIndex].season.x - season.x - this.w
         y1 = this.seasonTree[seasonIndex].season.y - season.y
@@ -455,31 +456,12 @@ export default defineComponent({
         x2 = season.x + this.w / 2
         y2 = season.y
       }
-      this.push_line(connections, season, x1, y1, x2, y2)
-    },
-    push_line(
-      connections: string[],
-      level: any,
-      x1: number | undefined,
-      y1: number | undefined,
-      x2: number | undefined,
-      y2: number | undefined
-    ): void {
-      for (const l of connections) {
-        if (this.seasonTree[parseInt(l) - 1].finished) {
-          level.lines.push({
-            x: x2,
-            y: y2,
-            fill: "rgba(255, 246, 193, 1)",
-            points: [0, 0, x1, y1],
-          })
-          return
-        }
-      }
-      level.lines.push({
+      const finished = item.finished || this.seasonTree[seasonIndex].finished
+      const fill = finished ? "rgba(255, 246, 193, 1)" : "rgba(28, 24, 20, 1)"
+      season.lines.push({
         x: x2,
         y: y2,
-        fill: "rgba(28, 24, 20, 1)",
+        fill,
         points: [0, 0, x1, y1],
       })
     },

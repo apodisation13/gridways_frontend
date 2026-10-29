@@ -261,7 +261,6 @@ export type LevelDifficulty = "easy" | "normal" | "hard"
 export interface LevelRelatedLevel {
   related_level_id: number | null
   line: string | null
-  connection: string | null
 }
 
 export interface LevelDefinition {
@@ -280,7 +279,6 @@ export interface LevelDefinition {
 export interface SeasonRelatedSeason {
   related_season_id: number | null
   line: string | null
-  connection: string | null
 }
 
 export interface SeasonDefinition {
