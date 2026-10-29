@@ -253,8 +253,7 @@ export default defineComponent({
     },
     calc_line(ch: LevelRelatedLevel, item: any): void {
       const { level } = item
-      const connections = ch.connection?.split("-")
-      if (!connections || !ch.line) return
+      if (!ch.line) return
       let x1: number | undefined
       let y1: number | undefined
       let x2: number | undefined
@@ -262,6 +261,8 @@ export default defineComponent({
       const levIndex = this.levels.findIndex(
         lev => lev.level.id === ch.related_level_id
       )
+
+      if (levIndex === -1) return
 
       if (ch.line === "right") {
         x1 = this.levs[levIndex].level.x - level.x - this.w
@@ -284,43 +285,16 @@ export default defineComponent({
         x2 = level.x + this.w / 2
         y2 = level.y
       }
-      this.push_line(connections, level, x1, y1, x2, y2)
-    },
-    push_line(
-      connections: string[],
-      level: any,
-      x1: number | undefined,
-      y1: number | undefined,
-      x2: number | undefined,
-      y2: number | undefined
-    ): void {
-      for (const l of connections) {
-        if (!this.userSeasonUnlocked) {
-          level.lines.push({
-            x: x2,
-            y: y2,
-            fill: "grey",
-            points: [0, 0, x1, y1],
-          })
-          return
-        }
-        const levIndex = this.levels.findIndex(
-          lev => lev.level.id === parseInt(l)
-        )
-        if (this.levs[levIndex].finished) {
-          level.lines.push({
-            x: x2,
-            y: y2,
-            fill: "rgba(255, 246, 193, 1)",
-            points: [0, 0, x1, y1],
-          })
-          return
-        }
-      }
+      const finished = item.finished || this.levs[levIndex].finished
+      const fill = !this.userSeasonUnlocked
+        ? "grey"
+        : finished
+          ? "rgba(255, 246, 193, 1)"
+          : "rgba(28, 24, 20, 1)"
       level.lines.push({
         x: x2,
         y: y2,
-        fill: "rgba(28, 24, 20, 1)",
+        fill,
         points: [0, 0, x1, y1],
       })
     },
