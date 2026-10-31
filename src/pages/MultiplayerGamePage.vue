@@ -676,6 +676,7 @@ export default defineComponent({
       }
 
       if (msg.event === "GAME_INIT" && !this.gameInitialized) {
+        this.$store.commit("set_level", msg.level)
         // Гость получил начальное состояние от хоста: сохраняем в стор и инициализируемся
         this.$store.commit("multi_set_initial_state", {
           enemies: msg.enemies,
@@ -806,6 +807,9 @@ export default defineComponent({
           this.$store.getters["maxEnemies"].max
         )
       )
+      generated.level.name = "multiplayer"
+      generated.level.random = true
+      this.$store.commit("set_level", generated)
       const enemies: Enemy[] = copyObj(generated.level.enemies)
       const enemy_leader: EnemyLeaderType = copyObj(
         generated.level.enemy_leader
@@ -851,6 +855,7 @@ export default defineComponent({
         ws.send(
           JSON.stringify({
             event: "GAME_INIT",
+            level: this.$store.state.game.whole_level,
             enemies: this.gameObj.enemies,
             field: this.gameObj.field,
             enemy_leader: this.gameObj.enemy_leader,
