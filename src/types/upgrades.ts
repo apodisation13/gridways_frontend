@@ -34,6 +34,7 @@ export enum UpgradeType {
 }
 
 export enum UpgradeSubtype {
+  // game
   MAX_CARDS_IN_DECK = "max_cards_in_deck",
   HAND_SIZE = "hand_size",
   MAX_ARMOR = "max_armor",
@@ -46,10 +47,12 @@ export enum UpgradeSubtype {
   MAX_EMPTY_PASSES = "max_empty_passes",
   FULL_HAND_REDRAW = "full_hand_redraw",
 
+  // settings
   AVATAR = "avatar",
   THEME = "theme",
   FIELD = "field",
 
+  // resources
   MONEY = "money",
   SCRAPS = "scraps",
   KEGS = "kegs",
@@ -60,6 +63,7 @@ export enum UpgradeSubtype {
   RAW = "raw",
   FLOWERS = "flowers",
 
+  // inventory resources
   FIRST_AID_KITS = "first_aid_kits",
   SHIELDS = "shields",
   IMMUNE_MAGICS = "immune_magics",
@@ -70,8 +74,10 @@ export enum UpgradeSubtype {
   PURIFIES = "purifies",
   RANDOM_EFFECTS = "random_effects",
 
+  // inventory slots
   INVENTORY_SLOTS = "inventory_slots",
 
+  // inventory resources values
   FIRST_AID_KIT_HEAL = "first_aid_kit_heal",
   SHIELD_ARMOR = "shield_armor",
   IMMUNE_MAGICS_TURNS = "immune_magics_turns",
@@ -79,6 +85,13 @@ export enum UpgradeSubtype {
   PURIFIES_TARGETS = "purifies_targets",
   RANDOM_EFFECTS_TURNS = "random_effects_turns",
   RANDOM_EFFECTS_VALUE = "random_effects_value",
+
+  // arena upgrades
+  ARENA_REDRAW_CARD = "arena_redraw_card",
+  ARENA_DRAW_EXACT_CARD = "arena_draw_exact_card",
+  ARENA_SECOND_INVENTORY_SLOT = "arena_second_inventory_slot",
+  ARENA_REDRAW_INVENTORY = "arena_redraw_inventory",
+  ARENA_RESTORE_SLOT = "arena_restore_slot",
 }
 
 export interface UpgradesResponse {
