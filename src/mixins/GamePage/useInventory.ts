@@ -42,34 +42,40 @@ export default defineComponent({
       )
     },
     inventoryItemValues(): Partial<Record<InventoryItem, number>> {
-      const game = this.$store.state.game
+      const values = this.$store.getters["inventoryEffectValues"]
       return {
-        [InventoryItem.FIRST_AID_KITS]: game.first_aid_kit_heal,
-        [InventoryItem.SHIELDS]: game.shield_armor,
-        [InventoryItem.IMMUNE_MAGICS]: game.immune_magics_turns,
-        [InventoryItem.DRAW_CARDS]: this.$store.getters["inventoryCardsDrawn"],
-        [InventoryItem.PURIFIES]: this.$store.getters["purifiesTargets"],
-        [InventoryItem.RANDOM_EFFECTS]:
-          this.$store.getters["randomEffectsTurns"],
+        [InventoryItem.FIRST_AID_KITS]: values.first_aid_kit_heal ?? 0,
+        [InventoryItem.SHIELDS]: values.shield_armor ?? 0,
+        [InventoryItem.IMMUNE_MAGICS]: values.immune_magics_turns ?? 0,
+        [InventoryItem.DRAW_CARDS]: values.inventory_cards_drawn ?? 0,
+        [InventoryItem.PURIFIES]: values.purifies_targets ?? 0,
+        [InventoryItem.RANDOM_EFFECTS]: values.random_effects_turns ?? 0,
       }
     },
     unavailableInventoryItems(): InventoryItem[] {
       const game = this.$store.state.game
       const getters = this.$store.getters
+      const values = this.inventoryItemValues
       const items: InventoryItem[] = []
-      if (game.health >= getters["maxHp"] || game.first_aid_kit_heal <= 0)
+      if (
+        game.health >= getters["maxHp"] ||
+        (values[InventoryItem.FIRST_AID_KITS] ?? 0) <= 0
+      )
         items.push(InventoryItem.FIRST_AID_KITS)
-      if (game.armor >= getters["maxArmor"] || game.shield_armor <= 0)
+      if (
+        game.armor >= getters["maxArmor"] ||
+        (values[InventoryItem.SHIELDS] ?? 0) <= 0
+      )
         items.push(InventoryItem.SHIELDS)
       if (
         game.invulnerability >= getters["maxImmuneTurns"] ||
-        game.immune_magics_turns <= 0
+        (values[InventoryItem.IMMUNE_MAGICS] ?? 0) <= 0
       )
         items.push(InventoryItem.IMMUNE_MAGICS)
       if (
         !this.gameObj.leader ||
         this.gameObj.hand.length >= getters["handSize"] ||
-        getters["inventoryCardsDrawn"] <= 0 ||
+        (values[InventoryItem.DRAW_CARDS] ?? 0) <= 0 ||
         !(getters["all_cards"] as CardEntry[]).some(
           entry => entry.card.faction === this.gameObj.leader.faction
         )
@@ -80,12 +86,12 @@ export default defineComponent({
       if (!get_negative_effects_indexes(this.gameObj.effects).length)
         items.push(InventoryItem.CLEARS)
       if (
-        getters["purifiesTargets"] <= 0 ||
+        (values[InventoryItem.PURIFIES] ?? 0) <= 0 ||
         !this.inventoryPurifyTargets.length
       )
         items.push(InventoryItem.PURIFIES)
       if (
-        getters["randomEffectsTurns"] <= 0 ||
+        (values[InventoryItem.RANDOM_EFFECTS] ?? 0) <= 0 ||
         !this.gameObj.field.length ||
         !Object.values(
           getters["effectsInfo"] as Record<string, EffectInfo>
@@ -100,26 +106,31 @@ export default defineComponent({
     afterInventoryItemApplied(): void {},
     async useInventoryItem(item: InventoryItem): Promise<void> {
       const getters = this.$store.getters
-      const slots = (getters["inventory"] as InventoryItem[]).slice(
+      const slots = (getters["activeInventory"] as InventoryItem[]).slice(
         0,
-        getters["inventorySlots"]
+        getters["activeInventorySlots"]
       )
       if (
         this.inventoryBusy ||
         !this.$store.state.game.player_turn ||
         !slots.includes(item) ||
-        !(getters["resource"][item] > 0) ||
+        !(getters["activeInventoryCounts"][item] > 0) ||
         this.unavailableInventoryItems.includes(item)
       )
         return
       const value = this.inventoryItemValues[item] ?? 0
-      const randomEffectsValue = getters["randomEffectsValue"]
+      const randomEffectsValue =
+        getters["inventoryEffectValues"].random_effects_value ?? 0
       this.inventoryBusy = true
       try {
-        await this.$store.dispatch("processResources", {
-          subtype: PayResourcesSubtype.useInventoryItem,
-          data: { [item]: -1 },
-        })
+        if (this.$store.state.game.arena_mode) {
+          this.$store.commit("arena_use_inventory_item", item)
+        } else {
+          await this.$store.dispatch("processResources", {
+            subtype: PayResourcesSubtype.useInventoryItem,
+            data: { [item]: -1 },
+          })
+        }
         if (item === InventoryItem.FIRST_AID_KITS)
           this.$store.commit("change_health", value)
         else if (item === InventoryItem.SHIELDS) {
