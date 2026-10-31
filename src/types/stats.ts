@@ -8,6 +8,7 @@ export enum LeaderboardGameMode {
   random = "random",
   random_n = "random_n",
   season = "season",
+  multiplayer = "multiplayer",
 }
 
 export interface FactionStats {
@@ -41,5 +42,6 @@ export interface LeaderboardEntry {
   faction_name: string
   leader_id: number
   max_kills: number
+  max_arena_level: number | null
   mode: LeaderboardGameMode
 }
