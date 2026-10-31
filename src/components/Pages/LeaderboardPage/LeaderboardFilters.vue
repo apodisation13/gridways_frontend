@@ -52,9 +52,10 @@ export default defineComponent({
     return {
       modes: [
         { value: "season", label: "Сезоны" },
+        { value: "arena", label: "Арена" },
         { value: "random", label: "Рандом" },
         { value: "random_n", label: "Рандом N" },
-        { value: "arena", label: "Арена" },
+        { value: "multiplayer", label: "Мультиплеер" },
       ],
     }
   },
