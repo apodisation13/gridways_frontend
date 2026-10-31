@@ -1,8 +1,16 @@
-import type { DeckCardEntry, Leader, LevelEntry } from "@/types"
+import type {
+  ActionContext,
+  DeckCardEntry,
+  InventoryItem,
+  Leader,
+  LevelEntry,
+} from "@/types"
 import type { ArenaParams } from "@/types/database"
-import type { UpgradeCategory } from "@/types/upgrades"
+import { type UpgradeCategory, UpgradeSubtype } from "@/types/upgrades"
 
 export interface ArenaState {
+  inventory: InventoryItem[]
+  inventoryCounts: Partial<Record<InventoryItem, number>>
   current_level: number
   current_enemies: number
   deck: DeckCardEntry[]
@@ -16,6 +24,8 @@ export interface ArenaState {
 }
 
 const state: ArenaState = {
+  inventory: [],
+  inventoryCounts: {},
   current_level: 1,
   current_enemies: 0,
   deck: [],
@@ -29,6 +39,12 @@ const state: ArenaState = {
 }
 
 const getters = {
+  arena_inventory_slots: (state: ArenaState): number =>
+    (state.user_upgrades[UpgradeSubtype.ARENA_SECOND_INVENTORY_SLOT] ?? 0) > 0
+      ? 2
+      : 1,
+  arena_inventory: (state: ArenaState) => state.inventory,
+  arena_inventory_counts: (state: ArenaState) => state.inventoryCounts,
   arena_current_level: (state: ArenaState) => state.current_level,
   arena_current_enemies: (state: ArenaState) => state.current_enemies,
   arena_deck: (state: ArenaState) => state.deck,
@@ -41,6 +57,30 @@ const getters = {
 }
 
 const mutations = {
+  arena_restore_inventory_slot(state: ArenaState, index: number) {
+    const item = state.inventory[index]
+    state.inventoryCounts[item] = 1
+    state.user_upgrades[UpgradeSubtype.ARENA_RESTORE_SLOT] -= 1
+  },
+  arena_pick_inventory_item(
+    state: ArenaState,
+    {
+      item,
+      index,
+      replace = false,
+    }: { item: InventoryItem; index: number; replace?: boolean }
+  ) {
+    if (replace) {
+      state.user_upgrades[UpgradeSubtype.ARENA_REDRAW_INVENTORY] -= 1
+    }
+    const previousItem = state.inventory[index]
+    if (previousItem) delete state.inventoryCounts[previousItem]
+    state.inventory[index] = item
+    state.inventoryCounts[item] = 1
+  },
+  arena_use_inventory_item(state: ArenaState, item: InventoryItem) {
+    state.inventoryCounts[item]! -= 1
+  },
   arena_set_deck_complete(
     state: ArenaState,
     payload: { deck: DeckCardEntry[]; leader: Leader }
@@ -75,6 +115,8 @@ const mutations = {
     state.user_upgrades[payload.key] = payload.value
   },
   arena_reset(state: ArenaState) {
+    state.inventory = []
+    state.inventoryCounts = {}
     state.current_level = 1
     state.current_enemies = state.arena_params?.base_enemies ?? 0
     state.deck = []
@@ -93,4 +135,28 @@ const mutations = {
   },
 }
 
-export default { state, getters, mutations }
+const actions = {
+  sync_arena_game_params({ commit, getters }: ActionContext) {
+    const arenaUpgrades = getters["arena_upgrades_config"]
+    const userUpgrades: Record<string, number> =
+      getters["arena_user_upgrades"] ?? {}
+
+    const arenaValue = (key: UpgradeSubtype, fallback: number): number => {
+      const level = userUpgrades[key] ?? 0
+      return (
+        arenaUpgrades?.upgrades?.[key]?.upgrades?.[level]?.value ?? fallback
+      )
+    }
+
+    commit("setUpgradesConst", {
+      max_hp: arenaValue(UpgradeSubtype.MAX_HP, getters["maxHp"]),
+      max_armor: arenaValue(UpgradeSubtype.MAX_ARMOR, getters["maxArmor"]),
+      max_immune_turns: arenaValue(
+        UpgradeSubtype.MAX_IMMUNE_TURNS,
+        getters["maxImmuneTurns"]
+      ),
+    })
+  },
+}
+
+export default { state, getters, mutations, actions }
