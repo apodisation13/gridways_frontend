@@ -38,13 +38,13 @@
 
       <!-- Фаза выбора лидера -->
       <div v-else-if="phase === 'picking_leader'" class="pick-zone">
-        <div class="pick-label global_text">Выберите лидера</div>
+        <div class="pick-label global_text">Выберите лидера двойным кликом</div>
         <div class="pick-row">
           <div
             v-for="leader in offered_leaders"
             :key="leader.card.id"
             class="pick-card"
-            @click="pick_leader(leader)"
+            @dblclick="pick_leader(leader)"
           >
             <card-item
               :card="leader.card"
@@ -53,6 +53,26 @@
               :hp_needed="true"
             />
           </div>
+        </div>
+      </div>
+
+      <div v-else-if="phase === 'picking_inventory'" class="pick-zone">
+        <div class="pick-label global_text">
+          Выберите предмет двойным кликом
+        </div>
+        <div class="inventory-offers">
+          <inventory-item-tile
+            v-for="item in offered_inventory"
+            :key="item"
+            :name="item"
+            :label="item"
+            :count="1"
+            :description="
+              $store.getters['resources_transitions'][item]?.description ?? ''
+            "
+            @activate="pick_inventory(item)"
+            @describe="inventoryDescriptionItem = item"
+          />
         </div>
       </div>
 
@@ -71,6 +91,13 @@
         </div>
       </div>
 
+      <div v-else-if="phase === 'replace_inventory'" class="pick-zone">
+        <div class="pick-label global_text">
+          Выберите предмет для замены двойным кликом
+        </div>
+        <button class="btn-extra" @click="phase = 'ready'">Отмена</button>
+      </div>
+
       <!-- Фаза готово: панель уровня -->
       <div v-else class="level-panel">
         <div class="level-info global_text">
@@ -79,37 +106,77 @@
         <button class="btn-next" @click="go_next">
           <themed-button title="ДАЛЕЕ" />
         </button>
-        <div class="extra-buttons">
-          <button
-            class="btn-extra"
-            :class="{ 'btn-active': can_use_card_button }"
-            @click="can_use_card_button ? click_card_button() : warn_card()"
-          >
-            Card
-          </button>
-          <button
-            class="btn-extra"
-            :class="{ 'btn-active': can_use_redraw }"
-            @click="can_use_redraw ? click_redraw() : warn_redraw()"
-          >
-            Redraw
-          </button>
-          <button
-            class="btn-extra"
-            :class="{ 'btn-active': can_use_fixdraw }"
-            @click="can_use_fixdraw ? click_fixdraw() : warn_fixdraw()"
-          >
-            FixDraw
-          </button>
-          <button
-            class="btn-extra btn-upgrades btn-active"
-            @click="showUpgrades = true"
-          >
-            Upgrades
-          </button>
+        <div class="arena-actions">
+          <div class="extra-buttons">
+            <button
+              class="btn-extra"
+              :class="{ 'btn-active': can_use_card_button }"
+              @click="can_use_card_button ? click_card_button() : warn_card()"
+            >
+              Card
+            </button>
+            <button
+              class="btn-extra"
+              :class="{ 'btn-active': can_use_redraw }"
+              @click="can_use_redraw ? click_redraw() : warn_redraw()"
+            >
+              Redraw
+            </button>
+            <button
+              class="btn-extra"
+              :class="{ 'btn-active': can_use_fixdraw }"
+              @click="can_use_fixdraw ? click_fixdraw() : warn_fixdraw()"
+            >
+              FixDraw
+            </button>
+          </div>
+          <div class="extra-buttons extra-buttons--inventory">
+            <button
+              class="btn-extra"
+              :class="{ 'btn-active': can_add_inventory }"
+              @click="can_add_inventory ? add_inventory() : warn_inventory()"
+            >
+              Inventory
+            </button>
+            <button
+              class="btn-extra"
+              :class="{ 'btn-active': can_redraw_inventory }"
+              @click="
+                can_redraw_inventory
+                  ? start_inventory_redraw()
+                  : warn_inventory_redraw()
+              "
+            >
+              Inventory Redraw
+            </button>
+            <button
+              v-for="index in 2"
+              :key="index"
+              class="btn-extra"
+              :class="{ 'btn-active': can_restore_inventory(index - 1) }"
+              @click="
+                can_restore_inventory(index - 1)
+                  ? restore_inventory(index - 1)
+                  : warn_inventory_restore(index - 1)
+              "
+            >
+              Restore {{ index }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
+
+    <resource-description-modal
+      v-if="inventoryDescriptionItem"
+      :name="inventoryDescriptionItem"
+      :count="arenaInventoryCounts[inventoryDescriptionItem] ?? 1"
+      :description="
+        $store.getters['resources_transitions'][inventoryDescriptionItem]
+          ?.description ?? ''
+      "
+      @close="inventoryDescriptionItem = null"
+    />
 
     <!-- Модалка выбора карты для сброса (Redraw / FixDraw) -->
     <div
@@ -163,8 +230,53 @@
         :arena_mode="true"
         :cant_save_deck="false"
         @change_order_deck="change_order_deck"
-      />
+      >
+        <template #leader-inventory>
+          <div v-if="deck.leader" class="arena-inventory-slots">
+            <button
+              v-for="(slot, index) in [arenaInventory[0], arenaInventory[1]]"
+              :key="index"
+              type="button"
+              class="arena-inventory-slot"
+              :class="{
+                'arena-inventory-slot--locked':
+                  index >= arenaInventorySlotCount,
+                'arena-inventory-slot--depleted':
+                  slot && !arenaInventoryCounts[slot],
+                'arena-inventory-slot--replace':
+                  phase === 'replace_inventory' && slot,
+              }"
+              :disabled="index >= arenaInventorySlotCount || !slot"
+              :aria-label="
+                index >= arenaInventorySlotCount
+                  ? 'Слот закрыт'
+                  : 'Предмет инвентаря'
+              "
+              @click="show_inventory_description(index)"
+              @dblclick="replace_inventory(index)"
+              @touchend="touch_inventory_slot(index, $event)"
+            >
+              <span v-if="index >= arenaInventorySlotCount">🔒</span>
+              <resource-item
+                v-else-if="slot"
+                :name="slot"
+                :count="arenaInventoryCounts[slot] ?? 0"
+                :highlight_max_count="false"
+              />
+              <span v-else>＋</span>
+            </button>
+          </div>
+        </template>
+      </block-assembling-the-deck>
     </div>
+    <button
+      class="btn-extra btn-upgrades btn-active"
+      :class="{ 'btn-upgrades--hidden': phase !== 'ready' }"
+      :disabled="phase !== 'ready'"
+      @click="showUpgrades = true"
+    >
+      Upgrades
+    </button>
   </div>
 </template>
 
@@ -176,10 +288,15 @@ import CardItem from "@/components/Cards/CardItem.vue"
 import CardListComponent from "@/components/Cards/CardListComponent.vue"
 import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
 import ArenaUpgradesModal from "@/components/Pages/ArenaDeckbuildPage/ArenaUpgradesModal.vue"
+import ResourceDescriptionModal from "@/components/Pages/BonusPage/ResourceDescriptionModal.vue"
 import BlockAssemblingTheDeck from "@/components/Pages/DeckbuildPage/BlockAssemblingTheDeck.vue"
+import InventoryItemTile from "@/components/Pages/InventoryPage/InventoryItemTile.vue"
 import ResourceList from "@/components/ResourceList.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
+import ResourceItem from "@/components/UI/ResourceItem.vue"
 import type { CardEntry, DeckCardEntry, Leader, LeaderEntry } from "@/types"
+import { InventoryItem } from "@/types/inventory"
+import { UpgradeSubtype } from "@/types/upgrades"
 
 const ARENA_RESOURCE_KEYS = [
   "scraps",
@@ -204,6 +321,8 @@ interface ActiveDeck {
 type Phase =
   | "picking_cards"
   | "picking_leader"
+  | "picking_inventory"
+  | "replace_inventory"
   | "ready"
   | "pick_one_card"
   | "pick_exact_card"
@@ -218,6 +337,9 @@ function pickRandom<T>(arr: T[], count: number): T[] {
 export default defineComponent({
   name: "ArenaDeckbuildPage",
   components: {
+    InventoryItemTile,
+    ResourceItem,
+    ResourceDescriptionModal,
     CardItem,
     CardListComponent,
     BlockAssemblingTheDeck,
@@ -253,9 +375,33 @@ export default defineComponent({
       } as ActiveDeck,
       offered_cards: [] as CardEntry[],
       offered_leaders: [] as LeaderEntry[],
+      offered_inventory: [] as InventoryItem[],
+      inventoryTargetIndex: 0,
+      inventoryReplacing: false,
+      lastInventoryTap: { index: -1, time: 0 },
+      inventoryDescriptionItem: null as InventoryItem | null,
     }
   },
   computed: {
+    arenaInventorySlotCount(): number {
+      return this.$store.getters["arena_inventory_slots"]
+    },
+    can_add_inventory(): boolean {
+      return this.arenaInventorySlotCount > 1 && !this.arenaInventory[1]
+    },
+    can_redraw_inventory(): boolean {
+      return (
+        (this.$store.state.arena.user_upgrades[
+          UpgradeSubtype.ARENA_REDRAW_INVENTORY
+        ] ?? 0) > 0 && this.arenaInventory.length > 0
+      )
+    },
+    arenaInventoryCounts(): Partial<Record<InventoryItem, number>> {
+      return this.$store.getters["arena_inventory_counts"]
+    },
+    arenaInventory(): InventoryItem[] {
+      return this.$store.getters["arena_inventory"]
+    },
     arena_resources(): Record<string, number> {
       const all = this.$store.getters["resource"]
       return Object.fromEntries(
@@ -285,7 +431,9 @@ export default defineComponent({
     },
     can_use_redraw(): boolean {
       return (
-        (this.$store.state.arena.user_upgrades["arena_redraw_card"] ?? 0) >= 1
+        (this.$store.state.arena.user_upgrades[
+          UpgradeSubtype.ARENA_REDRAW_CARD
+        ] ?? 0) >= 1
       )
     },
     fix_draw_cooldown_since(): number | null {
@@ -306,8 +454,9 @@ export default defineComponent({
     can_use_fixdraw(): boolean {
       return (
         !this.is_fix_draw_on_cooldown &&
-        (this.$store.state.arena.user_upgrades["arena_draw_exact_card"] ?? 0) >=
-          1
+        (this.$store.state.arena.user_upgrades[
+          UpgradeSubtype.ARENA_DRAW_EXACT_CARD
+        ] ?? 0) >= 1
       )
     },
     all_cards_for_exact_pick(): CardEntry[] {
@@ -319,12 +468,62 @@ export default defineComponent({
     this.$store.dispatch("sync_arena_game_params")
     if (this.deck_already_built) {
       this.restore_deck_from_store()
-      this.phase = "ready"
+      if (this.arenaInventory[0]) this.phase = "ready"
+      else this.draw_inventory()
     } else {
       this.draw_cards()
     }
   },
   methods: {
+    warn_inventory(): void {
+      this.toast.warning(
+        this.arenaInventorySlotCount < 2
+          ? "Прокачайте открытие второго слота"
+          : "Второй слот инвентаря уже заполнен"
+      )
+    },
+    warn_inventory_redraw(): void {
+      this.toast.warning(
+        (this.$store.state.arena.user_upgrades[
+          UpgradeSubtype.ARENA_REDRAW_INVENTORY
+        ] ?? 0) <= 0
+          ? "Прокачайте возможность замены предмета инвентаря"
+          : "Сначала выберите предмет инвентаря для замены"
+      )
+    },
+    warn_inventory_restore(index: number): void {
+      if (
+        (this.$store.state.arena.user_upgrades[
+          UpgradeSubtype.ARENA_RESTORE_SLOT
+        ] ?? 0) <= 0
+      ) {
+        this.toast.warning(
+          `Прокачайте возможность пополнения предмета в инвентаре (слот ${index + 1})`
+        )
+      } else if (index >= this.arenaInventorySlotCount) {
+        this.toast.warning("Прокачайте открытие второго слота")
+      } else if (!this.arenaInventory[index]) {
+        this.toast.warning(`Сначала выберите предмет в слот ${index + 1}`)
+      } else {
+        this.toast.warning(`Предмет в слоте ${index + 1} уже пополнен`)
+      }
+    },
+    can_restore_inventory(index: number): boolean {
+      const slot = this.arenaInventory[index]
+      return (
+        this.phase === "ready" &&
+        (this.$store.state.arena.user_upgrades[
+          UpgradeSubtype.ARENA_RESTORE_SLOT
+        ] ?? 0) > 0 &&
+        index < this.arenaInventorySlotCount &&
+        !!slot &&
+        (this.arenaInventoryCounts[slot] ?? 0) === 0
+      )
+    },
+    restore_inventory(index: number): void {
+      if (!this.can_restore_inventory(index)) return
+      this.$store.commit("arena_restore_inventory_slot", index)
+    },
     draw_cards(): void {
       this.offered_cards = pickRandom(this.all_cards, 3)
     },
@@ -345,9 +544,73 @@ export default defineComponent({
       }
     },
     pick_leader(leader: LeaderEntry): void {
+      if (this.phase !== "picking_leader") return
       this.deck.leader = leader.card
       this.deck.health += leader.card.data.hp
+      this.draw_inventory()
+    },
+    draw_inventory(): void {
+      const installed = this.arenaInventory
+      this.offered_inventory = pickRandom(
+        Object.values(InventoryItem).filter(item => !installed.includes(item)),
+        3
+      )
+      this.phase = "picking_inventory"
+    },
+    pick_inventory(item: InventoryItem): void {
+      if (
+        this.phase !== "picking_inventory" ||
+        !this.offered_inventory.includes(item)
+      )
+        return
+      if (this.inventoryReplacing && !this.can_redraw_inventory) return
+      this.$store.commit("arena_pick_inventory_item", {
+        item,
+        index: this.inventoryTargetIndex,
+        replace: this.inventoryReplacing,
+      })
+      this.inventoryReplacing = false
+      this.offered_inventory = []
       this.phase = "ready"
+    },
+    add_inventory(): void {
+      if (this.phase !== "ready" || !this.can_add_inventory) return
+      this.inventoryTargetIndex = 1
+      this.inventoryReplacing = false
+      this.draw_inventory()
+    },
+    start_inventory_redraw(): void {
+      if (this.phase !== "ready" || !this.can_redraw_inventory) return
+      this.lastInventoryTap = { index: -1, time: 0 }
+      this.phase = "replace_inventory"
+    },
+    replace_inventory(index: number): void {
+      if (
+        this.phase !== "replace_inventory" ||
+        !this.can_redraw_inventory ||
+        index >= this.arenaInventorySlotCount ||
+        !this.arenaInventory[index]
+      )
+        return
+      this.inventoryTargetIndex = index
+      this.inventoryReplacing = true
+      this.draw_inventory()
+    },
+    touch_inventory_slot(index: number, event: TouchEvent): void {
+      if (this.phase !== "replace_inventory") return
+      event.preventDefault()
+      const now = Date.now()
+      if (
+        this.lastInventoryTap.index === index &&
+        now - this.lastInventoryTap.time < 350
+      ) {
+        this.replace_inventory(index)
+        this.lastInventoryTap = { index: -1, time: 0 }
+      } else this.lastInventoryTap = { index, time: now }
+    },
+    show_inventory_description(index: number): void {
+      if (this.phase === "replace_inventory") return
+      this.inventoryDescriptionItem = this.arenaInventory[index] ?? null
     },
     // --- Card button ---
     click_card_button(): void {
@@ -405,7 +668,10 @@ export default defineComponent({
       this.deck.health += card.card.data.hp
 
       if (this.active_special === "redraw") {
-        this.$store.commit("arena_use_upgrade", "arena_redraw_card")
+        this.$store.commit(
+          "arena_use_upgrade",
+          UpgradeSubtype.ARENA_REDRAW_CARD
+        )
       }
       this.active_special = null
       this.phase = "ready"
@@ -417,7 +683,10 @@ export default defineComponent({
       this.deck.deck_body.push(card.card.id)
       this.deck.health += card.card.data.hp
 
-      this.$store.commit("arena_use_upgrade", "arena_draw_exact_card")
+      this.$store.commit(
+        "arena_use_upgrade",
+        UpgradeSubtype.ARENA_DRAW_EXACT_CARD
+      )
       this.$store.commit("arena_set_user_upgrade", {
         key: "fix_draw_cooldown_since",
         value: this.current_level,
@@ -448,7 +717,12 @@ export default defineComponent({
       this.$router.push("/main")
     },
     go_next(): void {
-      if (!this.deck.leader) return
+      if (
+        !this.deck.leader ||
+        !this.arenaInventory[0] ||
+        this.phase !== "ready"
+      )
+        return
       this.$store.commit("arena_set_deck_complete", {
         deck: this.deck.deck_is_progress,
         leader: this.deck.leader,
@@ -460,6 +734,61 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.inventory-offers {
+  display: grid;
+  grid-template-columns: repeat(3, 76px);
+  gap: 12px;
+  justify-content: center;
+}
+.arena-inventory-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 40px;
+  height: 58px;
+  padding: 3px;
+  flex-shrink: 0;
+  border: 1px solid #c5a87e;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #285e4b, #183c34);
+  cursor: pointer;
+}
+.arena-inventory-slot :deep(.resource-image) {
+  width: 28px;
+  height: 28px;
+  max-height: none;
+  object-fit: contain;
+}
+.arena-inventory-slots {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 0;
+}
+.arena-inventory-slot--locked,
+.arena-inventory-slot--depleted {
+  background: #303030;
+  border-color: #656565;
+  color: #aaa;
+}
+.arena-inventory-slot--replace {
+  border-color: #f1ce77;
+  box-shadow: 0 0 8px #d9a441;
+  touch-action: manipulation;
+}
+.arena-inventory-slot--locked {
+  border-style: dashed;
+  font-size: 24px;
+  cursor: default;
+}
+.arena-inventory-slot--depleted :deep(.resource-image) {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
 .arena-deckbuild-page {
   display: flex;
   flex-direction: column;
@@ -498,17 +827,35 @@ export default defineComponent({
 }
 
 .top-zone {
-  flex: 1;
+  /* One reserved area for every phase; its contents never move the deck. */
+  box-sizing: border-box;
+  flex: 0 0 clamp(230px, calc(var(--vh, 1vh) * 34), 290px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 8px 10px;
+  justify-content: flex-start;
+  padding: 24px 10px 16px;
   min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable both-edges;
+}
+
+.top-zone > * {
+  flex-shrink: 0;
+}
+
+.arena-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(196, 144, 0, 0.25);
 }
 
 .bottom-zone {
-  flex: 1;
+  flex: 1 1 0;
   overflow-y: auto;
   background: #3c4d60;
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7);
@@ -521,6 +868,7 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  width: 100%;
 }
 
 .pick-label {
@@ -545,7 +893,8 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding: 8px 0;
+  padding: 0 0 8px;
+  width: 100%;
 }
 
 .level-info {
@@ -563,10 +912,9 @@ export default defineComponent({
 .extra-buttons {
   display: flex;
   gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  width: 100%;
 }
 
 .btn-extra {
@@ -580,8 +928,35 @@ export default defineComponent({
   cursor: pointer;
 }
 
+.extra-buttons--inventory .btn-extra {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
 .btn-upgrades {
-  margin-left: 8px;
+  flex-shrink: 0;
+  align-self: center;
+  margin: 12px;
+  min-width: 210px;
+  min-height: 52px;
+  padding: 12px 32px;
+  font-size: 19px;
+  border-radius: 10px;
+  background: linear-gradient(
+    145deg,
+    rgba(196, 144, 0, 0.22),
+    rgba(196, 144, 0, 0.06)
+  );
+}
+
+.btn-extra:disabled {
+  cursor: not-allowed;
+}
+
+/* Reserve the footer even while choosing cards, leader, or inventory. */
+.btn-upgrades--hidden {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .btn-active {
