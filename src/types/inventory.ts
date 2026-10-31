@@ -16,11 +16,6 @@ export interface UserInventory {
   slots: InventoryItem[]
 }
 
-export interface ArenaInventorySlot {
-  item: InventoryItem
-  count: number
-}
-
 export interface InventoryEffectValues {
   [UpgradeSubtype.FIRST_AID_KIT_HEAL]: number
   [UpgradeSubtype.SHIELD_ARMOR]: number
