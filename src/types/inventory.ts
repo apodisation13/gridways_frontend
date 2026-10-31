@@ -1,3 +1,5 @@
+import { UpgradeSubtype } from "@/types/upgrades"
+
 export enum InventoryItem {
   FIRST_AID_KITS = "first_aid_kits",
   SHIELDS = "shields",
@@ -12,4 +14,19 @@ export enum InventoryItem {
 
 export interface UserInventory {
   slots: InventoryItem[]
+}
+
+export interface ArenaInventorySlot {
+  item: InventoryItem
+  count: number
+}
+
+export interface InventoryEffectValues {
+  [UpgradeSubtype.FIRST_AID_KIT_HEAL]: number
+  [UpgradeSubtype.SHIELD_ARMOR]: number
+  [UpgradeSubtype.IMMUNE_MAGICS_TURNS]: number
+  [UpgradeSubtype.INVENTORY_CARDS_DRAWN]: number
+  [UpgradeSubtype.PURIFIES_TARGETS]: number
+  [UpgradeSubtype.RANDOM_EFFECTS_TURNS]: number
+  [UpgradeSubtype.RANDOM_EFFECTS_VALUE]: number
 }
