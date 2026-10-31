@@ -128,10 +128,12 @@ export default defineComponent({
       return this.$store.state.game.player_turn
     },
     slots(): (InventoryItem | null)[] {
-      const inventory = this.$store.getters["inventory"] as InventoryItem[]
+      const inventory = this.$store.getters[
+        "activeInventory"
+      ] as InventoryItem[]
       const count = Math.max(
         0,
-        Math.floor(this.$store.getters["inventorySlots"])
+        Math.floor(this.$store.getters["activeInventorySlots"])
       )
       return Array.from(
         { length: count },
@@ -146,7 +148,7 @@ export default defineComponent({
   },
   methods: {
     count(item: InventoryItem): number {
-      return this.$store.getters["resource"][item] ?? 0
+      return this.$store.getters["activeInventoryCounts"][item] ?? 0
     },
     description(item: InventoryItem): string {
       const actions = this.$store.getters["resources_transitions"] as Record<
@@ -180,7 +182,7 @@ export default defineComponent({
         case InventoryItem.PURIFIES:
           return `Целей: ${value}`
         case InventoryItem.RANDOM_EFFECTS:
-          return `Ходов: ${value}\nСила: ${this.$store.getters["randomEffectsValue"]}`
+          return `Ходов: ${value}\nСила: ${this.$store.getters["inventoryEffectValues"].random_effects_value ?? 0}`
         default:
           return ""
       }
