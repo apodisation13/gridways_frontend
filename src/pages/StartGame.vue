@@ -176,7 +176,7 @@ export default defineComponent({
           data: payload,
         })
         await this.$store.dispatch("postUserStatistic", {
-          user_deck_id: this.selectedDeck.id,
+          leader_id: this.selectedDeck.deck.leader.id,
           type: GameStatsRecordType.play,
         })
         this.$store.commit("set_start_game_redirect", true)
