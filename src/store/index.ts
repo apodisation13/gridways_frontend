@@ -36,7 +36,7 @@ export interface RootState {
 // в .vue - this.$store. и то же самое
 // в .js - ИМПОРТ store отсюда, и тогда store.  а дальше то же
 
-const store = createStore({
+const store = createStore<RootState>({
   modules: {
     login,
     loading,
@@ -54,7 +54,6 @@ const store = createStore({
     upgrades,
     inventory,
   },
-  state: {},
   getters: {},
   mutations: {},
   actions: {},
