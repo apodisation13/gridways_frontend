@@ -34,7 +34,19 @@ import { defineComponent } from "vue"
 
 import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
-import { describeInventoryItem } from "@/logic/inventory_description"
+import { type InventoryEffectValues, InventoryItem } from "@/types/inventory"
+import { UpgradeSubtype } from "@/types/upgrades"
+
+const valueUpgrades: Partial<
+  Record<InventoryItem, keyof InventoryEffectValues>
+> = {
+  [InventoryItem.FIRST_AID_KITS]: UpgradeSubtype.FIRST_AID_KIT_HEAL,
+  [InventoryItem.SHIELDS]: UpgradeSubtype.SHIELD_ARMOR,
+  [InventoryItem.IMMUNE_MAGICS]: UpgradeSubtype.IMMUNE_MAGICS_TURNS,
+  [InventoryItem.DRAW_CARDS]: UpgradeSubtype.INVENTORY_CARDS_DRAWN,
+  [InventoryItem.PURIFIES]: UpgradeSubtype.PURIFIES_TARGETS,
+  [InventoryItem.RANDOM_EFFECTS]: UpgradeSubtype.RANDOM_EFFECTS_TURNS,
+}
 
 export default defineComponent({
   components: { ButtonCloseImg, ResourceItem },
@@ -46,11 +58,20 @@ export default defineComponent({
   emits: ["close"],
   computed: {
     formattedDescription(): string {
-      return describeInventoryItem(
-        this.name,
-        this.description,
-        this.$store.getters["upgradesConfig"],
-        this.$store.getters["userUpgrades"]
+      const values: Partial<InventoryEffectValues> =
+        this.$store.getters["inventoryEffectValues"]
+      return this.description.replace(
+        /\{(value|turns\/times_count)\}/g,
+        (placeholder, key: string) => {
+          const subtype =
+            key === "value"
+              ? valueUpgrades[this.name as InventoryItem]
+              : this.name === InventoryItem.RANDOM_EFFECTS
+                ? UpgradeSubtype.RANDOM_EFFECTS_VALUE
+                : undefined
+          if (!subtype) return placeholder
+          return `{{ ${values[subtype] ?? 0} }}`
+        }
       )
     },
   },
