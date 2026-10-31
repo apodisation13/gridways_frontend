@@ -191,7 +191,8 @@ export default defineComponent({
     if (!this.arena_level) {
       const enemies = this.$store.state.arena.current_enemies
       const level = random_level_generator_by_number(enemies)
-      ;(level.level as any).random = true
+      level.level.name = "arena"
+      level.level.random = true
       this.$store.commit("arena_set_level", level)
     }
   },
