@@ -137,6 +137,12 @@ const getters = {
   health(state: GameState): number {
     return state.health
   },
+  armor(state: GameState): number {
+    return state.armor
+  },
+  invulnerability(state: GameState): number {
+    return state.invulnerability
+  },
 
   // параметры для игры, которые берутся из апгрейдов
   maxCardsInDeck: (state: GameState, _getters: any, rootState: any) => {

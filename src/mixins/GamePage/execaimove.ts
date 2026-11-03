@@ -83,7 +83,7 @@ export default defineComponent({
                   this.$store.commit("set_player_turn", true)
 
                   const invulnerability: number =
-                    this.$store.state.game.invulnerability
+                    this.$store.getters["invulnerability"]
                   if (invulnerability > 0) {
                     let new_value = invulnerability - 1
                     if (new_value < 0) new_value = 0
