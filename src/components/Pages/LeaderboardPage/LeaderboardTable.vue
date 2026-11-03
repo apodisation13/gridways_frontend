@@ -1,14 +1,27 @@
 <template>
   <div class="leaderboard__table-wrap">
     <table class="leaderboard__table">
+      <colgroup>
+        <col class="leaderboard__col-rank" />
+        <col />
+        <col class="leaderboard__col-leader" />
+        <col class="leaderboard__col-mode" />
+        <col class="leaderboard__col-kills" />
+        <col class="leaderboard__col-arena" />
+      </colgroup>
       <thead>
         <tr>
-          <th>#</th>
-          <th v-if="is_world">Игрок</th>
-          <th v-if="!is_world">Фракция</th>
-          <th>Лидер</th>
-          <th>Режим</th>
-          <th>Рекорд</th>
+          <th scope="col">№</th>
+          <th v-if="is_world" scope="col">Игрок</th>
+          <th v-if="!is_world" scope="col">Фракция</th>
+          <th scope="col">Лидер</th>
+          <th scope="col">Режим</th>
+          <th scope="col" title="Убито врагов" aria-label="Убито врагов">
+            <span class="leaderboard__skull" aria-hidden="true">☠</span>
+          </th>
+          <th scope="col" aria-label="Уровень Арены">
+            Арена<br /><span class="leaderboard__subheading">ур.</span>
+          </th>
         </tr>
       </thead>
       <tbody class="leaderboard__table-body">
@@ -35,10 +48,10 @@
                 class="avatar"
               />
               <div v-else class="avatar avatar--placeholder" />
-              <span>{{ entry.username }}</span>
+              <span class="leaderboard__username">{{ entry.username }}</span>
             </div>
           </td>
-          <td v-if="!is_world">
+          <td v-if="!is_world" class="leaderboard__faction">
             <faction-item :faction="{ name: entry.faction_name }" />
           </td>
           <td>
@@ -54,8 +67,14 @@
               />
             </div>
           </td>
-          <td>{{ entry.mode }}</td>
-          <td>{{ entry.max_kills }}</td>
+          <td class="leaderboard__mode">{{ modeLabel(entry.mode) }}</td>
+          <td class="leaderboard__number">{{ entry.max_kills }}</td>
+          <td
+            class="leaderboard__number"
+            :class="{ leaderboard__muted: entry.mode !== 'arena' }"
+          >
+            {{ entry.mode === "arena" ? (entry.max_arena_level ?? "—") : "—" }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -67,7 +86,15 @@ import { defineComponent, PropType } from "vue"
 
 import CardItem from "@/components/Cards/CardItem.vue"
 import FactionItem from "@/components/Pages/DeckbuildPage/FactionItem.vue"
-import type { LeaderboardEntry } from "@/types"
+import type { LeaderboardEntry, LeaderboardGameMode } from "@/types"
+
+const MODE_LABELS: Record<LeaderboardGameMode, string> = {
+  season: "Сезон",
+  random: "Рандом",
+  random_n: "Рандом N",
+  arena: "Арена",
+  multiplayer: "Кооп",
+}
 
 export default defineComponent({
   name: "LeaderboardTable",
@@ -112,6 +139,9 @@ export default defineComponent({
     else await this.$store.dispatch("getUserLeaderboard")
   },
   methods: {
+    modeLabel(mode: LeaderboardGameMode): string {
+      return MODE_LABELS[mode] ?? mode
+    },
     findLeader(leaderId: number) {
       return this.$store.getters["all_leaders"].find(
         (item: any) => item.card.id === leaderId
@@ -133,87 +163,163 @@ export default defineComponent({
 
 <style scoped>
 .leaderboard__table-wrap {
-  overflow-y: auto;
-  max-height: calc(
-    100vh - 400px
-  ); /* 200px — примерная высота шапки + кнопки + отступы */
+  width: 100%;
+  min-width: 0;
+  overflow: auto;
+  max-height: calc(100vh - 400px);
+  border-radius: 10px;
+  border: 1px solid rgba(250, 207, 93, 0.14);
+  box-sizing: border-box;
 }
 
 .leaderboard__table {
   width: 100%;
+  min-width: 320px;
   border-collapse: collapse;
+  table-layout: fixed;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-.leaderboard__table-body {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
+.leaderboard__col-rank {
+  width: 32px;
+}
+.leaderboard__col-leader {
+  width: 76px;
+}
+.leaderboard__col-mode {
+  width: 82px;
+}
+.leaderboard__col-kills {
+  width: 48px;
+}
+.leaderboard__col-arena {
+  width: 56px;
 }
 
 .leaderboard__table th,
 .leaderboard__table td {
-  padding: 10px 16px;
+  padding: 10px 5px;
   text-align: center;
-  border: 1px solid #facf5d33;
-  font-size: 16px;
-}
-
-.leaderboard__table thead tr {
-  border-bottom: 2px solid #facf5d66;
+  vertical-align: middle;
 }
 
 .leaderboard__table th {
-  font-size: 13px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  background: var(--primary-gold-gradient);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
   color: #facf5d;
+  background: rgba(20, 25, 35, 0.92);
+  border-bottom: 1px solid rgba(250, 207, 93, 0.28);
+}
+
+.leaderboard__subheading {
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.leaderboard__skull {
+  font-size: 23px;
+  line-height: 1;
 }
 
 .leaderboard__table tbody tr {
+  border-bottom: 1px solid rgba(250, 207, 93, 0.1);
   transition: background 0.15s;
 }
 
+.leaderboard__table tbody tr:last-child {
+  border-bottom: none;
+}
 .leaderboard__table tbody tr:hover {
   background: rgba(250, 207, 93, 0.05);
 }
-
-.leaderboard__table td:first-child {
-  color: #facf5d99;
-  font-size: 13px;
-  width: 32px;
+.leaderboard__row--mine {
+  background: rgba(255, 215, 0, 0.09);
 }
 
-.leaderboard__table-body {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
+.leaderboard__table td:first-child {
+  color: rgba(250, 207, 93, 0.55);
+  font-size: 12px;
+}
+
+.leaderboard__number {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.leaderboard__muted {
+  color: rgba(255, 255, 255, 0.3);
+}
+.leaderboard__mode {
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .leaderboard__card-wrap {
   width: 60px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
-.leaderboard__row--mine {
-  background-color: rgba(255, 215, 0, 0.15); /* или любой цвет */
+.leaderboard__faction :deep(.faction) {
+  margin: 0 auto;
+  max-width: 100%;
 }
 
 .leaderboard__user {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   cursor: pointer;
 }
 
-.avatar {
-  width: 40px;
-  height: 40px;
+.leaderboard__username {
+  max-width: 100%;
+  font-size: 12px;
+  overflow-wrap: break-word;
 }
 
+.avatar {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
 .avatar--placeholder {
   background: #444;
   border-radius: 50%;
+}
+
+@media (max-width: 480px) {
+  .leaderboard__col-rank {
+    width: 26px;
+  }
+  .leaderboard__col-leader {
+    width: 62px;
+  }
+  .leaderboard__col-mode {
+    width: 64px;
+  }
+  .leaderboard__col-kills {
+    width: 38px;
+  }
+  .leaderboard__col-arena {
+    width: 48px;
+  }
+
+  .leaderboard__table th,
+  .leaderboard__table td {
+    padding: 8px 3px;
+  }
+  .leaderboard__table th {
+    font-size: 11px;
+  }
+  .leaderboard__mode {
+    font-size: 11px;
+  }
+  .leaderboard__card-wrap {
+    width: 54px;
+  }
 }
 </style>
