@@ -1,3 +1,4 @@
+import { sound_clear_negative_effect } from "@/logic/play_sounds"
 import { Card, EffectObject, GameObj, Leader } from "@/types"
 
 export function incr_effects(card: Card | Leader, gameObj: GameObj) {
@@ -20,4 +21,5 @@ export function remove_effects(gameObj: GameObj) {
     const effectObject: EffectObject | "" = effects[i]
     if (effectObject && effectObject.negative) effects[i] = ""
   }
+  sound_clear_negative_effect()
 }
