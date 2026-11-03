@@ -525,10 +525,10 @@ export default defineComponent({
       return this.$store.getters["health"]
     },
     armor(): number {
-      return this.$store.state.game.armor
+      return this.$store.getters["armor"]
     },
     invulnerability(): number {
-      return this.$store.state.game.invulnerability
+      return this.$store.getters["invulnerability"]
     },
   },
 
@@ -707,7 +707,7 @@ export default defineComponent({
         )
         const attackLog = (msg.attack_log as number[]) ?? []
         if (attackLog.length > 0) {
-          if (this.$store.state.game.invulnerability > 0) {
+          if (this.$store.getters["invulnerability"] > 0) {
             // Пассивный игрок неуязвим — все атаки этой волны заблокированы.
             this.$store.commit("set_invulnerability_hit", true)
             setTimeout(
@@ -719,7 +719,7 @@ export default defineComponent({
             // так же, как это делает damage_player() на стороне активного игрока.
             // 1 единица брони поглощает 1 атаку целиком, независимо от damage.
             for (const damage of attackLog) {
-              if (this.$store.state.game.armor > 0) {
+              if (this.$store.getters["armor"] > 0) {
                 this.$store.commit("change_armor", -1)
               } else {
                 this.$store.commit("change_health", -damage)
@@ -741,7 +741,7 @@ export default defineComponent({
         // Разблокируем карты и обновляем флаг can_draw.
         // ИИ уже отходил на стороне напарника — декрементируем свою неуязвимость
         // симметрично тому, как активный игрок делает это в exec_ai_move().
-        const invulnerability = this.$store.state.game.invulnerability
+        const invulnerability = this.$store.getters["invulnerability"]
         if (invulnerability > 0) {
           this.$store.commit("set_invulnerability", invulnerability - 1)
         }
@@ -843,7 +843,7 @@ export default defineComponent({
       this.gameInitialized = true
       this.myTurn = true // хост ходит первым
       this.lastSentHealth = this.$store.getters["health"]
-      this.lastSentArmor = this.$store.state.game.armor
+      this.lastSentArmor = this.$store.getters["armor"]
       this.sendPlayerState() // сразу отправляем наш стейт гостю
     },
 
@@ -886,7 +886,7 @@ export default defineComponent({
       this.gameInitialized = true
       this.myTurn = false // гость ждёт TURN_END от хоста
       this.lastSentHealth = this.$store.getters["health"]
-      this.lastSentArmor = this.$store.state.game.armor
+      this.lastSentArmor = this.$store.getters["armor"]
       this.sendPlayerState()
     },
 
@@ -975,7 +975,7 @@ export default defineComponent({
       const ws: WebSocket | null = this.$store.state.multi.ws
       if (!ws || ws.readyState !== WebSocket.OPEN) return
       const currentHealth = this.$store.getters["health"]
-      const currentArmor = this.$store.state.game.armor
+      const currentArmor = this.$store.getters["armor"]
 
       // Забираем накопленный лог атак и сразу очищаем его в сторе.
       // attack_log содержит значение damage каждого вызова damage_player за этот
@@ -1121,7 +1121,7 @@ export default defineComponent({
                   }, timeout + 100)
 
                   const invulnerability: number =
-                    this.$store.state.game.invulnerability
+                    this.$store.getters["invulnerability"]
                   if (invulnerability > 0) {
                     let new_value = invulnerability - 1
                     if (new_value < 0) new_value = 0
@@ -1149,9 +1149,9 @@ export default defineComponent({
           leader_faction: (this.gameObj.leader as any)?.faction ?? "",
           health: this.$store.getters["health"],
           max_hp: this.$store.getters["maxHp"],
-          armor: this.$store.state.game.armor,
+          armor: this.$store.getters["armor"],
           max_armor: this.$store.getters["maxArmor"],
-          invulnerability: this.$store.state.game.invulnerability,
+          invulnerability: this.$store.getters["invulnerability"],
           max_immune_turns: this.$store.getters["maxImmuneTurns"],
         })
       )
