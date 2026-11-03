@@ -16,7 +16,7 @@ export function damage_player(source: DamageSource, timeout = 1000): void {
   // Игрок 2 прогонит эти же удары через свою броню независимо.
   store.commit("log_player_attack", source.data.damage)
 
-  if (store.state.game.invulnerability > 0) {
+  if (store.getters["invulnerability"] > 0) {
     sound_immune_hit()
     timeoutAnimationFlag(source, "damages_player", null, timeout * 0.5)
     store.commit("set_invulnerability_hit", true)
@@ -26,7 +26,7 @@ export function damage_player(source: DamageSource, timeout = 1000): void {
     return
   }
 
-  if (store.state.game.armor > 0) {
+  if (store.getters["armor"] > 0) {
     timeoutAnimationFlag(source, "damages_player", null, timeout * 0.5)
     store.commit("change_armor", -1)
     store.commit("set_armor_delta", -1)

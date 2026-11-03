@@ -137,6 +137,12 @@ const getters = {
   health(state: GameState): number {
     return state.health
   },
+  armor(state: GameState): number {
+    return state.armor
+  },
+  invulnerability(state: GameState): number {
+    return state.invulnerability
+  },
 
   // параметры для игры, которые берутся из апгрейдов
   maxCardsInDeck: (state: GameState, _getters: any, rootState: any) => {
@@ -169,10 +175,6 @@ const getters = {
   fullHandRedraw: (state: GameState) => state.full_hand_redraw,
 
   inventorySlots: (state: GameState) => state.inventory_slots,
-  inventoryCardsDrawn: (state: GameState) => state.inventory_cards_drawn,
-  purifiesTargets: (state: GameState) => state.purifies_targets,
-  randomEffectsTurns: (state: GameState) => state.random_effects_turns,
-  randomEffectsValue: (state: GameState) => state.random_effects_value,
 
   get_season: (state: GameState) => state.season,
   currentLevel: (state: GameState) => state.level,
@@ -345,24 +347,6 @@ const mutations = {
 }
 
 const actions = {
-  sync_arena_game_params({ commit, getters }: ActionContext) {
-    const arenaUpgrades = getters["arena_upgrades_config"]
-    const userUpgrades: Record<string, number> =
-      getters["arena_user_upgrades"] ?? {}
-
-    const arenaValue = (key: string, fallback: number): number => {
-      const level = userUpgrades[key] ?? 0
-      return (
-        arenaUpgrades?.upgrades?.[key]?.upgrades?.[level]?.value ?? fallback
-      )
-    }
-
-    commit("setUpgradesConst", {
-      max_hp: arenaValue("max_hp", getters["maxHp"]),
-      max_armor: arenaValue("max_armor", getters["maxArmor"]),
-    })
-  },
-
   set_deck_in_play(
     { commit, getters }: ActionContext,
     deck: DeckEntry | null = null

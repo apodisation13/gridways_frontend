@@ -73,13 +73,13 @@ export default defineComponent({
       return this.$store.getters["health"]
     },
     armor(): number {
-      return this.$store.state.game.armor
+      return this.$store.getters["armor"]
     },
     armorDelta(): number {
       return this.$store.state.game.armor_delta
     },
     invulnerability(): number {
-      return this.$store.state.game.invulnerability
+      return this.$store.getters["invulnerability"]
     },
     invulnerabilityHit(): boolean {
       return this.$store.state.game.invulnerability_hit

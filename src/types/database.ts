@@ -2,7 +2,7 @@ import Upgrades from "@/store/modules/upgrades"
 
 import { EffectObject, EffectType } from "./game"
 import { Helps } from "./help"
-import type { InventoryItem } from "./inventory"
+import type { InventoryEffectValues, InventoryItem } from "./inventory"
 
 export interface CardData {
   damage: number
@@ -374,6 +374,7 @@ export interface ArenaRewardMultiply {
 }
 
 export interface ArenaParams {
+  inventory_items_values: InventoryEffectValues
   enter_price: UserResources
   base_enemies: number
   delta_enemies: number

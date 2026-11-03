@@ -207,7 +207,11 @@ import ResourceList from "@/components/ResourceList.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
 import { PayResourcesSubtype } from "@/types"
 import type { ArenaParams } from "@/types/database"
-import type { UpgradeCategory, UpgradeItem } from "@/types/upgrades"
+import {
+  type UpgradeCategory,
+  type UpgradeItem,
+  UpgradeSubtype,
+} from "@/types/upgrades"
 
 const RESOURCE_ORDER: Record<string, number> = {
   scraps: 0,
@@ -282,7 +286,7 @@ export default defineComponent({
       return String(value)
     },
     cooldownAvailableAt(key: string): number | null {
-      if (key !== "arena_draw_exact_card") return null
+      if (key !== UpgradeSubtype.ARENA_DRAW_EXACT_CARD) return null
       const since =
         this.$store.state.arena.user_upgrades["fix_draw_cooldown_since"]
       if (since === undefined) return null

@@ -3,7 +3,7 @@
     <transition-group name="card-hand" tag="div" class="hand-list">
       <div
         v-for="(card, index) in displayedHand"
-        :key="card.id || index"
+        :key="getCardKey(card)"
         class="card_wrap"
         :class="{ 'card_wrap--dragging': draggedCardIndex === index }"
         :style="cardStyle(index)"
@@ -71,6 +71,21 @@ export default defineComponent({
     "cell_in_cross",
     "cell_in_cross_locked",
   ],
+  setup() {
+    const cardKeys = new WeakMap<Card, number>()
+    let nextKey = 0
+
+    function getCardKey(card: Card): number {
+      let key = cardKeys.get(card)
+      if (key === undefined) {
+        key = nextKey++
+        cardKeys.set(card, key)
+      }
+      return key
+    }
+
+    return { getCardKey }
+  },
   data() {
     return {
       effectiveInitialSize: 0,

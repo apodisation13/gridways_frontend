@@ -1,6 +1,7 @@
 import { defineComponent } from "vue"
 
 import { choice_pop } from "@/lib/utils"
+import { sound_card_draw } from "@/logic/play_sounds"
 import type { Card } from "@/types"
 import {
   get_value_from_upgrades,
@@ -72,6 +73,7 @@ export default defineComponent({
         )
           break
         this.gameObj.hand.push(choice_pop(this.gameObj.deck) as Card)
+        sound_card_draw()
       }
       if (this.redraws !== 0) this.draw = true // показать окно редро, если не 0 там
       this.emptyPassApply = false

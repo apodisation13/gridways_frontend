@@ -1,5 +1,5 @@
 <template>
-  <div class="block-assembling-deck">
+  <div class="block-assembling-deck" :class="{ 'arena-deck': arena_mode }">
     <div class="deck-block">
       <div class="leader-block">
         <div class="leader-img-block">
@@ -21,6 +21,17 @@
             $store.getters["maxCardsInDeck"]
           }}
         </span>
+        <div v-if="arena_mode" class="arena-deck-stats">
+          <div class="deck-health">
+            <div class="heart"></div>
+            {{ deck.health }}
+          </div>
+          <div class="deck-charge">
+            <div class="charges"></div>
+            {{ charges }}
+          </div>
+        </div>
+        <slot v-if="arena_mode" name="leader-inventory" />
       </div>
       <assembling-pool-list
         class="pool-block"
@@ -29,7 +40,7 @@
         @change_order_deck="change_order_deck"
       />
     </div>
-    <div class="deck-info-block">
+    <div v-if="!arena_mode" class="deck-info-block">
       <input-name-for-deck
         v-if="!arena_mode"
         :deck_name="deck.deck_name"
@@ -154,6 +165,27 @@ export default defineComponent({
   width: 85px;
   margin-right: 10px;
 }
+.arena-deck .leader-block {
+  flex: 0 0 85px;
+}
+
+.arena-deck .pool-block {
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.arena-deck .leader-block-info {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.arena-deck-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
 .leader-img-block {
   margin-bottom: 10px;
 }

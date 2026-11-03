@@ -81,14 +81,14 @@ const actions = {
 
   async postUserStatistic(
     { getters }: ActionContext,
-    { user_deck_id, type }: { user_deck_id: number; type: GameStatsRecordType }
+    { leader_id, type }: { leader_id: number; type: GameStatsRecordType }
   ) {
     const userId = getters["getUser"].user_id
     try {
       await callApi({
         method: HttpMethod.POST,
         url: USER_STATS.replace("{userId}", userId),
-        data: { user_deck_id, type },
+        data: { leader_id, type },
       })
     } catch (err) {
       console.log(err)
@@ -124,17 +124,28 @@ const actions = {
   async postUserLeaderboard(
     { getters }: ActionContext,
     {
-      user_deck_id,
+      leader_id,
       mode,
       max_kills,
-    }: { user_deck_id: number; mode: LeaderboardGameMode; max_kills: number }
+      max_arena_level,
+    }: {
+      leader_id: number
+      mode: LeaderboardGameMode
+      max_kills: number
+      max_arena_level?: number
+    }
   ) {
     const userId = getters["getUser"].user_id
     try {
       await callApi({
         method: HttpMethod.POST,
         url: USER_LEADERBOARD.replace("{userId}", userId),
-        data: { user_deck_id, max_kills, mode },
+        data: {
+          leader_id,
+          max_kills,
+          mode,
+          ...(mode === LeaderboardGameMode.arena ? { max_arena_level } : {}),
+        },
       })
     } catch (err) {
       console.log(err)

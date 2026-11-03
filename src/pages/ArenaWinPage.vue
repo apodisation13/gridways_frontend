@@ -113,7 +113,7 @@ import ResourceList from "@/components/ResourceList.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
 import { getRewardForLevel } from "@/logic/random_rewards"
-import { PayResourcesSubtype } from "@/types"
+import { LeaderboardGameMode, PayResourcesSubtype } from "@/types"
 
 const ARENA_RESOURCE_KEYS = [
   "scraps",
@@ -142,24 +142,30 @@ export default defineComponent({
       )
     },
   },
-  created() {
+  async created() {
     if (!this.$store.state.user_actions.win_redirect) return
     this.$store.commit("set_win_redirect", false)
+    const completed_level = this.$store.state.arena.current_level
+    const leaderboardRequest = this.$store.dispatch("postUserLeaderboard", {
+      leader_id: this.$store.state.game.leader!.id,
+      mode: LeaderboardGameMode.arena,
+      max_kills: this.$store.getters["enemies_grave"].length + 1,
+      max_arena_level: completed_level,
+    })
     this.$store.commit("arena_advance_level")
-    this.compute_rewards()
+    await Promise.all([
+      leaderboardRequest,
+      this.compute_rewards(completed_level),
+    ])
   },
   methods: {
-    async compute_rewards(): Promise<void> {
+    async compute_rewards(completed_level: number): Promise<void> {
       const difficulty = this.$store.state.game.level?.difficulty ?? "easy"
       const win_level_rewards = this.$store.getters["win_level_rewards"]
       const base_rewards = getRewardForLevel(win_level_rewards[difficulty])
 
       const arena_params = this.$store.getters["arena_params"]
       const win_multiply = arena_params?.win_multiply ?? {}
-      // arena_advance_level already ran, so current_level is the NEXT level
-      const completed_level: number =
-        (this.$store.getters["arena_current_level"] as number) - 1
-
       this.pay_data = Object.fromEntries(
         Object.entries(base_rewards).map(([k, v]) => {
           const mult = win_multiply[k]

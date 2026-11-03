@@ -146,3 +146,19 @@ export function frost_sound(): void {
 export function fire_sound(): void {
   sound("./../../audio/sounds/fire.mp3")
 }
+
+export function sound_add_armor(): void {
+  sound("./../../audio/sounds/add_armor.mp3")
+}
+
+export function sound_add_invulnerability(): void {
+  sound("./../../audio/sounds/invulnerability.mp3")
+}
+
+export function sound_clear_negative_effect(): void {
+  sound("./../../audio/sounds/clear_negative_effect.mp3")
+}
+
+export function sound_card_draw(): void {
+  sound("./../../audio/sounds/card_draw.mp3")
+}

@@ -1,6 +1,13 @@
 <template>
   <div class="start-game__page">
     <div class="arena-top-bar">
+      <button
+        class="arena-back-btn"
+        :disabled="loading"
+        @click="$router.push('/arena/deckbuild')"
+      >
+        ← НАЗАД
+      </button>
       <button class="arena-exit-btn" @click="showExitConfirm = true">
         ВЫХОД
       </button>
@@ -184,7 +191,8 @@ export default defineComponent({
     if (!this.arena_level) {
       const enemies = this.$store.state.arena.current_enemies
       const level = random_level_generator_by_number(enemies)
-      ;(level.level as any).random = true
+      level.level.name = "arena"
+      level.level.random = true
       this.$store.commit("arena_set_level", level)
     }
   },
@@ -238,7 +246,7 @@ export default defineComponent({
 .arena-top-bar {
   flex-shrink: 0;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 6px 10px 0;
 }
 
@@ -256,6 +264,27 @@ export default defineComponent({
 
 .arena-exit-btn:active {
   background: rgba(180, 40, 40, 0.35);
+}
+
+.arena-back-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(196, 144, 0, 0.5);
+  border-radius: 6px;
+  background: rgba(196, 144, 0, 0.12);
+  color: #edc379;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+}
+
+.arena-back-btn:active {
+  background: rgba(196, 144, 0, 0.25);
+}
+
+.arena-back-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .resources-bar {

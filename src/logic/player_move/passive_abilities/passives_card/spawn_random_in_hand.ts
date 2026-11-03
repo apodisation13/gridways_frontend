@@ -1,5 +1,6 @@
 import { choice_element, copyObj } from "@/lib/utils"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
+import { sound_card_draw } from "@/logic/play_sounds"
 import store from "@/store"
 import type { Card, CardEntry, GameObj } from "@/types"
 
@@ -17,5 +18,6 @@ export function spawn_random_in_hand(
   if (!pool.length) return
   const random_card = choice_element(pool)
   hand.push(copyObj(random_card.card))
+  sound_card_draw()
   if (card) timeoutAnimationFlag(card, "spawning", null, timeout * 0.5)
 }

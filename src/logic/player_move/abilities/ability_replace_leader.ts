@@ -6,4 +6,5 @@ export function replace_leader(gameObj: GameObj): void {
   const all_leaders: LeaderEntry[] = store.getters["all_leaders"]
   const random_leader = choice_element(all_leaders)
   gameObj.leader = copyObj(random_leader.card)
+  store.commit("set_leader", gameObj.leader)
 }

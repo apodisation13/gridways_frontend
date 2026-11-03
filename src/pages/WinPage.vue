@@ -175,24 +175,30 @@ export default defineComponent({
   },
   async created() {
     if (!this.$store.state.user_actions.win_redirect) return
+    this.$store.commit("set_win_redirect", false)
+    const leader_id = this.$store.state.game.leader!.id
+    const max_kills = this.$store.getters["enemies_grave"].length + 1
+    const level_name = this.$store.state.game.level?.name
+    const gameMode =
+      level_name === LeaderboardGameMode.multiplayer
+        ? LeaderboardGameMode.multiplayer
+        : level_name === "random"
+          ? LeaderboardGameMode.random
+          : level_name === "random_n"
+            ? LeaderboardGameMode.random_n
+            : LeaderboardGameMode.season
+    await this.$store.dispatch("postUserLeaderboard", {
+      leader_id,
+      mode: gameMode,
+      max_kills,
+    })
     this.$store.dispatch("re_set_deck") // и тут переустанавливаем выбранную деку
     await this.pay_resources() // получаем ресурсы за выигрыш
     await this.open_levels() // открываем связанные уровни в дереве
     await this.$store.dispatch("postUserStatistic", {
-      user_deck_id: this.$store.state.game.whole_deck.id,
+      leader_id,
       type: GameStatsRecordType.win,
     })
-    const level_name = this.$store.state.game.level.name
-    let gameMode: LeaderboardGameMode
-    if (level_name === "random") gameMode = LeaderboardGameMode.random
-    else if (level_name === "random_n") gameMode = LeaderboardGameMode.random_n
-    else gameMode = LeaderboardGameMode.season
-    await this.$store.dispatch("postUserLeaderboard", {
-      user_deck_id: this.$store.state.game.whole_deck.id,
-      mode: gameMode,
-      max_kills: this.$store.getters["enemies_grave"].length + 1,
-    })
-    this.$store.commit("set_win_redirect", false)
   },
   methods: {
     closeRewards(): void {
