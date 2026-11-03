@@ -44,11 +44,11 @@
               {{ $store.getters["maxHp"] }}</span
             >
             <span
-              >🛡 {{ $store.state.game.armor }} /
+              >🛡 {{ $store.getters["armor"] }} /
               {{ $store.getters["maxArmor"] }}</span
             >
             <span
-              >✨ {{ $store.state.game.invulnerability }} /
+              >✨ {{ $store.getters["invulnerability"] }} /
               {{ $store.getters["maxImmuneTurns"] }}</span
             >
           </div>

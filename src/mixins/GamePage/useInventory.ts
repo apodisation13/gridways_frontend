@@ -1,8 +1,11 @@
 import { defineComponent } from "vue"
 
 import { choice_pop } from "@/lib/utils"
+import { change_health } from "@/logic/game_logic/change_health"
 import { sound_destroy_enemy } from "@/logic/play_sounds"
+import { add_armor } from "@/logic/player_move/abilities/ability_armor"
 import { remove_effects } from "@/logic/player_move/abilities/ability_effects"
+import { add_invulnerability } from "@/logic/player_move/abilities/ability_invulnerability"
 import { purify } from "@/logic/player_move/abilities/ability_purify"
 import { enemy_takes_damage } from "@/logic/player_move/abilities/enemy_takes_damage"
 import { spawn_random_positive_effects_everywhere } from "@/logic/player_move/passive_abilities/passives_card/effects"
@@ -53,22 +56,21 @@ export default defineComponent({
       }
     },
     unavailableInventoryItems(): InventoryItem[] {
-      const game = this.$store.state.game
       const getters = this.$store.getters
       const values = this.inventoryItemValues
       const items: InventoryItem[] = []
       if (
-        game.health >= getters["maxHp"] ||
+        getters["health"] >= getters["maxHp"] ||
         (values[InventoryItem.FIRST_AID_KITS] ?? 0) <= 0
       )
         items.push(InventoryItem.FIRST_AID_KITS)
       if (
-        game.armor >= getters["maxArmor"] ||
+        getters["armor"] >= getters["maxArmor"] ||
         (values[InventoryItem.SHIELDS] ?? 0) <= 0
       )
         items.push(InventoryItem.SHIELDS)
       if (
-        game.invulnerability >= getters["maxImmuneTurns"] ||
+        getters["invulnerability"] >= getters["maxImmuneTurns"] ||
         (values[InventoryItem.IMMUNE_MAGICS] ?? 0) <= 0
       )
         items.push(InventoryItem.IMMUNE_MAGICS)
@@ -104,6 +106,8 @@ export default defineComponent({
   methods: {
     // Мультиплеер переопределяет этот хук для отправки состояния напарнику.
     afterInventoryItemApplied(): void {},
+
+    // Использование предметов
     async useInventoryItem(item: InventoryItem): Promise<void> {
       const getters = this.$store.getters
       const slots = (getters["activeInventory"] as InventoryItem[]).slice(
@@ -131,24 +135,22 @@ export default defineComponent({
             data: { [item]: -1 },
           })
         }
-        if (item === InventoryItem.FIRST_AID_KITS)
-          this.$store.commit("change_health", value)
-        else if (item === InventoryItem.SHIELDS) {
-          this.$store.commit("change_armor", value)
-          this.$store.commit("set_armor_delta", value)
-          setTimeout(() => this.$store.commit("set_armor_delta", null), 500)
+
+        // вот тут начинаем использовать предметы
+        if (item === InventoryItem.FIRST_AID_KITS) {
+          change_health({ data: { heal: value } })
+        } else if (item === InventoryItem.SHIELDS) {
+          add_armor(value)
         } else if (item === InventoryItem.IMMUNE_MAGICS) {
-          this.$store.commit(
-            "set_invulnerability",
-            this.$store.state.game.invulnerability + value
-          )
+          add_invulnerability(value)
         } else if (item === InventoryItem.DRAW_CARDS) {
           const count = Math.min(
             value,
             getters["handSize"] - this.gameObj.hand.length
           )
-          for (let i = 0; i < count; i++)
+          for (let i = 0; i < count; i++) {
             spawn_random_in_hand(null, this.gameObj)
+          }
         } else if (
           item === InventoryItem.MEGA_BOMBS ||
           item === InventoryItem.RANDOM_BOMBS
