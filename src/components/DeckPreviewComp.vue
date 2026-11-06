@@ -30,6 +30,8 @@
     <deck-modal
       v-if="show_deck && deck.deck.leader"
       :deck="deck.deck.cards"
+      :deck-name="deck.deck.name"
+      :deck-health="deck.deck.health"
       :leader="deck.deck.leader"
       @close_deck_modal="show_deck = false"
     />

@@ -310,4 +310,11 @@ div {
   width: 90%;
   height: 100%;
 }
+
+@media (min-width: 600px) and (max-width: 899px),
+  (min-width: 600px) and (any-pointer: coarse) {
+  .card-ui {
+    width: min(85%, 420px, calc(var(--vh, 1vh) * 42));
+  }
+}
 </style>

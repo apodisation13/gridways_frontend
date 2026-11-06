@@ -534,4 +534,13 @@ export default defineComponent({
     opacity: 0;
   }
 }
+
+/* Center each pair on tablets without changing button or panel sizes. */
+@media (min-width: 600px) and (max-width: 899px) and (min-height: 600px),
+  (min-width: 600px) and (min-height: 600px) and (any-pointer: coarse) {
+  .right-panel > .div-two-buttons {
+    align-self: center;
+    justify-content: center;
+  }
+}
 </style>

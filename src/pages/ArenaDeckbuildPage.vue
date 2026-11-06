@@ -792,9 +792,10 @@ export default defineComponent({
 .arena-deckbuild-page {
   display: flex;
   flex-direction: column;
-  height: calc(var(--vh, 1vh) * 100 - 100px);
-  padding-bottom: calc(57px + env(safe-area-inset-bottom, 0px));
-  overflow: hidden;
+  /* This route hides both navigation menus. */
+  height: calc(var(--vh, 1vh) * 100);
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
 }
 
 .arena-top-bar {
@@ -855,8 +856,8 @@ export default defineComponent({
 }
 
 .bottom-zone {
-  flex: 1 1 0;
-  overflow-y: auto;
+  flex: 1 0 auto;
+  overflow: visible;
   background: #3c4d60;
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.7);
   padding: 5px;
@@ -1025,5 +1026,47 @@ export default defineComponent({
   flex: 1;
   overflow-y: auto;
   padding: 8px;
+}
+
+/* The pool cards extend below their negative bottom margins. */
+.bottom-zone :deep(.assembling-pool-list) {
+  padding-bottom: 65px;
+}
+
+/* There is no navigation footer on the arena deckbuilding route. */
+.btn-upgrades {
+  position: fixed;
+  left: 50%;
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 2;
+  margin: 0;
+  min-height: 48px;
+  padding: 8px 28px;
+  background: linear-gradient(145deg, #3c4034, #202a32);
+}
+
+@media (max-width: 899px) {
+  .top-zone {
+    flex: 0 0 auto;
+    padding: 12px 10px;
+    overflow: visible;
+    scrollbar-gutter: auto;
+  }
+
+  .pick-label {
+    margin-bottom: 4px;
+  }
+
+  .arena-actions {
+    margin-top: 4px;
+    padding-top: 8px;
+    gap: 6px;
+  }
+
+  .level-panel {
+    gap: 6px;
+    padding-bottom: 0;
+  }
 }
 </style>

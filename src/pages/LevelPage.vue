@@ -650,4 +650,27 @@ div {
   letter-spacing: 1px;
   margin-bottom: -16px;
 }
+
+/* Above 900px App.vue uses the compact desktop layout. Avoid size
+   containment here: previews contain fixed-position dialogs. */
+@media (min-width: 600px) and (max-width: 899px) {
+  .levels-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 160px));
+    justify-content: center;
+    gap: 24px;
+    padding: 0 24px 12px 12px;
+  }
+
+  .levels-row > .level {
+    width: auto;
+    margin: 0;
+  }
+
+  .levels-row :deep(.level-stack) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+  }
+}
 </style>
