@@ -306,4 +306,29 @@ export default defineComponent({
   filter: grayscale(1) brightness(0.55);
   cursor: not-allowed;
 }
+
+/* Above 900px App.vue uses the compact desktop layout. Avoid size
+   containment here: previews contain fixed-position dialogs. */
+@media (min-width: 600px) and (max-width: 899px) {
+  .battle-section {
+    width: min(100% - 32px, 560px);
+    gap: 20px;
+  }
+
+  .battle-side {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .battle-side :deep(.level-stack),
+  .battle-side :deep(.deck-stack) {
+    width: min(100%, 160px, calc(var(--vh, 1vh) * 24));
+    height: auto;
+    aspect-ratio: 3 / 4;
+  }
+
+  .battle-label {
+    font-size: 14px;
+  }
+}
 </style>

@@ -48,4 +48,12 @@ export default defineComponent({
 .modal_footer {
   flex-shrink: 0; /* Футер не сжимается */
 }
+/* All shared dialogs fill phones and tablets; mouse-only desktop
+   viewports retain the compact 425px layout used by App.vue. */
+@media (max-width: 899px), (any-pointer: coarse) {
+  .modal_window {
+    width: 100vw;
+    max-width: none;
+  }
+}
 </style>
