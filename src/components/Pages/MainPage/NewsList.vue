@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="news-list">
     <div v-if="news && showNews" class="news">
       <button class="news__prev" @click="prev">
         <img :src="require('@/assets/icons/' + 'arrow.svg')" alt="" />
@@ -276,5 +276,20 @@ export default defineComponent({
   justify-content: center;
   width: 100%;
   margin-top: -1vh;
+}
+
+.news-list {
+  container: news-list / inline-size;
+}
+
+@container news-list (min-width: 600px) {
+  .news__item {
+    position: relative;
+    width: calc(100% - 32px);
+  }
+
+  .news__text {
+    width: 100%;
+  }
 }
 </style>

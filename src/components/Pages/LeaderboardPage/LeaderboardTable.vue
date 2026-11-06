@@ -3,7 +3,7 @@
     <table class="leaderboard__table">
       <colgroup>
         <col class="leaderboard__col-rank" />
-        <col />
+        <col class="leaderboard__col-identity" />
         <col class="leaderboard__col-leader" />
         <col class="leaderboard__col-mode" />
         <col class="leaderboard__col-kills" />
@@ -320,6 +320,31 @@ export default defineComponent({
   }
   .leaderboard__card-wrap {
     width: 54px;
+  }
+}
+
+.leaderboard__table-wrap {
+  container: leaderboard-table / inline-size;
+}
+
+@container leaderboard-table (min-width: 600px) {
+  .leaderboard__col-rank {
+    width: 7%;
+  }
+  .leaderboard__col-identity {
+    width: 25%;
+  }
+  .leaderboard__col-leader {
+    width: 19%;
+  }
+  .leaderboard__col-mode {
+    width: 21%;
+  }
+  .leaderboard__col-kills {
+    width: 13%;
+  }
+  .leaderboard__col-arena {
+    width: 15%;
   }
 }
 </style>

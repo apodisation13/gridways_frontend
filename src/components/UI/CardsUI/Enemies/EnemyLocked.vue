@@ -13,13 +13,11 @@ export default defineComponent({
 <style scoped>
 .enemy_locked {
   position: absolute;
-  right: 30%;
-  top: 30%;
-  width: 40px;
-  height: 40px;
+  inset: 0;
+  pointer-events: none;
   background-image: url("~@/assets/icons/card/locked.svg");
   background-position: center;
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: 30% auto;
 }
 </style>
