@@ -346,11 +346,6 @@ const actions = {
       // - user_inventory
       // - user_cards, leaders, decks, seasons
 
-      // const upgrades = await callApi<UserUpgrades>({
-      //   method: HttpMethod.GET,
-      //   url: UPGRADES.replace("{userId}", userId),
-      // })
-
       const user_database = await callApi<UserProgressResponse>({
         method: HttpMethod.GET,
         url: USER_DATABASE.replace("{userId}", userId),
