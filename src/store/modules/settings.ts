@@ -83,19 +83,6 @@ const mutations = {
 }
 
 const actions = {
-  async getUserPreferences({ getters, commit }: ActionContext) {
-    const userId = getters["getUser"].user_id
-    try {
-      const response = await callApi<UserPreferencesResponse>({
-        method: HttpMethod.GET,
-        url: USER_PREFERENCES.replace("{userId}", userId),
-      })
-      commit("setPreferences", response.data)
-    } catch (err) {
-      console.log(err)
-    }
-  },
-
   async updateUserPreferences({ getters }: ActionContext) {
     const userId = getters["getUser"].user_id
     const body: UserPreferencesResponse = {

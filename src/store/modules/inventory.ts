@@ -72,20 +72,6 @@ const mutations = {
 }
 
 const actions = {
-  async getUserInventory({ getters, commit, dispatch }: ActionContext) {
-    const userId = getters["getUser"].user_id
-    try {
-      const response = await callApi<UserInventory>({
-        method: HttpMethod.GET,
-        url: INVENTORY.replace("{userId}", String(userId)),
-      })
-      commit("setInventory", response.data.slots)
-    } catch (err) {
-      dispatch("error_action", err)
-      throw err
-    }
-  },
-
   async updateUserInventory(
     { getters, commit, dispatch }: ActionContext,
     slots: InventoryItem[]
