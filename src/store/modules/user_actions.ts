@@ -1,4 +1,3 @@
-import axios from "axios"
 import { useToast } from "vue-toastification"
 
 import { callApi, HttpMethod } from "@/lib/api/api"
@@ -8,7 +7,6 @@ import {
   CRAFT_BONUS_CARD,
   CREATE_USER_DECK,
   OPEN_RELATED_LEVELS,
-  patch_levels,
   USER_RESOURCE,
 } from "@/store/const/api_urls"
 import type {
@@ -243,20 +241,6 @@ const actions = {
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при создании карты")
-    }
-  },
-
-  // тестовый экшен, сбрасывает все уровни юзера кроме первого
-  async reset_levels({ dispatch, getters }: ActionContext) {
-    const header = getters["getHeader"]
-    let url = `${patch_levels}1/`
-
-    try {
-      const response = await axios.patch(url, null, header)
-      return response.data
-    } catch (err) {
-      dispatch("error_action", err)
-      throw new Error("Какая-то ошибка при сбрасывании уровней")
     }
   },
 

@@ -5,12 +5,7 @@ import {
   describeCardAbility,
   describeCardPassiveAbility,
 } from "@/logic/card_descriptions"
-import {
-  GAME_DATA,
-  UPGRADES,
-  USER_DATABASE,
-  USER_RESOURCE,
-} from "@/store/const/api_urls"
+import { GAME_DATA, USER_DATABASE, USER_RESOURCE } from "@/store/const/api_urls"
 import {
   ActionContext,
   Card,
@@ -36,7 +31,6 @@ import {
   UserResources,
   UserSeasonsProgress,
 } from "@/types"
-import { UserUpgrades } from "@/types/upgrades"
 
 const toast = useToast()
 
@@ -352,11 +346,10 @@ const actions = {
       // - user_inventory
       // - user_cards, leaders, decks, seasons
 
-      const upgrades = await callApi<UserUpgrades>({
-        method: HttpMethod.GET,
-        url: UPGRADES.replace("{userId}", userId),
-      })
-      commit("setUserUpgrades", upgrades.data)
+      // const upgrades = await callApi<UserUpgrades>({
+      //   method: HttpMethod.GET,
+      //   url: UPGRADES.replace("{userId}", userId),
+      // })
 
       const user_database = await callApi<UserProgressResponse>({
         method: HttpMethod.GET,
@@ -369,6 +362,9 @@ const actions = {
         user_decks,
         user_seasons,
         user_resources,
+        user_upgrades,
+        user_inventory,
+        user_preferences,
       } = user_database.data
 
       commit("set_cards", user_cards)
@@ -380,13 +376,14 @@ const actions = {
 
       commit("set_resource", user_resources)
 
+      commit("setUserUpgrades", user_upgrades)
+      commit("setInventory", user_inventory.slots)
+      commit("setPreferences", user_preferences)
+
       dispatch("set_deck_in_play", getters["all_decks"][0])
       dispatch("set_level_in_play", getters["all_seasons"][0].season.levels[0]) // устанавливаем для игры первый уровень
 
       dispatch("syncGameUpgrades")
-
-      dispatch("getUserInventory")
-      dispatch("getUserPreferences")
 
       toast.success("Успешно загрузили всю вашу базу данных")
     } catch (err) {

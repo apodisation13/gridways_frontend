@@ -1,8 +1,11 @@
 import Upgrades from "@/store/modules/upgrades"
+import { UserPreferencesResponse } from "@/types/settings"
+import { UserUpgrades } from "@/types/upgrades"
 
 import { EffectObject, EffectType } from "./game"
 import { Helps } from "./help"
 import type { InventoryEffectValues, InventoryItem } from "./inventory"
+import { UserInventory } from "./inventory"
 
 export interface CardData {
   damage: number
@@ -347,6 +350,9 @@ export interface UserProgressResponse {
   user_leaders: Record<number, UserLeader>
   user_decks: UserDeck[]
   user_seasons: UserSeasonsProgress
+  user_upgrades: UserUpgrades
+  user_inventory: UserInventory
+  user_preferences: UserPreferencesResponse
 }
 
 export interface ListDecksResponse {
