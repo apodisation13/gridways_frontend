@@ -198,7 +198,7 @@ const mutations = {
     state.maxResourcesValue = payload
   },
 
-  set_cardsdb(state: DatabaseState, result: GameCatalogResponse) {
+  setCardsDB(state: DatabaseState, result: GameCatalogResponse) {
     state.cardsdb = new Map(result.cards.map(card => [card.id, card]))
     state.leadersdb = new Map(result.leaders.map(card => [card.id, card]))
     state.enemiesdb = result.enemies
@@ -326,16 +326,31 @@ const mutations = {
 }
 
 const actions = {
-  // TODO: написать
   async getUserDatabase({ commit, getters, dispatch }: ActionContext) {
     const userId = getters["getUser"].user_id
 
+    // 1. Загружаем вначале все данные игры, которые не зависят от прогресса юзера
+    // Там есть:
+    // - game_const
+    // - cards, leaders, enemies, enemy_leaders
+    // - seasons + related seasons и еще levels + related levels с enemies (id)
     try {
       const gameDataResponse = await callApi<GameCatalogResponse>({
         method: HttpMethod.GET,
         url: GAME_DATA,
       })
-      commit("set_cardsdb", gameDataResponse.data)
+      // вот здесь все карты, лидеры, враги, сезоны
+      commit("setCardsDB", gameDataResponse.data)
+      // а здесь просто распределяется по разным модулям всё из игровых конфигов
+      dispatch("setGameConstants", gameDataResponse.data.game_const)
+
+      // 2. Далее загружаем весь прогресс юзера
+      // Там есть:
+      // - user_resources
+      // - user_upgrades
+      // - user_settings
+      // - user_inventory
+      // - user_cards, leaders, decks, seasons
 
       const upgrades = await callApi<UserUpgrades>({
         method: HttpMethod.GET,
@@ -368,23 +383,6 @@ const actions = {
       dispatch("set_deck_in_play", getters["all_decks"][0])
       dispatch("set_level_in_play", getters["all_seasons"][0].season.levels[0]) // устанавливаем для игры первый уровень
 
-      const game_const: GameConst = gameDataResponse.data.game_const
-      commit("setUpgrades", game_const.upgrades) // все данные об апгрейдах
-      commit("setArenaUpgrades", game_const.arena_upgrades) // все данные об апгрейдах для арены
-      commit("setArenaParams", game_const.arena_params)
-      commit("setMaxEnemies", game_const.multiplayer.max_enemies)
-      commit("set_game_const", {
-        random_level_enemies_count: game_const.random_level_enemies_count,
-        max_random_n_enemies: game_const.max_random_n_enemies,
-      }) // распределение рандомных врагов
-      commit("setEffectsInfo", game_const.effects)
-      commit("setHelpsInfo", game_const.helps ?? {})
-      commit("set_resources_transitions", game_const.resources_transitions) // покупка/продажа ресурсов
-      commit("set_keys_rewards", game_const.keys_rewards) // награды за открытие ключей
-      commit("set_win_level_rewards", game_const.win_level_rewards) // награды за прохождение уровня
-      commit("set_start_level_prices", game_const.start_level_prices) // стоимость игры в уровни
-      commit("set_cards_resources_prices", game_const.cards_resources_prices) // крафт/милл карт и лидеров
-
       dispatch("syncGameUpgrades")
 
       dispatch("getUserInventory")
@@ -410,6 +408,24 @@ const actions = {
       dispatch("error_action", err)
       throw new Error("Ошибка загрузки базы данных!")
     }
+  },
+
+  async setGameConstants({ commit }: ActionContext, game_const: GameConst) {
+    commit("setUpgrades", game_const.upgrades) // все данные об апгрейдах
+    commit("setArenaUpgrades", game_const.arena_upgrades) // все данные об апгрейдах для арены
+    commit("setArenaParams", game_const.arena_params)
+    commit("setMaxEnemies", game_const.multiplayer.max_enemies)
+    commit("set_game_const", {
+      random_level_enemies_count: game_const.random_level_enemies_count,
+      max_random_n_enemies: game_const.max_random_n_enemies,
+    }) // распределение рандомных врагов
+    commit("setEffectsInfo", game_const.effects)
+    commit("setHelpsInfo", game_const.helps ?? {})
+    commit("set_resources_transitions", game_const.resources_transitions) // покупка/продажа ресурсов
+    commit("set_keys_rewards", game_const.keys_rewards) // награды за открытие ключей
+    commit("set_win_level_rewards", game_const.win_level_rewards) // награды за прохождение уровня
+    commit("set_start_level_prices", game_const.start_level_prices) // стоимость игры в уровни
+    commit("set_cards_resources_prices", game_const.cards_resources_prices) // крафт/милл карт и лидеров
   },
 }
 
