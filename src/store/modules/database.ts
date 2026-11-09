@@ -6,8 +6,7 @@ import {
   describeCardPassiveAbility,
 } from "@/logic/card_descriptions"
 import {
-  CARDS_DATABASE,
-  GAME_CONST,
+  GAME_DATA,
   UPGRADES,
   USER_DATABASE,
   USER_RESOURCE,
@@ -332,11 +331,11 @@ const actions = {
     const userId = getters["getUser"].user_id
 
     try {
-      const cards_response = await callApi<GameCatalogResponse>({
+      const gameDataResponse = await callApi<GameCatalogResponse>({
         method: HttpMethod.GET,
-        url: CARDS_DATABASE,
+        url: GAME_DATA,
       })
-      commit("set_cardsdb", cards_response.data)
+      commit("set_cardsdb", gameDataResponse.data)
 
       const upgrades = await callApi<UserUpgrades>({
         method: HttpMethod.GET,
@@ -369,11 +368,7 @@ const actions = {
       dispatch("set_deck_in_play", getters["all_decks"][0])
       dispatch("set_level_in_play", getters["all_seasons"][0].season.levels[0]) // устанавливаем для игры первый уровень
 
-      const game_const_response = await callApi<GameConst>({
-        method: HttpMethod.GET,
-        url: GAME_CONST,
-      })
-      const game_const = game_const_response.data
+      const game_const: GameConst = gameDataResponse.data.game_const
       commit("setUpgrades", game_const.upgrades) // все данные об апгрейдах
       commit("setArenaUpgrades", game_const.arena_upgrades) // все данные об апгрейдах для арены
       commit("setArenaParams", game_const.arena_params)

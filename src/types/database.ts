@@ -338,6 +338,7 @@ export interface GameCatalogResponse {
   enemies: Record<number, Enemy>
   enemy_leaders: Record<number, EnemyLeader>
   seasons: Record<number, SeasonDefinition>
+  game_const: GameConst
 }
 
 export interface UserProgressResponse {
