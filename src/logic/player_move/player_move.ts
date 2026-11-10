@@ -1,4 +1,5 @@
 import { copyObj } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { change_health } from "@/logic/game_logic/change_health"
 import { add_charges_to_leader } from "@/logic/player_move/abilities/ability_add_charges_to_leader"
 import { add_damage_to_leader } from "@/logic/player_move/abilities/ability_add_damage_to_leader"
@@ -56,8 +57,8 @@ import { passives_upon_playing_a_card } from "@/logic/player_move/passive_abilit
 import { check_win } from "@/logic/player_move/service/check_win"
 import { change_card_charges } from "@/logic/player_move/service/service_for_player_move"
 import store from "@/store"
-import type { Card, Enemy, EnemyLeader, GameObj, Leader } from "@/types"
-import { CardAbility } from "@/types"
+import { Card, Enemy, EnemyLeader, GameObj, Leader } from "@/types"
+import { AchievementEventType, CardAbility } from "@/types"
 
 // Сюда заходим если там есть враг
 // card - карта, которую мы играем (или из руки, или лидер).
@@ -204,6 +205,11 @@ export function damage_ai_card(
   // а в special-case-abilities там где закрываем окно и в afterDamage (если не вызывалась sca)
   change_card_charges(card, -1, timeout)
 
+  trackAchievementEvent({
+    type: AchievementEventType.ActionPlayed,
+    actor: card,
+  })
+
   // пассивные абилки от хода
   leader_passive_abilities_upon_playing_a_card(
     card,
@@ -251,6 +257,11 @@ export function damage_ai_card_multi(
   // чтобы анимация сброса корректно игралась, сброс карты происходит теперь не здесь,
   // а в special-case-abilities там где закрываем окно и в afterDamage (если не вызывалась sca)
   change_card_charges(card, -1, timeout)
+
+  trackAchievementEvent({
+    type: AchievementEventType.ActionPlayed,
+    actor: card,
+  })
 
   // пассивные абилки от хода - а тут костыль))
   leader_passive_abilities_upon_playing_a_card(
