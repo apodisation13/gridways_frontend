@@ -13,6 +13,7 @@ import type {
   AchievementGameConfig,
   AchievementPreview,
   GrantedAchievementReward,
+  PinnedAchievement,
   UserAchievementsProgress,
 } from "@/types"
 
@@ -31,6 +32,8 @@ export interface AchievementsState {
   sending: boolean
   // Номер локальной сессии: помогает отбросить ответ, пришедший после выхода.
   session: number
+  // Только память приложения: после перезагрузки или выхода список пустой.
+  pinnedAchievements: PinnedAchievement[]
 }
 
 const state: AchievementsState = {
@@ -45,9 +48,42 @@ const state: AchievementsState = {
   grantedRewards: [],
   sending: false,
   session: 0,
+  pinnedAchievements: [],
+}
+
+export const MAX_PINNED_ACHIEVEMENTS = 5
+
+function findPinnedDefinition(
+  state: AchievementsState,
+  pin: PinnedAchievement
+) {
+  return Object.values(state.achievementsConfig[pin.section].categories)
+    .flatMap(category => Object.values(category.achievements))
+    .find(definition => definition.id === pin.id)
+}
+
+function canKeepPin(state: AchievementsState, pin: PinnedAchievement): boolean {
+  const progress = state.userAchievements.permanent?.[pin.id]
+  return (
+    Boolean(findPinnedDefinition(state, pin)) &&
+    !progress?.completed_at &&
+    !progress?.reward_granted_at
+  )
+}
+
+function prunePins(state: AchievementsState) {
+  // Только подтверждение бэка снимает закрепление. Локальные 10/10 ещё ждут ответа.
+  state.pinnedAchievements = state.pinnedAchievements.filter(pin =>
+    canKeepPin(state, pin)
+  )
 }
 
 const getters = {
+  pinnedAchievementEntries: (state: AchievementsState) =>
+    state.pinnedAchievements.flatMap(pin => {
+      const definition = findPinnedDefinition(state, pin)
+      return definition ? [{ ...pin, definition }] : []
+    }),
   // Заново считаем от данных бэка + событий, ещё не подтверждённых ответом.
   // Поэтому повторный вызов getter не прибавляет один и тот же ход ещё раз.
   achievementPreview: (state: AchievementsState): AchievementPreview =>
@@ -67,6 +103,19 @@ const getters = {
 }
 
 const mutations = {
+  toggleAchievementPin(state: AchievementsState, pin: PinnedAchievement) {
+    const index = state.pinnedAchievements.findIndex(
+      item => item.section === pin.section && item.id === pin.id
+    )
+    if (index >= 0) {
+      state.pinnedAchievements.splice(index, 1)
+    } else if (
+      canKeepPin(state, pin) &&
+      state.pinnedAchievements.length < MAX_PINNED_ACHIEVEMENTS
+    ) {
+      state.pinnedAchievements.push({ ...pin })
+    }
+  },
   setAchievementSending(state: AchievementsState, sending: boolean) {
     state.sending = sending
   },
@@ -82,6 +131,7 @@ const mutations = {
     // Бэк уже учёл отправленную пачку: заменяем прогресс и убираем её вместе.
     // Новые pendingEvents оставляем — они ещё не входят в этот ответ.
     state.userAchievements = response.user_achievements
+    prunePins(state)
     state.inFlightEvents = []
     state.grantedRewards.push(...response.granted_rewards)
   },
@@ -93,6 +143,7 @@ const mutations = {
   resetAchievementSession(state: AchievementsState) {
     // При входе/выходе не переносим прогресс и очередь между пользователями.
     state.session += 1
+    state.pinnedAchievements = []
     state.userAchievements = {}
     state.pendingEvents = []
     state.inFlightEvents = []
@@ -113,6 +164,7 @@ const mutations = {
   ) {
     // Daily и weekly позднее загрузим отдельно; game_const присылает permanent.
     state.achievementsConfig.permanent = catalog.permanent
+    prunePins(state)
   },
   setUserAchievements(
     state: AchievementsState,
@@ -120,6 +172,7 @@ const mutations = {
   ) {
     // Вызывается при загрузке общей базы пользователя через getUserDatabase.
     state.userAchievements = progress
+    prunePins(state)
   },
 }
 
@@ -127,6 +180,23 @@ const REQUEST_TIMEOUT_MS = 15_000
 const toast = useToast()
 
 const actions = {
+  togglePinnedAchievement(
+    { state, commit }: ActionContext<AchievementsState, RootState>,
+    pin: PinnedAchievement
+  ) {
+    const alreadyPinned = state.pinnedAchievements.some(
+      item => item.section === pin.section && item.id === pin.id
+    )
+    if (!alreadyPinned && !canKeepPin(state, pin)) return
+    if (
+      !alreadyPinned &&
+      state.pinnedAchievements.length >= MAX_PINNED_ACHIEVEMENTS
+    ) {
+      toast.info(`Можно закрепить не больше ${MAX_PINNED_ACHIEVEMENTS} заданий`)
+      return
+    }
+    commit("toggleAchievementPin", pin)
+  },
   // true означает «запрос был запущен», а не «бэк успешно сохранил события».
   // По этому результату планировщик понимает, стоит ли проверить новую очередь.
   async sendAchievementEvents({
@@ -144,7 +214,7 @@ const actions = {
     const batchSession = state.session
     commit("startAchievementBatch")
     const request: AchievementEventsRequest = {
-      // Локальные ID на бэк не отправляем: согласовали протокол без повторов.
+      // Локальные ID на бэк не отправляем. После сетевого сбоя пачку не повторяем.
       events: state.inFlightEvents.map(({ type, data }) => ({ type, data })),
     }
 
@@ -153,8 +223,7 @@ const actions = {
         method: HttpMethod.POST,
         url: USER_ACHIEVEMENTS.replace("{userId}", String(userId)),
         data: { events: request.events },
-        // Несмотря на название, true здесь ЗАПРЕЩАЕТ повтор после 401 в callApi.
-        _retry: true,
+        // При 401 callApi сам обновит токен и повторит отклонённый запрос.
         timeout: REQUEST_TIMEOUT_MS,
       })
       // Ответ от предыдущей сессии не должен менять данные текущего игрока.

@@ -21,6 +21,15 @@
       >
         Только выполненные
       </button>
+      <button
+        type="button"
+        class="filter-option"
+        :class="{ 'filter-option--active': pinnedOnly }"
+        :aria-pressed="pinnedOnly"
+        @click="$emit('toggle-pinned')"
+      >
+        Только закреплённые
+      </button>
       <button type="button" class="cancel" @click="$emit('reset-filters')">
         Сброс фильтров
       </button>
@@ -37,12 +46,18 @@ import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
 export default defineComponent({
   components: { BaseModal, ButtonCloseImg },
   props: {
+    pinnedOnly: { type: Boolean, default: false },
     completedFilter: {
       type: Boolean as PropType<boolean | null>,
       default: null,
     },
   },
-  emits: ["close-modal", "set-completed-filter", "reset-filters"],
+  emits: [
+    "close-modal",
+    "set-completed-filter",
+    "reset-filters",
+    "toggle-pinned",
+  ],
 })
 </script>
 

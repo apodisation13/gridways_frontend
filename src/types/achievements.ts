@@ -146,3 +146,9 @@ export interface AchievementPreview {
   // Locally reached permanent goals, not confirmed completions or rewards.
   reachedAchievementIds: string[]
 }
+
+// Сейчас закрепляем постоянные задания; для daily/weekly добавим ещё период набора.
+export interface PinnedAchievement {
+  section: "permanent"
+  id: string
+}

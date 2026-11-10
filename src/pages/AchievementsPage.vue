@@ -26,7 +26,7 @@
       <button
         type="button"
         class="filter_btn"
-        :class="{ 'set-filter': completedFilter !== null }"
+        :class="{ 'set-filter': completedFilter !== null || pinnedOnly }"
         aria-label="Фильтры"
         :aria-expanded="showFilters"
         @click="showFilters = true"
@@ -34,11 +34,11 @@
         <button-icon image_name="open_filters.svg" />
       </button>
       <button
-        v-if="completedFilter !== null"
+        v-if="completedFilter !== null || pinnedOnly"
         type="button"
         class="filter_btn_cancel"
         aria-label="Сбросить фильтры"
-        @click="completedFilter = null"
+        @click="resetFilters"
       >
         <button-icon image_name="add_icon.svg" />
       </button>
@@ -47,9 +47,11 @@
     <achievement-filters
       v-if="showFilters"
       :completed-filter="completedFilter"
+      :pinned-only="pinnedOnly"
+      @toggle-pinned="pinnedOnly = !pinnedOnly"
       @close-modal="showFilters = false"
       @set-completed-filter="toggleCompletedFilter"
-      @reset-filters="completedFilter = null"
+      @reset-filters="resetFilters"
     />
 
     <div
@@ -74,49 +76,12 @@
             </span>
           </summary>
           <div class="group-items">
-            <article
+            <achievement-card
               v-for="entry in group.visibleEntries"
               :key="entry.key"
-              class="achievement"
-              :class="{ 'achievement--completed': entry.completed }"
-            >
-              <h2>{{ entry.definition.title }}</h2>
-              <div class="achievement__progress-label">
-                <span>{{ entry.value }} / {{ entry.definition.target }}</span>
-                <span v-if="entry.rewardGranted" class="achievement__status">
-                  ✓ Награда получена
-                </span>
-                <span v-else-if="entry.completed" class="achievement__status">
-                  ✓ Выполнено
-                </span>
-                <span
-                  v-else-if="
-                    entry.definition.target > 0 &&
-                    entry.value >= entry.definition.target
-                  "
-                >
-                  Ожидает подтверждения
-                </span>
-              </div>
-              <div
-                class="achievement__bar"
-                role="progressbar"
-                :aria-label="entry.definition.title"
-                :aria-valuenow="entry.value"
-                :aria-valuemin="0"
-                :aria-valuemax="entry.definition.target"
-              >
-                <span :style="{ width: `${entry.percent}%` }" />
-              </div>
-              <div class="achievement__reward">
-                <span class="reward-label">Награда</span>
-                <resource-list
-                  class="reward-resources"
-                  :resources="entry.definition.rewards.resources"
-                  :highlight_max_count="false"
-                />
-              </div>
-            </article>
+              :definition="entry.definition"
+              :progress="progress.permanent?.[entry.key]"
+            />
           </div>
         </details>
       </template>
@@ -128,24 +93,22 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 
+import AchievementCard from "@/components/Pages/AchievementsPage/AchievementCard.vue"
 import AchievementFilters from "@/components/Pages/AchievementsPage/AchievementFilters.vue"
 import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon.vue"
-import ResourceList from "@/components/ResourceList.vue"
 import type {
   AchievementCatalog,
   AchievementDefinition,
   AchievementPeriod,
+  PinnedAchievement,
   UserAchievementsProgress,
 } from "@/types"
 
 interface AchievementEntry {
   key: string
   definition: AchievementDefinition
-  value: number
-  percent: number
   completed: boolean
   completedAt: number
-  rewardGranted: boolean
 }
 
 const TABS: Array<{ key: AchievementPeriod; title: string }> = [
@@ -156,11 +119,12 @@ const TABS: Array<{ key: AchievementPeriod; title: string }> = [
 
 export default defineComponent({
   name: "AchievementsPage",
-  components: { ResourceList, ButtonIcon, AchievementFilters },
+  components: { AchievementCard, ButtonIcon, AchievementFilters },
   data() {
     return {
       activeTab: "permanent" as AchievementPeriod,
       showFilters: false,
+      pinnedOnly: false,
       // null — все, false — невыполненные, true — выполненные.
       completedFilter: null as boolean | null,
     }
@@ -196,19 +160,13 @@ export default defineComponent({
           entries: Object.values(category.achievements)
             .map(definition => {
               const progress = this.progress.permanent?.[definition.id]
-              const value = Math.min(
-                definition.target,
-                Math.max(0, progress?.value ?? 0)
-              )
               return {
                 key: definition.id,
                 definition,
-                value,
-                percent:
-                  definition.target > 0 ? (value / definition.target) * 100 : 0,
-                completed: Boolean(progress?.completed_at),
+                completed: Boolean(
+                  progress?.completed_at || progress?.reward_granted_at
+                ),
                 completedAt: Date.parse(progress?.completed_at ?? "") || 0,
-                rewardGranted: Boolean(progress?.reward_granted_at),
               }
             })
             .sort((a, b) => {
@@ -231,8 +189,13 @@ export default defineComponent({
           ...group,
           visibleEntries: group.entries.filter(
             entry =>
-              this.completedFilter === null ||
-              entry.completed === this.completedFilter
+              (this.completedFilter === null ||
+                entry.completed === this.completedFilter) &&
+              (!this.pinnedOnly ||
+                this.$store.state.achievements.pinnedAchievements.some(
+                  (pin: PinnedAchievement) =>
+                    pin.section === "permanent" && pin.id === entry.key
+                ))
           ),
         }))
         .filter(group => group.visibleEntries.length > 0)
@@ -244,6 +207,8 @@ export default defineComponent({
         return "Ежедневные задания пока недоступны."
       if (this.activeTab === "weekly")
         return "Недельные задания пока недоступны."
+      if (this.pinnedOnly)
+        return "Нет закреплённых заданий, подходящих под фильтры."
       if (this.completedFilter === false && this.groups.length)
         return "Нет невыполненных достижений."
       if (this.completedFilter === true && this.groups.length)
@@ -252,6 +217,10 @@ export default defineComponent({
     },
   },
   methods: {
+    resetFilters(): void {
+      this.completedFilter = null
+      this.pinnedOnly = false
+    },
     toggleCompletedFilter(completed: boolean): void {
       this.completedFilter =
         this.completedFilter === completed ? null : completed
@@ -400,71 +369,6 @@ summary {
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-.achievement {
-  padding: 14px;
-  border: 1px solid rgba(250, 207, 93, 0.12);
-  border-radius: 12px;
-  background: rgba(255, 215, 0, 0.08);
-}
-
-.achievement--completed {
-  border-color: rgba(170, 235, 170, 0.35);
-}
-
-h2 {
-  font-family: "Philosopher", serif;
-  font-size: 1rem;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-}
-
-.achievement__progress-label {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 10px 0 8px;
-  font-size: 0.8rem;
-  color: #facf5d;
-}
-
-.achievement__status {
-  color: #aaebaa;
-}
-
-.achievement__bar {
-  height: 6px;
-  overflow: hidden;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.achievement__bar > span {
-  display: block;
-  height: 100%;
-  background: var(--primary-gold-gradient, #c49000);
-}
-
-.achievement__reward {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin-top: 14px;
-}
-
-.reward-label {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.reward-resources {
-  width: auto;
-  min-width: 0;
-  flex-wrap: wrap;
-  justify-content: flex-start;
 }
 
 .empty-state {

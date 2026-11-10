@@ -1,7 +1,12 @@
 <template>
   <Teleport to="body">
     <Transition name="inventory-popup" appear>
-      <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
+      <div
+        v-if="visible"
+        v-show="!showPinned"
+        class="modal-overlay"
+        @click.self="$emit('close')"
+      >
         <section
           class="inventory-modal"
           role="dialog"
@@ -17,6 +22,15 @@
             @keydown.enter.prevent="$emit('close')"
             @keydown.space.prevent="$emit('close')"
           />
+          <button
+            type="button"
+            class="pinned-button"
+            :aria-label="`Закреплённые задания: ${pinnedCount} из ${pinnedLimit}`"
+            :title="`Закреплённые задания: ${pinnedCount} / ${pinnedLimit}`"
+            @click="showPinned = true"
+          >
+            <span class="pin-icon" aria-hidden="true" />
+          </button>
           <h2 class="modal-title">Инвентарь</h2>
           <dl class="turn-stats">
             <div>
@@ -83,6 +97,10 @@
         </section>
       </div>
     </Transition>
+    <pinned-achievements-modal
+      v-if="visible && showPinned"
+      @close="showPinned = false"
+    />
     <resource-description-modal
       v-if="visible && descriptionItem && description(descriptionItem)"
       :name="descriptionItem"
@@ -96,14 +114,21 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
 
+import PinnedAchievementsModal from "@/components/Pages/AchievementsPage/PinnedAchievementsModal.vue"
 import ResourceDescriptionModal from "@/components/Pages/BonusPage/ResourceDescriptionModal.vue"
 import InventoryItemTile from "@/components/Pages/InventoryPage/InventoryItemTile.vue"
 import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
+import { MAX_PINNED_ACHIEVEMENTS } from "@/store/modules/achievements"
 import { InventoryItem, type ResourceActions } from "@/types"
 
 export default defineComponent({
   name: "UseInventory",
-  components: { ButtonCloseImg, InventoryItemTile, ResourceDescriptionModal },
+  components: {
+    ButtonCloseImg,
+    InventoryItemTile,
+    ResourceDescriptionModal,
+    PinnedAchievementsModal,
+  },
   props: {
     handCount: { type: Number, required: true },
     emptyPassesRemaining: { type: Number, required: true },
@@ -121,9 +146,16 @@ export default defineComponent({
   },
   emits: ["close", "use-item"],
   data() {
-    return { descriptionItem: null as InventoryItem | null }
+    return {
+      descriptionItem: null as InventoryItem | null,
+      showPinned: false,
+      pinnedLimit: MAX_PINNED_ACHIEVEMENTS,
+    }
   },
   computed: {
+    pinnedCount(): number {
+      return this.$store.state.achievements.pinnedAchievements.length
+    },
     playerTurn(): boolean {
       return this.$store.state.game.player_turn
     },
@@ -143,7 +175,10 @@ export default defineComponent({
   },
   watch: {
     visible(value: boolean) {
-      if (!value) this.descriptionItem = null
+      if (!value) {
+        this.descriptionItem = null
+        this.showPinned = false
+      }
     },
   },
   methods: {
@@ -192,6 +227,34 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/* Тот же меч, который используется для урона на картах. */
+.pin-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  background: url("@/assets/icons/card/sword.svg") center / contain no-repeat;
+}
+
+.pinned-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  color: #facf5d;
+  cursor: pointer;
+}
+.pinned-button:focus-visible {
+  outline: 2px solid #c5a87e;
+}
+
 .modal-overlay {
   box-sizing: border-box;
   position: fixed;
