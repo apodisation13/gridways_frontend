@@ -70,6 +70,8 @@ export function damage_ai_card(
 ): void {
   const { field, enemy_leader, enemies, leader, enemies_grave } = gameObj
 
+  // Для достижений сохраняем поля до эффекта хода и списания заряда.
+  const achievementActor = copyObj(card)
   const ability = card?.ability?.name
   const timeout = store.getters["selectedMoveTimeout"]
 
@@ -207,7 +209,7 @@ export function damage_ai_card(
 
   trackAchievementEvent({
     type: AchievementEventType.ActionPlayed,
-    actor: card,
+    actor: achievementActor,
   })
 
   // пассивные абилки от хода
@@ -228,6 +230,8 @@ export function damage_ai_card_multi(
   gameObj: GameObj,
   targets: Array<{ isLeader: boolean; fieldValue: Enemy | null }>
 ): void {
+  // Для достижений сохраняем поля до эффекта хода и списания заряда.
+  const achievementActor = copyObj(card)
   const ability = card?.ability?.name
   const timeout = store.getters["selectedMoveTimeout"]
 
@@ -260,7 +264,7 @@ export function damage_ai_card_multi(
 
   trackAchievementEvent({
     type: AchievementEventType.ActionPlayed,
-    actor: card,
+    actor: achievementActor,
   })
 
   // пассивные абилки от хода - а тут костыль))

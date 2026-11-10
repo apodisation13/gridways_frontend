@@ -2,16 +2,10 @@ import type { Card, Leader, UserResources } from "./database"
 
 export enum AchievementEventType {
   ActionPlayed = "action.played",
-  CardPlayed = "card.played",
-  LeaderPlayed = "leader.played",
   ResourceSpent = "resource.spent",
 }
 
-// ActionPlayed is an input signal; only normalized facts enter the queue/config.
-export type AchievementRecordedEventType = Exclude<
-  AchievementEventType,
-  AchievementEventType.ActionPlayed
->
+export type AchievementRecordedEventType = AchievementEventType
 
 export type AchievementPeriod = "permanent" | "daily" | "weekly"
 
@@ -34,7 +28,7 @@ export interface AchievementDefinition {
   ordering: number
   title: string
   event: AchievementRecordedEventType
-  filters: Record<string, string | number | boolean>
+  filters: Record<string, AchievementFilter>
   counter: AchievementCounter
   target: number
   rewards: AchievementRewards
@@ -81,12 +75,44 @@ export interface UserAchievementsProgress {
   weekly?: PeriodAchievementProgress
 }
 
-export type AchievementEventValue = string | number | boolean
+export type AchievementScalar = string | number | boolean | null
+export type AchievementEventValue =
+  | AchievementScalar
+  | AchievementEventValue[]
+  | { [key: string]: AchievementEventValue }
+
+export enum AchievementFilterOperator {
+  Eq = "eq",
+  Ne = "ne",
+  Gt = "gt",
+  Gte = "gte",
+  Lt = "lt",
+  Lte = "lte",
+  In = "in",
+  Exists = "exists",
+}
+
+export type AchievementFilter =
+  | AchievementScalar
+  | {
+      type: AchievementFilterOperator.Eq | AchievementFilterOperator.Ne
+      value: AchievementScalar
+    }
+  | {
+      type:
+        | AchievementFilterOperator.Gt
+        | AchievementFilterOperator.Gte
+        | AchievementFilterOperator.Lt
+        | AchievementFilterOperator.Lte
+      value: number
+    }
+  | { type: AchievementFilterOperator.In; value: AchievementScalar[] }
+  | { type: AchievementFilterOperator.Exists; value: boolean }
 
 export type AchievementEventInput =
   | { type: AchievementEventType.ActionPlayed; actor: Card | Leader }
   | {
-      type: AchievementRecordedEventType
+      type: AchievementEventType.ResourceSpent
       data: Record<string, AchievementEventValue>
     }
 

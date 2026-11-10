@@ -8,6 +8,8 @@ import type {
 } from "@/types"
 import { AchievementCounterType } from "@/types"
 
+import { getAchievementField, matchesAchievementFilters } from "./filters"
+
 // Считает предварительный прогресс, не меняя исходные данные и не выдавая наград.
 // Пока поддерживаем постоянные задания с count и sum. Для daily/weekly нужны их периоды.
 export function processAchievementEvents(
@@ -45,15 +47,8 @@ export function processAchievementEvents(
     for (const definition of byEvent.get(event.type) ?? []) {
       if (!Number.isFinite(definition.target) || definition.target <= 0)
         continue
-      // Все фильтры должны совпасть. Например, rarity: bronze пропустит серебряную карту.
-      if (
-        !Object.entries(definition.filters).every(
-          ([field, expected]) =>
-            Object.prototype.hasOwnProperty.call(event.data, field) &&
-            event.data[field] === expected
-        )
-      )
-        continue
+      // Условия берём из конфига: обработчик не знает про цвет, фракцию или урон.
+      if (!matchesAchievementFilters(event.data, definition.filters)) continue
 
       // Выполненное больше не растёт. Отсутствующая запись означает нулевой прогресс.
       const current = progress.permanent?.[definition.id]
@@ -67,7 +62,7 @@ export function processAchievementEvents(
         increment = 1
       } else if (definition.counter.type === AchievementCounterType.Sum) {
         // Берём число из указанного поля: например, amount при расходе ресурса.
-        const amount = event.data[definition.counter.field]
+        const amount = getAchievementField(event.data, definition.counter.field)
         if (
           typeof amount !== "number" ||
           !Number.isFinite(amount) ||
