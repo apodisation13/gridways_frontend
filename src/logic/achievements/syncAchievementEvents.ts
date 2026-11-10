@@ -5,14 +5,16 @@ import { processAchievementEvents } from "./processAchievementEvents"
 const FLUSH_INTERVAL_MS = 10_000
 const MAX_PENDING_EVENTS = 20
 
-/** Install once for the lifetime of the app. Sent batches are never retried. */
+// Подключается один раз в main.ts. Здесь решаем КОГДА отправить, сам запрос — в store.
 export function installAchievementSync(): () => void {
   function shouldFlush(): boolean {
     const state = store.state.achievements
     if (!state.pendingEvents.length) return false
     if (state.pendingEvents.length >= MAX_PENDING_EVENTS) return true
 
-    // Only a goal reached by waiting events should trigger another request.
+    // before — прогресс с учётом уже отправленной пачки.
+    // after — добавляем к нему новые ходы из очереди.
+    // Если именно новые ходы довели задание до цели, ждать таймера не нужно.
     const before = processAchievementEvents(
       state.achievementsConfig.permanent,
       state.userAchievements,
@@ -28,6 +30,8 @@ export function installAchievementSync(): () => void {
 
   async function flush(): Promise<void> {
     const sent = await store.dispatch("sendAchievementEvents")
+    // Пока ждали ответ, могли накопиться ещё 20 событий или выполниться другая цель.
+    // Проверяем их сразу. Если action не запустил запрос, повторно его не вызываем.
     if (sent && shouldFlush()) void flush()
   }
 
@@ -35,11 +39,14 @@ export function installAchievementSync(): () => void {
     if (mutation.type === "logOut" || mutation.type === "logIn") {
       store.commit("resetAchievementSession")
     } else if (mutation.type === "enqueueAchievementEvent" && shouldFlush()) {
+      // Проверка после каждого нового события: цель достигнута или очередь заполнена.
       void flush()
     }
   })
+  // Это регулярный таймер, новые ходы не отодвигают его. Пустую очередь action пропустит.
   const timer = setInterval(() => void flush(), FLUSH_INTERVAL_MS)
 
+  // Функция отключения подписки и таймера, если понадобится остановить синхронизацию.
   return () => {
     clearInterval(timer)
     unsubscribe()

@@ -17,12 +17,19 @@ import type {
 } from "@/types"
 
 export interface AchievementsState {
+  // Описания заданий: условия, цели, награды. Permanent приходит из game_const.
   achievementsConfig: AchievementCatalog
+  // Только подтверждённый бэком прогресс. Локальные ходы сюда не прибавляем.
   userAchievements: UserAchievementsProgress
+  // Новые события, которые ещё ни разу не отправляли.
   pendingEvents: AchievementEvent[]
+  // Уже отправленная пачка, для которой ждём ответ. Повторно её не отправляем.
   inFlightEvents: AchievementEvent[]
+  // Награды, о выдаче которых сообщил бэк. Сохраняем для будущей модалки.
   grantedRewards: GrantedAchievementReward[]
+  // Пока запрос выполняется, второй не запускаем.
   sending: boolean
+  // Номер локальной сессии: помогает отбросить ответ, пришедший после выхода.
   session: number
 }
 
@@ -41,16 +48,21 @@ const state: AchievementsState = {
 }
 
 const getters = {
+  // Заново считаем от данных бэка + событий, ещё не подтверждённых ответом.
+  // Поэтому повторный вызов getter не прибавляет один и тот же ход ещё раз.
   achievementPreview: (state: AchievementsState): AchievementPreview =>
     processAchievementEvents(
       state.achievementsConfig.permanent,
       state.userAchievements,
       [...state.inFlightEvents, ...state.pendingEvents]
     ),
+
+  // Именно этот прогресс показывает страница: ход виден сразу, до ответа бэка.
   localUserAchievements: (
     _state: AchievementsState,
     getters: { achievementPreview: AchievementPreview }
   ): UserAchievementsProgress => getters.achievementPreview.progress,
+
   achievementsConfig: (state: AchievementsState) => state.achievementsConfig,
 }
 
@@ -59,6 +71,7 @@ const mutations = {
     state.sending = sending
   },
   startAchievementBatch(state: AchievementsState) {
+    // Забираем всю очередь. Следующие ходы будут копиться уже в новой очереди.
     state.inFlightEvents = state.pendingEvents
     state.pendingEvents = []
   },
@@ -66,14 +79,19 @@ const mutations = {
     state: AchievementsState,
     response: AchievementEventsResponse
   ) {
+    // Бэк уже учёл отправленную пачку: заменяем прогресс и убираем её вместе.
+    // Новые pendingEvents оставляем — они ещё не входят в этот ответ.
     state.userAchievements = response.user_achievements
     state.inFlightEvents = []
     state.grantedRewards.push(...response.granted_rewards)
   },
   discardAchievementBatch(state: AchievementsState) {
+    // При ошибке теряем только отправленную пачку. Новые события остаются.
+    // Предварительный прогресс на странице после этого может уменьшиться.
     state.inFlightEvents = []
   },
   resetAchievementSession(state: AchievementsState) {
+    // При входе/выходе не переносим прогресс и очередь между пользователями.
     state.session += 1
     state.userAchievements = {}
     state.pendingEvents = []
@@ -81,8 +99,10 @@ const mutations = {
     state.grantedRewards = []
     state.achievementsConfig.daily = null
     state.achievementsConfig.weekly = null
+    // sending снимет сам выполняющийся запрос в finally, когда завершится.
   },
   enqueueAchievementEvent(state: AchievementsState, event: AchievementEvent) {
+    // Это защита от повторного добавления того же ID в локальную очередь.
     if (!state.pendingEvents.some(pending => pending.id === event.id)) {
       state.pendingEvents.push(event)
     }
@@ -91,12 +111,14 @@ const mutations = {
     state: AchievementsState,
     catalog: AchievementGameConfig
   ) {
+    // Daily и weekly позднее загрузим отдельно; game_const присылает permanent.
     state.achievementsConfig.permanent = catalog.permanent
   },
   setUserAchievements(
     state: AchievementsState,
     progress: UserAchievementsProgress
   ) {
+    // Вызывается при загрузке общей базы пользователя через getUserDatabase.
     state.userAchievements = progress
   },
 }
@@ -105,6 +127,8 @@ const REQUEST_TIMEOUT_MS = 15_000
 const toast = useToast()
 
 const actions = {
+  // true означает «запрос был запущен», а не «бэк успешно сохранил события».
+  // По этому результату планировщик понимает, стоит ли проверить новую очередь.
   async sendAchievementEvents({
     state,
     getters,
@@ -116,9 +140,11 @@ const actions = {
     if (userId == null) return false
 
     commit("setAchievementSending", true)
+    // Запоминаем сессию до await: пока ждём сеть, пользователь может выйти.
     const batchSession = state.session
     commit("startAchievementBatch")
     const request: AchievementEventsRequest = {
+      // Локальные ID на бэк не отправляем: согласовали протокол без повторов.
       events: state.inFlightEvents.map(({ type, data }) => ({ type, data })),
     }
 
@@ -127,12 +153,14 @@ const actions = {
         method: HttpMethod.POST,
         url: USER_ACHIEVEMENTS.replace("{userId}", String(userId)),
         data: { events: request.events },
-        // Do not replay this batch, including after token refresh.
+        // Несмотря на название, true здесь ЗАПРЕЩАЕТ повтор после 401 в callApi.
         _retry: true,
         timeout: REQUEST_TIMEOUT_MS,
       })
+      // Ответ от предыдущей сессии не должен менять данные текущего игрока.
       if (state.session !== batchSession) return true
       commit("finishAchievementBatch", data)
+      // null — баланс не меняем. Иначе бэк прислал полный актуальный баланс.
       if (data.user_resources !== null)
         commit("set_resource", data.user_resources)
       if (data.granted_rewards.length) {
@@ -140,7 +168,8 @@ const actions = {
       }
     } catch (error) {
       if (state.session !== batchSession) return true
-      // The server may already have processed it; never requeue this batch.
+      // Бэк мог обработать запрос, а ответ потеряться. Повтор дал бы лишний прогресс.
+      // Поэтому пачку не возвращаем в очередь даже при сетевой ошибке.
       commit("discardAchievementBatch")
       console.warn(
         "Не удалось синхронизировать достижения; пачка не повторяется",

@@ -22,6 +22,36 @@
       </button>
     </div>
 
+    <div class="achievements-filter-row">
+      <button
+        type="button"
+        class="filter_btn"
+        :class="{ 'set-filter': completedFilter !== null }"
+        aria-label="Фильтры"
+        :aria-expanded="showFilters"
+        @click="showFilters = true"
+      >
+        <button-icon image_name="open_filters.svg" />
+      </button>
+      <button
+        v-if="completedFilter !== null"
+        type="button"
+        class="filter_btn_cancel"
+        aria-label="Сбросить фильтры"
+        @click="completedFilter = null"
+      >
+        <button-icon image_name="add_icon.svg" />
+      </button>
+    </div>
+
+    <achievement-filters
+      v-if="showFilters"
+      :completed-filter="completedFilter"
+      @close-modal="showFilters = false"
+      @set-completed-filter="toggleCompletedFilter"
+      @reset-filters="completedFilter = null"
+    />
+
     <div
       id="achievements-panel"
       class="achievements-list"
@@ -29,9 +59,9 @@
       :aria-labelledby="`achievement-tab-${activeTab}`"
       tabindex="0"
     >
-      <template v-if="activeTab === 'permanent' && groups.length">
+      <template v-if="activeTab === 'permanent' && visibleGroups.length">
         <details
-          v-for="group in groups"
+          v-for="group in visibleGroups"
           :key="group.key"
           class="achievement-group"
           open
@@ -45,7 +75,7 @@
           </summary>
           <div class="group-items">
             <article
-              v-for="entry in group.entries"
+              v-for="entry in group.visibleEntries"
               :key="entry.key"
               class="achievement"
               :class="{ 'achievement--completed': entry.completed }"
@@ -98,6 +128,8 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 
+import AchievementFilters from "@/components/Pages/AchievementsPage/AchievementFilters.vue"
+import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon.vue"
 import ResourceList from "@/components/ResourceList.vue"
 import type {
   AchievementCatalog,
@@ -112,6 +144,7 @@ interface AchievementEntry {
   value: number
   percent: number
   completed: boolean
+  completedAt: number
   rewardGranted: boolean
 }
 
@@ -123,10 +156,13 @@ const TABS: Array<{ key: AchievementPeriod; title: string }> = [
 
 export default defineComponent({
   name: "AchievementsPage",
-  components: { ResourceList },
+  components: { ResourceList, ButtonIcon, AchievementFilters },
   data() {
     return {
       activeTab: "permanent" as AchievementPeriod,
+      showFilters: false,
+      // null — все, false — невыполненные, true — выполненные.
+      completedFilter: null as boolean | null,
     }
   },
   computed: {
@@ -158,7 +194,6 @@ export default defineComponent({
           key: category.id,
           title: category.title,
           entries: Object.values(category.achievements)
-            .sort((a, b) => a.ordering - b.ordering || a.id.localeCompare(b.id))
             .map(definition => {
               const progress = this.progress.permanent?.[definition.id]
               const value = Math.min(
@@ -172,11 +207,35 @@ export default defineComponent({
                 percent:
                   definition.target > 0 ? (value / definition.target) * 100 : 0,
                 completed: Boolean(progress?.completed_at),
+                completedAt: Date.parse(progress?.completed_at ?? "") || 0,
                 rewardGranted: Boolean(progress?.reward_granted_at),
               }
+            })
+            .sort((a, b) => {
+              // Выполнение подтверждает бэк; локальные 10/10 ещё не считаем выполнением.
+              if (a.completed !== b.completed) return a.completed ? 1 : -1
+              if (a.completed && a.completedAt !== b.completedAt)
+                return b.completedAt - a.completedAt
+              return (
+                a.definition.ordering - b.definition.ordering ||
+                a.key.localeCompare(b.key)
+              )
             }),
         }))
         .filter(group => group.entries.length > 0)
+    },
+    visibleGroups() {
+      // Счётчик категории остаётся общим, фильтруем только отображаемые задания.
+      return this.groups
+        .map(group => ({
+          ...group,
+          visibleEntries: group.entries.filter(
+            entry =>
+              this.completedFilter === null ||
+              entry.completed === this.completedFilter
+          ),
+        }))
+        .filter(group => group.visibleEntries.length > 0)
     },
     emptyMessage(): string {
       // The catalog is not the selected daily/weekly set. Do not expose
@@ -185,10 +244,18 @@ export default defineComponent({
         return "Ежедневные задания пока недоступны."
       if (this.activeTab === "weekly")
         return "Недельные задания пока недоступны."
+      if (this.completedFilter === false && this.groups.length)
+        return "Нет невыполненных достижений."
+      if (this.completedFilter === true && this.groups.length)
+        return "Нет выполненных достижений."
       return "Постоянных достижений пока нет."
     },
   },
   methods: {
+    toggleCompletedFilter(completed: boolean): void {
+      this.completedFilter =
+        this.completedFilter === completed ? null : completed
+    },
     navigateTabs(event: KeyboardEvent, index: number): void {
       let next = index
       if (event.key === "ArrowRight") next = (index + 1) % this.tabs.length
@@ -265,6 +332,43 @@ h1 {
 .tabs__btn--active {
   color: #1a1208;
   font-weight: bold;
+}
+
+.achievements-filter-row {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.filter_btn,
+.filter_btn_cancel {
+  border: 0;
+  padding: 10px;
+  background: none;
+  cursor: pointer;
+}
+
+.filter_btn {
+  position: relative;
+}
+
+.set-filter::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #facf5d;
+}
+
+.filter_btn_cancel {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
 }
 
 .achievements-list {
