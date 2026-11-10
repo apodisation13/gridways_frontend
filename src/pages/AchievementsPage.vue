@@ -59,6 +59,14 @@
                 <span v-else-if="entry.completed" class="achievement__status">
                   ✓ Выполнено
                 </span>
+                <span
+                  v-else-if="
+                    entry.definition.target > 0 &&
+                    entry.value >= entry.definition.target
+                  "
+                >
+                  Ожидает подтверждения
+                </span>
               </div>
               <div
                 class="achievement__bar"
@@ -132,7 +140,7 @@ export default defineComponent({
       return this.$store.getters["achievementsConfig"]
     },
     progress(): UserAchievementsProgress {
-      return this.$store.getters["userAchievements"]
+      return this.$store.getters["localUserAchievements"]
     },
     sliderStyle(): Record<string, string> {
       return {

@@ -1,8 +1,29 @@
+import type { Card, Leader, UserResources } from "./database"
+
+export enum AchievementEventType {
+  ActionPlayed = "action.played",
+  CardPlayed = "card.played",
+  LeaderPlayed = "leader.played",
+  ResourceSpent = "resource.spent",
+}
+
+// ActionPlayed is an input signal; only normalized facts enter the queue/config.
+export type AchievementRecordedEventType = Exclude<
+  AchievementEventType,
+  AchievementEventType.ActionPlayed
+>
+
 export type AchievementPeriod = "permanent" | "daily" | "weekly"
 
+// Only implemented counting mechanisms belong here.
+export enum AchievementCounterType {
+  Count = "count",
+  Sum = "sum",
+}
+
 export type AchievementCounter =
-  | { type: "count" }
-  | { type: "sum" | "distinct" | "max"; field: string }
+  | { type: AchievementCounterType.Count }
+  | { type: AchievementCounterType.Sum; field: string }
 
 export interface AchievementRewards {
   resources: Record<string, number>
@@ -12,7 +33,7 @@ export interface AchievementDefinition {
   id: string
   ordering: number
   title: string
-  event: string
+  event: AchievementRecordedEventType
   filters: Record<string, string | number | boolean>
   counter: AchievementCounter
   target: number
@@ -58,4 +79,44 @@ export interface UserAchievementsProgress {
   permanent?: Record<string, AchievementProgress>
   daily?: PeriodAchievementProgress
   weekly?: PeriodAchievementProgress
+}
+
+export type AchievementEventValue = string | number | boolean
+
+export type AchievementEventInput =
+  | { type: AchievementEventType.ActionPlayed; actor: Card | Leader }
+  | {
+      type: AchievementRecordedEventType
+      data: Record<string, AchievementEventValue>
+    }
+
+export interface AchievementEvent {
+  id: string
+  type: AchievementRecordedEventType
+  data: Record<string, AchievementEventValue>
+}
+
+export type AchievementEventPayload = Omit<AchievementEvent, "id">
+
+export interface AchievementEventsRequest {
+  events: AchievementEventPayload[]
+}
+
+export interface GrantedAchievementReward {
+  achievement_id: string
+  period_type: AchievementPeriod
+  period: string | null
+  rewards: AchievementRewards
+}
+
+export interface AchievementEventsResponse {
+  user_achievements: UserAchievementsProgress
+  granted_rewards: GrantedAchievementReward[]
+  user_resources: UserResources | null
+}
+
+export interface AchievementPreview {
+  progress: UserAchievementsProgress
+  // Locally reached permanent goals, not confirmed completions or rewards.
+  reachedAchievementIds: string[]
 }
