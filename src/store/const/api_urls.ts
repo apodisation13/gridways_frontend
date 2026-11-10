@@ -62,3 +62,6 @@ export const UPGRADES = `${getDomain()}/user-upgrades/{userId}`
 
 // inventory
 export const INVENTORY = `${getDomain()}/user-inventory/{userId}`
+
+// post user achievements progress
+export const USER_ACHIEVEMENTS = `${getDomain()}/user-achievements/{userId}`
