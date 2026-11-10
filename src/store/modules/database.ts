@@ -345,6 +345,7 @@ const actions = {
       // - user_settings
       // - user_inventory
       // - user_cards, leaders, decks, seasons
+      // - user_achievements - прогресс по всем ачивкам
 
       const user_database = await callApi<UserProgressResponse>({
         method: HttpMethod.GET,
@@ -360,6 +361,7 @@ const actions = {
         user_upgrades,
         user_inventory,
         user_preferences,
+        user_achievements,
       } = user_database.data
 
       commit("set_cards", user_cards)
@@ -374,6 +376,7 @@ const actions = {
       commit("setUserUpgrades", user_upgrades)
       commit("setInventory", user_inventory.slots)
       commit("setPreferences", user_preferences)
+      commit("setUserAchievements", user_achievements)
 
       dispatch("set_deck_in_play", getters["all_decks"][0])
       dispatch("set_level_in_play", getters["all_seasons"][0].season.levels[0]) // устанавливаем для игры первый уровень
@@ -413,6 +416,7 @@ const actions = {
     }) // распределение рандомных врагов
     commit("setEffectsInfo", game_const.effects)
     commit("setHelpsInfo", game_const.helps ?? {})
+    commit("setAchievementsConfig", game_const.achievements)
     commit("set_resources_transitions", game_const.resources_transitions) // покупка/продажа ресурсов
     commit("set_keys_rewards", game_const.keys_rewards) // награды за открытие ключей
     commit("set_win_level_rewards", game_const.win_level_rewards) // награды за прохождение уровня

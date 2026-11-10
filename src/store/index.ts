@@ -1,5 +1,7 @@
 import { createStore } from "vuex"
 
+import type { AchievementsState } from "@/store/modules/achievements"
+import achievements from "@/store/modules/achievements"
 import type { ArenaState } from "@/store/modules/arena"
 import arena from "@/store/modules/arena"
 import database from "@/store/modules/database"
@@ -23,6 +25,7 @@ import upgrades from "@/store/modules/upgrades"
 import user_actions from "@/store/modules/user_actions"
 
 export interface RootState {
+  achievements: AchievementsState
   inventory: InventoryState
   game: GameState
   settings: SettingsState
@@ -38,6 +41,7 @@ export interface RootState {
 
 const store = createStore<RootState>({
   modules: {
+    achievements,
     login,
     loading,
     database,

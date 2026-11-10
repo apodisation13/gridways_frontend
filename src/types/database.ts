@@ -2,6 +2,10 @@ import Upgrades from "@/store/modules/upgrades"
 import { UserPreferencesResponse } from "@/types/settings"
 import { UserUpgrades } from "@/types/upgrades"
 
+import type {
+  AchievementGameConfig,
+  UserAchievementsProgress,
+} from "./achievements"
 import { EffectObject, EffectType } from "./game"
 import { Helps } from "./help"
 import type { InventoryEffectValues, InventoryItem } from "./inventory"
@@ -353,6 +357,7 @@ export interface UserProgressResponse {
   user_upgrades: UserUpgrades
   user_inventory: UserInventory
   user_preferences: UserPreferencesResponse
+  user_achievements: UserAchievementsProgress
 }
 
 export interface ListDecksResponse {
@@ -394,6 +399,7 @@ interface Multiplayer {
 }
 
 export interface GameConst {
+  achievements: AchievementGameConfig
   max_random_n_enemies: number
   random_level_enemies_count: Record<string, unknown>
   resources_transitions: Record<string, unknown>

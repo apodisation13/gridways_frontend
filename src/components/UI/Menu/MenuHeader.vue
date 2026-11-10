@@ -180,6 +180,7 @@ export default defineComponent({
         { title: "Правила", path: "/rules" },
         { title: "Магазин", path: "/shop", requireAuth: true },
         { title: "Прокачка", path: "/upgrades", requireAuth: true },
+        { title: "Достижения", path: "/achievements", requireAuth: true },
         { title: "Инвентарь", path: "/inventory", requireAuth: true },
         { title: "Статистика", path: "/stats", requireAuth: true },
         { title: "Доска лидеров", path: "/leaderboard", requireAuth: true },
@@ -351,7 +352,8 @@ export default defineComponent({
   flex-direction: column;
   justify-content: space-around;
   border-radius: 5px;
-  height: 100%;
+  max-height: calc(var(--vh, 1vh) * 100 - 36px);
+  overflow: hidden;
 }
 
 .expand-menu__content ::before {
@@ -372,11 +374,19 @@ export default defineComponent({
 .expand-menu__top {
   display: flex;
   flex-direction: column;
-  margin: 20px 22px 39px 22px;
+  margin: 20px 22px 24px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   gap: 22px;
 }
 
+.expand-menu__top > .menu-btn {
+  flex-shrink: 0;
+}
+
 .expand-menu__footer {
+  flex-shrink: 0;
   border-top: 1px solid;
   border-image-source: linear-gradient(
     266.83deg,
