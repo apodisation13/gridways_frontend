@@ -1,11 +1,19 @@
 import type { Card, Leader, UserResources } from "./database"
 
 export enum AchievementEventType {
+  // любая сыгранная карта или лидер в любом режиме
   ActionPlayed = "action.played",
+  // общий ивент об изменении ресурсов - потом он преобразуется в один из двух ниже
+  ResourcesChanged = "resources.changed",
   ResourceSpent = "resource.spent",
+  ResourceGained = "resource.gained",
 }
 
-export type AchievementRecordedEventType = AchievementEventType
+// Изменение со знаками — только входной сигнал. В очередь идут отдельные факты.
+export type AchievementRecordedEventType = Exclude<
+  AchievementEventType,
+  AchievementEventType.ResourcesChanged
+>
 
 export type AchievementPeriod = "permanent" | "daily" | "weekly"
 
@@ -109,11 +117,31 @@ export type AchievementFilter =
   | { type: AchievementFilterOperator.In; value: AchievementScalar[] }
   | { type: AchievementFilterOperator.Exists; value: boolean }
 
+export interface AchievementResourceSpentData {
+  // Один факт траты может включать несколько ресурсов. Количества положительные.
+  resources: Record<string, number>
+}
+
 export type AchievementEventInput =
   | { type: AchievementEventType.ActionPlayed; actor: Card | Leader }
   | {
       type: AchievementEventType.ResourceSpent
-      data: Record<string, AchievementEventValue>
+      data: AchievementResourceSpentData
+    }
+  | {
+      type: AchievementEventType.ResourceGained
+      data: { resources: Record<string, number> }
+    }
+  | {
+      type: AchievementEventType.ResourcesChanged
+      // Минус — потрачено, плюс — запрошенное начисление. Для дохода нужны оба снимка.
+      data: { resources: Record<string, number> } & (
+        | {
+            before: Record<string, number>
+            after: Record<string, number>
+          }
+        | { before?: never; after?: never }
+      )
     }
 
 export interface AchievementEvent {

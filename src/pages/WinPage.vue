@@ -152,8 +152,10 @@ import { defineComponent } from "vue"
 import LevelSeasonReward from "@/components/Pages/LevelPage/LevelSeasonReward.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { getRewardForLevel } from "@/logic/random_rewards"
 import {
+  AchievementEventType,
   GameStatsRecordType,
   LeaderboardGameMode,
   LevelEntry,
@@ -211,9 +213,19 @@ export default defineComponent({
       const difficulty = this.$store.state.game.level.difficulty
       const win_level_rewards = this.$store.getters["win_level_rewards"]
       this.pay_data = getRewardForLevel(win_level_rewards[difficulty])
+      // Сохраняем баланс до запроса: processResources заменит его ответом бэка.
+      const before = { ...this.$store.getters["resource"] }
       await this.$store.dispatch("processResources", {
         subtype: PayResourcesSubtype.winSeasonLevel,
         data: this.pay_data,
+      })
+      trackAchievementEvent({
+        type: AchievementEventType.ResourcesChanged,
+        data: {
+          resources: this.pay_data,
+          before,
+          after: { ...this.$store.getters["resource"] },
+        },
       })
     },
     // открытие всех связанных уровней при прохождении уровня

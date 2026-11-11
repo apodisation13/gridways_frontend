@@ -166,11 +166,13 @@ const actions = {
     body: ResourcesPayload
   ) {
     // в body придет обязательно subtype, data
-    // data: { wood: 201, crops: 210 } - для оплаты игры на уровне сезона
+    // data: { wood: -201, crops: -210 } - для оплаты игры на уровне сезона
     // data: { wood: 201, scraps: 185, etc } - для получения ресурсов после прохождения уровня сезона
     // data: { action:buy/sell/crart/mill, resource: kegs, quantity: int, recipe: {money: -1000, etc} }
     // - для получения и списания ресурсов на странице бонусов
     const userId = getters["getUser"].user_id
+
+    console.log("23333333333333333333333333", body)
 
     try {
       const response = await callApi<UserResources>({
