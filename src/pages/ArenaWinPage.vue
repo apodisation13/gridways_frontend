@@ -112,8 +112,13 @@ import { defineComponent } from "vue"
 import ResourceList from "@/components/ResourceList.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { getRewardForLevel } from "@/logic/random_rewards"
-import { LeaderboardGameMode, PayResourcesSubtype } from "@/types"
+import {
+  AchievementEventType,
+  LeaderboardGameMode,
+  PayResourcesSubtype,
+} from "@/types"
 
 const ARENA_RESOURCE_KEYS = [
   "scraps",
@@ -175,9 +180,19 @@ export default defineComponent({
         })
       )
 
+      // До запроса сохраняем баланс, чтобы учесть фактический доход с лимитами.
+      const before = { ...this.$store.getters["resource"] }
       await this.$store.dispatch("processResources", {
         subtype: PayResourcesSubtype.winArenaLevel,
         data: this.pay_data,
+      })
+      trackAchievementEvent({
+        type: AchievementEventType.ResourcesChanged,
+        data: {
+          resources: this.pay_data,
+          before,
+          after: { ...this.$store.getters["resource"] },
+        },
       })
     },
     go_forward(): void {
