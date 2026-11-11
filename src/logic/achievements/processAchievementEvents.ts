@@ -6,12 +6,12 @@ import type {
   AchievementSection,
   UserAchievementsProgress,
 } from "@/types"
-import { AchievementCounterType } from "@/types"
+import { AchievementCounterType, AchievementEventType } from "@/types"
 
 import { getAchievementField, matchesAchievementFilters } from "./filters"
 
 // Считает предварительный прогресс, не меняя исходные данные и не выдавая наград.
-// Пока поддерживаем постоянные задания с count и sum. Для daily/weekly нужны их периоды.
+// Пока поддерживаем постоянные задания с count, sum и current. Для daily/weekly нужны их периоды.
 export function processAchievementEvents(
   section: AchievementSection,
   confirmedProgress: UserAchievementsProgress,
@@ -54,19 +54,26 @@ export function processAchievementEvents(
       const current = progress.permanent?.[definition.id]
       if (current?.completed_at || current?.reward_granted_at) continue
       const value = current?.value ?? 0
-      if (value >= definition.target) continue
+      const isCurrent =
+        definition.counter.type === AchievementCounterType.Current
+      if (isCurrent && event.type !== AchievementEventType.ResourcesChecked)
+        continue
+      if (!isCurrent && value >= definition.target) continue
 
       let increment: number
       if (definition.counter.type === AchievementCounterType.Count) {
         // Одно событие — один шаг, например применение карты.
         increment = 1
-      } else if (definition.counter.type === AchievementCounterType.Sum) {
+      } else if (
+        definition.counter.type === AchievementCounterType.Sum ||
+        definition.counter.type === AchievementCounterType.Current
+      ) {
         // Берём число из указанного поля: например, amount при расходе ресурса.
         const amount = getAchievementField(event.data, definition.counter.field)
         if (
           typeof amount !== "number" ||
           !Number.isFinite(amount) ||
-          amount <= 0
+          (isCurrent ? amount < 0 : amount <= 0)
         ) {
           continue
         }
@@ -77,7 +84,10 @@ export function processAchievementEvents(
       }
 
       // Показываем не больше цели: максимум 10/10, даже если событий было 12.
-      const nextValue = Math.min(definition.target, value + increment)
+      const nextValue = Math.min(
+        definition.target,
+        isCurrent ? increment : value + increment
+      )
       progress.permanent ??= {}
       progress.permanent[definition.id] = {
         ...current,

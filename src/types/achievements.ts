@@ -15,6 +15,9 @@ export enum AchievementEventType {
 
   // любое открытие ключа, бочек или коробки
   ResourceOpened = "resource.opened",
+
+  // проверка ресурсов на накопление типа накопите 40000 денег
+  ResourcesChecked = "resources.checked",
 }
 
 // Изменение со знаками — только входной сигнал. В очередь идут отдельные факты.
@@ -30,11 +33,13 @@ export type AchievementPeriod = "permanent" | "daily" | "weekly"
 export enum AchievementCounterType {
   Count = "count",
   Sum = "sum",
+  Current = "current",
 }
 
 export type AchievementCounter =
   | { type: AchievementCounterType.Count }
   | { type: AchievementCounterType.Sum; field: string }
+  | { type: AchievementCounterType.Current; field: string }
 
 export interface AchievementRewards {
   resources: Record<string, number>
@@ -132,6 +137,7 @@ export interface AchievementResourceSpentData {
 }
 
 export type AchievementEventInput =
+  | { type: AchievementEventType.ResourcesChecked; data: Record<string, never> }
   | {
       type: AchievementEventType.ResourceTransformed
       data: {

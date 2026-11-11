@@ -4,6 +4,8 @@ import store from "@/store"
 import type { AchievementEvent, AchievementEventInput } from "@/types"
 import { AchievementEventType } from "@/types"
 
+import { checkCurrentResources } from "./currentResources"
+
 // Общая точка входа из игры: сообщаем, что произошло, без перечисления заданий.
 // Подсчёт выполняется отдельно, а отправку очереди организует syncAchievementEvents.
 export function trackAchievementEvent(input: AchievementEventInput): string[] {
@@ -15,7 +17,10 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
   // любое изменение любого ресурса - как в плюс, так и минус
   if (input.type === AchievementEventType.ResourcesChanged) {
     const { spent, gained } = getResourceChanges(input.data)
-    return trackResourceChanges({ spent, gained })
+    return [
+      ...trackResourceChanges({ spent, gained }),
+      ...checkCurrentResources(),
+    ]
   }
 
   // Снимок всех полей КАРТЫ ИЛИ ЛИДЕРА, включая вложенные объекты и массивы.
@@ -75,6 +80,7 @@ function trackResourceTransition(
       data: { action, resource, amount: transformedAmount, ...changes },
     })
   )
+  ids.push(...checkCurrentResources())
   return ids
 }
 

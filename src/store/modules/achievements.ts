@@ -3,6 +3,10 @@ import { useToast } from "vue-toastification"
 import type { ActionContext } from "vuex"
 
 import { callApi, HttpMethod } from "@/lib/api/api"
+import {
+  checkCurrentResources,
+  previewCurrentResources,
+} from "@/logic/achievements/currentResources"
 import { processAchievementEvents } from "@/logic/achievements/processAchievementEvents"
 import type { RootState } from "@/store"
 import { USER_ACHIEVEMENTS } from "@/store/const/api_urls"
@@ -87,12 +91,30 @@ const getters = {
     }),
   // Заново считаем от данных бэка + событий, ещё не подтверждённых ответом.
   // Поэтому повторный вызов getter не прибавляет один и тот же ход ещё раз.
-  achievementPreview: (state: AchievementsState): AchievementPreview =>
-    processAchievementEvents(
+  achievementPreview: (
+    state: AchievementsState,
+    getters: { resource: Record<string, number> }
+  ): AchievementPreview => {
+    const preview = processAchievementEvents(
       state.achievementsConfig.permanent,
       state.userAchievements,
       [...state.inFlightEvents, ...state.pendingEvents]
-    ),
+    )
+    const current = previewCurrentResources(
+      state.achievementsConfig.permanent,
+      preview.progress,
+      getters.resource
+    )
+    return {
+      progress: current.progress,
+      reachedAchievementIds: [
+        ...new Set([
+          ...preview.reachedAchievementIds,
+          ...current.reachedAchievementIds,
+        ]),
+      ],
+    }
+  },
 
   // Именно этот прогресс показывает страница: ход виден сразу, до ответа бэка.
   localUserAchievements: (
@@ -247,8 +269,11 @@ const actions = {
       if (state.session !== batchSession) return true
       commit("finishAchievementBatch", data)
       // null — баланс не меняем. Иначе бэк прислал полный актуальный баланс.
-      if (data.user_resources !== null)
+      if (data.user_resources !== null) {
         commit("set_resource", data.user_resources)
+        // Награда тоже может довести баланс до цели другого контракта.
+        checkCurrentResources()
+      }
     } catch (error) {
       if (state.session !== batchSession) return true
       // Бэк мог обработать запрос, а ответ потеряться. Повтор дал бы лишний прогресс.
