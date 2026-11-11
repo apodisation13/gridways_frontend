@@ -138,6 +138,9 @@ export type AchievementEventInput =
         action: "buy" | "sell" | "craft" | "mill"
         resource: string
         amount: number
+        // Стоимость и фактический доход именно этого обмена. Нули не включаем.
+        spent: Record<string, number>
+        gained: Record<string, number>
       }
     }
   | { type: AchievementEventType.ResourceOpened; data: { resource: string } }
