@@ -20,6 +20,8 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
       return []
     const increase = action === "buy" || action === "craft"
     if (!increase && action !== "sell" && action !== "mill") return []
+    const transformedAmount = quantity * step
+    if (!Number.isFinite(transformedAmount)) return []
 
     // Как на бэке: рецепт за одну операцию + изменение самого ресурса,
     // затем всё умножается на quantity. Исходный рецепт не изменяем.
@@ -30,10 +32,19 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
         amount * quantity,
       ])
     )
-    return trackAchievementEvent({
+    const ids = trackAchievementEvent({
       type: AchievementEventType.ResourcesChanged,
       data: { resources, before, after },
     })
+    // Отдельный факт успешной покупки/продажи/крафта/разбора.
+    // Количество предметов — quantity × step, без повторной проверки лимита.
+    ids.push(
+      ...trackAchievementEvent({
+        type: AchievementEventType.ResourceTransformed,
+        data: { action, resource, amount: transformedAmount },
+      })
+    )
+    return ids
   }
 
   // любое изменение любого ресурса - как в плюс, так и минус

@@ -6,11 +6,12 @@ export enum AchievementEventType {
 
   // общий ивент об изменении ресурсов - потом он преобразуется в один из двух ниже
   ResourcesChanged = "resources.changed",
-  // эта тоже превращается в итоге в одну из двух наверху
+  // Обмен превращается в расходы, доходы и факт операции с ресурсом.
   ResourceTransition = "resource.transition",
   // --------------- настоящие которые отправляются ---------------
   ResourceSpent = "resource.spent",
   ResourceGained = "resource.gained",
+  ResourceTransformed = "resource.transformed",
 
   // любое открытие ключа, бочек или коробки
   ResourceOpened = "resource.opened",
@@ -131,6 +132,14 @@ export interface AchievementResourceSpentData {
 }
 
 export type AchievementEventInput =
+  | {
+      type: AchievementEventType.ResourceTransformed
+      data: {
+        action: "buy" | "sell" | "craft" | "mill"
+        resource: string
+        amount: number
+      }
+    }
   | { type: AchievementEventType.ResourceOpened; data: { resource: string } }
   | {
       type: AchievementEventType.ResourceTransition
