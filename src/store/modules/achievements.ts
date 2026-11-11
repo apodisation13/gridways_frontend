@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid"
 import { useToast } from "vue-toastification"
 import type { ActionContext } from "vuex"
 
@@ -12,7 +13,7 @@ import type {
   AchievementEventsResponse,
   AchievementGameConfig,
   AchievementPreview,
-  GrantedAchievementReward,
+  AchievementRewardNotification,
   PinnedAchievement,
   UserAchievementsProgress,
 } from "@/types"
@@ -26,8 +27,8 @@ export interface AchievementsState {
   pendingEvents: AchievementEvent[]
   // Уже отправленная пачка, для которой ждём ответ. Повторно её не отправляем.
   inFlightEvents: AchievementEvent[]
-  // Награды, о выдаче которых сообщил бэк. Сохраняем для будущей модалки.
-  grantedRewards: GrantedAchievementReward[]
+  // Очередь уведомлений: удаляем запись после закрытия соответствующего тоста.
+  grantedRewards: AchievementRewardNotification[]
   // Пока запрос выполняется, второй не запускаем.
   sending: boolean
   // Номер локальной сессии: помогает отбросить ответ, пришедший после выхода.
@@ -103,6 +104,11 @@ const getters = {
 }
 
 const mutations = {
+  dismissAchievementReward(state: AchievementsState, notificationId: string) {
+    state.grantedRewards = state.grantedRewards.filter(
+      reward => reward.notification_id !== notificationId
+    )
+  },
   toggleAchievementPin(state: AchievementsState, pin: PinnedAchievement) {
     const index = state.pinnedAchievements.findIndex(
       item => item.section === pin.section && item.id === pin.id
@@ -133,7 +139,18 @@ const mutations = {
     state.userAchievements = response.user_achievements
     prunePins(state)
     state.inFlightEvents = []
-    state.grantedRewards.push(...response.granted_rewards)
+    for (const reward of response.granted_rewards) {
+      const section = state.achievementsConfig[reward.period_type]
+      const definition = Object.values(section?.categories ?? {})
+        .flatMap(category => Object.values(category.achievements))
+        .find(item => item.id === reward.achievement_id)
+      state.grantedRewards.push({
+        ...reward,
+        notification_id: uuidv4(),
+        title: definition?.title ?? reward.achievement_id,
+        rewards: { resources: { ...reward.rewards.resources } },
+      })
+    }
   },
   discardAchievementBatch(state: AchievementsState) {
     // При ошибке теряем только отправленную пачку. Новые события остаются.
@@ -232,9 +249,6 @@ const actions = {
       // null — баланс не меняем. Иначе бэк прислал полный актуальный баланс.
       if (data.user_resources !== null)
         commit("set_resource", data.user_resources)
-      if (data.granted_rewards.length) {
-        toast.success("Награда за достижения начислена!")
-      }
     } catch (error) {
       if (state.session !== batchSession) return true
       // Бэк мог обработать запрос, а ответ потеряться. Повтор дал бы лишний прогресс.

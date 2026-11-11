@@ -135,6 +135,12 @@ export interface GrantedAchievementReward {
   rewards: AchievementRewards
 }
 
+// Снимок для уведомления: название и фактически начисленные ресурсы на момент ответа.
+export interface AchievementRewardNotification extends GrantedAchievementReward {
+  notification_id: string
+  title: string
+}
+
 export interface AchievementEventsResponse {
   user_achievements: UserAchievementsProgress
   granted_rewards: GrantedAchievementReward[]

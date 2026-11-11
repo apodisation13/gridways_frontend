@@ -3,6 +3,34 @@ body .Vue-Toastification__container {
   z-index: 1000000;
 }
 
+/* Тостер живёт в body, поэтому сам не знает о ширине игрового экрана. */
+body .Vue-Toastification__container.top-right:has(.achievement-reward-notification) {
+  width: min(400px, calc(100vw - 16px));
+  max-width: calc(100vw - 16px);
+  padding: 0;
+  left: auto;
+  right: 8px;
+}
+
+body .Vue-Toastification__toast.achievement-reward-notification {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+body .achievement-reward-notification .Vue-Toastification__toast-component-body {
+  min-width: 0;
+}
+
+/* На широком экране приложение занимает центральные 425px, а не весь viewport. */
+@media (min-width: 900px) {
+  body .Vue-Toastification__container.top-right:has(.achievement-reward-notification) {
+    right: calc((100vw - 425px) / 2 + 8px);
+  }
+}
+
 :root {
   --primary-gold-gradient: linear-gradient(
     183.6deg,
