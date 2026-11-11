@@ -1,4 +1,5 @@
 import type { Card, Leader, UserResources } from "./database"
+import type { PayResourcesSubtype } from "./user_actions"
 
 export enum AchievementEventType {
   // любая сыгранная карта или лидер в любом режиме
@@ -132,6 +133,8 @@ export type AchievementFilter =
   | { type: AchievementFilterOperator.Exists; value: boolean }
 
 export interface AchievementResourceSpentData {
+  // Причина операции позволяет отличить использование предмета от продажи.
+  subtype?: PayResourcesSubtype
   // Один факт траты может включать несколько ресурсов. Количества положительные.
   resources: Record<string, number>
 }
@@ -169,12 +172,15 @@ export type AchievementEventInput =
     }
   | {
       type: AchievementEventType.ResourceGained
-      data: { resources: Record<string, number> }
+      data: { resources: Record<string, number>; subtype?: PayResourcesSubtype }
     }
   | {
       type: AchievementEventType.ResourcesChanged
       // Минус — потрачено, плюс — запрошенное начисление. Для дохода нужны оба снимка.
-      data: { resources: Record<string, number> } & (
+      data: {
+        resources: Record<string, number>
+        subtype?: PayResourcesSubtype
+      } & (
         | {
             before: Record<string, number>
             after: Record<string, number>

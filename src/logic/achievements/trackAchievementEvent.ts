@@ -1,7 +1,11 @@
 import { v4 as uuidv4 } from "uuid"
 
 import store from "@/store"
-import type { AchievementEvent, AchievementEventInput } from "@/types"
+import type {
+  AchievementEvent,
+  AchievementEventInput,
+  PayResourcesSubtype,
+} from "@/types"
 import { AchievementEventType } from "@/types"
 
 import { checkCurrentResources } from "./currentResources"
@@ -18,7 +22,7 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
   if (input.type === AchievementEventType.ResourcesChanged) {
     const { spent, gained } = getResourceChanges(input.data)
     return [
-      ...trackResourceChanges({ spent, gained }),
+      ...trackResourceChanges({ spent, gained, subtype: input.data.subtype }),
       ...checkCurrentResources(),
     ]
   }
@@ -124,9 +128,11 @@ function getResourceChanges({
 function trackResourceChanges({
   spent,
   gained,
+  subtype,
 }: {
   spent: Record<string, number>
   gained: Record<string, number>
+  subtype?: PayResourcesSubtype
 }): string[] {
   // Вызывающий код передаёт весь словарь. Разделение нужно только здесь.
   // Пустые события не создаём; исходный словарь не изменяем.
@@ -135,7 +141,7 @@ function trackResourceChanges({
     ids.push(
       ...trackAchievementEvent({
         type: AchievementEventType.ResourceSpent,
-        data: { resources: spent },
+        data: { resources: spent, subtype },
       })
     )
   }
@@ -143,7 +149,7 @@ function trackResourceChanges({
     ids.push(
       ...trackAchievementEvent({
         type: AchievementEventType.ResourceGained,
-        data: { resources: gained },
+        data: { resources: gained, subtype },
       })
     )
   }

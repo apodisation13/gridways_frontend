@@ -1,6 +1,7 @@
 import { defineComponent } from "vue"
 
 import { choice_pop } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { change_health } from "@/logic/game_logic/change_health"
 import { sound_destroy_enemy } from "@/logic/play_sounds"
 import { add_armor } from "@/logic/player_move/abilities/ability_armor"
@@ -16,6 +17,7 @@ import {
   get_negative_effects_indexes,
 } from "@/logic/player_move/service/service_for_player_move"
 import {
+  AchievementEventType,
   type CardEntry,
   type EffectInfo,
   type Enemy,
@@ -133,6 +135,14 @@ export default defineComponent({
           await this.$store.dispatch("processResources", {
             subtype: PayResourcesSubtype.useInventoryItem,
             data: { [item]: -1 },
+          })
+          // Считаем только успешное списание предмета из обычного инвентаря.
+          trackAchievementEvent({
+            type: AchievementEventType.ResourcesChanged,
+            data: {
+              resources: { [item]: -1 },
+              subtype: PayResourcesSubtype.useInventoryItem,
+            },
           })
         }
 
