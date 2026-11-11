@@ -3,16 +3,24 @@ import type { Card, Leader, UserResources } from "./database"
 export enum AchievementEventType {
   // любая сыгранная карта или лидер в любом режиме
   ActionPlayed = "action.played",
+
   // общий ивент об изменении ресурсов - потом он преобразуется в один из двух ниже
   ResourcesChanged = "resources.changed",
+  // эта тоже превращается в итоге в одну из двух наверху
+  ResourceTransition = "resource.transition",
+  // --------------- настоящие которые отправляются ---------------
   ResourceSpent = "resource.spent",
   ResourceGained = "resource.gained",
+
+  // любое открытие ключа, бочек или коробки
+  ResourceOpened = "resource.opened",
 }
 
 // Изменение со знаками — только входной сигнал. В очередь идут отдельные факты.
 export type AchievementRecordedEventType = Exclude<
   AchievementEventType,
-  AchievementEventType.ResourcesChanged
+  | AchievementEventType.ResourcesChanged
+  | AchievementEventType.ResourceTransition
 >
 
 export type AchievementPeriod = "permanent" | "daily" | "weekly"
@@ -123,6 +131,19 @@ export interface AchievementResourceSpentData {
 }
 
 export type AchievementEventInput =
+  | { type: AchievementEventType.ResourceOpened; data: { resource: string } }
+  | {
+      type: AchievementEventType.ResourceTransition
+      data: {
+        resource: string
+        action: "buy" | "sell" | "craft" | "mill"
+        quantity: number
+        step: number
+        recipe: Record<string, number>
+        before: Record<string, number>
+        after: Record<string, number>
+      }
+    }
   | { type: AchievementEventType.ActionPlayed; actor: Card | Leader }
   | {
       type: AchievementEventType.ResourceSpent

@@ -7,6 +7,36 @@ import { AchievementEventType } from "@/types"
 // Общая точка входа из игры: сообщаем, что произошло, без перечисления заданий.
 // Подсчёт выполняется отдельно, а отправку очереди организует syncAchievementEvents.
 export function trackAchievementEvent(input: AchievementEventInput): string[] {
+  // сценарий перехода между ресурсами - крафт, милл итп
+  if (input.type === AchievementEventType.ResourceTransition) {
+    const { resource, action, quantity, step, recipe, before, after } =
+      input.data
+    if (
+      !Number.isFinite(step) ||
+      step <= 0 ||
+      !Number.isInteger(quantity) ||
+      quantity <= 0
+    )
+      return []
+    const increase = action === "buy" || action === "craft"
+    if (!increase && action !== "sell" && action !== "mill") return []
+
+    // Как на бэке: рецепт за одну операцию + изменение самого ресурса,
+    // затем всё умножается на quantity. Исходный рецепт не изменяем.
+    const perOperation = { ...recipe, [resource]: increase ? step : -step }
+    const resources = Object.fromEntries(
+      Object.entries(perOperation).map(([name, amount]) => [
+        name,
+        amount * quantity,
+      ])
+    )
+    return trackAchievementEvent({
+      type: AchievementEventType.ResourcesChanged,
+      data: { resources, before, after },
+    })
+  }
+
+  // любое изменение любого ресурса - как в плюс, так и минус
   if (input.type === AchievementEventType.ResourcesChanged) {
     const spent: Record<string, number> = {}
     const gained: Record<string, number> = {}
@@ -55,7 +85,7 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     return ids
   }
 
-  // Снимок всех JSON-полей КАРТЫ ИЛИ ЛИДЕРА, включая вложенные объекты и массивы.
+  // Снимок всех полей КАРТЫ ИЛИ ЛИДЕРА, включая вложенные объекты и массивы.
   // Более поздние изменения игровой карты не должны менять уже записанное событие.
   // undefined, как и при обычной отправке JSON, не сохраняется в полях объекта.
   const data: AchievementEvent["data"] = JSON.parse(

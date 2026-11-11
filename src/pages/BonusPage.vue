@@ -51,9 +51,10 @@ import { defineComponent } from "vue"
 import BonusPageResource from "@/components/Pages/BonusPage/BonusPageResource.vue"
 import RewardComp from "@/components/Pages/BonusPage/RewardComp.vue"
 import { choice } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { getRandomReward } from "@/logic/random_rewards"
 import type { CardEntry, KeyRewardResult, ResourceActions } from "@/types"
-import { PayResourcesSubtype } from "@/types"
+import { AchievementEventType, PayResourcesSubtype } from "@/types"
 
 export default defineComponent({
   components: { BonusPageResource, RewardComp },
@@ -157,12 +158,19 @@ export default defineComponent({
     },
 
     async pay_resource(
-      data: Record<string, unknown>,
+      data: Record<string, number>,
       subtype: PayResourcesSubtype
     ): Promise<void> {
+      const resources = { ...data }
+      const before = { ...this.resource }
       await this.$store.dispatch("processResources", {
         subtype: subtype,
-        data,
+        data: resources,
+      })
+      // Открытие контейнера/ключа — расход, принятие награды — доход с учётом лимита.
+      trackAchievementEvent({
+        type: AchievementEventType.ResourcesChanged,
+        data: { resources, before, after: { ...this.resource } },
       })
     },
 
@@ -173,31 +181,47 @@ export default defineComponent({
       quantity,
     }: {
       resource_name: string
-      action: string
+      action: "buy" | "sell" | "craft" | "mill"
       recipe: Record<string, number>
       quantity: number
     }): Promise<void> {
-      await this.pay_resource(
-        {
-          resource: resource_name,
-          action,
-          quantity,
-          recipe,
-        },
-        PayResourcesSubtype.resourceTransition
-      )
+      const before = { ...this.resource }
+      const step = this.resources_config[resource_name]?.step ?? 0
+      const transition = {
+        resource: resource_name,
+        action,
+        quantity,
+        recipe: { ...recipe },
+      }
+      await this.$store.dispatch("processResources", {
+        subtype: PayResourcesSubtype.resourceTransition,
+        data: transition,
+      })
+      // Рецепт, step и quantity разбираются в мастер-функции, а не в компоненте.
+      trackAchievementEvent({
+        type: AchievementEventType.ResourceTransition,
+        data: { ...transition, step, before, after: { ...this.resource } },
+      })
     },
 
     async openResource(resource_name: string): Promise<void> {
-      console.log(resource_name)
-      if (resource_name === "kegs") await this.open_keg()
-      else if (resource_name === "big_kegs") await this.open_big_keg()
-      else if (resource_name === "chests") await this.open_chest()
-      else if (resource_name === "keys") await this.open_key()
+      let opened = false
+      if (resource_name === "kegs") opened = await this.open_keg()
+      else if (resource_name === "big_kegs") opened = await this.open_big_keg()
+      else if (resource_name === "chests") opened = await this.open_chest()
+      else if (resource_name === "keys") opened = await this.open_key()
+
+      // Один факт открытия — только после успешного списания и показа награды.
+      if (opened) {
+        trackAchievementEvent({
+          type: AchievementEventType.ResourceOpened,
+          data: { resource: resource_name },
+        })
+      }
     },
 
-    async open_keg(): Promise<void> {
-      if (this.resource.kegs <= 0) return
+    async open_keg(): Promise<boolean> {
+      if (this.resource.kegs <= 0) return false
       await this.pay_resource(
         { kegs: -1 },
         PayResourcesSubtype.openBonusResource
@@ -209,9 +233,10 @@ export default defineComponent({
         this.random_cards.push(this.pool[choice(this.pool)])
       }
       this.show_reward_page = true
+      return true
     },
-    async open_big_keg(): Promise<void> {
-      if (this.resource.big_kegs <= 0) return
+    async open_big_keg(): Promise<boolean> {
+      if (this.resource.big_kegs <= 0) return false
       await this.pay_resource(
         { big_kegs: -1 },
         PayResourcesSubtype.openBonusResource
@@ -223,9 +248,10 @@ export default defineComponent({
         this.random_cards.push(this.pool[choice(this.pool)])
       }
       this.show_reward_page = true
+      return true
     },
-    async open_chest(): Promise<void> {
-      if (this.resource.chests <= 0) return
+    async open_chest(): Promise<boolean> {
+      if (this.resource.chests <= 0) return false
       await this.pay_resource(
         { chests: -1 },
         PayResourcesSubtype.openBonusResource
@@ -237,9 +263,11 @@ export default defineComponent({
         this.random_cards.push(this.pool[choice(this.pool)])
       }
       this.show_reward_page = true
+      return true
     },
 
-    async open_key(): Promise<void> {
+    async open_key(): Promise<boolean> {
+      if (this.resource.keys <= 0) return false
       await this.pay_resource(
         { keys: -1 },
         PayResourcesSubtype.openBonusResource
@@ -251,6 +279,7 @@ export default defineComponent({
       this.reward_name = "keys"
       this.random_reward_choice = key_reward
       this.show_reward_page = true
+      return true
     },
 
     async accept_random_reward(res: KeyRewardResult): Promise<void> {
