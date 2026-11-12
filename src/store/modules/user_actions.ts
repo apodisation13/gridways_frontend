@@ -190,7 +190,7 @@ const actions = {
   async processCraftMillCard(
     { getters, commit, dispatch }: ActionContext,
     body: ProcessCraftMillPayload
-  ) {
+  ): Promise<UserResources> {
     const userId = getters["getUser"].user_id
     const subtype = body.subtype
     try {
@@ -221,6 +221,7 @@ const actions = {
       ) {
         commit("set_leaders", response.data.cards)
       }
+      return response.data.resources
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при создании карты")

@@ -179,16 +179,19 @@ export type AchievementEventInput =
     }
   | {
       type: AchievementEventType.ResourcesChanged
-      // Минус — потрачено, плюс — запрошенное начисление. Для дохода нужны оба снимка.
-      data: {
-        resources: Record<string, number>
-        subtype?: PayResourcesSubtype
-      } & (
+      // С суммами: минус — расход, плюс — запрошенный доход.
+      // Без сумм нужны оба баланса: трекер сам разделит фактическую разницу.
+      data: { subtype?: PayResourcesSubtype } & (
         | {
+            resources: Record<string, number>
+            before?: never
+            after?: never
+          }
+        | {
+            resources?: Record<string, number>
             before: Record<string, number>
             after: Record<string, number>
           }
-        | { before?: never; after?: never }
       )
     }
 

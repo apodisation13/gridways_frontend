@@ -114,13 +114,29 @@ function getResourceChanges({
   before: beforeSnapshot,
   after: afterSnapshot,
 }: {
-  resources: Record<string, number>
+  resources?: Record<string, number>
   before?: Record<string, number>
   after?: Record<string, number>
 }): { spent: Record<string, number>; gained: Record<string, number> } {
   const spent: Record<string, number> = {}
   const gained: Record<string, number> = {}
-  for (const [resource, amount] of Object.entries(resources)) {
+  // Ручки крафта/разбора возвращают баланс, но не отдельную сумму операции.
+  // Сравниваем только поля, присутствующие в обоих снимках.
+  const changes =
+    resources ??
+    Object.fromEntries(
+      Object.entries(afterSnapshot ?? {})
+        .filter(
+          ([resource, amount]) =>
+            Number.isFinite(amount) &&
+            Number.isFinite(beforeSnapshot?.[resource])
+        )
+        .map(([resource, amount]) => [
+          resource,
+          amount - beforeSnapshot![resource],
+        ])
+    )
+  for (const [resource, amount] of Object.entries(changes)) {
     if (!Number.isFinite(amount)) continue
     if (amount < 0) spent[resource] = -amount
     else if (amount > 0) {

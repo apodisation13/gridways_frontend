@@ -74,6 +74,7 @@ import CardActionModal from "@/components/ModalWindows/CardActionModal.vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle.vue"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import {
   background_color_hp,
   background_color_leader,
@@ -81,6 +82,7 @@ import {
   border_leader,
 } from "@/logic/border_styles"
 import {
+  AchievementEventType,
   type Card,
   type CardEntry,
   CraftMillCardActionSubtype,
@@ -245,7 +247,12 @@ export default defineComponent({
         cardId: (this.user_card as CardEntry | LeaderEntry).card.id,
         subtype: subtypeCardAction,
       }
-      await this.$store.dispatch("processCraftMillCard", data)
+      const before = { ...this.$store.getters["resource"] }
+      const after = await this.$store.dispatch("processCraftMillCard", data)
+      trackAchievementEvent({
+        type: AchievementEventType.ResourcesChanged,
+        data: { before, after: { ...after } },
+      })
     },
     async confirm_craft(recipe: unknown): Promise<void> {
       this.show_modal_craft = false
@@ -258,7 +265,12 @@ export default defineComponent({
         subtype: subtypeCardAction,
         recipe: recipe,
       }
-      await this.$store.dispatch("processCraftMillCard", data)
+      const before = { ...this.$store.getters["resource"] }
+      const after = await this.$store.dispatch("processCraftMillCard", data)
+      trackAchievementEvent({
+        type: AchievementEventType.ResourcesChanged,
+        data: { before, after: { ...after } },
+      })
     },
   },
 })
