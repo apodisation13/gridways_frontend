@@ -35,12 +35,14 @@ export enum AchievementCounterType {
   Count = "count",
   Sum = "sum",
   Current = "current",
+  Unique = "unique",
 }
 
 export type AchievementCounter =
   | { type: AchievementCounterType.Count }
   | { type: AchievementCounterType.Sum; field: string }
   | { type: AchievementCounterType.Current; field: string }
+  | { type: AchievementCounterType.Unique; field: string }
 
 export interface AchievementRewards {
   resources: Record<string, number>

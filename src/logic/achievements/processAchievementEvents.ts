@@ -11,7 +11,7 @@ import { AchievementCounterType, AchievementEventType } from "@/types"
 import { getAchievementField, matchesAchievementFilters } from "./filters"
 
 // Считает предварительный прогресс, не меняя исходные данные и не выдавая наград.
-// Пока поддерживаем постоянные задания с count, sum и current. Для daily/weekly нужны их периоды.
+// Пока поддерживаем постоянные задания с count, sum, current и unique. Для daily/weekly нужны их периоды.
 export function processAchievementEvents(
   section: AchievementSection,
   confirmedProgress: UserAchievementsProgress,
@@ -60,6 +60,7 @@ export function processAchievementEvents(
         continue
       if (!isCurrent && value >= definition.target) continue
 
+      let seen: Array<string | number> | undefined
       let increment: number
       if (definition.counter.type === AchievementCounterType.Count) {
         // Одно событие — один шаг, например применение карты.
@@ -78,6 +79,18 @@ export function processAchievementEvents(
           continue
         }
         increment = amount
+      } else if (definition.counter.type === AchievementCounterType.Unique) {
+        const item = getAchievementField(event.data, definition.counter.field)
+        // Собираем названия или числовые ID. null, объекты и отсутствующие поля не считаем.
+        if (
+          typeof item !== "string" &&
+          !(typeof item === "number" && Number.isFinite(item))
+        )
+          continue
+        if (current?.seen?.includes(item)) continue
+        // Копируем список: предварительный расчёт не должен менять прогресс бэка.
+        seen = [...(current?.seen ?? []), item]
+        increment = 0
       } else {
         // Если бэк прислал ещё не поддерживаемый способ подсчёта, пропускаем его.
         continue
@@ -86,12 +99,13 @@ export function processAchievementEvents(
       // Показываем не больше цели: максимум 10/10, даже если событий было 12.
       const nextValue = Math.min(
         definition.target,
-        isCurrent ? increment : value + increment
+        seen ? seen.length : isCurrent ? increment : value + increment
       )
       progress.permanent ??= {}
       progress.permanent[definition.id] = {
         ...current,
         value: nextValue,
+        ...(seen ? { seen } : {}),
         // Даты выполнения и выдачи награды устанавливает только бэк.
         completed_at: current?.completed_at ?? null,
         reward_granted_at: current?.reward_granted_at ?? null,
