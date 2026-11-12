@@ -13,6 +13,26 @@ import { checkCurrentResources } from "./currentResources"
 // Общая точка входа из игры: сообщаем, что произошло, без перечисления заданий.
 // Подсчёт выполняется отдельно, а отправку очереди организует syncAchievementEvents.
 export function trackAchievementEvent(input: AchievementEventInput): string[] {
+  // Некоторые награды возвращают только полный баланс, без суммы начисления.
+  // Для них учитываем положительную разницу; уменьшения не считаем расходами.
+  if (
+    input.type === AchievementEventType.ResourceGained &&
+    "before" in input.data
+  ) {
+    const { before, after } = input.data
+    const gained: Record<string, number> = {}
+    for (const [resource, amount] of Object.entries(after)) {
+      const previous = before[resource]
+      if (!Number.isFinite(amount) || !Number.isFinite(previous)) continue
+      const received = amount - previous
+      if (Number.isFinite(received) && received > 0) gained[resource] = received
+    }
+    return [
+      ...trackResourceChanges({ spent: {}, gained }),
+      ...checkCurrentResources(),
+    ]
+  }
+
   // сценарий перехода между ресурсами - крафт, милл итп
   if (input.type === AchievementEventType.ResourceTransition) {
     return trackResourceTransition(input.data)

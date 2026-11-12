@@ -251,7 +251,18 @@ export default defineComponent({
       // если уровень УЖЕ пройден, то нет смысла открывать его детей
       if (!userLevel || userLevel.finished) return
 
-      await this.$store.dispatch("openRelatedLevels", userLevel.id)
+      // Обычная награда за победу уже начислена — здесь считаем только новые награды.
+      const before = { ...this.$store.getters["resource"] }
+      const resources = await this.$store.dispatch(
+        "openRelatedLevels",
+        userLevel.id
+      )
+      if (resources != null) {
+        trackAchievementEvent({
+          type: AchievementEventType.ResourceGained,
+          data: { before, after: { ...resources } },
+        })
+      }
       const rewards = userLevel.level.data?.rewards
       if (rewards && Object.keys(rewards).length) {
         this.levelRewards = rewards

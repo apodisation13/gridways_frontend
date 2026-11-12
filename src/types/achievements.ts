@@ -172,7 +172,10 @@ export type AchievementEventInput =
     }
   | {
       type: AchievementEventType.ResourceGained
-      data: { resources: Record<string, number>; subtype?: PayResourcesSubtype }
+      data:
+        | { resources: Record<string, number>; subtype?: PayResourcesSubtype }
+        // Если ручка вернула только баланс, фактический доход вычислит трекер.
+        | { before: Record<string, number>; after: Record<string, number> }
     }
   | {
       type: AchievementEventType.ResourcesChanged

@@ -267,6 +267,7 @@ const actions = {
       if (resources != null) commit("set_resource", resources)
       if (cards != null) commit("set_cards", cards)
       if (leaders != null) commit("set_leaders", leaders)
+      return resources
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при открытии уровней")
