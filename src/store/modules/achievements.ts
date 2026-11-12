@@ -8,6 +8,7 @@ import {
   previewCurrentResources,
 } from "@/logic/achievements/currentResources"
 import { processAchievementEvents } from "@/logic/achievements/processAchievementEvents"
+import { trackAchievementRewards } from "@/logic/achievements/trackAchievementRewards"
 import type { RootState } from "@/store"
 import { USER_ACHIEVEMENTS } from "@/store/const/api_urls"
 import type {
@@ -271,6 +272,9 @@ const actions = {
       // null — баланс не меняем. Иначе бэк прислал полный актуальный баланс.
       if (data.user_resources !== null) {
         commit("set_resource", data.user_resources)
+        // Сначала подтверждаем выполненные контракты, потом учитываем их доход.
+        // Поэтому награда не сможет повторно продвинуть выдавший её контракт.
+        trackAchievementRewards(data.granted_rewards)
         // Награда тоже может довести баланс до цели другого контракта.
         checkCurrentResources()
       }

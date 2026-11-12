@@ -69,6 +69,7 @@ const actions = {
       commit("setUserUpgrades", response.data.upgrades)
       commit("set_resource", response.data.resources)
       dispatch("syncGameUpgrades")
+      return response.data.resources
     } catch (err) {
       console.log(err)
       throw err

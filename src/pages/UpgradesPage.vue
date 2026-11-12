@@ -231,6 +231,8 @@ import { useToast } from "vue-toastification"
 import ConfirmModal from "@/components/ModalWindows/ConfirmModal.vue"
 import ResourceList from "@/components/ResourceList.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
+import { AchievementEventType } from "@/types"
 import {
   ModalState,
   UpgradeCategory,
@@ -412,9 +414,14 @@ export default defineComponent({
     async handleUpgrade(modalState: ModalState): Promise<void> {
       this.upgrading = true
       try {
-        await this.$store.dispatch("postUserUpgrade", {
+        const before = { ...this.$store.getters["resource"] }
+        const after = await this.$store.dispatch("postUserUpgrade", {
           upgradeType: modalState.category,
           upgradeSubtype: modalState.key,
+        })
+        trackAchievementEvent({
+          type: AchievementEventType.ResourcesChanged,
+          data: { before, after: { ...after } },
         })
         this.closeModal()
         this.toast.success("Прокачано!")
