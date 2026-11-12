@@ -4,6 +4,8 @@ import type { PayResourcesSubtype } from "./user_actions"
 export enum AchievementEventType {
   // любая сыгранная карта или лидер в любом режиме
   ActionPlayed = "action.played",
+  ActorTransition = "actor.transition", // Локальный сигнал с балансами до/после.
+  ActorTransformed = "actor.transformed",
 
   // общий ивент об изменении ресурсов - потом он преобразуется в один из двух ниже
   ResourcesChanged = "resources.changed",
@@ -26,6 +28,7 @@ export type AchievementRecordedEventType = Exclude<
   AchievementEventType,
   | AchievementEventType.ResourcesChanged
   | AchievementEventType.ResourceTransition
+  | AchievementEventType.ActorTransition
 >
 
 export type AchievementPeriod = "permanent" | "daily" | "weekly"
@@ -141,7 +144,27 @@ export interface AchievementResourceSpentData {
   resources: Record<string, number>
 }
 
+export interface AchievementActorOperation {
+  action: "craft" | "mill"
+  actor: Card | Leader
+  recipe: Record<string, number>
+}
+
 export type AchievementEventInput =
+  | {
+      type: AchievementEventType.ActorTransition
+      data: AchievementActorOperation & {
+        before: Record<string, number>
+        after: Record<string, number>
+      }
+    }
+  | {
+      type: AchievementEventType.ActorTransformed
+      data: AchievementActorOperation & {
+        spent: Record<string, number>
+        gained: Record<string, number>
+      }
+    }
   | { type: AchievementEventType.ResourcesChecked; data: Record<string, never> }
   | {
       type: AchievementEventType.ResourceTransformed

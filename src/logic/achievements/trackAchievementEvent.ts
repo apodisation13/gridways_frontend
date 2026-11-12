@@ -33,6 +33,10 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     ]
   }
 
+  if (input.type === AchievementEventType.ActorTransition) {
+    return trackActorTransition(input.data)
+  }
+
   // сценарий перехода между ресурсами - крафт, милл итп
   if (input.type === AchievementEventType.ResourceTransition) {
     return trackResourceTransition(input.data)
@@ -63,6 +67,26 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
   store.commit("enqueueAchievementEvent", event)
 
   return [event.id]
+}
+
+// Один успешный крафт/разбор: ресурсы учитываем один раз, затем записываем саму операцию.
+function trackActorTransition(
+  data: Extract<
+    AchievementEventInput,
+    { type: AchievementEventType.ActorTransition }
+  >["data"]
+): string[] {
+  const { action, actor, recipe, before, after } = data
+  const changes = getResourceChanges({ before, after })
+  const ids = trackResourceChanges(changes)
+  ids.push(
+    ...trackAchievementEvent({
+      type: AchievementEventType.ActorTransformed,
+      data: { action, actor, recipe, ...changes },
+    })
+  )
+  ids.push(...checkCurrentResources())
+  return ids
 }
 
 // Обмен создаёт события расходов, доходов и отдельный факт операции.

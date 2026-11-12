@@ -74,6 +74,7 @@ import CardActionModal from "@/components/ModalWindows/CardActionModal.vue"
 import ModalWindow from "@/components/ModalWindows/ModalWindow.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import CardCountTriangle from "@/components/UI/CardsUI/Cards/CardCountTriangle.vue"
+import { copyObj } from "@/lib/utils"
 import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import {
   background_color_hp,
@@ -236,7 +237,7 @@ export default defineComponent({
     craft(): void {
       this.show_modal_craft = true
     },
-    async confirm_mill(): Promise<void> {
+    async confirm_mill(recipe: Record<string, number>): Promise<void> {
       this.show_modal_mill = false
       if (!this.can_mill()) return
       const subtypeCardAction =
@@ -247,14 +248,23 @@ export default defineComponent({
         cardId: (this.user_card as CardEntry | LeaderEntry).card.id,
         subtype: subtypeCardAction,
       }
+      // Снимок до запроса: после разбора запись карты может исчезнуть из стора.
+      const actor = copyObj((this.user_card as CardEntry | LeaderEntry).card)
+      const operationRecipe = { ...recipe }
       const before = { ...this.$store.getters["resource"] }
       const after = await this.$store.dispatch("processCraftMillCard", data)
       trackAchievementEvent({
-        type: AchievementEventType.ResourcesChanged,
-        data: { before, after: { ...after } },
+        type: AchievementEventType.ActorTransition,
+        data: {
+          action: "mill",
+          actor,
+          recipe: operationRecipe,
+          before,
+          after: { ...after },
+        },
       })
     },
-    async confirm_craft(recipe: unknown): Promise<void> {
+    async confirm_craft(recipe: Record<string, number>): Promise<void> {
       this.show_modal_craft = false
       const subtypeCardAction =
         (this.user_card?.card as any)?.color !== undefined
@@ -265,11 +275,20 @@ export default defineComponent({
         subtype: subtypeCardAction,
         recipe: recipe,
       }
+      // Снимок до запроса: после разбора запись карты может исчезнуть из стора.
+      const actor = copyObj((this.user_card as CardEntry | LeaderEntry).card)
+      const operationRecipe = { ...recipe }
       const before = { ...this.$store.getters["resource"] }
       const after = await this.$store.dispatch("processCraftMillCard", data)
       trackAchievementEvent({
-        type: AchievementEventType.ResourcesChanged,
-        data: { before, after: { ...after } },
+        type: AchievementEventType.ActorTransition,
+        data: {
+          action: "craft",
+          actor,
+          recipe: operationRecipe,
+          before,
+          after: { ...after },
+        },
       })
     },
   },
