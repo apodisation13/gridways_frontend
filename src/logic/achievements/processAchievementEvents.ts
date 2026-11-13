@@ -56,7 +56,11 @@ export function processAchievementEvents(
       const value = current?.value ?? 0
       const isCurrent =
         definition.counter.type === AchievementCounterType.Current
-      if (isCurrent && event.type !== AchievementEventType.ResourcesChecked)
+      if (
+        isCurrent &&
+        event.type !== AchievementEventType.ResourcesChecked &&
+        event.type !== AchievementEventType.UpgradesChecked
+      )
         continue
       if (!isCurrent && value >= definition.target) continue
 

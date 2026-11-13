@@ -9,10 +9,16 @@ import type {
 import { AchievementEventType } from "@/types"
 
 import { checkCurrentResources } from "./currentResources"
+import { checkCurrentUpgrades } from "./currentUpgrades"
+import { buildUpgradeSnapshot } from "./upgradeSnapshot"
 
 // Общая точка входа из игры: сообщаем, что произошло, без перечисления заданий.
 // Подсчёт выполняется отдельно, а отправку очереди организует syncAchievementEvents.
 export function trackAchievementEvent(input: AchievementEventInput): string[] {
+  if (input.type === AchievementEventType.UpgradeChanged) {
+    return trackUpgradeChange(input.data)
+  }
+
   // Некоторые награды возвращают только полный баланс, без суммы начисления.
   // Для них учитываем положительную разницу; уменьшения не считаем расходами.
   if (
@@ -67,6 +73,29 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
   store.commit("enqueueAchievementEvent", event)
 
   return [event.id]
+}
+
+// Покупка прокачки создаёт один факт покупки, обычные ресурсы и проверку достигнутых целей.
+function trackUpgradeChange(
+  data: Extract<
+    AchievementEventInput,
+    { type: AchievementEventType.UpgradeChanged }
+  >["data"]
+): string[] {
+  const { upgrade_type, upgrade_subtype, upgrades, before, after } = data
+  const ids = trackResourceChanges(getResourceChanges({ before, after }))
+  const snapshot = buildUpgradeSnapshot(store.getters.upgradesConfig, upgrades)
+  const purchased = snapshot.upgrades[upgrade_type]?.[upgrade_subtype]
+  if (purchased) {
+    ids.push(
+      ...trackAchievementEvent({
+        type: AchievementEventType.UpgradePurchased,
+        data: { upgrade_type, upgrade_subtype, ...purchased },
+      })
+    )
+  }
+  ids.push(...checkCurrentResources(), ...checkCurrentUpgrades())
+  return ids
 }
 
 // Один успешный крафт/разбор: ресурсы учитываем один раз, затем записываем саму операцию.

@@ -324,9 +324,6 @@ export default defineComponent({
       )
     },
   },
-  async created() {
-    await this.$store.dispatch("getUserUpgrades")
-  },
   methods: {
     userLevel(category: UpgradeType, key: UpgradeSubtype): number {
       return (this.userUpgrades[category]?.[key] as number) ?? 0
@@ -415,13 +412,19 @@ export default defineComponent({
       this.upgrading = true
       try {
         const before = { ...this.$store.getters["resource"] }
-        const after = await this.$store.dispatch("postUserUpgrade", {
+        const result = await this.$store.dispatch("postUserUpgrade", {
           upgradeType: modalState.category,
           upgradeSubtype: modalState.key,
         })
         trackAchievementEvent({
-          type: AchievementEventType.ResourcesChanged,
-          data: { before, after: { ...after } },
+          type: AchievementEventType.UpgradeChanged,
+          data: {
+            upgrade_type: modalState.category,
+            upgrade_subtype: modalState.key,
+            upgrades: result.upgrades,
+            before,
+            after: { ...result.resources },
+          },
         })
         this.closeModal()
         this.toast.success("Прокачано!")

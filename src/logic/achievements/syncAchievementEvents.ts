@@ -2,6 +2,7 @@ import store from "@/store"
 import { AchievementEventType } from "@/types"
 
 import { checkCurrentResources } from "./currentResources"
+import { checkCurrentUpgrades } from "./currentUpgrades"
 import { processAchievementEvents } from "./processAchievementEvents"
 
 const FLUSH_INTERVAL_MS = 10_000
@@ -11,13 +12,16 @@ const MAX_PENDING_EVENTS = 20
 export function installAchievementSync(): () => void {
   let loaded = new Set<string>()
   let initialCheckDone = false
+  let initialUpgradesCheckDone = false
 
   function shouldFlush(): boolean {
     const state = store.state.achievements
     if (!state.pendingEvents.length) return false
     if (
       state.pendingEvents.some(
-        event => event.type === AchievementEventType.ResourcesChecked
+        event =>
+          event.type === AchievementEventType.ResourcesChecked ||
+          event.type === AchievementEventType.UpgradesChecked
       )
     )
       return true
@@ -48,19 +52,41 @@ export function installAchievementSync(): () => void {
 
   const unsubscribe = store.subscribe(mutation => {
     if (
-      ["set_resource", "setUserAchievements", "setAchievementsConfig"].includes(
-        mutation.type
-      )
+      [
+        "set_resource",
+        "setUserAchievements",
+        "setAchievementsConfig",
+        "setUpgrades",
+        "setUserUpgrades",
+      ].includes(mutation.type)
     ) {
       loaded.add(mutation.type)
-      if (!initialCheckDone && loaded.size === 3) {
+      if (
+        !initialCheckDone &&
+        ["set_resource", "setUserAchievements", "setAchievementsConfig"].every(
+          type => loaded.has(type)
+        )
+      ) {
         initialCheckDone = true
         checkCurrentResources()
+      }
+      if (
+        !initialUpgradesCheckDone &&
+        [
+          "setUpgrades",
+          "setUserUpgrades",
+          "setUserAchievements",
+          "setAchievementsConfig",
+        ].every(type => loaded.has(type))
+      ) {
+        initialUpgradesCheckDone = true
+        checkCurrentUpgrades()
       }
     }
     if (mutation.type === "logOut" || mutation.type === "logIn") {
       loaded = new Set<string>()
       initialCheckDone = false
+      initialUpgradesCheckDone = false
       store.commit("resetAchievementSession")
     } else if (mutation.type === "enqueueAchievementEvent" && shouldFlush()) {
       // Проверка после каждого нового события: цель достигнута или очередь заполнена.

@@ -35,30 +35,13 @@ const mutations = {
 }
 
 const actions = {
-  async getUserUpgrades({ commit, getters }: ActionContext) {
-    const userUpgrades: UserUpgrades = getters["userUpgrades"]
-    if (Object.keys(userUpgrades).length > 0) return
-
-    const userId = getters["getUser"].user_id
-
-    try {
-      const upgrades = await callApi<UserUpgrades>({
-        method: HttpMethod.GET,
-        url: UPGRADES.replace("{userId}", userId),
-      })
-      commit("setUserUpgrades", upgrades)
-    } catch (err) {
-      console.log(err)
-    }
-  },
-
   async postUserUpgrade(
     { commit, getters, dispatch }: ActionContext,
     {
       upgradeType,
       upgradeSubtype,
     }: { upgradeType: UpgradeType; upgradeSubtype: UpgradeSubtype }
-  ) {
+  ): Promise<UpgradesResponse> {
     const userId = getters["getUser"].user_id
     try {
       const response = await callApi<UpgradesResponse>({
@@ -69,7 +52,7 @@ const actions = {
       commit("setUserUpgrades", response.data.upgrades)
       commit("set_resource", response.data.resources)
       dispatch("syncGameUpgrades")
-      return response.data.resources
+      return response.data
     } catch (err) {
       console.log(err)
       throw err

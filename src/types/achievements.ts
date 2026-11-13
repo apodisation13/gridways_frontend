@@ -1,4 +1,5 @@
 import type { Card, Leader, UserResources } from "./database"
+import type { UpgradeSubtype, UpgradeType, UserUpgrades } from "./upgrades"
 import type { PayResourcesSubtype } from "./user_actions"
 
 export enum AchievementEventType {
@@ -6,6 +7,9 @@ export enum AchievementEventType {
   ActionPlayed = "action.played",
   ActorTransition = "actor.transition", // Локальный сигнал с балансами до/после.
   ActorTransformed = "actor.transformed",
+  UpgradeChanged = "upgrade.changed", // Локальный сигнал после покупки.
+  UpgradePurchased = "upgrade.purchased",
+  UpgradesChecked = "upgrades.checked",
 
   // общий ивент об изменении ресурсов - потом он преобразуется в один из двух ниже
   ResourcesChanged = "resources.changed",
@@ -29,6 +33,7 @@ export type AchievementRecordedEventType = Exclude<
   | AchievementEventType.ResourcesChanged
   | AchievementEventType.ResourceTransition
   | AchievementEventType.ActorTransition
+  | AchievementEventType.UpgradeChanged
 >
 
 export type AchievementPeriod = "permanent" | "daily" | "weekly"
@@ -150,7 +155,43 @@ export interface AchievementActorOperation {
   recipe: Record<string, number>
 }
 
+export interface AchievementUpgradeState {
+  level: number
+  value: number | boolean
+  maxed: boolean
+}
+
+export interface AchievementUpgradeSummary {
+  total_count: number
+  maxed_count: number
+  // Число 0/1 позволяет использовать обычный current с target: 1.
+  all_maxed: number
+}
+
+export interface AchievementUpgradeSnapshot {
+  upgrades: Record<string, Record<string, AchievementUpgradeState>>
+  summary: Record<string, AchievementUpgradeSummary>
+}
+
 export type AchievementEventInput =
+  | {
+      type: AchievementEventType.UpgradeChanged
+      data: {
+        upgrade_type: UpgradeType
+        upgrade_subtype: UpgradeSubtype
+        upgrades: UserUpgrades
+        before: Record<string, number>
+        after: Record<string, number>
+      }
+    }
+  | {
+      type: AchievementEventType.UpgradePurchased
+      data: AchievementUpgradeState & {
+        upgrade_type: UpgradeType
+        upgrade_subtype: UpgradeSubtype
+      }
+    }
+  | { type: AchievementEventType.UpgradesChecked; data: Record<string, never> }
   | {
       type: AchievementEventType.ActorTransition
       data: AchievementActorOperation & {

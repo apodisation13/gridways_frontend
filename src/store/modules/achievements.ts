@@ -7,6 +7,7 @@ import {
   checkCurrentResources,
   previewCurrentResources,
 } from "@/logic/achievements/currentResources"
+import { previewCurrentUpgrades } from "@/logic/achievements/currentUpgrades"
 import { processAchievementEvents } from "@/logic/achievements/processAchievementEvents"
 import { trackAchievementRewards } from "@/logic/achievements/trackAchievementRewards"
 import type { RootState } from "@/store"
@@ -22,6 +23,7 @@ import type {
   PinnedAchievement,
   UserAchievementsProgress,
 } from "@/types"
+import type { UpgradesConfig, UserUpgrades } from "@/types/upgrades"
 
 export interface AchievementsState {
   // Описания заданий: условия, цели, награды. Permanent приходит из game_const.
@@ -94,7 +96,11 @@ const getters = {
   // Поэтому повторный вызов getter не прибавляет один и тот же ход ещё раз.
   achievementPreview: (
     state: AchievementsState,
-    getters: { resource: Record<string, number> }
+    getters: {
+      resource: Record<string, number>
+      upgradesConfig: UpgradesConfig
+      userUpgrades: UserUpgrades
+    }
   ): AchievementPreview => {
     const preview = processAchievementEvents(
       state.achievementsConfig.permanent,
@@ -106,12 +112,19 @@ const getters = {
       preview.progress,
       getters.resource
     )
+    const upgrades = previewCurrentUpgrades(
+      state.achievementsConfig.permanent,
+      current.progress,
+      getters.upgradesConfig,
+      getters.userUpgrades
+    )
     return {
-      progress: current.progress,
+      progress: upgrades.progress,
       reachedAchievementIds: [
         ...new Set([
           ...preview.reachedAchievementIds,
           ...current.reachedAchievementIds,
+          ...upgrades.reachedAchievementIds,
         ]),
       ],
     }

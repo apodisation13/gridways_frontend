@@ -66,7 +66,6 @@
           v-for="group in visibleGroups"
           :key="group.key"
           class="achievement-group"
-          open
         >
           <summary>
             <span>{{ group.title }}</span>
