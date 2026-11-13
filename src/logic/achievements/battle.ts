@@ -6,8 +6,10 @@ export function startAchievementBattle(mode: AchievementGameMode): void {
   const battle: AchievementBattle = JSON.parse(
     JSON.stringify({
       mode,
+      difficulty: store.state.game.level?.difficulty,
       starting_deck: {
         cards: store.state.game.current_deck.map(entry => entry.card),
+        leader: store.state.game.leader,
       },
       leader_uses: 0,
     })
@@ -21,6 +23,7 @@ export function finishAchievementBattle(mode: AchievementGameMode) {
     battle?.mode === mode
       ? JSON.parse(
           JSON.stringify({
+            difficulty: battle.difficulty,
             starting_deck: battle.starting_deck,
             leader_uses: battle.leader_uses,
           })

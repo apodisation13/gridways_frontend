@@ -1,4 +1,4 @@
-import type { Card, Leader, UserResources } from "./database"
+import type { Card, Leader, LevelDifficulty, UserResources } from "./database"
 import type { InventoryItem } from "./inventory"
 import type { UpgradeSubtype, UpgradeType, UserUpgrades } from "./upgrades"
 import type { PayResourcesSubtype } from "./user_actions"
@@ -199,6 +199,7 @@ export interface AchievementUpgradeSnapshot {
 // Только текущий бой; не часть сохраняемого пользовательского прогресса.
 export interface AchievementBattle {
   mode: AchievementGameMode
+  difficulty?: LevelDifficulty
   starting_deck: Record<string, AchievementEventValue>
   leader_uses: number
 }

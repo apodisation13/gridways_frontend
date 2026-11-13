@@ -1267,6 +1267,240 @@
             }
           }
         }
+      },
+      "normal": {
+        "id": "normal",
+        "title": "Обычная игра",
+        "ordering": 65,
+        "achievements": {
+          "normal_win_games_100": {
+            "id": "normal_win_games_100",
+            "title": "Выиграйте 100 игр в обычном режиме",
+            "ordering": 10,
+            "event": "game.won",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_soldiers_100": {
+            "id": "normal_win_soldiers_100",
+            "title": "Выиграйте 100 игр за фракцию Soldiers",
+            "ordering": 20,
+            "event": "game.won",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "starting_deck.leader.faction": "Soldiers"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_only_bronze_1": {
+            "id": "normal_win_only_bronze_1",
+            "title": "Выиграйте обычный бой колодой только из бронзовых карт 1 раз",
+            "ordering": 30,
+            "event": "game.won",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "starting_deck.summary.all_bronze": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_only_bronze_3": {
+            "id": "normal_win_only_bronze_3",
+            "title": "Выиграйте обычный бой колодой только из бронзовых карт 3 раз",
+            "ordering": 40,
+            "event": "game.won",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "starting_deck.summary.all_bronze": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_only_silver_1": {
+            "id": "normal_win_only_silver_1",
+            "title": "Выиграйте обычный бой колодой только из серебряных карт 1 раз",
+            "ordering": 50,
+            "event": "game.won",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "starting_deck.summary.all_silver": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_only_silver_3": {
+            "id": "normal_win_only_silver_3",
+            "title": "Выиграйте обычный бой колодой только из серебряных карт 3 раз",
+            "ordering": 60,
+            "event": "game.won",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "starting_deck.summary.all_silver": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_only_gold_1": {
+            "id": "normal_win_only_gold_1",
+            "title": "Выиграйте обычный бой колодой только из золотых карт 1 раз",
+            "ordering": 70,
+            "event": "game.won",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "starting_deck.summary.all_gold": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_only_gold_3": {
+            "id": "normal_win_only_gold_3",
+            "title": "Выиграйте обычный бой колодой только из золотых карт 3 раз",
+            "ordering": 80,
+            "event": "game.won",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "starting_deck.summary.all_gold": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_easy_100": {
+            "id": "normal_win_easy_100",
+            "title": "Выиграйте 100 обычных боёв простой сложности",
+            "ordering": 90,
+            "event": "game.won",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "difficulty": "easy"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_normal_100": {
+            "id": "normal_win_normal_100",
+            "title": "Выиграйте 100 обычных боёв нормальной сложности",
+            "ordering": 100,
+            "event": "game.won",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "difficulty": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_hard_100": {
+            "id": "normal_win_hard_100",
+            "title": "Выиграйте 100 обычных боёв сложной сложности",
+            "ordering": 110,
+            "event": "game.won",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "difficulty": "hard"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_without_leader_3": {
+            "id": "normal_win_without_leader_3",
+            "title": "Выиграйте 3 обычных боя без применения лидера",
+            "ordering": 120,
+            "event": "game.won",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "leader_uses": 0
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          }
+        }
       }
     }
   }

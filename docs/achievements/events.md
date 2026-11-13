@@ -8,7 +8,7 @@
 |---|---|---|
 | `action.played` | `{actor: <полный Card или Leader>, mode}` | count зарядов, unique actor.id, фильтры actor.color/faction/type/data.damage |
 | `game.started` | `{mode}` | count начатых боёв, начало локальной статистики |
-| `game.won` | `{mode, starting_deck?, leader_uses?}` | count побед, условия по исходному составу и применению лидера |
+| `game.won` | `{mode, difficulty?, starting_deck?, leader_uses?}` | count побед, условия по исходному составу и применению лидера |
 | `arena.upgrade.purchased` | `{upgrade_subtype, level}` | count успешных покупок прокачек арены |
 | `arena.level.reached` | `{level}` | count/target 1 с фильтром level gte N |
 | `inventory.restored` | `{item, mode}` | count восстановлений предмета кнопкой |
@@ -121,10 +121,16 @@ WinPage/ArenaWinPage отправляют game.won после проверки �
 
 ## Контракты арены и статистика боя
 
-AchievementsState.battle хранит mode, независимый starting_deck.cards, leader_uses. GameStarted заменяет снимок через battle.ts из game.current_deck; применённый лидер в ActionPlayed увеличивает leader_uses до постановки события в очередь. Возврат/изменение зарядов счётчик не уменьшает. На GameWon снимок копируется в событие и очищается. На LosePage и resetAchievementSession очищается; новый старт всегда заменяет предыдущий снимок, в том числе после выхода из боя. Если снимок отсутствует или режим не совпал, game.won не содержит starting_deck/leader_uses: отсутствие не считается нулём.
+AchievementsState.battle хранит mode, difficulty, независимые starting_deck.cards и starting_deck.leader, leader_uses. GameStarted заменяет снимок через battle.ts из game.current_deck; применённый лидер в ActionPlayed увеличивает leader_uses до постановки события в очередь. Возврат/изменение зарядов счётчик не уменьшает. На GameWon снимок копируется в событие и очищается. На LosePage и resetAchievementSession очищается; новый старт всегда заменяет предыдущий снимок, в том числе после выхода из боя. Если снимок отсутствует или режим не совпал, game.won не содержит starting_deck/leader_uses: отсутствие не считается нулём.
 
 Frontend preview и backend events.py пересчитывают starting_deck.summary общей функцией сводки состава, не доверяя переданному summary. Лидер исключён. Контракт без золотых требует непустой колоды и by_color.Gold = 0; только бронзовые — all_bronze = true. Три победы без лидера — count/target 3, leader_uses = 0, mode arena, не серия. Обычные game.won-контракты без этих фильтров работают как прежде. Бэк принимает исходный состав/счётчик от клиента, не симулирует бой.
 
 ArenaUpgradesModal.doUpgrade отправляет arena.upgrade.purchased после успешной оплаты и arena_increment_upgrade; расход ресурсов в этом месте пока отдельно не подключён. ArenaDeckbuildPage.restore_inventory отправляет inventory.restored после проверки доступности и мутации восстановления, не после покупки ARENA_RESTORE_SLOT. ArenaWinPage после arena_advance_level отправляет arena.level.reached: выигрыш уровня 4 означает достижение 5. Проверки по level gte N с target 1; загрузка старого состояния пока не даёт ретроспективных событий. Все девять новых примеров лежат в категории arena в config-examples.json.
 
 В текущей схеме бэка режимы используют LeaderboardGameMode плюс literal normal для контрактов обычного режима. Поле mode у inventory.used теперь обязательно. result — словарь неотрицательных целых результатов; пока фронт измеряет только cards_drawn.
+
+## Победы обычного режима
+
+При старте battle.ts копирует полного лидера из game.leader в starting_deck.leader и difficulty из game.level. На победе оба поля берутся из этого снимка, не из текущего изменяемого состояния. Фильтры: mode normal, starting_deck.leader.faction Soldiers, difficulty easy/normal/hard. Сводка starting_deck.summary по-прежнему считает только карты, не лидера. Без снимка дополнительные поля не подставляются. Backend GameWonData принимает необязательную difficulty (easy/normal/hard), лидер уже входит в произвольный словарь starting_deck.
+
+Категория normal в config-examples.json содержит 12 контрактов: 100 побед, 100 побед за Soldiers, по 1/3 победы каждым одноцветным составом Bronze/Silver/Gold, по 100 побед каждой сложности, 3 победы без применения лидера. Все имеют mode normal; сложности normal и режим normal — разные поля. Повторное прохождение уровня считается новой победой; победы не обязаны идти подряд. Предыдущие конфиги не требуют изменений.
