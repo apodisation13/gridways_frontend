@@ -287,6 +287,39 @@
                 "money": 100
               }
             }
+          },
+          "use_all_inventory_items": {
+            "id": "use_all_inventory_items",
+            "title": "Используйте каждый предмет инвентаря",
+            "ordering": 140,
+            "event": "resource.spent",
+            "target": 9,
+            "counter": {
+              "type": "unique",
+              "field": "item"
+            },
+            "filters": {
+              "subtype": "use_inventory_item",
+              "item": {
+                "type": "in",
+                "value": [
+                  "first_aid_kits",
+                  "shields",
+                  "immune_magics",
+                  "draw_cards",
+                  "mega_bombs",
+                  "random_bombs",
+                  "clears",
+                  "purifies",
+                  "random_effects"
+                ]
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
           }
         }
       },

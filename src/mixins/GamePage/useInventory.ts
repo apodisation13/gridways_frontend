@@ -141,6 +141,7 @@ export default defineComponent({
             type: AchievementEventType.ResourcesChanged,
             data: {
               resources: { [item]: -1 },
+              item,
               subtype: PayResourcesSubtype.useInventoryItem,
             },
           })

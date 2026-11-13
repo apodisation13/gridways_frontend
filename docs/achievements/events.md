@@ -7,7 +7,7 @@
 | type | data | Примеры |
 |---|---|---|
 | `action.played` | `{actor: <полный Card или Leader>}` | count зарядов, unique actor.id, фильтры actor.color/faction/type/data.damage |
-| `resource.spent` | `{resources: {money: 100}, subtype?: string}` | sum resources.money; use_inventory_item для обычного инвентаря |
+| `resource.spent` | `{resources: {money: 100}, subtype?: string, item?: string}` | sum resources.money; use_inventory_item для обычного инвентаря |
 | `resource.gained` | `{resources: {money: 100}, subtype?: string}` | фактический доход с учётом лимитов |
 | `resource.opened` | `{resource: "kegs"}` | count открытий; keys, kegs, big_kegs, chests |
 | `resource.transformed` | `{action, resource, amount, spent, gained}` | buy/sell/craft/mill; amount = quantity × step |
@@ -64,7 +64,7 @@ Groups: game/resources/settings/inventory, all, non_settings. maxed по `next =
 | `src/pages/BonusPage.vue`: pay_resource | контейнеры/ключи и принятие награды ключа |
 | BonusPage.handleAction | ResourceTransition |
 | BonusPage.openResource | успешное открытие одного ресурса; ключ считается при открытии выбора, не при принятии награды |
-| `src/mixins/GamePage/useInventory.ts` | после processResources вне arena_mode, subtype use_inventory_item; один предмет за операцию |
+| `src/mixins/GamePage/useInventory.ts` | после processResources вне arena_mode, subtype use_inventory_item, item — название предмета; один предмет за операцию |
 | `src/components/ModalWindows/CardModal.vue` | ActorTransition после craft/mill карты/лидера |
 | `src/pages/UpgradesPage.vue` | UpgradeChanged после postUserUpgrade |
 | `src/store/modules/achievements.ts` | после подтверждения: доход из granted_rewards, проверка current баланса |
@@ -72,3 +72,7 @@ Groups: game/resources/settings/inventory, all, non_settings. maxed по `next =
 Не подключены: ArenaUpgradesModal, отдельные arena.inventoryCounts, оплаченные покупки PaymentResultPage. Начальные GET и обновление всего баланса не превращать в доход за всё время. `processCraftBonusCard` меняет коллекцию карт, не является платным craft и не считается actor.transformed.
 
 При новом месте изменения ресурсов сначала искать `processResources`, `set_resource`, альтернативные ответы с resources и прямые изменения баланса. Не добавлять общий трекер к каждой мутации стора: загрузка/подтверждение/новая операция имеют разную семантику.
+
+## Уникальные использованные предметы
+
+При обычном использовании инвентаря ResourcesChanged получает item (InventoryItem) и переносит его в resource.spent. Схема бэка принимает необязательное item (ResourceType). Для «используйте каждый предмет» ставим unique по item, subtype = use_inventory_item и фильтр item in со списком предметов. Старые расходы без item работают как раньше, но не продвигают этот unique-контракт. Прошлые использования не восстанавливаются. Арена остаётся отдельно и не учитывается.

@@ -4,6 +4,7 @@ import store from "@/store"
 import type {
   AchievementEvent,
   AchievementEventInput,
+  InventoryItem,
   PayResourcesSubtype,
 } from "@/types"
 import { AchievementEventType } from "@/types"
@@ -52,7 +53,12 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
   if (input.type === AchievementEventType.ResourcesChanged) {
     const { spent, gained } = getResourceChanges(input.data)
     return [
-      ...trackResourceChanges({ spent, gained, subtype: input.data.subtype }),
+      ...trackResourceChanges({
+        spent,
+        gained,
+        subtype: input.data.subtype,
+        item: input.data.item,
+      }),
       ...checkCurrentResources(),
     ]
   }
@@ -218,10 +224,12 @@ function trackResourceChanges({
   spent,
   gained,
   subtype,
+  item,
 }: {
   spent: Record<string, number>
   gained: Record<string, number>
   subtype?: PayResourcesSubtype
+  item?: InventoryItem
 }): string[] {
   // Вызывающий код передаёт весь словарь. Разделение нужно только здесь.
   // Пустые события не создаём; исходный словарь не изменяем.
@@ -230,7 +238,7 @@ function trackResourceChanges({
     ids.push(
       ...trackAchievementEvent({
         type: AchievementEventType.ResourceSpent,
-        data: { resources: spent, subtype },
+        data: { resources: spent, subtype, item },
       })
     )
   }

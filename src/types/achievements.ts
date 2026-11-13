@@ -1,4 +1,5 @@
 import type { Card, Leader, UserResources } from "./database"
+import type { InventoryItem } from "./inventory"
 import type { UpgradeSubtype, UpgradeType, UserUpgrades } from "./upgrades"
 import type { PayResourcesSubtype } from "./user_actions"
 
@@ -143,6 +144,8 @@ export type AchievementFilter =
   | { type: AchievementFilterOperator.Exists; value: boolean }
 
 export interface AchievementResourceSpentData {
+  // Название использованного предмета для unique-контрактов.
+  item?: InventoryItem
   // Причина операции позволяет отличить использование предмета от продажи.
   subtype?: PayResourcesSubtype
   // Один факт траты может включать несколько ресурсов. Количества положительные.
@@ -247,7 +250,7 @@ export type AchievementEventInput =
       type: AchievementEventType.ResourcesChanged
       // С суммами: минус — расход, плюс — запрошенный доход.
       // Без сумм нужны оба баланса: трекер сам разделит фактическую разницу.
-      data: { subtype?: PayResourcesSubtype } & (
+      data: { subtype?: PayResourcesSubtype; item?: InventoryItem } & (
         | {
             resources: Record<string, number>
             before?: never
