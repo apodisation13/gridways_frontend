@@ -60,3 +60,5 @@ python3 docs/achievements/validate_catalog.py docs/achievements/config-examples.
 ### Колоды
 
 `deck.created` и `deck.deleted` используют count; фракция доступна как `deck.leader.faction`. `decks.checked` использует только current с field `decks.count`: число хранящихся колод, включая базовую. Порог 3/5/7/10 задаётся target; примеры приведены в категории decks файла config-examples.json. Редактирование не является новым созданием.
+
+Для состава используйте deck.saved с count и target 1: фильтры deck.summary.all_bronze/all_silver/all_gold/no_neutral/all_neutral = true или deck.summary.cards_count = 20. Условия можно сочетать через обычное AND. Событие работает при создании и редактировании, но не при загрузке. Примеры шести заданий находятся в категории decks.

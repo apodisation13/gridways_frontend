@@ -625,6 +625,114 @@
                 "money": 100
               }
             }
+          },
+          "save_bronze_deck": {
+            "id": "save_bronze_deck",
+            "title": "Соберите колоду полностью из бронзовых карт",
+            "ordering": 50,
+            "event": "deck.saved",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "deck.summary.all_bronze": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "save_silver_deck": {
+            "id": "save_silver_deck",
+            "title": "Соберите колоду полностью из серебряных карт",
+            "ordering": 60,
+            "event": "deck.saved",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "deck.summary.all_silver": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "save_gold_deck": {
+            "id": "save_gold_deck",
+            "title": "Соберите колоду полностью из золотых карт",
+            "ordering": 70,
+            "event": "deck.saved",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "deck.summary.all_gold": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "save_no_neutral_deck": {
+            "id": "save_no_neutral_deck",
+            "title": "Соберите колоду без нейтральных карт",
+            "ordering": 80,
+            "event": "deck.saved",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "deck.summary.no_neutral": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "save_neutral_deck": {
+            "id": "save_neutral_deck",
+            "title": "Соберите колоду только из нейтральных карт",
+            "ordering": 90,
+            "event": "deck.saved",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "deck.summary.all_neutral": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "save_20_card_deck": {
+            "id": "save_20_card_deck",
+            "title": "Соберите колоду из 20 карт",
+            "ordering": 100,
+            "event": "deck.saved",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "deck.summary.cards_count": 20
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
           }
         }
       }

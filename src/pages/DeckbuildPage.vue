@@ -319,10 +319,9 @@ export default defineComponent({
       return true
     },
 
-    async save_deck(): Promise<void> {
-      if (!this.validate_deck()) return
-      // Сохраняем состав до запроса: после успеха форма сбрасывается.
-      const deck = JSON.parse(
+    // Снимок до запроса: успешное сохранение сбрасывает форму.
+    achievementDeckSnapshot() {
+      return JSON.parse(
         JSON.stringify({
           name: this.deck.deck_name.trim(),
           leader: this.deck.leader,
@@ -330,6 +329,11 @@ export default defineComponent({
           health: this.deck.health,
         })
       )
+    },
+
+    async save_deck(): Promise<void> {
+      if (!this.validate_deck()) return
+      const deck = this.achievementDeckSnapshot()
       await this.send_data_to_store("createUserDeck", {
         deck_name: this.deck.deck_name.trim(),
         cards: this.deck.deck_body,
@@ -383,11 +387,16 @@ export default defineComponent({
 
     async patch_deck(): Promise<void> {
       if (!this.validate_deck()) return
+      const deck = this.achievementDeckSnapshot()
       await this.send_data_to_store("patchUserDeck", {
         deck_name: this.deck.deck_name.trim(),
         cards: this.deck.deck_body,
         leader_id: this.deck.leader?.id,
         deck_id: this.deck.deck_id,
+      })
+      trackAchievementEvent({
+        type: AchievementEventType.DeckSaved,
+        data: { deck },
       })
     },
 

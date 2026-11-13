@@ -30,7 +30,7 @@
 | Типы / enum / конфиги / прогресс | `src/types/achievements.ts`, `src/types/upgrades.ts` |
 | Общий вход, преобразование событий | `src/logic/achievements/trackAchievementEvent.ts` |
 | Фильтры и предварительный подсчёт | `src/logic/achievements/filters.ts`, `processAchievementEvents.ts` |
-| Проверки состояния | `currentResources.ts`, `currentUpgrades.ts`, `currentDecks.ts`, `upgradeSnapshot.ts` в той же папке |
+| Проверки состояния | `currentResources.ts`, `currentUpgrades.ts`, `currentDecks.ts`, `deckSummary.ts`, `upgradeSnapshot.ts` в той же папке |
 | Очередь и HTTP | `syncAchievementEvents.ts`, `src/store/modules/achievements.ts` |
 | Награды как доход, тосты | `trackAchievementRewards.ts`, `achievementRewardToasts.ts` |
 | Страница / карточки | `src/pages/AchievementsPage.vue`, `src/components/Pages/AchievementsPage/` |
@@ -39,7 +39,7 @@
 Бэк — отдельный репозиторий `GridwaysBackend`. Найти его checkout в текущем рабочем окружении или уточнить расположение у пользователя. Персональные абсолютные пути в документации не сохраняем. В нём:
 
 - `services/api/app/apps/user_achievements/{schemas.py,routes.py,service.py}`;
-- `.../logic/{events.py,filters.py,upgrades.py,user_achievements.py}`;
+- `.../logic/{events.py,filters.py,upgrades.py,decks.py,user_achievements.py}`;
 - `services/api/app/apps/progress/service.py` — загрузка прогресса;
 - `services/api/app/apps/game_data/logic/game_const.py` — выдача констант;
 - `lib/utils/models/game/achievements.py` и миграция `2026_11_09_1752_b2d646105a26_achievements.py`;

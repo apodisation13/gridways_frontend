@@ -79,10 +79,15 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
 
   store.commit("enqueueAchievementEvent", event)
 
-  if (
-    input.type === AchievementEventType.DeckCreated ||
-    input.type === AchievementEventType.DeckDeleted
-  ) {
+  if (input.type === AchievementEventType.DeckCreated) {
+    // Создание также является сохранением состава, но это разные контракты.
+    const savedIds = trackAchievementEvent({
+      type: AchievementEventType.DeckSaved,
+      data: input.data,
+    })
+    return [event.id, ...savedIds, ...checkCurrentDecks()]
+  }
+  if (input.type === AchievementEventType.DeckDeleted) {
     return [event.id, ...checkCurrentDecks()]
   }
   return [event.id]

@@ -9,6 +9,7 @@
 | `action.played` | `{actor: <полный Card или Leader>}` | count зарядов, unique actor.id, фильтры actor.color/faction/type/data.damage |
 | `resource.spent` | `{resources: {money: 100}, subtype?: string, item?: string}` | sum resources.money; use_inventory_item для обычного инвентаря |
 | `resource.gained` | `{resources: {money: 100}, subtype?: string}` | фактический доход с учётом лимитов |
+| `deck.saved` | `{deck: {name, leader, cards, health}}` | сохранение после создания или редактирования, вычисляемая deck.summary |
 | `deck.created` / `deck.deleted` | `{deck: {name, leader, cards, health, id?}}` | count успешных операций, фильтр deck.leader.faction; cards — полные объекты карт |
 | `decks.checked` | `{}` | current по decks.count из БД, включая базовую колоду |
 | `inventory.used` | `{item: "draw_cards", result: {cards_drawn: 3}}` | count применений с фактическим результатом; пока только draw_cards вне арены |
@@ -88,8 +89,14 @@ Groups: game/resources/settings/inventory, all, non_settings. maxed по `next =
 
 ## Колоды
 
-DeckbuildPage.save_deck сохраняет снимок перед createUserDeck, отправляет deck.created после успешного завершения. DeckSelection.confirm_delete сохраняет снимок перед deleteUserDeck, отправляет deck.deleted после успеха. В снимке cards — массив объектов карт, leader — полный объект лидера. Новый ID создания в ответе отдельно не выделяется и в снимке создания отсутствует. patchUserDeck не создаёт событий для этих контрактов. Экшены колод не вызывают трекер.
+DeckbuildPage.save_deck сохраняет снимок перед createUserDeck, отправляет deck.created после успешного завершения. DeckSelection.confirm_delete сохраняет снимок перед deleteUserDeck, отправляет deck.deleted после успеха. В снимке cards — массив объектов карт, leader — полный объект лидера. Новый ID создания в ответе отдельно не выделяется и в снимке создания отсутствует. patchUserDeck создаёт только deck.saved, не deck.created. Экшены колод не вызывают трекер.
 
-Трекер после deck.created/deleted вызывает checkCurrentDecks. Первичная проверка ждёт set_decks, setUserAchievements и setAchievementsConfig. Preview использует all_decks.length; бэк принимает пустой decks.checked и считает строки user_decks с блокировкой users, общей с операциями над колодами. В decks.count входит базовая колода id=1. При локальном достижении цели проверка отправляется немедленно. До подтверждения количество может уменьшаться; после подтверждения выполнение сохраняется. Сервер проверяет актуальное количество на момент обработки, не исторический пик.
+Трекер после deck.created формирует также deck.saved; после deck.created/deleted вызывает checkCurrentDecks. Первичная проверка ждёт set_decks, setUserAchievements и setAchievementsConfig. Preview использует all_decks.length; бэк принимает пустой decks.checked и считает строки user_decks с блокировкой users, общей с операциями над колодами. В decks.count входит базовая колода id=1. При локальном достижении цели проверка отправляется немедленно. До подтверждения количество может уменьшаться; после подтверждения выполнение сохраняется. Сервер проверяет актуальное количество на момент обработки, не исторический пик.
 
 Создания и удаления до подключения событий не восстанавливаются; загрузка списка не считается созданием. События операций, как и другие факты клиента, не подтверждаются отдельной историей в БД.
+
+### Состав сохранённой колоды
+
+Для deck.saved фронтовый processAchievementEvents и backend logic/decks.py вычисляют deck.summary из deck.cards. Сводка не отправляется отдельным источником истины: любое переданное summary при обработке заменяется. Поля: cards_count, by_color.Bronze/Silver/Gold, neutral_count, all_bronze/all_silver/all_gold, all_neutral, no_neutral. Лидер не учитывается. Фракция нейтральных карт — строка Neutral. Пустой состав не проходит ни один all_* или no_neutral; неизвестные цвета не проходят all_<color>, отсутствующая фракция не проходит no_neutral.
+
+Создание автоматически порождает одно deck.saved внутри трекера; patch_deck вызывает его напрямую после успеха. Снимок создаётся до запроса и сброса формы. Загрузка уже сохранённых колод не создаёт это событие. Повторное сохранение — новый факт; контракты с count/target 1 выдаются однократно. Счётчики по summary могут использовать обычные вложенные пути; для ровно 20 карт фильтр deck.summary.cards_count = 20.

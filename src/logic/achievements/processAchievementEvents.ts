@@ -8,6 +8,7 @@ import type {
 } from "@/types"
 import { AchievementCounterType, AchievementEventType } from "@/types"
 
+import { buildDeckSummary } from "./deckSummary"
 import { getAchievementField, matchesAchievementFilters } from "./filters"
 
 // Считает предварительный прогресс, не меняя исходные данные и не выдавая наград.
@@ -43,12 +44,22 @@ export function processAchievementEvents(
   for (const event of events) {
     if (processedIds.has(event.id)) continue
     processedIds.add(event.id)
+    let data = event.data
+    if (event.type === AchievementEventType.DeckSaved) {
+      const deck = data.deck
+      if (!deck || typeof deck !== "object" || Array.isArray(deck)) continue
+      // Вычисляем при обработке, как на бэке; переданной summary не доверяем.
+      data = {
+        ...data,
+        deck: { ...deck, summary: buildDeckSummary(deck.cards) },
+      }
+    }
 
     for (const definition of byEvent.get(event.type) ?? []) {
       if (!Number.isFinite(definition.target) || definition.target <= 0)
         continue
       // Условия берём из конфига: обработчик не знает про цвет, фракцию или урон.
-      if (!matchesAchievementFilters(event.data, definition.filters)) continue
+      if (!matchesAchievementFilters(data, definition.filters)) continue
 
       // Выполненное больше не растёт. Отсутствующая запись означает нулевой прогресс.
       const current = progress.permanent?.[definition.id]
@@ -75,7 +86,7 @@ export function processAchievementEvents(
         definition.counter.type === AchievementCounterType.Current
       ) {
         // Берём число из указанного поля: например, amount при расходе ресурса.
-        const amount = getAchievementField(event.data, definition.counter.field)
+        const amount = getAchievementField(data, definition.counter.field)
         if (
           typeof amount !== "number" ||
           !Number.isFinite(amount) ||
@@ -85,7 +96,7 @@ export function processAchievementEvents(
         }
         increment = amount
       } else if (definition.counter.type === AchievementCounterType.Unique) {
-        const item = getAchievementField(event.data, definition.counter.field)
+        const item = getAchievementField(data, definition.counter.field)
         // Собираем названия или числовые ID. null, объекты и отсутствующие поля не считаем.
         if (
           typeof item !== "string" &&

@@ -26,6 +26,7 @@ export enum AchievementEventType {
   // Фактический результат применения предмета, отдельно от его списания.
   InventoryUsed = "inventory.used",
   DeckCreated = "deck.created",
+  DeckSaved = "deck.saved",
   DeckDeleted = "deck.deleted",
   DecksChecked = "decks.checked",
 
@@ -184,7 +185,10 @@ export interface AchievementUpgradeSnapshot {
 export type AchievementEventInput =
   | { type: AchievementEventType.DecksChecked; data: Record<string, never> }
   | {
-      type: AchievementEventType.DeckCreated | AchievementEventType.DeckDeleted
+      type:
+        | AchievementEventType.DeckCreated
+        | AchievementEventType.DeckDeleted
+        | AchievementEventType.DeckSaved
       data: { deck: Record<string, AchievementEventValue> }
     }
   | {
