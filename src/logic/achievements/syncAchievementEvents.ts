@@ -1,6 +1,7 @@
 import store from "@/store"
 import { AchievementEventType } from "@/types"
 
+import { checkCurrentDecks } from "./currentDecks"
 import { checkCurrentResources } from "./currentResources"
 import { checkCurrentUpgrades } from "./currentUpgrades"
 import { processAchievementEvents } from "./processAchievementEvents"
@@ -13,6 +14,7 @@ export function installAchievementSync(): () => void {
   let loaded = new Set<string>()
   let initialCheckDone = false
   let initialUpgradesCheckDone = false
+  let initialDecksCheckDone = false
 
   function shouldFlush(): boolean {
     const state = store.state.achievements
@@ -21,7 +23,8 @@ export function installAchievementSync(): () => void {
       state.pendingEvents.some(
         event =>
           event.type === AchievementEventType.ResourcesChecked ||
-          event.type === AchievementEventType.UpgradesChecked
+          event.type === AchievementEventType.UpgradesChecked ||
+          event.type === AchievementEventType.DecksChecked
       )
     )
       return true
@@ -53,6 +56,7 @@ export function installAchievementSync(): () => void {
   const unsubscribe = store.subscribe(mutation => {
     if (
       [
+        "set_decks",
         "set_resource",
         "setUserAchievements",
         "setAchievementsConfig",
@@ -61,6 +65,15 @@ export function installAchievementSync(): () => void {
       ].includes(mutation.type)
     ) {
       loaded.add(mutation.type)
+      if (
+        !initialDecksCheckDone &&
+        ["set_decks", "setUserAchievements", "setAchievementsConfig"].every(
+          type => loaded.has(type)
+        )
+      ) {
+        initialDecksCheckDone = true
+        checkCurrentDecks()
+      }
       if (
         !initialCheckDone &&
         ["set_resource", "setUserAchievements", "setAchievementsConfig"].every(
@@ -87,6 +100,7 @@ export function installAchievementSync(): () => void {
       loaded = new Set<string>()
       initialCheckDone = false
       initialUpgradesCheckDone = false
+      initialDecksCheckDone = false
       store.commit("resetAchievementSession")
     } else if (mutation.type === "enqueueAchievementEvent" && shouldFlush()) {
       // Проверка после каждого нового события: цель достигнута или очередь заполнена.

@@ -9,6 +9,7 @@ import type {
 } from "@/types"
 import { AchievementEventType } from "@/types"
 
+import { checkCurrentDecks } from "./currentDecks"
 import { checkCurrentResources } from "./currentResources"
 import { checkCurrentUpgrades } from "./currentUpgrades"
 import { buildUpgradeSnapshot } from "./upgradeSnapshot"
@@ -78,6 +79,12 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
 
   store.commit("enqueueAchievementEvent", event)
 
+  if (
+    input.type === AchievementEventType.DeckCreated ||
+    input.type === AchievementEventType.DeckDeleted
+  ) {
+    return [event.id, ...checkCurrentDecks()]
+  }
   return [event.id]
 }
 

@@ -30,7 +30,7 @@
 | Типы / enum / конфиги / прогресс | `src/types/achievements.ts`, `src/types/upgrades.ts` |
 | Общий вход, преобразование событий | `src/logic/achievements/trackAchievementEvent.ts` |
 | Фильтры и предварительный подсчёт | `src/logic/achievements/filters.ts`, `processAchievementEvents.ts` |
-| Проверки состояния | `currentResources.ts`, `currentUpgrades.ts`, `upgradeSnapshot.ts` в той же папке |
+| Проверки состояния | `currentResources.ts`, `currentUpgrades.ts`, `currentDecks.ts`, `upgradeSnapshot.ts` в той же папке |
 | Очередь и HTTP | `syncAchievementEvents.ts`, `src/store/modules/achievements.ts` |
 | Награды как доход, тосты | `trackAchievementRewards.ts`, `achievementRewardToasts.ts` |
 | Страница / карточки | `src/pages/AchievementsPage.vue`, `src/components/Pages/AchievementsPage/` |

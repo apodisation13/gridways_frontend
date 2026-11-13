@@ -553,6 +553,80 @@
             }
           }
         }
+      },
+      "decks": {
+        "id": "decks",
+        "title": "Колоды",
+        "ordering": 60,
+        "achievements": {
+          "create_decks_5": {
+            "id": "create_decks_5",
+            "title": "Создайте суммарно 5 колод",
+            "ordering": 10,
+            "event": "deck.created",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "create_soldiers_decks_5": {
+            "id": "create_soldiers_decks_5",
+            "title": "Создайте 5 колод фракции Soldiers",
+            "ordering": 20,
+            "event": "deck.created",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "deck.leader.faction": "Soldiers"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "delete_decks_3": {
+            "id": "delete_decks_3",
+            "title": "Удалите 3 созданные вами колоды",
+            "ordering": 30,
+            "event": "deck.deleted",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "own_decks_3": {
+            "id": "own_decks_3",
+            "title": "Имейте в хранении 3 колоды",
+            "ordering": 40,
+            "event": "decks.checked",
+            "target": 3,
+            "counter": {
+              "type": "current",
+              "field": "decks.count"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          }
+        }
       }
     }
   }

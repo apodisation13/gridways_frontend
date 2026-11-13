@@ -38,7 +38,9 @@ import { defineComponent } from "vue"
 
 import DeckPreviewComp from "@/components/DeckPreviewComp.vue"
 import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import type { DeckEntry, MappedDeck } from "@/types"
+import { AchievementEventType } from "@/types"
 export default defineComponent({
   name: "DeckSelection",
   components: { YesnoModal, DeckPreviewComp },
@@ -78,7 +80,22 @@ export default defineComponent({
     async confirm_delete(): Promise<void> {
       this.show_yesno = false
       try {
+        // После запроса этой колоды в сторе уже не будет.
+        const selected = this.decks.find(
+          entry => entry.deck.id === this.deck_id
+        )
+        if (!selected) return
+        const deck = JSON.parse(
+          JSON.stringify({
+            ...selected.deck,
+            cards: selected.deck.cards.map(entry => entry.card),
+          })
+        )
         await this.$store.dispatch("deleteUserDeck", this.deck_id)
+        trackAchievementEvent({
+          type: AchievementEventType.DeckDeleted,
+          data: { deck },
+        })
       } catch (err) {
         console.log(err)
         throw err

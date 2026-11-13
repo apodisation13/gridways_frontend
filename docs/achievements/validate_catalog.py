@@ -61,7 +61,7 @@ def validate(catalog):
     upgrade_source = (ROOT / "src/types/upgrades.ts").read_text()
     upgrade_types = enum_values(upgrade_source, "UpgradeType")
     upgrade_subtypes = enum_values(upgrade_source, "UpgradeSubtype")
-    checked = {"resources.checked", "upgrades.checked"}
+    checked = {"resources.checked", "upgrades.checked", "decks.checked"}
     require(isinstance(catalog, dict) and "permanent" in catalog, "$", "expected achievements root with permanent")
     require(set(catalog) <= {"permanent", "daily", "weekly"}, "$", "unexpected root keys; do not pass all game_const")
     total = 0
@@ -106,6 +106,8 @@ def validate(catalog):
                     parts = counter["field"].split(".")
                     if event == "resources.checked":
                         require(len(parts) == 2 and parts[0] == "resources", p, "expected resources.<resource>")
+                    elif event == "decks.checked":
+                        require(counter["field"] == "decks.count", p, "expected decks.count")
                     else:
                         item = (len(parts) == 4 and parts[0] == "upgrades" and parts[1] in upgrade_types
                                 and parts[2] in upgrade_subtypes and parts[3] in {"level", "value"})

@@ -59,7 +59,8 @@ export function processAchievementEvents(
       if (
         isCurrent &&
         event.type !== AchievementEventType.ResourcesChecked &&
-        event.type !== AchievementEventType.UpgradesChecked
+        event.type !== AchievementEventType.UpgradesChecked &&
+        event.type !== AchievementEventType.DecksChecked
       )
         continue
       if (!isCurrent && value >= definition.target) continue

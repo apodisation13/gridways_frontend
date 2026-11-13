@@ -9,6 +9,8 @@
 | `action.played` | `{actor: <полный Card или Leader>}` | count зарядов, unique actor.id, фильтры actor.color/faction/type/data.damage |
 | `resource.spent` | `{resources: {money: 100}, subtype?: string, item?: string}` | sum resources.money; use_inventory_item для обычного инвентаря |
 | `resource.gained` | `{resources: {money: 100}, subtype?: string}` | фактический доход с учётом лимитов |
+| `deck.created` / `deck.deleted` | `{deck: {name, leader, cards, health, id?}}` | count успешных операций, фильтр deck.leader.faction; cards — полные объекты карт |
+| `decks.checked` | `{}` | current по decks.count из БД, включая базовую колоду |
 | `inventory.used` | `{item: "draw_cards", result: {cards_drawn: 3}}` | count применений с фактическим результатом; пока только draw_cards вне арены |
 | `resource.opened` | `{resource: "kegs"}` | count открытий; keys, kegs, big_kegs, chests |
 | `resource.transformed` | `{action, resource, amount, spent, gained}` | buy/sell/craft/mill; amount = quantity × step |
@@ -83,3 +85,11 @@ Groups: game/resources/settings/inventory, all, non_settings. maxed по `next =
 `useInventory.ts` отправляет `inventory.used` после синхронного цикла draw_cards. `result.cards_drawn` — разница размера руки после и до цикла, включая ноль, а не число попыток или значение INVENTORY_CARDS_DRAWN. Списание остаётся отдельным resource.spent до применения эффекта; новое событие повторно ресурсы не списывает и не считает расход.
 
 Для «взять ровно 3 карты пять раз» используются filters item = draw_cards и result.cards_drawn = 3, counter count, target 5. Для «не менее 3» нужен gte. Схемы фронта и бэка пока описывают только результат cards_drawn; другие эффекты ещё не подключены. Фактический результат сообщает клиент, сервер не симулирует добор карт. Арена по-прежнему исключена.
+
+## Колоды
+
+DeckbuildPage.save_deck сохраняет снимок перед createUserDeck, отправляет deck.created после успешного завершения. DeckSelection.confirm_delete сохраняет снимок перед deleteUserDeck, отправляет deck.deleted после успеха. В снимке cards — массив объектов карт, leader — полный объект лидера. Новый ID создания в ответе отдельно не выделяется и в снимке создания отсутствует. patchUserDeck не создаёт событий для этих контрактов. Экшены колод не вызывают трекер.
+
+Трекер после deck.created/deleted вызывает checkCurrentDecks. Первичная проверка ждёт set_decks, setUserAchievements и setAchievementsConfig. Preview использует all_decks.length; бэк принимает пустой decks.checked и считает строки user_decks с блокировкой users, общей с операциями над колодами. В decks.count входит базовая колода id=1. При локальном достижении цели проверка отправляется немедленно. До подтверждения количество может уменьшаться; после подтверждения выполнение сохраняется. Сервер проверяет актуальное количество на момент обработки, не исторический пик.
+
+Создания и удаления до подключения событий не восстанавливаются; загрузка списка не считается созданием. События операций, как и другие факты клиента, не подтверждаются отдельной историей в БД.

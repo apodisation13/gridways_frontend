@@ -3,6 +3,7 @@ import { useToast } from "vue-toastification"
 import type { ActionContext } from "vuex"
 
 import { callApi, HttpMethod } from "@/lib/api/api"
+import { previewCurrentDecks } from "@/logic/achievements/currentDecks"
 import {
   checkCurrentResources,
   previewCurrentResources,
@@ -100,6 +101,7 @@ const getters = {
       resource: Record<string, number>
       upgradesConfig: UpgradesConfig
       userUpgrades: UserUpgrades
+      all_decks: unknown[]
     }
   ): AchievementPreview => {
     const preview = processAchievementEvents(
@@ -118,13 +120,19 @@ const getters = {
       getters.upgradesConfig,
       getters.userUpgrades
     )
+    const decks = previewCurrentDecks(
+      state.achievementsConfig.permanent,
+      upgrades.progress,
+      getters.all_decks.length
+    )
     return {
-      progress: upgrades.progress,
+      progress: decks.progress,
       reachedAchievementIds: [
         ...new Set([
           ...preview.reachedAchievementIds,
           ...current.reachedAchievementIds,
           ...upgrades.reachedAchievementIds,
+          ...decks.reachedAchievementIds,
         ]),
       ],
     }

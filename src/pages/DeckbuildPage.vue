@@ -90,6 +90,7 @@ import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vu
 import DeckbuilderFilters from "@/components/Pages/DeckbuildPage/DeckbuilderFilters.vue"
 import DeckbuilderTopButtonsBlock from "@/components/Pages/DeckbuildPage/DeckbuilderTopButtonsBlock.vue"
 import { copyObj } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import type {
   CardEntry,
   CardFilterQuery,
@@ -97,6 +98,7 @@ import type {
   Leader,
   LeaderEntry,
 } from "@/types"
+import { AchievementEventType } from "@/types"
 
 interface ActiveDeck {
   deck_id: number | null
@@ -319,10 +321,23 @@ export default defineComponent({
 
     async save_deck(): Promise<void> {
       if (!this.validate_deck()) return
+      // Сохраняем состав до запроса: после успеха форма сбрасывается.
+      const deck = JSON.parse(
+        JSON.stringify({
+          name: this.deck.deck_name.trim(),
+          leader: this.deck.leader,
+          cards: this.deck.deck_is_progress.map(entry => entry.card),
+          health: this.deck.health,
+        })
+      )
       await this.send_data_to_store("createUserDeck", {
         deck_name: this.deck.deck_name.trim(),
         cards: this.deck.deck_body,
         leader_id: this.deck.leader!.id,
+      })
+      trackAchievementEvent({
+        type: AchievementEventType.DeckCreated,
+        data: { deck },
       })
     },
 
