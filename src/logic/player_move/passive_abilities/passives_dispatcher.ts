@@ -1,3 +1,5 @@
+import { copyObj } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import {
   allowActionTimer,
   timeoutAnimationFlag,
@@ -43,6 +45,7 @@ import {
 import { spawn_random_in_hand } from "@/logic/player_move/passive_abilities/passives_card/spawn_random_in_hand"
 import { add_charges_if_playing_d_all } from "@/logic/player_move/passive_abilities/passives_leader/add-charges-if-playing-d-all"
 import type { Card, GameObj } from "@/types"
+import { AchievementEventType } from "@/types"
 import { CardPassiveAbility } from "@/types"
 
 export type PassiveLocation = "hand" | "deck" | "grave"
@@ -60,6 +63,7 @@ export function run_passive(
   else if (location === "grave")
     timeoutAnimationFlag(card, "trigger_grave_passive", null, timeout * 0.5)
 
+  const actor = copyObj(card)
   const fromHand = location === "hand"
   const pa = card?.passive_ability?.name
 
@@ -124,5 +128,12 @@ export function run_passive(
     if (armorValueDrained > 0) add_armor(armorValueDrained, timeout)
   } else if (pa === CardPassiveAbility.IfInGraveSpawnSelfInEnemyGrave) {
     if_in_grave_spawn_self_in_enemy_grave(card, gameObj, timeout)
+  } else {
+    return // Неизвестная/отсутствующая пассивка не является активацией.
   }
+  trackAchievementEvent({
+    type: AchievementEventType.PassiveTriggered,
+    actor,
+    location,
+  })
 }

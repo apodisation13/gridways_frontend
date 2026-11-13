@@ -6,13 +6,15 @@ export function add_charges_if_overkill(
   leader: Leader,
   targets: Array<{ isLeader: boolean; fieldValue: Enemy | null }> = [],
   gameObj: GameObj
-): void {
+): boolean {
+  let applied = false
   // для обычного режима, без multi-целей
   if (targets.length === 0) {
     if (enemy.data.hp < 0) {
       change_card_charges(leader, 1)
+      applied = true
     }
-    return
+    return applied
   }
   // для режима multi-целей - проверяем каждую цель
   for (const target of targets) {
@@ -22,6 +24,8 @@ export function add_charges_if_overkill(
     if (!e) continue
     if (e.data.hp < 0) {
       change_card_charges(leader, 1)
+      applied = true
     }
   }
+  return applied
 }

@@ -5,8 +5,10 @@ import { CardType } from "@/types"
 export function add_charges_to_leader_if_play_special(
   card: Card | Leader,
   leader: Leader
-): void {
+): boolean {
   if ((card as Card).type === CardType.Special) {
     change_card_charges(leader, 1)
+    return true
   }
+  return false
 }

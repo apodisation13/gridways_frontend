@@ -5,7 +5,8 @@ export function add_charges_if_playing_d_all(
   card: Card | Leader,
   leader: Leader,
   upon_playing_card: boolean
-): void {
+): boolean {
+  let applied = false
   // сюда заходим по пассивке самого лидера каждый ход (тогда upon = false)
   // ИЛИ если играем карту damage-all (кроме самого лидера!) (тогда upon = true и смотрим саму карту)
   if (
@@ -13,6 +14,7 @@ export function add_charges_if_playing_d_all(
     leader.data?.passive?.timer === leader.data?.passive?.default_timer
   ) {
     change_card_charges(leader, 1)
+    applied = true
   }
   if (
     upon_playing_card &&
@@ -20,5 +22,7 @@ export function add_charges_if_playing_d_all(
     (card as Card).color
   ) {
     change_card_charges(leader, 1)
+    applied = true
   }
+  return applied
 }
