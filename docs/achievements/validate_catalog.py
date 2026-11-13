@@ -46,6 +46,23 @@ def field_path(value, path):
                 for part in value.split(".")), path, "invalid/unsafe field path")
 
 
+def validate_filters(filters, p, operators):
+    require(isinstance(filters, dict), p, "filters object required")
+    for field, condition in filters.items():
+        field_path(field, p)
+        if not isinstance(condition, dict):
+            require(scalar(condition), p, "literal filter must be scalar")
+            continue
+        require(set(condition) == {"type", "value"}, p, "filter needs type and value only")
+        op, value = condition["type"], condition["value"]
+        require(isinstance(op, str) and op in operators, p, "unknown filter operator")
+        valid = (scalar(value) if op in {"eq", "ne"} else
+                 number(value) if op in {"gt", "gte", "lt", "lte"} else
+                 type(value) is bool if op == "exists" else
+                 isinstance(value, list) and all(scalar(v) for v in value))
+        require(valid, p, f"invalid value for filter {op}")
+
+
 def validate(catalog):
     source = (ROOT / "src/types/achievements.ts").read_text()
     events = enum_values(source, "AchievementEventType")
@@ -96,12 +113,18 @@ def validate(catalog):
                 require(isinstance(counter, dict), p, "counter object required")
                 kind = counter.get("type")
                 require(isinstance(kind, str) and kind in counters, p, "unknown counter")
-                require(set(counter) == ({"type"} if kind == "count" else {"type", "field"}), p, "invalid counter fields")
-                if kind != "count":
+                require(set(counter) == ({"type", "length", "reset"} if kind == "streak" else {"type"} if kind == "count" else {"type", "field"}), p, "invalid counter fields")
+                if kind not in {"count", "streak"}:
                     field_path(counter["field"], p)
                 require((kind == "current") == (event in checked), p, "current and state-check events must be used together")
-                if kind == "unique":
-                    require(target == int(target), p, "unique target must be an integer")
+                if kind in {"unique", "streak"}:
+                    require(target == int(target), p, "unique/streak target must be an integer")
+                if kind == "streak":
+                    require(type(counter["length"]) is int and counter["length"] > 0, p, "streak length must be a positive integer")
+                    reset = counter["reset"]
+                    require(isinstance(reset, dict) and set(reset) == {"event", "filters"}, p, "reset needs event and filters")
+                    require(isinstance(reset["event"], str) and reset["event"] in events, p, "unknown reset event")
+                    validate_filters(reset["filters"], p + ".counter.reset", operators)
                 if kind == "current":
                     parts = counter["field"].split(".")
                     if event == "resources.checked":
@@ -114,21 +137,7 @@ def validate(catalog):
                         summary = (len(parts) == 3 and parts[0] == "summary" and parts[1] in upgrade_types | {"all", "non_settings"}
                                    and parts[2] in {"maxed_count", "total_count", "all_maxed"})
                         require(item or summary, p, "invalid upgrade snapshot path")
-                filters = task.get("filters")
-                require(isinstance(filters, dict), p, "filters object required")
-                for field, condition in filters.items():
-                    field_path(field, p)
-                    if not isinstance(condition, dict):
-                        require(scalar(condition), p, "literal filter must be scalar")
-                        continue
-                    require(set(condition) == {"type", "value"}, p, "filter needs type and value only")
-                    op, value = condition["type"], condition["value"]
-                    require(isinstance(op, str) and op in operators, p, "unknown filter operator")
-                    valid = (scalar(value) if op in {"eq", "ne"} else
-                             number(value) if op in {"gt", "gte", "lt", "lte"} else
-                             type(value) is bool if op == "exists" else
-                             isinstance(value, list) and all(scalar(v) for v in value))
-                    require(valid, p, f"invalid value for filter {op}")
+                validate_filters(task.get("filters"), p, operators)
                 rewards = task.get("rewards")
                 require(isinstance(rewards, dict) and set(rewards) == {"resources"}, p, "rewards.resources required; other rewards not implemented")
                 require(isinstance(rewards["resources"], dict), p, "resources reward must be an object")

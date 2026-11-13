@@ -1499,6 +1499,56 @@
                 "money": 1000
               }
             }
+          },
+          "normal_win_streak_3_5": {
+            "id": "normal_win_streak_3_5",
+            "title": "Выиграйте 3 игр подряд — 5 раз",
+            "ordering": 130,
+            "event": "game.won",
+            "target": 5,
+            "counter": {
+              "type": "streak",
+              "length": 3,
+              "reset": {
+                "event": "game.lost",
+                "filters": {
+                  "mode": "normal"
+                }
+              }
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_streak_10_1": {
+            "id": "normal_win_streak_10_1",
+            "title": "Выиграйте 10 игр подряд",
+            "ordering": 140,
+            "event": "game.won",
+            "target": 1,
+            "counter": {
+              "type": "streak",
+              "length": 10,
+              "reset": {
+                "event": "game.lost",
+                "filters": {
+                  "mode": "normal"
+                }
+              }
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
           }
         }
       }

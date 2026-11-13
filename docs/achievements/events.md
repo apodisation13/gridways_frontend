@@ -7,6 +7,7 @@
 | type | data | Примеры |
 |---|---|---|
 | `action.played` | `{actor: <полный Card или Leader>, mode}` | count зарядов, unique actor.id, фильтры actor.color/faction/type/data.damage |
+| `game.lost` | `{mode}` | факт поражения, в том числе reset для streak |
 | `game.started` | `{mode}` | count начатых боёв, начало локальной статистики |
 | `game.won` | `{mode, difficulty?, starting_deck?, leader_uses?}` | count побед, условия по исходному составу и применению лидера |
 | `arena.upgrade.purchased` | `{upgrade_subtype, level}` | count успешных покупок прокачек арены |
@@ -134,3 +135,5 @@ ArenaUpgradesModal.doUpgrade отправляет arena.upgrade.purchased пос
 При старте battle.ts копирует полного лидера из game.leader в starting_deck.leader и difficulty из game.level. На победе оба поля берутся из этого снимка, не из текущего изменяемого состояния. Фильтры: mode normal, starting_deck.leader.faction Soldiers, difficulty easy/normal/hard. Сводка starting_deck.summary по-прежнему считает только карты, не лидера. Без снимка дополнительные поля не подставляются. Backend GameWonData принимает необязательную difficulty (easy/normal/hard), лидер уже входит в произвольный словарь starting_deck.
 
 Категория normal в config-examples.json содержит 12 контрактов: 100 побед, 100 побед за Soldiers, по 1/3 победы каждым одноцветным составом Bronze/Silver/Gold, по 100 побед каждой сложности, 3 победы без применения лидера. Все имеют mode normal; сложности normal и режим normal — разные поля. Повторное прохождение уровня считается новой победой; победы не обязаны идти подряд. Предыдущие конфиги не требуют изменений.
+
+GameLost вызывается только из фактических веток поражения; принимает {type}, читает режим из battle и очищает его. Повторный вызов без battle ничего не отправляет. LosePage, выход и ожидание матча не создают события поражения. Для streak сбрасывающее событие задаётся в counter.reset отдельно от основного event задания.

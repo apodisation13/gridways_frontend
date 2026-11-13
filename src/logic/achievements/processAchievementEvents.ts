@@ -31,9 +31,14 @@ export function processAchievementEvents(
   >()
   for (const category of Object.values(section.categories)) {
     for (const definition of Object.values(category.achievements)) {
-      const definitions = byEvent.get(definition.event) ?? []
-      definitions.push(definition)
-      byEvent.set(definition.event, definitions)
+      const types = new Set([definition.event])
+      if (definition.counter.type === AchievementCounterType.Streak)
+        types.add(definition.counter.reset.event)
+      for (const type of types) {
+        const definitions = byEvent.get(type) ?? []
+        definitions.push(definition)
+        byEvent.set(type, definitions)
+      }
     }
   }
 
@@ -69,7 +74,6 @@ export function processAchievementEvents(
       if (!Number.isFinite(definition.target) || definition.target <= 0)
         continue
       // Условия берём из конфига: обработчик не знает про цвет, фракцию или урон.
-      if (!matchesAchievementFilters(data, definition.filters)) continue
 
       // Выполненное больше не растёт. Отсутствующая запись означает нулевой прогресс.
       const current = progress.permanent?.[definition.id]
@@ -86,9 +90,40 @@ export function processAchievementEvents(
         continue
       if (!isCurrent && value >= definition.target) continue
 
+      const counter = definition.counter
+      let streak: number | undefined
+      if (counter.type === AchievementCounterType.Streak) {
+        if (
+          !Number.isInteger(counter.length) ||
+          counter.length <= 0 ||
+          !Number.isInteger(definition.target)
+        )
+          continue
+        // Сброс имеет приоритет, если событие совпало с обоими условиями.
+        if (
+          event.type === counter.reset.event &&
+          matchesAchievementFilters(data, counter.reset.filters)
+        ) {
+          if (current?.streak) {
+            progress.permanent ??= {}
+            progress.permanent[definition.id] = { ...current, streak: 0 }
+          }
+          continue
+        }
+      }
+      if (
+        event.type !== definition.event ||
+        !matchesAchievementFilters(data, definition.filters)
+      )
+        continue
+
       let seen: Array<string | number> | undefined
       let increment: number
-      if (definition.counter.type === AchievementCounterType.Count) {
+      if (counter.type === AchievementCounterType.Streak) {
+        streak = (current?.streak ?? 0) + 1
+        increment = streak >= counter.length ? 1 : 0
+        if (increment) streak = 0 // Серии не перекрываются.
+      } else if (definition.counter.type === AchievementCounterType.Count) {
         // Одно событие — один шаг, например применение карты.
         increment = 1
       } else if (
@@ -132,6 +167,7 @@ export function processAchievementEvents(
         ...current,
         value: nextValue,
         ...(seen ? { seen } : {}),
+        ...(streak !== undefined ? { streak } : {}),
         // Даты выполнения и выдачи награды устанавливает только бэк.
         completed_at: current?.completed_at ?? null,
         reward_granted_at: current?.reward_granted_at ?? null,

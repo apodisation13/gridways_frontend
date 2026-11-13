@@ -17,6 +17,7 @@ export enum AchievementEventType {
   ActionPlayed = "action.played",
   GameStarted = "game.started",
   GameWon = "game.won",
+  GameLost = "game.lost",
   ActorTransition = "actor.transition", // Локальный сигнал с балансами до/после.
   ActorTransformed = "actor.transformed",
   UpgradeChanged = "upgrade.changed", // Локальный сигнал после покупки.
@@ -65,9 +66,18 @@ export enum AchievementCounterType {
   Sum = "sum",
   Current = "current",
   Unique = "unique",
+  Streak = "streak",
 }
 
 export type AchievementCounter =
+  | {
+      type: AchievementCounterType.Streak
+      length: number
+      reset: {
+        event: AchievementRecordedEventType
+        filters: Record<string, AchievementFilter>
+      }
+    }
   | { type: AchievementCounterType.Count }
   | { type: AchievementCounterType.Sum; field: string }
   | { type: AchievementCounterType.Current; field: string }
@@ -114,6 +124,7 @@ export interface AchievementCatalog extends AchievementGameConfig {
 export interface AchievementProgress {
   value: number
   seen?: Array<string | number>
+  streak?: number // Текущая серия скрыта в UI; value — число полных серий.
   completed_at: string | null
   reward_granted_at: string | null
 }
@@ -215,7 +226,10 @@ export type AchievementEventInput =
       data: { item: InventoryItem; mode: AchievementGameMode }
     }
   | {
-      type: AchievementEventType.GameStarted | AchievementEventType.GameWon
+      type:
+        | AchievementEventType.GameStarted
+        | AchievementEventType.GameWon
+        | AchievementEventType.GameLost
       mode?: AchievementGameMode
     }
   | { type: AchievementEventType.DecksChecked; data: Record<string, never> }

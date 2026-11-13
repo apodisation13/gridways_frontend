@@ -556,6 +556,7 @@ export default defineComponent({
       if (this.gameInitialized) this.sendPlayerState()
       if (val <= 0 && !this.myTurn && this.gameInitialized && !this.gameOver) {
         this.gameOver = true
+        trackAchievementEvent({ type: AchievementEventType.GameLost })
         this.$router.push("/lose")
       }
     },
@@ -786,6 +787,7 @@ export default defineComponent({
           this.$router.push("/win")
         } else {
           this.$store.commit("multi_reset")
+          trackAchievementEvent({ type: AchievementEventType.GameLost })
           this.$router.push("/lose")
         }
       } else if (msg.event === "OPPONENT_DISCONNECTED") {

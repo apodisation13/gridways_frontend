@@ -78,3 +78,7 @@ mode = normal/random_n/random/multiplayer/arena. Для action.played добав
 ### Обычная игра
 
 Категория normal: game.won + filters.mode = normal. Фракция определяется фильтром starting_deck.leader.faction, сложность — difficulty = easy/normal/hard. Для состава используются starting_deck.summary.all_bronze/all_silver/all_gold, для победы без лидера — leader_uses = 0. Все счётчики count; повторное прохождение засчитывается. Примеры в config-examples.json, старые конфиги менять не требуется.
+
+### Скрытые серии
+
+Два примера в normal: normal_win_streak_3_5 (length 3, target 5) и normal_win_streak_10_1 (length 10, target 1). Основной event game.won с mode normal; reset event game.lost с mode normal. Подходящая победа продвигает скрытый streak, поражение обнуляет только его, каждая полная серия увеличивает value. Серии непересекающиеся; неподходящие события не сбрасывают их. UI отображает только value/target. Существующие контракты менять не нужно.

@@ -66,6 +66,18 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     ]
   }
 
+  if (input.type === AchievementEventType.GameLost) {
+    const battle = store.state.achievements.battle
+    if (!battle) return [] // Повторная проверка поражения не создаёт второй факт.
+    const event: AchievementEvent = {
+      id: uuidv4(),
+      type: input.type,
+      data: { mode: battle.mode },
+    }
+    store.commit("clearAchievementBattle")
+    store.commit("enqueueAchievementEvent", event)
+    return [event.id]
+  }
   if (input.type === AchievementEventType.GameStarted) {
     startAchievementBattle(
       input.mode ?? resolveAchievementGameMode(store.state.game)
