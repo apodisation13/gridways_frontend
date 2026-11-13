@@ -15,6 +15,7 @@ export enum AchievementGameMode {
 export enum AchievementEventType {
   // любая сыгранная карта или лидер в любом режиме
   ActionPlayed = "action.played",
+  PassiveTriggered = "passive.triggered",
   GameStarted = "game.started",
   GameWon = "game.won",
   GameLost = "game.lost",
@@ -215,7 +216,14 @@ export interface AchievementBattle {
   leader_uses: number
 }
 
+export type AchievementPassiveLocation = "hand" | "deck" | "grave"
+
 export type AchievementEventInput =
+  | {
+      type: AchievementEventType.PassiveTriggered
+      actor: Card | Leader
+      location: AchievementPassiveLocation
+    }
   | {
       type: AchievementEventType.ArenaUpgradePurchased
       data: { upgrade_subtype: UpgradeSubtype; level: number }

@@ -96,9 +96,13 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
   // undefined, как и при обычной отправке JSON, не сохраняется в полях объекта.
   const data: AchievementEvent["data"] = JSON.parse(
     JSON.stringify(
-      input.type === AchievementEventType.ActionPlayed
+      input.type === AchievementEventType.ActionPlayed ||
+        input.type === AchievementEventType.PassiveTriggered
         ? {
             actor: input.actor,
+            ...(input.type === AchievementEventType.PassiveTriggered
+              ? { location: input.location }
+              : {}),
             mode: resolveAchievementGameMode(store.state.game),
           }
         : input.type === AchievementEventType.GameWon
