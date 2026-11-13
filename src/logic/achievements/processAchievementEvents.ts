@@ -55,6 +55,16 @@ export function processAchievementEvents(
       }
     }
 
+    if (event.type === AchievementEventType.GameWon) {
+      const deck = data.starting_deck
+      if (deck && typeof deck === "object" && !Array.isArray(deck)) {
+        data = {
+          ...data,
+          starting_deck: { ...deck, summary: buildDeckSummary(deck.cards) },
+        }
+      }
+    }
+
     for (const definition of byEvent.get(event.type) ?? []) {
       if (!Number.isFinite(definition.target) || definition.target <= 0)
         continue

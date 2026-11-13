@@ -68,3 +68,9 @@ python3 docs/achievements/validate_catalog.py docs/achievements/config-examples.
 mode = normal/random_n/random/multiplayer/arena. Для action.played добавьте mode и actor.color exists true, если лидер не должен учитываться. Пример Monsters: дополнительно actor.faction = Monsters. game.started/game.won используют count с target 100 и mode выбранного режима. Шестнадцать примеров находятся в [config-examples.json](config-examples.json), в permanent.categories.random_n/random/multiplayer/arena. Нужные категории копируются в permanent.categories. Награды money:1000 — демонстрационные, настройте экономику перед применением.
 
 [normal-mode-card-contracts.sql](normal-mode-card-contracts.sql) добавляет mode:normal только permanent action.played без явно заданного mode. Скрипт необходимо применить отдельно; сами изменения кода не ограничивают ранее сохранённые конфиги. Накопленный прогресс сохраняется: прошлые события других режимов из него не вычитаются.
+
+### Арена
+
+В категории arena добавлены покупка 10 прокачек, использование/восстановление 10 предметов, достижение уровней 5/10/20, победы стартовым составом без золотых/только бронзовыми и 3 победы без применения лидера. Уровень достигнут сразу после победы на предыдущем; отсутствие лидера проверяется по фактам ActionPlayed, не по остатку зарядов. Все примеры в config-examples.json, SQL для этого изменения нет.
+
+Старые resource.spent-контракты инвентаря оставляются без изменений. inventory.used на добор карт теперь работает и в арене; чтобы сохранить прежний охват, добавить filters.mode = {"type":"ne","value":"arena"}. Для только обычного режима вместо этого использовать "normal".

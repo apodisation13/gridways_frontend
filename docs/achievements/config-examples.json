@@ -1089,6 +1089,182 @@
                 "money": 1000
               }
             }
+          },
+          "arena_buy_upgrades_10": {
+            "id": "arena_buy_upgrades_10",
+            "title": "Купите 10 прокачек арены",
+            "ordering": 50,
+            "event": "arena.upgrade.purchased",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_use_inventory_10": {
+            "id": "arena_use_inventory_10",
+            "title": "Используйте 10 предметов инвентаря в арене",
+            "ordering": 60,
+            "event": "inventory.used",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "arena"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_restore_inventory_10": {
+            "id": "arena_restore_inventory_10",
+            "title": "Восстановите предметы инвентаря в арене 10 раз",
+            "ordering": 70,
+            "event": "inventory.restored",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "arena"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_reach_level_5": {
+            "id": "arena_reach_level_5",
+            "title": "Достигните 5-го уровня арены",
+            "ordering": 80,
+            "event": "arena.level.reached",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "level": {
+                "type": "gte",
+                "value": 5
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_reach_level_10": {
+            "id": "arena_reach_level_10",
+            "title": "Достигните 10-го уровня арены",
+            "ordering": 90,
+            "event": "arena.level.reached",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "level": {
+                "type": "gte",
+                "value": 10
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_reach_level_20": {
+            "id": "arena_reach_level_20",
+            "title": "Достигните 20-го уровня арены",
+            "ordering": 100,
+            "event": "arena.level.reached",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "level": {
+                "type": "gte",
+                "value": 20
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_win_without_gold": {
+            "id": "arena_win_without_gold",
+            "title": "Выиграйте бой арены стартовой колодой без золотых карт",
+            "ordering": 110,
+            "event": "game.won",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "arena",
+              "starting_deck.summary.cards_count": {
+                "type": "gt",
+                "value": 0
+              },
+              "starting_deck.summary.by_color.Gold": 0
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_win_only_bronze": {
+            "id": "arena_win_only_bronze",
+            "title": "Выиграйте бой арены стартовой колодой только из бронзовых карт",
+            "ordering": 120,
+            "event": "game.won",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "arena",
+              "starting_deck.summary.all_bronze": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_win_without_leader_3": {
+            "id": "arena_win_without_leader_3",
+            "title": "Выиграйте 3 боя арены без применения лидера",
+            "ordering": 130,
+            "event": "game.won",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "arena",
+              "leader_uses": 0
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
           }
         }
       }

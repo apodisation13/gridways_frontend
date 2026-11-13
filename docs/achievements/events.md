@@ -7,13 +7,17 @@
 | type | data | Примеры |
 |---|---|---|
 | `action.played` | `{actor: <полный Card или Leader>, mode}` | count зарядов, unique actor.id, фильтры actor.color/faction/type/data.damage |
-| `game.started` / `game.won` | `{mode}` | count начатых/выигранных боёв |
+| `game.started` | `{mode}` | count начатых боёв, начало локальной статистики |
+| `game.won` | `{mode, starting_deck?, leader_uses?}` | count побед, условия по исходному составу и применению лидера |
+| `arena.upgrade.purchased` | `{upgrade_subtype, level}` | count успешных покупок прокачек арены |
+| `arena.level.reached` | `{level}` | count/target 1 с фильтром level gte N |
+| `inventory.restored` | `{item, mode}` | count восстановлений предмета кнопкой |
 | `resource.spent` | `{resources: {money: 100}, subtype?: string, item?: string}` | sum resources.money; use_inventory_item для обычного инвентаря |
 | `resource.gained` | `{resources: {money: 100}, subtype?: string}` | фактический доход с учётом лимитов |
 | `deck.saved` | `{deck: {name, leader, cards, health}}` | сохранение после создания или редактирования, вычисляемая deck.summary |
 | `deck.created` / `deck.deleted` | `{deck: {name, leader, cards, health, id?}}` | count успешных операций, фильтр deck.leader.faction; cards — полные объекты карт |
 | `decks.checked` | `{}` | current по decks.count из БД, включая базовую колоду |
-| `inventory.used` | `{item: "draw_cards", result: {cards_drawn: 3}}` | count применений с фактическим результатом; пока только draw_cards вне арены |
+| `inventory.used` | `{item, mode, result: {cards_drawn?: number}}` | одно событие применения любого предмета во всех режимах |
 | `resource.opened` | `{resource: "kegs"}` | count открытий; keys, kegs, big_kegs, chests |
 | `resource.transformed` | `{action, resource, amount, spent, gained}` | buy/sell/craft/mill; amount = quantity × step |
 | `actor.transformed` | `{action, actor, recipe, spent, gained}` | craft/mill карты или лидера, unique actor.faction |
@@ -75,7 +79,7 @@ Groups: game/resources/settings/inventory, all, non_settings. maxed по `next =
 | `src/pages/UpgradesPage.vue` | UpgradeChanged после postUserUpgrade |
 | `src/store/modules/achievements.ts` | после подтверждения: доход из granted_rewards, проверка current баланса |
 
-Не подключены: ArenaUpgradesModal, отдельные arena.inventoryCounts, оплаченные покупки PaymentResultPage. Начальные GET и обновление всего баланса не превращать в доход за всё время. `processCraftBonusCard` меняет коллекцию карт, не является платным craft и не считается actor.transformed.
+Не подключены: расход ресурсов на прокачки ArenaUpgradesModal, оплаченные покупки PaymentResultPage. Покупки прокачек арены и применения arena.inventoryCounts учитываются отдельными событиями. Начальные GET и обновление всего баланса не превращать в доход за всё время. `processCraftBonusCard` меняет коллекцию карт, не является платным craft и не считается actor.transformed.
 
 При новом месте изменения ресурсов сначала искать `processResources`, `set_resource`, альтернативные ответы с resources и прямые изменения баланса. Не добавлять общий трекер к каждой мутации стора: загрузка/подтверждение/новая операция имеют разную семантику.
 
@@ -85,9 +89,9 @@ Groups: game/resources/settings/inventory, all, non_settings. maxed по `next =
 
 ## Результат использования инвентаря
 
-`useInventory.ts` отправляет `inventory.used` после синхронного цикла draw_cards. `result.cards_drawn` — разница размера руки после и до цикла, включая ноль, а не число попыток или значение INVENTORY_CARDS_DRAWN. Списание остаётся отдельным resource.spent до применения эффекта; новое событие повторно ресурсы не списывает и не считает расход.
+`useInventory.ts` отправляет одно inventory.used после применения любого предмета, включая арену. item и mode обязательны; result пустой для неизмеряемых эффектов. Для draw_cards result.cards_drawn — реальная разница размера руки, включая ноль. Режим сохраняется до await: предмет может закончить бой. Отдельного события внутри ветки draw_cards больше нет. Обычное списание resource.spent остаётся до эффекта; аренный предмет его не создаёт.
 
-Для «взять ровно 3 карты пять раз» используются filters item = draw_cards и result.cards_drawn = 3, counter count, target 5. Для «не менее 3» нужен gte. Схемы фронта и бэка пока описывают только результат cards_drawn; другие эффекты ещё не подключены. Фактический результат сообщает клиент, сервер не симулирует добор карт. Арена по-прежнему исключена.
+Старые контракты по resource.spent/use_inventory_item не изменяются и по-прежнему учитывают только обычный запас инвентаря. Старому контракту на добор 3 карт для сохранения прежнего охвата добавить mode ne arena (либо mode normal для только обычного режима). В примере добавлен ne arena. Для контракта на все применения в арене: inventory.used, mode arena, count.
 
 ## Колоды
 
@@ -114,3 +118,13 @@ GamePage после разрешённого перехода и start_game от
 WinPage/ArenaWinPage отправляют game.won после проверки и потребления одноразового win_redirect, до отдельных запросов статистики/наград. Оба участника кооператива переходят в WinPage с этим флагом: каждый отправляет свою победу. Нет запроса за другого пользователя и нет гарантированного начисления офлайн-напарнику. Арена: старт/победа относятся к отдельному бою, не к полному забегу.
 
 `mode` обязателен в backend action.played/game.started/game.won. Существующие вызовы ActionPlayed в компонентах не требуют дополнительных аргументов. Фильтр режима всегда задаётся конфигом; отсутствие mode-фильтра означает все режимы. Чтобы ограничить старые permanent action.played обычным режимом, выполнить normal-mode-card-contracts.sql. Он не меняет прогресс, даты наград и уже явно заданные mode-фильтры. Категории random_n/random/multiplayer/arena находятся в config-examples.json внутри permanent.categories; копировать нужно выбранные категории, а не весь файл поверх game_const. Эти файлы не применяются к БД автоматически.
+
+## Контракты арены и статистика боя
+
+AchievementsState.battle хранит mode, независимый starting_deck.cards, leader_uses. GameStarted заменяет снимок через battle.ts из game.current_deck; применённый лидер в ActionPlayed увеличивает leader_uses до постановки события в очередь. Возврат/изменение зарядов счётчик не уменьшает. На GameWon снимок копируется в событие и очищается. На LosePage и resetAchievementSession очищается; новый старт всегда заменяет предыдущий снимок, в том числе после выхода из боя. Если снимок отсутствует или режим не совпал, game.won не содержит starting_deck/leader_uses: отсутствие не считается нулём.
+
+Frontend preview и backend events.py пересчитывают starting_deck.summary общей функцией сводки состава, не доверяя переданному summary. Лидер исключён. Контракт без золотых требует непустой колоды и by_color.Gold = 0; только бронзовые — all_bronze = true. Три победы без лидера — count/target 3, leader_uses = 0, mode arena, не серия. Обычные game.won-контракты без этих фильтров работают как прежде. Бэк принимает исходный состав/счётчик от клиента, не симулирует бой.
+
+ArenaUpgradesModal.doUpgrade отправляет arena.upgrade.purchased после успешной оплаты и arena_increment_upgrade; расход ресурсов в этом месте пока отдельно не подключён. ArenaDeckbuildPage.restore_inventory отправляет inventory.restored после проверки доступности и мутации восстановления, не после покупки ARENA_RESTORE_SLOT. ArenaWinPage после arena_advance_level отправляет arena.level.reached: выигрыш уровня 4 означает достижение 5. Проверки по level gte N с target 1; загрузка старого состояния пока не даёт ретроспективных событий. Все девять новых примеров лежат в категории arena в config-examples.json.
+
+В текущей схеме бэка режимы используют LeaderboardGameMode плюс literal normal для контрактов обычного режима. Поле mode у inventory.used теперь обязательно. result — словарь неотрицательных целых результатов; пока фронт измеряет только cards_drawn.

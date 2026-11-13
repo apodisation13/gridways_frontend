@@ -160,6 +160,10 @@ export default defineComponent({
       max_arena_level: completed_level,
     })
     this.$store.commit("arena_advance_level")
+    trackAchievementEvent({
+      type: AchievementEventType.ArenaLevelReached,
+      data: { level: this.$store.state.arena.current_level },
+    })
     await Promise.all([
       leaderboardRequest,
       this.compute_rewards(completed_level),

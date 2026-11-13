@@ -14,6 +14,7 @@ import { trackAchievementRewards } from "@/logic/achievements/trackAchievementRe
 import type { RootState } from "@/store"
 import { USER_ACHIEVEMENTS } from "@/store/const/api_urls"
 import type {
+  AchievementBattle,
   AchievementCatalog,
   AchievementEvent,
   AchievementEventsRequest,
@@ -27,6 +28,7 @@ import type {
 import type { UpgradesConfig, UserUpgrades } from "@/types/upgrades"
 
 export interface AchievementsState {
+  battle: AchievementBattle | null
   // Описания заданий: условия, цели, награды. Permanent приходит из game_const.
   achievementsConfig: AchievementCatalog
   // Только подтверждённый бэком прогресс. Локальные ходы сюда не прибавляем.
@@ -46,6 +48,7 @@ export interface AchievementsState {
 }
 
 const state: AchievementsState = {
+  battle: null,
   achievementsConfig: {
     permanent: { title: "Постоянные", categories: {} },
     daily: null,
@@ -148,6 +151,15 @@ const getters = {
 }
 
 const mutations = {
+  startAchievementBattle(state: AchievementsState, battle: AchievementBattle) {
+    state.battle = battle
+  },
+  recordAchievementLeaderUse(state: AchievementsState) {
+    if (state.battle) state.battle.leader_uses += 1
+  },
+  clearAchievementBattle(state: AchievementsState) {
+    state.battle = null
+  },
   dismissAchievementReward(state: AchievementsState, notificationId: string) {
     state.grantedRewards = state.grantedRewards.filter(
       reward => reward.notification_id !== notificationId
@@ -204,6 +216,7 @@ const mutations = {
   resetAchievementSession(state: AchievementsState) {
     // При входе/выходе не переносим прогресс и очередь между пользователями.
     state.session += 1
+    state.battle = null
     state.pinnedAchievements = []
     state.userAchievements = {}
     state.pendingEvents = []

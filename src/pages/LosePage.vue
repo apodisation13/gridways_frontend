@@ -37,6 +37,7 @@ export default defineComponent({
     }
   },
   created() {
+    this.$store.commit("clearAchievementBattle")
     this.was_arena = this.$store.state.game.arena_mode
     if (this.was_arena) {
       this.$store.commit("set_arena_mode", false)

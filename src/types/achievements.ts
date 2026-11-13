@@ -36,6 +36,9 @@ export enum AchievementEventType {
   ResourceOpened = "resource.opened",
   // Фактический результат применения предмета, отдельно от его списания.
   InventoryUsed = "inventory.used",
+  InventoryRestored = "inventory.restored",
+  ArenaUpgradePurchased = "arena.upgrade.purchased",
+  ArenaLevelReached = "arena.level.reached",
   DeckCreated = "deck.created",
   DeckSaved = "deck.saved",
   DeckDeleted = "deck.deleted",
@@ -193,7 +196,23 @@ export interface AchievementUpgradeSnapshot {
   summary: Record<string, AchievementUpgradeSummary>
 }
 
+// Только текущий бой; не часть сохраняемого пользовательского прогресса.
+export interface AchievementBattle {
+  mode: AchievementGameMode
+  starting_deck: Record<string, AchievementEventValue>
+  leader_uses: number
+}
+
 export type AchievementEventInput =
+  | {
+      type: AchievementEventType.ArenaUpgradePurchased
+      data: { upgrade_subtype: UpgradeSubtype; level: number }
+    }
+  | { type: AchievementEventType.ArenaLevelReached; data: { level: number } }
+  | {
+      type: AchievementEventType.InventoryRestored
+      data: { item: InventoryItem; mode: AchievementGameMode }
+    }
   | {
       type: AchievementEventType.GameStarted | AchievementEventType.GameWon
       mode?: AchievementGameMode
@@ -255,7 +274,8 @@ export type AchievementEventInput =
       type: AchievementEventType.InventoryUsed
       data: {
         item: InventoryItem
-        result: { cards_drawn: number }
+        mode: AchievementGameMode
+        result: { cards_drawn?: number }
       }
     }
   | {

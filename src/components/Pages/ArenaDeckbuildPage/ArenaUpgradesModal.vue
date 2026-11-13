@@ -205,7 +205,8 @@ import { defineComponent } from "vue"
 
 import ResourceList from "@/components/ResourceList.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
-import { PayResourcesSubtype } from "@/types"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
+import { AchievementEventType, PayResourcesSubtype } from "@/types"
 import type { ArenaParams } from "@/types/database"
 import {
   type UpgradeCategory,
@@ -347,6 +348,13 @@ export default defineComponent({
       })
 
       this.$store.commit("arena_increment_upgrade", key)
+      trackAchievementEvent({
+        type: AchievementEventType.ArenaUpgradePurchased,
+        data: {
+          upgrade_subtype: key as UpgradeSubtype,
+          level: this.userLevel(key),
+        },
+      })
       this.$store.dispatch("sync_arena_game_params")
     },
   },

@@ -1,6 +1,7 @@
 import { defineComponent } from "vue"
 
 import { choice_pop } from "@/lib/utils"
+import { resolveAchievementGameMode } from "@/logic/achievements/gameMode"
 import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { change_health } from "@/logic/game_logic/change_health"
 import { sound_destroy_enemy } from "@/logic/play_sounds"
@@ -127,6 +128,8 @@ export default defineComponent({
       const value = this.inventoryItemValues[item] ?? 0
       const randomEffectsValue =
         getters["inventoryEffectValues"].random_effects_value ?? 0
+      const mode = resolveAchievementGameMode(this.$store.state.game)
+      const result: { cards_drawn?: number } = {}
       this.inventoryBusy = true
       try {
         if (this.$store.state.game.arena_mode) {
@@ -163,19 +166,8 @@ export default defineComponent({
           for (let i = 0; i < count; i++) {
             spawn_random_in_hand(null, this.gameObj)
           }
-          // Спавн может не добавить карту. Считаем результат, а не попытки.
-          // Отдельный инвентарь арены пока не участвует в контрактах.
-          if (!this.$store.state.game.arena_mode) {
-            trackAchievementEvent({
-              type: AchievementEventType.InventoryUsed,
-              data: {
-                item,
-                result: {
-                  cards_drawn: this.gameObj.hand.length - handSizeBefore,
-                },
-              },
-            })
-          }
+          // Только реально появившиеся карты, а не значение прокачки.
+          result.cards_drawn = this.gameObj.hand.length - handSizeBefore
         } else if (
           item === InventoryItem.MEGA_BOMBS ||
           item === InventoryItem.RANDOM_BOMBS
@@ -218,6 +210,10 @@ export default defineComponent({
             randomEffectsValue
           )
         }
+        trackAchievementEvent({
+          type: AchievementEventType.InventoryUsed,
+          data: { item, mode, result },
+        })
         this.can_draw = this.calc_can_draw()
         this.afterInventoryItemApplied()
       } catch {

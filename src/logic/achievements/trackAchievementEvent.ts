@@ -9,6 +9,7 @@ import type {
 } from "@/types"
 import { AchievementEventType } from "@/types"
 
+import { finishAchievementBattle, startAchievementBattle } from "./battle"
 import { checkCurrentDecks } from "./currentDecks"
 import { checkCurrentResources } from "./currentResources"
 import { checkCurrentUpgrades } from "./currentUpgrades"
@@ -65,6 +66,19 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     ]
   }
 
+  if (input.type === AchievementEventType.GameStarted) {
+    startAchievementBattle(
+      input.mode ?? resolveAchievementGameMode(store.state.game)
+    )
+  }
+  if (
+    input.type === AchievementEventType.ActionPlayed &&
+    !("color" in input.actor)
+  ) {
+    // Факт применения надёжнее остатка зарядов: пассивки могут вернуть заряды.
+    store.commit("recordAchievementLeaderUse")
+  }
+
   // Снимок всех полей КАРТЫ ИЛИ ЛИДЕРА, включая вложенные объекты и массивы.
   // Более поздние изменения игровой карты не должны менять уже записанное событие.
   // undefined, как и при обычной отправке JSON, не сохраняется в полях объекта.
@@ -75,9 +89,16 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
             actor: input.actor,
             mode: resolveAchievementGameMode(store.state.game),
           }
-        : "data" in input
-          ? input.data
-          : { mode: input.mode ?? resolveAchievementGameMode(store.state.game) }
+        : input.type === AchievementEventType.GameWon
+          ? finishAchievementBattle(
+              input.mode ?? resolveAchievementGameMode(store.state.game)
+            )
+          : "data" in input
+            ? input.data
+            : {
+                mode:
+                  input.mode ?? resolveAchievementGameMode(store.state.game),
+              }
     )
   )
 
