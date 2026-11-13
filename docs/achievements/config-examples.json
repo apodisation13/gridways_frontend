@@ -1551,6 +1551,195 @@
             }
           }
         }
+      },
+      "passives": {
+        "id": "passives",
+        "title": "Пассивные способности",
+        "ordering": 15,
+        "achievements": {
+          "passive_hand_10": {
+            "id": "passive_hand_10",
+            "title": "Активируйте пассивные способности карты в руке 10 раз",
+            "ordering": 10,
+            "event": "passive.triggered",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "location": "hand"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "passive_hand_50": {
+            "id": "passive_hand_50",
+            "title": "Активируйте пассивные способности карты в руке 50 раз",
+            "ordering": 20,
+            "event": "passive.triggered",
+            "target": 50,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "location": "hand"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "passive_grave_10": {
+            "id": "passive_grave_10",
+            "title": "Активируйте пассивные способности карты в сбросе 10 раз",
+            "ordering": 30,
+            "event": "passive.triggered",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "location": "grave"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "passive_grave_50": {
+            "id": "passive_grave_50",
+            "title": "Активируйте пассивные способности карты в сбросе 50 раз",
+            "ordering": 40,
+            "event": "passive.triggered",
+            "target": 50,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "location": "grave"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "passive_deck_10": {
+            "id": "passive_deck_10",
+            "title": "Активируйте пассивные способности карты в колоде 10 раз",
+            "ordering": 50,
+            "event": "passive.triggered",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "location": "deck"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "passive_deck_50": {
+            "id": "passive_deck_50",
+            "title": "Активируйте пассивные способности карты в колоде 50 раз",
+            "ordering": 60,
+            "event": "passive.triggered",
+            "target": 50,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "location": "deck"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "passive_leader_10": {
+            "id": "passive_leader_10",
+            "title": "Активируйте пассивные способности лидера 10 раз",
+            "ordering": 70,
+            "event": "passive.triggered",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "actor.color": {
+                "type": "exists",
+                "value": false
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "passive_leader_50": {
+            "id": "passive_leader_50",
+            "title": "Активируйте пассивные способности лидера 50 раз",
+            "ordering": 80,
+            "event": "passive.triggered",
+            "target": 50,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "actor.color": {
+                "type": "exists",
+                "value": false
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          }
+        }
       }
     }
   }

@@ -82,3 +82,7 @@ mode = normal/random_n/random/multiplayer/arena. Для action.played добав
 ### Скрытые серии
 
 Два примера в normal: normal_win_streak_3_5 (length 3, target 5) и normal_win_streak_10_1 (length 10, target 1). Основной event game.won с mode normal; reset event game.lost с mode normal. Подходящая победа продвигает скрытый streak, поражение обнуляет только его, каждая полная серия увеличивает value. Серии непересекающиеся; неподходящие события не сбрасывают их. UI отображает только value/target. Существующие контракты менять не нужно.
+
+### Пассивные способности
+
+Категория passives содержит восемь примеров passive.triggered, count 10/50. Для карты: actor.color exists true + location hand/deck/grave. Для лидера: actor.color exists false (в игровом обработчике location hand). Примеры ограничены mode normal. Дополнительные фильтры actor.color/actor.data.damage/actor.passive_ability.name работают без новых счётчиков. Существующие контракты менять не нужно. Активация при таймере учитывается после запуска поддерживаемого обработчика; условные реакции и начало боя — только при подтверждении boolean от способности.
