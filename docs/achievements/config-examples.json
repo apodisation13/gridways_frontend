@@ -1,0 +1,507 @@
+{
+  "permanent": {
+    "title": "Постоянные",
+    "categories": {
+      "cards": {
+        "id": "cards",
+        "title": "Карты",
+        "ordering": 10,
+        "achievements": {
+          "play_bronze_10": {
+            "id": "play_bronze_10",
+            "title": "Примените бронзовые карты 10 раз",
+            "ordering": 10,
+            "event": "action.played",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "actor.color": "Bronze"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "play_bronze_damage_8_10": {
+            "id": "play_bronze_damage_8_10",
+            "title": "Примените бронзовые карты с уроном от 8 десять раз",
+            "ordering": 20,
+            "event": "action.played",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "actor.color": "Bronze",
+              "actor.data.damage": {
+                "type": "gte",
+                "value": 8
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "play_monsters_leader_10": {
+            "id": "play_monsters_leader_10",
+            "title": "Используйте 10 зарядов лидера Monsters с пассивной способностью",
+            "ordering": 30,
+            "event": "action.played",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "actor.color": {
+                "type": "exists",
+                "value": false
+              },
+              "actor.faction": "Monsters",
+              "actor.passive_ability.name": {
+                "type": "ne",
+                "value": null
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "play_unique_cards_30": {
+            "id": "play_unique_cards_30",
+            "title": "Примените 30 разных карт",
+            "ordering": 40,
+            "event": "action.played",
+            "target": 30,
+            "counter": {
+              "type": "unique",
+              "field": "actor.id"
+            },
+            "filters": {
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          }
+        }
+      },
+      "resources": {
+        "id": "resources",
+        "title": "Ресурсы",
+        "ordering": 20,
+        "achievements": {
+          "spend_money_10000": {
+            "id": "spend_money_10000",
+            "title": "Потратьте суммарно 10000 денег",
+            "ordering": 10,
+            "event": "resource.spent",
+            "target": 10000,
+            "counter": {
+              "type": "sum",
+              "field": "resources.money"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "gain_scraps_3000": {
+            "id": "gain_scraps_3000",
+            "title": "Заработайте суммарно 3000 обломков",
+            "ordering": 20,
+            "event": "resource.gained",
+            "target": 3000,
+            "counter": {
+              "type": "sum",
+              "field": "resources.scraps"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "accumulate_rare_gem_3": {
+            "id": "accumulate_rare_gem_3",
+            "title": "Накопите 3 rare_gem",
+            "ordering": 30,
+            "event": "resources.checked",
+            "target": 3,
+            "counter": {
+              "type": "current",
+              "field": "resources.rare_gem"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "open_kegs_10": {
+            "id": "open_kegs_10",
+            "title": "Откройте 10 бочек",
+            "ordering": 40,
+            "event": "resource.opened",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "resource": "kegs"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "buy_flowers_3000": {
+            "id": "buy_flowers_3000",
+            "title": "Купите 3000 flowers",
+            "ordering": 50,
+            "event": "resource.transformed",
+            "target": 3000,
+            "counter": {
+              "type": "sum",
+              "field": "amount"
+            },
+            "filters": {
+              "action": "buy",
+              "resource": "flowers"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "buy_level_resources_for_10000": {
+            "id": "buy_level_resources_for_10000",
+            "title": "Купите ресурсы уровней на 10000 денег",
+            "ordering": 60,
+            "event": "resource.transformed",
+            "target": 10000,
+            "counter": {
+              "type": "sum",
+              "field": "spent.money"
+            },
+            "filters": {
+              "action": "buy",
+              "resource": {
+                "type": "in",
+                "value": [
+                  "crops",
+                  "wood",
+                  "silk"
+                ]
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "sell_items_for_30000": {
+            "id": "sell_items_for_30000",
+            "title": "Продайте предметы на 30000 денег",
+            "ordering": 70,
+            "event": "resource.transformed",
+            "target": 30000,
+            "counter": {
+              "type": "sum",
+              "field": "gained.money"
+            },
+            "filters": {
+              "action": "sell"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "use_inventory_items_5": {
+            "id": "use_inventory_items_5",
+            "title": "Используйте 5 предметов инвентаря",
+            "ordering": 80,
+            "event": "resource.spent",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "subtype": "use_inventory_item"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "craft_all_inventory_items": {
+            "id": "craft_all_inventory_items",
+            "title": "Создайте каждый предмет инвентаря",
+            "ordering": 90,
+            "event": "resource.transformed",
+            "target": 9,
+            "counter": {
+              "type": "unique",
+              "field": "resource"
+            },
+            "filters": {
+              "action": "craft",
+              "resource": {
+                "type": "in",
+                "value": [
+                  "first_aid_kits",
+                  "shields",
+                  "immune_magics",
+                  "draw_cards",
+                  "mega_bombs",
+                  "random_bombs",
+                  "clears",
+                  "purifies",
+                  "random_effects"
+                ]
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          }
+        }
+      },
+      "craft_mills": {
+        "id": "craft_mills",
+        "title": "Крафт и разбор",
+        "ordering": 30,
+        "achievements": {
+          "craft_cards_100": {
+            "id": "craft_cards_100",
+            "title": "Создайте 100 карт",
+            "ordering": 10,
+            "event": "actor.transformed",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "action": "craft",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "mill_leaders_3": {
+            "id": "mill_leaders_3",
+            "title": "Разберите 3 лидеров",
+            "ordering": 20,
+            "event": "actor.transformed",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "action": "mill",
+              "actor.color": {
+                "type": "exists",
+                "value": false
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "craft_leaders_three_factions": {
+            "id": "craft_leaders_three_factions",
+            "title": "Создайте лидеров Soldiers, Monsters и Animals",
+            "ordering": 30,
+            "event": "actor.transformed",
+            "target": 3,
+            "counter": {
+              "type": "unique",
+              "field": "actor.faction"
+            },
+            "filters": {
+              "action": "craft",
+              "actor.color": {
+                "type": "exists",
+                "value": false
+              },
+              "actor.faction": {
+                "type": "in",
+                "value": [
+                  "Soldiers",
+                  "Monsters",
+                  "Animals"
+                ]
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "craft_with_rare_gem_1": {
+            "id": "craft_with_rare_gem_1",
+            "title": "Создайте карту или лидера через rare_gem",
+            "ordering": 40,
+            "event": "actor.transformed",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "action": "craft",
+              "recipe.rare_gem": {
+                "type": "ne",
+                "value": 0
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          }
+        }
+      },
+      "upgrades": {
+        "id": "upgrades",
+        "title": "Прокачки",
+        "ordering": 40,
+        "achievements": {
+          "purchase_upgrades_5": {
+            "id": "purchase_upgrades_5",
+            "title": "Совершите 5 прокачек",
+            "ordering": 10,
+            "event": "upgrade.purchased",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "max_any_upgrade_except_settings": {
+            "id": "max_any_upgrade_except_settings",
+            "title": "Прокачайте любой параметр кроме Settings до максимума",
+            "ordering": 20,
+            "event": "upgrades.checked",
+            "target": 1,
+            "counter": {
+              "type": "current",
+              "field": "summary.non_settings.maxed_count"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "max_all_upgrades": {
+            "id": "max_all_upgrades",
+            "title": "Все прокачки до максимума",
+            "ordering": 30,
+            "event": "upgrades.checked",
+            "target": 1,
+            "counter": {
+              "type": "current",
+              "field": "summary.all.all_maxed"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "max_inventory_upgrades": {
+            "id": "max_inventory_upgrades",
+            "title": "Все прокачки Inventory до максимума",
+            "ordering": 40,
+            "event": "upgrades.checked",
+            "target": 1,
+            "counter": {
+              "type": "current",
+              "field": "summary.inventory.all_maxed"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "max_settings_upgrades": {
+            "id": "max_settings_upgrades",
+            "title": "Все прокачки Settings до максимума",
+            "ordering": 50,
+            "event": "upgrades.checked",
+            "target": 1,
+            "counter": {
+              "type": "current",
+              "field": "summary.settings.all_maxed"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "reach_max_cards_in_deck_12": {
+            "id": "reach_max_cards_in_deck_12",
+            "title": "Увеличьте размер колоды до 12",
+            "ordering": 60,
+            "event": "upgrades.checked",
+            "target": 12,
+            "counter": {
+              "type": "current",
+              "field": "upgrades.game.max_cards_in_deck.value"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

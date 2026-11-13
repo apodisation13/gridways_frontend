@@ -4,6 +4,10 @@
 /android
 /data
 
+# Python tooling caches
+__pycache__/
+*.py[cod]
+
 
 # local env files
 .env
