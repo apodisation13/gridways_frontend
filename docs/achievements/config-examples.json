@@ -320,6 +320,25 @@
                 "money": 1000
               }
             }
+          },
+          "draw_three_cards_5": {
+            "id": "draw_three_cards_5",
+            "title": "Возьмите ровно 3 карты предметом draw_cards пять раз",
+            "ordering": 90,
+            "event": "inventory.used",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "item": "draw_cards",
+              "result.cards_drawn": 3
+            },
+            "rewards": {
+              "resources": {
+                "money": 500
+              }
+            }
           }
         }
       },

@@ -9,6 +9,7 @@
 | `action.played` | `{actor: <полный Card или Leader>}` | count зарядов, unique actor.id, фильтры actor.color/faction/type/data.damage |
 | `resource.spent` | `{resources: {money: 100}, subtype?: string, item?: string}` | sum resources.money; use_inventory_item для обычного инвентаря |
 | `resource.gained` | `{resources: {money: 100}, subtype?: string}` | фактический доход с учётом лимитов |
+| `inventory.used` | `{item: "draw_cards", result: {cards_drawn: 3}}` | count применений с фактическим результатом; пока только draw_cards вне арены |
 | `resource.opened` | `{resource: "kegs"}` | count открытий; keys, kegs, big_kegs, chests |
 | `resource.transformed` | `{action, resource, amount, spent, gained}` | buy/sell/craft/mill; amount = quantity × step |
 | `actor.transformed` | `{action, actor, recipe, spent, gained}` | craft/mill карты или лидера, unique actor.faction |
@@ -76,3 +77,9 @@ Groups: game/resources/settings/inventory, all, non_settings. maxed по `next =
 ## Уникальные использованные предметы
 
 При обычном использовании инвентаря ResourcesChanged получает item (InventoryItem) и переносит его в resource.spent. Схема бэка принимает необязательное item (ResourceType). Для «используйте каждый предмет» ставим unique по item, subtype = use_inventory_item и фильтр item in со списком предметов. Старые расходы без item работают как раньше, но не продвигают этот unique-контракт. Прошлые использования не восстанавливаются. Арена остаётся отдельно и не учитывается.
+
+## Результат использования инвентаря
+
+`useInventory.ts` отправляет `inventory.used` после синхронного цикла draw_cards. `result.cards_drawn` — разница размера руки после и до цикла, включая ноль, а не число попыток или значение INVENTORY_CARDS_DRAWN. Списание остаётся отдельным resource.spent до применения эффекта; новое событие повторно ресурсы не списывает и не считает расход.
+
+Для «взять ровно 3 карты пять раз» используются filters item = draw_cards и result.cards_drawn = 3, counter count, target 5. Для «не менее 3» нужен gte. Схемы фронта и бэка пока описывают только результат cards_drawn; другие эффекты ещё не подключены. Фактический результат сообщает клиент, сервер не симулирует добор карт. Арена по-прежнему исключена.

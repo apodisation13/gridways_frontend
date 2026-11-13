@@ -155,12 +155,26 @@ export default defineComponent({
         } else if (item === InventoryItem.IMMUNE_MAGICS) {
           add_invulnerability(value)
         } else if (item === InventoryItem.DRAW_CARDS) {
+          const handSizeBefore = this.gameObj.hand.length
           const count = Math.min(
             value,
             getters["handSize"] - this.gameObj.hand.length
           )
           for (let i = 0; i < count; i++) {
             spawn_random_in_hand(null, this.gameObj)
+          }
+          // Спавн может не добавить карту. Считаем результат, а не попытки.
+          // Отдельный инвентарь арены пока не участвует в контрактах.
+          if (!this.$store.state.game.arena_mode) {
+            trackAchievementEvent({
+              type: AchievementEventType.InventoryUsed,
+              data: {
+                item,
+                result: {
+                  cards_drawn: this.gameObj.hand.length - handSizeBefore,
+                },
+              },
+            })
           }
         } else if (
           item === InventoryItem.MEGA_BOMBS ||

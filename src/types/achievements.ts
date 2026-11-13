@@ -23,6 +23,8 @@ export enum AchievementEventType {
 
   // любое открытие ключа, бочек или коробки
   ResourceOpened = "resource.opened",
+  // Фактический результат применения предмета, отдельно от его списания.
+  InventoryUsed = "inventory.used",
 
   // проверка ресурсов на накопление типа накопите 40000 денег
   ResourcesChecked = "resources.checked",
@@ -222,6 +224,13 @@ export type AchievementEventInput =
       }
     }
   | { type: AchievementEventType.ResourceOpened; data: { resource: string } }
+  | {
+      type: AchievementEventType.InventoryUsed
+      data: {
+        item: InventoryItem
+        result: { cards_drawn: number }
+      }
+    }
   | {
       type: AchievementEventType.ResourceTransition
       data: {
