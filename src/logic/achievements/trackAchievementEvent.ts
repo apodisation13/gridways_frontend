@@ -12,6 +12,7 @@ import { AchievementEventType } from "@/types"
 import { checkCurrentDecks } from "./currentDecks"
 import { checkCurrentResources } from "./currentResources"
 import { checkCurrentUpgrades } from "./currentUpgrades"
+import { resolveAchievementGameMode } from "./gameMode"
 import { buildUpgradeSnapshot } from "./upgradeSnapshot"
 
 // Общая точка входа из игры: сообщаем, что произошло, без перечисления заданий.
@@ -70,8 +71,13 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
   const data: AchievementEvent["data"] = JSON.parse(
     JSON.stringify(
       input.type === AchievementEventType.ActionPlayed
-        ? { actor: input.actor }
-        : input.data
+        ? {
+            actor: input.actor,
+            mode: resolveAchievementGameMode(store.state.game),
+          }
+        : "data" in input
+          ? input.data
+          : { mode: input.mode ?? resolveAchievementGameMode(store.state.game) }
     )
   )
 

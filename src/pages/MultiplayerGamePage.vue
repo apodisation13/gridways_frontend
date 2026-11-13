@@ -312,6 +312,7 @@ import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbiliti
 import UseInventory from "@/components/Pages/GamePage/UseInventory.vue"
 import frontendLogContext from "@/lib/frontend-logs/context"
 import { copyObj, randInt } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { enemy_leader_ai_move_once } from "@/logic/ai_move/ai_leader_move_once"
 import { ai_move } from "@/logic/ai_move/ai_move"
 import { enemy_passive_abilities_end_turn } from "@/logic/ai_move/ai_passive_abilties"
@@ -340,6 +341,7 @@ import type {
   IsActive,
   Leader,
 } from "@/types"
+import { AchievementEventType, AchievementGameMode } from "@/types"
 import {
   get_value_from_upgrades,
   UpgradeSubtype,
@@ -841,6 +843,10 @@ export default defineComponent({
 
       this.draw = true // открываем окно редро
       this.gameInitialized = true
+      trackAchievementEvent({
+        type: AchievementEventType.GameStarted,
+        mode: AchievementGameMode.Multiplayer,
+      })
       this.myTurn = true // хост ходит первым
       this.lastSentHealth = this.$store.getters["health"]
       this.lastSentArmor = this.$store.getters["armor"]
@@ -884,6 +890,10 @@ export default defineComponent({
       this.can_draw = this.calc_can_draw()
       this.draw = true
       this.gameInitialized = true
+      trackAchievementEvent({
+        type: AchievementEventType.GameStarted,
+        mode: AchievementGameMode.Multiplayer,
+      })
       this.myTurn = false // гость ждёт TURN_END от хоста
       this.lastSentHealth = this.$store.getters["health"]
       this.lastSentArmor = this.$store.getters["armor"]

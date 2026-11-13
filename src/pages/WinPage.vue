@@ -178,6 +178,8 @@ export default defineComponent({
   async created() {
     if (!this.$store.state.user_actions.win_redirect) return
     this.$store.commit("set_win_redirect", false)
+    // Флаг одноразовый: повторное открытие страницы не даёт новую победу.
+    trackAchievementEvent({ type: AchievementEventType.GameWon })
     const leader_id = this.$store.state.game.leader!.id
     const max_kills = this.$store.getters["enemies_grave"].length + 1
     const level_name = this.$store.state.game.level?.name

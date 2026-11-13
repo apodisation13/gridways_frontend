@@ -62,3 +62,9 @@ python3 docs/achievements/validate_catalog.py docs/achievements/config-examples.
 `deck.created` и `deck.deleted` используют count; фракция доступна как `deck.leader.faction`. `decks.checked` использует только current с field `decks.count`: число хранящихся колод, включая базовую. Порог 3/5/7/10 задаётся target; примеры приведены в категории decks файла config-examples.json. Редактирование не является новым созданием.
 
 Для состава используйте deck.saved с count и target 1: фильтры deck.summary.all_bronze/all_silver/all_gold/no_neutral/all_neutral = true или deck.summary.cards_count = 20. Условия можно сочетать через обычное AND. Событие работает при создании и редактировании, но не при загрузке. Примеры шести заданий находятся в категории decks.
+
+### Контракты по режимам
+
+mode = normal/random_n/random/multiplayer/arena. Для action.played добавьте mode и actor.color exists true, если лидер не должен учитываться. Пример Monsters: дополнительно actor.faction = Monsters. game.started/game.won используют count с target 100 и mode выбранного режима. Шестнадцать примеров находятся в [config-examples.json](config-examples.json), в permanent.categories.random_n/random/multiplayer/arena. Нужные категории копируются в permanent.categories. Награды money:1000 — демонстрационные, настройте экономику перед применением.
+
+[normal-mode-card-contracts.sql](normal-mode-card-contracts.sql) добавляет mode:normal только permanent action.played без явно заданного mode. Скрипт необходимо применить отдельно; сами изменения кода не ограничивают ранее сохранённые конфиги. Накопленный прогресс сохраняется: прошлые события других режимов из него не вычитаются.

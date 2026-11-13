@@ -17,7 +17,8 @@
               "type": "count"
             },
             "filters": {
-              "actor.color": "Bronze"
+              "actor.color": "Bronze",
+              "mode": "normal"
             },
             "rewards": {
               "resources": {
@@ -39,7 +40,8 @@
               "actor.data.damage": {
                 "type": "gte",
                 "value": 8
-              }
+              },
+              "mode": "normal"
             },
             "rewards": {
               "resources": {
@@ -65,7 +67,8 @@
               "actor.passive_ability.name": {
                 "type": "ne",
                 "value": null
-              }
+              },
+              "mode": "normal"
             },
             "rewards": {
               "resources": {
@@ -87,7 +90,8 @@
               "actor.color": {
                 "type": "exists",
                 "value": true
-              }
+              },
+              "mode": "normal"
             },
             "rewards": {
               "resources": {
@@ -731,6 +735,358 @@
             "rewards": {
               "resources": {
                 "money": 100
+              }
+            }
+          }
+        }
+      },
+      "random_n": {
+        "id": "random_n",
+        "title": "Random N",
+        "ordering": 70,
+        "achievements": {
+          "random_n_play_cards_100": {
+            "id": "random_n_play_cards_100",
+            "title": "Примените карты 100 раз в режиме random_n",
+            "event": "action.played",
+            "ordering": 10,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "random_n",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "random_n_play_monsters_cards_100": {
+            "id": "random_n_play_monsters_cards_100",
+            "title": "Примените карты Monsters 100 раз в режиме random_n",
+            "event": "action.played",
+            "ordering": 20,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "random_n",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "actor.faction": "Monsters"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "random_n_win_games_100": {
+            "id": "random_n_win_games_100",
+            "title": "Выиграйте 100 боёв в режиме random_n",
+            "event": "game.won",
+            "ordering": 30,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "random_n"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "random_n_start_games_100": {
+            "id": "random_n_start_games_100",
+            "title": "Начните 100 боёв в режиме random_n",
+            "event": "game.started",
+            "ordering": 40,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "random_n"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          }
+        }
+      },
+      "random": {
+        "id": "random",
+        "title": "Random",
+        "ordering": 80,
+        "achievements": {
+          "random_play_cards_100": {
+            "id": "random_play_cards_100",
+            "title": "Примените карты 100 раз в режиме random",
+            "event": "action.played",
+            "ordering": 10,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "random",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "random_play_monsters_cards_100": {
+            "id": "random_play_monsters_cards_100",
+            "title": "Примените карты Monsters 100 раз в режиме random",
+            "event": "action.played",
+            "ordering": 20,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "random",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "actor.faction": "Monsters"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "random_win_games_100": {
+            "id": "random_win_games_100",
+            "title": "Выиграйте 100 боёв в режиме random",
+            "event": "game.won",
+            "ordering": 30,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "random"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "random_start_games_100": {
+            "id": "random_start_games_100",
+            "title": "Начните 100 боёв в режиме random",
+            "event": "game.started",
+            "ordering": 40,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "random"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          }
+        }
+      },
+      "multiplayer": {
+        "id": "multiplayer",
+        "title": "Мультиплеер",
+        "ordering": 90,
+        "achievements": {
+          "multiplayer_play_cards_100": {
+            "id": "multiplayer_play_cards_100",
+            "title": "Примените карты 100 раз в режиме multiplayer",
+            "event": "action.played",
+            "ordering": 10,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "multiplayer",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "multiplayer_play_monsters_cards_100": {
+            "id": "multiplayer_play_monsters_cards_100",
+            "title": "Примените карты Monsters 100 раз в режиме multiplayer",
+            "event": "action.played",
+            "ordering": 20,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "multiplayer",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "actor.faction": "Monsters"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "multiplayer_win_games_100": {
+            "id": "multiplayer_win_games_100",
+            "title": "Выиграйте 100 боёв в режиме multiplayer",
+            "event": "game.won",
+            "ordering": 30,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "multiplayer"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "multiplayer_start_games_100": {
+            "id": "multiplayer_start_games_100",
+            "title": "Начните 100 боёв в режиме multiplayer",
+            "event": "game.started",
+            "ordering": 40,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "multiplayer"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          }
+        }
+      },
+      "arena": {
+        "id": "arena",
+        "title": "Арена",
+        "ordering": 100,
+        "achievements": {
+          "arena_play_cards_100": {
+            "id": "arena_play_cards_100",
+            "title": "Примените карты 100 раз в режиме arena",
+            "event": "action.played",
+            "ordering": 10,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "arena",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_play_monsters_cards_100": {
+            "id": "arena_play_monsters_cards_100",
+            "title": "Примените карты Monsters 100 раз в режиме arena",
+            "event": "action.played",
+            "ordering": 20,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "arena",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "actor.faction": "Monsters"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_win_games_100": {
+            "id": "arena_win_games_100",
+            "title": "Выиграйте 100 боёв в режиме arena",
+            "event": "game.won",
+            "ordering": 30,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "arena"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_start_games_100": {
+            "id": "arena_start_games_100",
+            "title": "Начните 100 боёв в режиме arena",
+            "event": "game.started",
+            "ordering": 40,
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "arena"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
               }
             }
           }

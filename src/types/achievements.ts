@@ -3,9 +3,20 @@ import type { InventoryItem } from "./inventory"
 import type { UpgradeSubtype, UpgradeType, UserUpgrades } from "./upgrades"
 import type { PayResourcesSubtype } from "./user_actions"
 
+// Обычный режим — сезоны. Значения используются в фильтре mode.
+export enum AchievementGameMode {
+  Normal = "normal",
+  Random = "random",
+  RandomN = "random_n",
+  Multiplayer = "multiplayer",
+  Arena = "arena",
+}
+
 export enum AchievementEventType {
   // любая сыгранная карта или лидер в любом режиме
   ActionPlayed = "action.played",
+  GameStarted = "game.started",
+  GameWon = "game.won",
   ActorTransition = "actor.transition", // Локальный сигнал с балансами до/после.
   ActorTransformed = "actor.transformed",
   UpgradeChanged = "upgrade.changed", // Локальный сигнал после покупки.
@@ -183,6 +194,10 @@ export interface AchievementUpgradeSnapshot {
 }
 
 export type AchievementEventInput =
+  | {
+      type: AchievementEventType.GameStarted | AchievementEventType.GameWon
+      mode?: AchievementGameMode
+    }
   | { type: AchievementEventType.DecksChecked; data: Record<string, never> }
   | {
       type:

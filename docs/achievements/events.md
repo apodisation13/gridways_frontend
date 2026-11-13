@@ -6,7 +6,8 @@
 
 | type | data | Примеры |
 |---|---|---|
-| `action.played` | `{actor: <полный Card или Leader>}` | count зарядов, unique actor.id, фильтры actor.color/faction/type/data.damage |
+| `action.played` | `{actor: <полный Card или Leader>, mode}` | count зарядов, unique actor.id, фильтры actor.color/faction/type/data.damage |
+| `game.started` / `game.won` | `{mode}` | count начатых/выигранных боёв |
 | `resource.spent` | `{resources: {money: 100}, subtype?: string, item?: string}` | sum resources.money; use_inventory_item для обычного инвентаря |
 | `resource.gained` | `{resources: {money: 100}, subtype?: string}` | фактический доход с учётом лимитов |
 | `deck.saved` | `{deck: {name, leader, cards, health}}` | сохранение после создания или редактирования, вычисляемая deck.summary |
@@ -35,7 +36,8 @@ spent/gained содержат положительные количества и
 - `ResourceTransition`: `{resource, action, quantity, step, recipe, before, after}`. Формирует обычные расходы/доходы и resource.transformed. Рецепт за операцию дополняется знаком изменения самого ресурса, умножается на quantity. amount не обрезается лимитом повторно: UI уже проверяет допустимость обмена.
 - `ActorTransition`: `{action, actor, recipe, before, after}`. Разница балансов + actor.transformed; снимок actor и recipe до await. Это заменяет старый ResourcesChanged в том же месте, а не добавляется рядом с ним.
 - `UpgradeChanged`: `{upgrade_type, upgrade_subtype, upgrades, before, after}`. Расход/доход, один upgrade.purchased, проверки current. Ответ postUserUpgrade теперь весь UpgradesResponse, не только resources.
-- `ActionPlayed` принимает `{type, actor}`; в очереди будет `{type, data: {actor}}`.
+- `ActionPlayed` принимает `{type, actor}`; трекер добавляет текущий mode, в очереди будет `{type, data: {actor, mode}}`.
+- `GameStarted`/`GameWon` принимают `{type, mode?}`; трекер определяет режим, если он не задан. Wire-форма — `{type, data: {mode}}`.
 
 Не считать награды из обещания в конфиге, когда уже есть серверный фактический доход. При лимите 5000 и изменении 4900 → 5000 награда 1000 даёт событие +100; повтор при 5000 → 5000 — ни одного доходного события.
 
@@ -100,3 +102,15 @@ DeckbuildPage.save_deck сохраняет снимок перед createUserDec
 Для deck.saved фронтовый processAchievementEvents и backend logic/decks.py вычисляют deck.summary из deck.cards. Сводка не отправляется отдельным источником истины: любое переданное summary при обработке заменяется. Поля: cards_count, by_color.Bronze/Silver/Gold, neutral_count, all_bronze/all_silver/all_gold, all_neutral, no_neutral. Лидер не учитывается. Фракция нейтральных карт — строка Neutral. Пустой состав не проходит ни один all_* или no_neutral; неизвестные цвета не проходят all_<color>, отсутствующая фракция не проходит no_neutral.
 
 Создание автоматически порождает одно deck.saved внутри трекера; patch_deck вызывает его напрямую после успеха. Снимок создаётся до запроса и сброса формы. Загрузка уже сохранённых колод не создаёт это событие. Повторное сохранение — новый факт; контракты с count/target 1 выдаются однократно. Счётчики по summary могут использовать обычные вложенные пути; для ровно 20 карт фильтр deck.summary.cards_count = 20.
+
+## Режимы и результаты боя
+
+AchievementGameMode: normal (обычные сезоны), random_n, random, multiplayer, arena. Это значения для контрактов; в leaderboard обычный режим по-прежнему называется season. `gameMode.ts` определяет режим по multiplayer-имени уровня, затем arena_mode, затем random_n/random, иначе normal. Имя multiplayer сохраняется после multi_reset, поэтому результат обоих участников относится к нужному режиму.
+
+ActionPlayed вызывается в двух общих обработчиках player_move. Считается один заряд карты/лидера; для контрактов только на карты нужен actor.color exists true. В мультиплеере каждый клиент вызывает обработчик для своей карты. Входящий GAME_STATE только обновляет поле, не воспроизводит attack и не создаёт событие карты напарника.
+
+GamePage после разрешённого перехода и start_game отправляет game.started (normal/random/random_n/arena). При отсутствии start_game_redirect делает return после перенаправления и не инициализирует бой. MultiplayerGamePage отправляет game.started отдельно на каждом клиенте после initAsHost/initFromStore; ожидание матчмейкинга не считается.
+
+WinPage/ArenaWinPage отправляют game.won после проверки и потребления одноразового win_redirect, до отдельных запросов статистики/наград. Оба участника кооператива переходят в WinPage с этим флагом: каждый отправляет свою победу. Нет запроса за другого пользователя и нет гарантированного начисления офлайн-напарнику. Арена: старт/победа относятся к отдельному бою, не к полному забегу.
+
+`mode` обязателен в backend action.played/game.started/game.won. Существующие вызовы ActionPlayed в компонентах не требуют дополнительных аргументов. Фильтр режима всегда задаётся конфигом; отсутствие mode-фильтра означает все режимы. Чтобы ограничить старые permanent action.played обычным режимом, выполнить normal-mode-card-contracts.sql. Он не меняет прогресс, даты наград и уже явно заданные mode-фильтры. Категории random_n/random/multiplayer/arena находятся в config-examples.json внутри permanent.categories; копировать нужно выбранные категории, а не весь файл поверх game_const. Эти файлы не применяются к БД автоматически.

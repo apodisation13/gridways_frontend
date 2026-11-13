@@ -38,11 +38,11 @@
 - `count`: +1 за подходящее событие.
 - `sum`: положительное конечное число из `counter.field`.
 - `unique`: строка или конечное число из `counter.field`, добавляем в `seen` только новое, `value = len(seen)`. Число 1 и строка "1" различаются. null, bool, объект, массив и отсутствующее поле не учитываются.
-- `current`: заменяем value текущим числом; пока нет подтверждения, он может уменьшаться. Только для `resources.checked` / `upgrades.checked`. Нулевое значение допустимо.
+- `current`: заменяем value текущим числом; пока нет подтверждения, он может уменьшаться. Только для `resources.checked` / `upgrades.checked` / `decks.checked`. Нулевое значение допустимо.
 
 Значение ограничено target; подтверждённые награды повторно не выдаются. Фронт не создаёт даты выполнения и не начисляет ресурсы самостоятельно. Порог локально достигнут — это ещё не подтверждённый контракт.
 
-`localUserAchievements` для UI = подтверждённый прогресс + replay in-flight/pending событий + живые снимки ресурсов/прокачек. Локально собранный unique не должен портить исходный `seen`. После ответа/ошибки preview пересчитывается.
+`localUserAchievements` для UI = подтверждённый прогресс + replay in-flight/pending событий + живые снимки ресурсов/прокачек/колод. Локально собранный unique не должен портить исходный `seen`. После ответа/ошибки preview пересчитывается.
 
 ## Очередь и HTTP
 
@@ -90,6 +90,7 @@ POST `/user-achievements/{user_id}`. Локальный UUID есть у `Achiev
 
 Подписка `installAchievementSync` ждёт мутации:
 
+- Колоды: set_decks, setUserAchievements, setAchievementsConfig.
 - Баланс: set_resource, setUserAchievements, setAchievementsConfig.
 - Прокачки: setUpgrades, setUserUpgrades, setUserAchievements, setAchievementsConfig.
 
