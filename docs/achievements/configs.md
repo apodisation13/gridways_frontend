@@ -86,3 +86,5 @@ mode = normal/random_n/random/multiplayer/arena. Для action.played добав
 ### Пассивные способности
 
 Категория passives содержит восемь примеров passive.triggered, count 10/50. Для карты: actor.color exists true + location hand/deck/grave. Для лидера: actor.color exists false (в игровом обработчике location hand). Примеры ограничены mode normal. Дополнительные фильтры actor.color/actor.data.damage/actor.passive_ability.name работают без новых счётчиков. Существующие контракты менять не нужно. Активация при таймере учитывается после запуска поддерживаемого обработчика; условные реакции и начало боя — только при подтверждении boolean от способности.
+
+Для пассивок начала боя: event passive.triggered, filters.location = passive_once. Примеры passive_once_10/30 лежат в категории passives и ограничены mode normal. Для обычных пассивок колоды остаётся location deck; начало боя больше в этот фильтр не попадает.

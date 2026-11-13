@@ -216,7 +216,11 @@ export interface AchievementBattle {
   leader_uses: number
 }
 
-export type AchievementPassiveLocation = "hand" | "deck" | "grave"
+export type AchievementPassiveLocation =
+  | "hand"
+  | "deck"
+  | "grave"
+  | "passive_once"
 
 export type AchievementEventInput =
   | {

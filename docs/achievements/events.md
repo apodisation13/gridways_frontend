@@ -6,7 +6,7 @@
 
 | type | data | Примеры |
 |---|---|---|
-| `passive.triggered` | `{actor: <полный Card или Leader>, mode, location}` | count активаций, location hand/deck/grave; лидер отличается отсутствием actor.color |
+| `passive.triggered` | `{actor: <полный Card или Leader>, mode, location}` | count активаций, location hand/deck/grave/passive_once; лидер отличается отсутствием actor.color |
 | `action.played` | `{actor: <полный Card или Leader>, mode}` | count зарядов, unique actor.id, фильтры actor.color/faction/type/data.damage |
 | `game.lost` | `{mode}` | факт поражения, в том числе reset для streak |
 | `game.started` | `{mode}` | count начатых боёв, начало локальной статистики |
@@ -147,8 +147,10 @@ PassiveTriggered принимает {type, actor, location}; трекер доб
 - player_move/passive_abilities/passives_dispatcher.run_passive: после allowActionTimer и вызова поддерживаемого обработчика. Допускается бесполезный эффект без цели; неизвестная/отсутствующая пассивка не считается.
 - leader_passive_abilities_upon_playing_a_card: boolean от конкретной условной способности; событие только при true. location hand, actor лидер. Много целей обрабатываются все; один вызов диспетчера даёт максимум одно событие.
 - passives_upon_playing_a_card: DamageWheneverLock возвращает true при выполненном условии перехода врага в locked и ненулевом значении эффекта; событие для каждой подходящей карты.
-- passives_upon_beginning: SetSelfAsDeckLen возвращает true при выполнении условия единственной нейтральной карты; location deck, снимок до изменения параметров.
+- passives_upon_beginning: SetSelfAsDeckLen возвращает true при выполнении условия единственной нейтральной карты; location passive_once, снимок до изменения параметров.
 
 Для условных способностей добавлено возвращаемое boolean без изменения условий/порядка применения эффектов. При неизвестной или неподходящей способности нет события. Тип run_passive остаётся прежним; расположение не переопределяется: согласно конфигу флаги зон взаимоисключающие. Лидер исторически проходит как hand. Поэтому контракт «карта в руке» обязательно фильтрует actor.color exists true, а контракт лидера — exists false. Вражеские пассивки не подключены. Мультиплеер использует локальные обработчики владельца; обновления состояния напарника сами событий не создают.
 
 Восемь примеров в категории passives: hand/grave/deck/leader по 10 и 50, mode normal. Сменить режим можно одним фильтром; исходный снимок позволяет фильтровать цвет, фракцию, урон и название способности. Текущая очередь не гарантирует доставку, как и для остальных фактов.
+
+Пассивки начала боя используют отдельную location passive_once (событие остаётся passive.triggered). Поэтому они больше не увеличивают контракты с location deck. В категории passives добавлены passive_once_10 и passive_once_30, mode normal. Одна успешно применённая пассивка одной карты — одно событие; это не счётчик начатых боёв. Ранее накопленный прогресс deck автоматически не пересчитывается.

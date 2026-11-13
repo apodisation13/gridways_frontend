@@ -1738,6 +1738,52 @@
                 "money": 1000
               }
             }
+          },
+          "passive_once_10": {
+            "id": "passive_once_10",
+            "title": "Активируйте пассивные способности начала боя 10 раз",
+            "ordering": 90,
+            "event": "passive.triggered",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "location": "passive_once",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "passive_once_30": {
+            "id": "passive_once_30",
+            "title": "Активируйте пассивные способности начала боя 30 раз",
+            "ordering": 100,
+            "event": "passive.triggered",
+            "target": 30,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "location": "passive_once",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
           }
         }
       }
