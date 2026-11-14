@@ -51,13 +51,17 @@
 </template>
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
+import { useToast } from "vue-toastification"
 
 import ResourceList from "@/components/ResourceList.vue"
+import { MAX_PINNED_ACHIEVEMENTS } from "@/store/modules/achievements"
 import type {
   AchievementDefinition,
   AchievementProgress,
   PinnedAchievement,
 } from "@/types"
+
+const toast = useToast()
 
 export default defineComponent({
   components: { ResourceList },
@@ -100,7 +104,20 @@ export default defineComponent({
   },
   methods: {
     togglePin(): void {
-      void this.$store.dispatch("togglePinnedAchievement", {
+      // Снять закрепление можно всегда. Ограничения проверяем только при добавлении.
+      if (!this.pinned) {
+        if (this.completed) return
+        if (
+          this.$store.state.achievements.pinnedAchievements.length >=
+          MAX_PINNED_ACHIEVEMENTS
+        ) {
+          toast.info(
+            `Можно закрепить не больше ${MAX_PINNED_ACHIEVEMENTS} заданий`
+          )
+          return
+        }
+      }
+      this.$store.commit("toggleAchievementPin", {
         section: "permanent",
         id: this.definition.id,
       })

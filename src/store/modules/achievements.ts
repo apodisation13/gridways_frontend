@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from "uuid"
-import { useToast } from "vue-toastification"
 import type { ActionContext } from "vuex"
 
 import { callApi, HttpMethod } from "@/lib/api/api"
@@ -63,6 +62,7 @@ const state: AchievementsState = {
   leader_uses: 0,
 }
 
+// Общий лимит для кнопки закрепления и отображения счётчика в игровом инвентаре.
 export const MAX_PINNED_ACHIEVEMENTS = 5
 
 function findPinnedDefinition(
@@ -74,20 +74,17 @@ function findPinnedDefinition(
     .find(definition => definition.id === pin.id)
 }
 
-function canKeepPin(state: AchievementsState, pin: PinnedAchievement): boolean {
-  const progress = state.userAchievements.permanent?.[pin.id]
-  return (
-    Boolean(findPinnedDefinition(state, pin)) &&
-    !progress?.completed_at &&
-    !progress?.reward_granted_at
-  )
-}
-
 function prunePins(state: AchievementsState) {
   // Только подтверждение бэка снимает закрепление. Локальные 10/10 ещё ждут ответа.
-  state.pinnedAchievements = state.pinnedAchievements.filter(pin =>
-    canKeepPin(state, pin)
-  )
+  // Исчезнувшие из конфига задания тоже убираем, даже если карточка не открыта.
+  state.pinnedAchievements = state.pinnedAchievements.filter(pin => {
+    const progress = state.userAchievements.permanent?.[pin.id]
+    return (
+      Boolean(findPinnedDefinition(state, pin)) &&
+      !progress?.completed_at &&
+      !progress?.reward_granted_at
+    )
+  })
 }
 
 const getters = {
@@ -168,10 +165,7 @@ const mutations = {
     )
     if (index >= 0) {
       state.pinnedAchievements.splice(index, 1)
-    } else if (
-      canKeepPin(state, pin) &&
-      state.pinnedAchievements.length < MAX_PINNED_ACHIEVEMENTS
-    ) {
+    } else {
       state.pinnedAchievements.push({ ...pin })
     }
   },
@@ -248,26 +242,8 @@ const mutations = {
 }
 
 const REQUEST_TIMEOUT_MS = 15_000
-const toast = useToast()
 
 const actions = {
-  togglePinnedAchievement(
-    { state, commit }: ActionContext<AchievementsState, RootState>,
-    pin: PinnedAchievement
-  ) {
-    const alreadyPinned = state.pinnedAchievements.some(
-      item => item.section === pin.section && item.id === pin.id
-    )
-    if (!alreadyPinned && !canKeepPin(state, pin)) return
-    if (
-      !alreadyPinned &&
-      state.pinnedAchievements.length >= MAX_PINNED_ACHIEVEMENTS
-    ) {
-      toast.info(`Можно закрепить не больше ${MAX_PINNED_ACHIEVEMENTS} заданий`)
-      return
-    }
-    commit("toggleAchievementPin", pin)
-  },
   // true означает «запрос был запущен», а не «бэк успешно сохранил события».
   // По этому результату планировщик понимает, стоит ли проверить новую очередь.
   async sendAchievementEvents({
