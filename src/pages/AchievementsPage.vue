@@ -352,8 +352,11 @@ summary {
   padding: 10px 4px;
   cursor: pointer;
   color: #facf5d;
+  font-size: 1rem;
+}
+
+summary > span:first-child {
   font-family: "Philosopher", serif;
-  font-size: 1.15rem;
 }
 
 .group-count {
