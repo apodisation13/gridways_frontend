@@ -19,7 +19,7 @@
 | `passive.triggered` | `{actor: <полный Card или Leader>, mode, location}` | count активаций, location hand/deck/grave/passive_once; лидер отличается отсутствием actor.color |
 | `action.played` | `{actor: <полный Card или Leader>, mode}` | count зарядов, unique actor.id, фильтры actor.color/faction/type/data.damage |
 | `game.lost` | `{mode}` | факт поражения, в том числе reset для streak |
-| `game.won` | `{mode, difficulty?, starting_deck?, leader_uses?}` | count побед, условия по исходному составу и применению лидера |
+| `game.won` | `{mode, difficulty?, starting_deck?, leader_uses?, enemy_grave?}` | count побед, условия по исходному составу и применению лидера |
 | `arena.upgrade.purchased` | `{upgrade_subtype, level}` | count успешных покупок прокачек арены |
 | `arena.level.reached` | `{level}` | count/target 1 с фильтром level gte N |
 | `inventory.restored` | `{item, mode}` | count восстановлений предмета кнопкой |
@@ -124,7 +124,7 @@ AchievementGameMode: normal (обычные сезоны), random_n, random, mul
 
 ActionPlayed вызывается в двух общих обработчиках player_move. Считается один заряд карты/лидера; для контрактов только на карты нужен actor.color exists true. В мультиплеере каждый клиент вызывает обработчик для своей карты. Входящий GAME_STATE только обновляет поле, не воспроизводит attack и не создаёт событие карты напарника.
 
-GamePage после разрешённого перехода и start_game вызывает startAchievementBattle: только локальный снимок для условий победы, без события или запроса на бэк. При отсутствии start_game_redirect делает return после перенаправления и не инициализирует бой. MultiplayerGamePage сохраняет такой же локальный снимок на каждом клиенте после initAsHost/initFromStore.
+Миксин GamePage/startgame.ts в начале start_game вызывает startAchievementBattle: только сброс leader_uses, без события или запроса на бэк. У мультиплеера отдельные initAsHost/initFromStore, в каждом вызывается тот же сброс.
 
 WinPage/ArenaWinPage отправляют game.won после проверки и потребления одноразового win_redirect, до отдельных запросов статистики/наград. Оба участника кооператива переходят в WinPage с этим флагом: каждый отправляет свою победу. Нет запроса за другого пользователя и нет гарантированного начисления офлайн-напарнику. Арена: старт/победа относятся к отдельному бою, не к полному забегу.
 
@@ -132,7 +132,7 @@ WinPage/ArenaWinPage отправляют game.won после проверки �
 
 ## Контракты арены и статистика боя
 
-AchievementsState.battle хранит mode, difficulty, независимые starting_deck.cards и starting_deck.leader, leader_uses. Прямой вызов startAchievementBattle из страницы игры заменяет снимок через battle.ts из game.current_deck; применённый лидер в ActionPlayed увеличивает leader_uses до постановки события в очередь. Возврат/изменение зарядов счётчик не уменьшает. На GameWon снимок копируется в событие и очищается. На LosePage и resetAchievementSession очищается; новый старт всегда заменяет предыдущий снимок, в том числе после выхода из боя. Если снимок отсутствует или режим не совпал, game.won не содержит starting_deck/leader_uses: отсутствие не считается нулём.
+AchievementsState хранит только leader_uses. startAchievementBattle обнуляет его при начале каждого боя; ActionPlayed без color увеличивает при применении лидера. Пассивки не увеличивают счётчик. Отдельной копии колоды/лидера/сложности и признака активного боя нет. При победе finishAchievementBattle берёт current_deck, текущего game.leader, level.difficulty и enemies_grave из игрового стора. Независимую копию создаёт трекер при постановке события в очередь. Формат API не изменён.
 
 Frontend preview и backend events.py пересчитывают starting_deck.summary общей функцией сводки состава, не доверяя переданному summary. Лидер исключён. Контракт без золотых требует непустой колоды и by_color.Gold = 0; только бронзовые — all_bronze = true. Три победы без лидера — count/target 3, leader_uses = 0, mode arena, не серия. Обычные game.won-контракты без этих фильтров работают как прежде. Бэк принимает исходный состав/счётчик от клиента, не симулирует бой.
 
@@ -144,11 +144,11 @@ ArenaUpgradesModal.doUpgrade отправляет arena.upgrade.purchased пос
 
 Каждое `game.won` также содержит `enemy_grave: {total, bronze, silver, gold}`. `finishAchievementBattle` считает текущий `game.enemies_grave` на момент победы, до очистки игрового состояния. Лидер туда не попадает и к total не прибавляется; повторяющиеся экземпляры считаются отдельно. Это состав кладбища, а не накопленная история убийств. Данные добавляются во всех режимах; backend принимает неотрицательные целые, поле необязательно для совместимости со старыми событиями. Вложенные фильтры и count обрабатываются обычным механизмом.
 
-При старте battle.ts копирует полного лидера из game.leader в starting_deck.leader и difficulty из game.level. На победе оба поля берутся из этого снимка, не из текущего изменяемого состояния. Фильтры: mode normal, starting_deck.leader.faction Soldiers, difficulty easy/normal/hard. Сводка starting_deck.summary по-прежнему считает только карты, не лидера. Без снимка дополнительные поля не подставляются. Backend GameWonData принимает необязательную difficulty (easy/normal/hard), лидер уже входит в произвольный словарь starting_deck.
+На победе battle.ts читает колоду из game.current_deck, лидера из game.leader и сложность из game.level. Игровые функции работают с отдельными копиями колоды; если лидер в сторе заменён, учитывается текущий. Фильтры остаются прежними: starting_deck.leader.faction, difficulty, starting_deck.summary и leader_uses.
 
 Категория normal демонстрирует фракцию лидера, сложность, отсутствие применения лидера и серию побед. Сложность normal и режим normal — разные поля. Повторное прохождение уровня считается новой победой; последовательность требуется только для streak.
 
-GameLost вызывается только из фактических веток поражения; принимает {type}, читает режим из battle и очищает его. Повторный вызов без battle ничего не отправляет. LosePage, выход и ожидание матча не создают события поражения. Для streak условия сброса задаются непустым массивом counter.reset отдельно от основного event задания. Достаточно совпадения одного элемента; повторяющиеся типы событий в индексе не дублируют обработку задания.
+GameLost вызывается только из фактических веток поражения; принимает {type}, читает режим из игрового стора (или явного mode). Проверки активного боя нет; повторное поражение тоже отправляется, повторный сброс нулевой серии безвреден. LosePage, выход и ожидание матча не создают события поражения. Для streak условия сброса задаются непустым массивом counter.reset отдельно от основного event задания. Достаточно совпадения одного элемента; повторяющиеся типы событий в индексе не дублируют обработку задания.
 
 ## Активации пассивных способностей
 

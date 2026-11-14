@@ -9,7 +9,7 @@ import type {
 } from "@/types"
 import { AchievementEventType } from "@/types"
 
-import { finishAchievementBattle, startAchievementBattle } from "./battle"
+import { finishAchievementBattle } from "./battle"
 import { checkCurrentDecks } from "./currentDecks"
 import { checkCurrentResources } from "./currentResources"
 import { checkCurrentUpgrades } from "./currentUpgrades"
@@ -81,28 +81,20 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     ]
   }
 
-  // Поражение относится к активному бою: режим берём из сохранённого battle.
-  // Закрываем его сразу, чтобы повторная проверка поражения не создала событие.
-  // GameLost может сбросить streak, но конкретные правила сброса заданы конфигом.
+  // Поражение сбрасывает серии согласно конфигу. Режим берём из игрового стора.
+  // Проверки «бой активен» нет: повторный сброс уже нулевой серии безвреден.
   if (input.type === AchievementEventType.GameLost) {
-    const battle = store.state.achievements.battle
-    if (!battle) return [] // Повторная проверка поражения не создаёт второй факт.
     const event: AchievementEvent = {
       id: uuidv4(),
       type: input.type,
-      data: { mode: battle.mode },
+      data: {
+        mode: input.mode ?? resolveAchievementGameMode(store.state.game),
+      },
     }
-    store.commit("clearAchievementBattle")
     store.commit("enqueueAchievementEvent", event)
     return [event.id]
   }
-  // До записи старта сохраняем исходную колоду/лидера/сложность и обнуляем
-  // число применений лидера. Здесь не выходим: сам GameStarted ещё надо записать.
-  if (input.type === AchievementEventType.GameStarted) {
-    startAchievementBattle(
-      input.mode ?? resolveAchievementGameMode(store.state.game)
-    )
-  }
+
   // Отсутствие color отличает лидера от карты. Только его сыгранный заряд
   // увеличивает статистику боя; PassiveTriggered сюда не попадает.
   if (
@@ -115,11 +107,9 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
 
   // Приводим разные входные формы к единому event.data:
   // - игра карты/лидера и пассивка: полный actor + mode, для пассивки ещё location;
-  // - победа: сохранённая статистика боя + текущий состав кладбища врагов;
-  //   finishAchievementBattle после чтения закрывает локальную статистику боя;
+  // - победа: колода/лидер/сложность из стора, счётчик применений лидера и кладбище;
   // - убийство/снятие защиты: полный enemy + mode, для брони ещё amount;
   // - готовый data: сохраняем как передан (ресурсы, колоды, инвентарь и т. д.);
-  // - оставшийся GameStarted: достаточно режима, явного или определённого из игры.
   // Делаем независимую копию со всеми вложенными полями: последующие изменения
   // карты, врага или стора не должны менять уже поставленное в очередь событие.
   // undefined, как и при обычной отправке JSON, не сохраняется в полях объекта.
@@ -146,12 +136,7 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
                   ? { amount: input.amount }
                   : {}),
               }
-            : "data" in input
-              ? input.data
-              : {
-                  mode:
-                    input.mode ?? resolveAchievementGameMode(store.state.game),
-                }
+            : input.data
     )
   )
 
