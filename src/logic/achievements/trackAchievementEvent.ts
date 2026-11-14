@@ -18,13 +18,21 @@ import { buildUpgradeSnapshot } from "./upgradeSnapshot"
 
 // Общая точка входа из игры: сообщаем, что произошло, без перечисления заданий.
 // Подсчёт выполняется отдельно, а отправку очереди организует syncAchievementEvents.
+// Сначала разбираем составные локальные сигналы, затем записываем готовые события.
+// Возвращаем локальные ID созданных событий (их может быть несколько или ни одного).
+// Это не список выполненных контрактов и не подтверждение обработки сервером.
 export function trackAchievementEvent(input: AchievementEventInput): string[] {
+  // Покупка прокачки: один вызов учитывает изменение ресурсов, саму покупку
+  // и новые значения для контрактов «накопите»/«прокачайте до ...».
+  // Сам UpgradeChanged в очередь не попадает — ниже будут отдельные события.
   if (input.type === AchievementEventType.UpgradeChanged) {
     return trackUpgradeChange(input.data)
   }
 
   // Некоторые награды возвращают только полный баланс, без суммы начисления.
   // Для них учитываем положительную разницу; уменьшения не считаем расходами.
+  // Это особая входная форма ResourceGained. Если уже передан resources,
+  // эта ветка не нужна: готовый фактический доход попадёт в общую очередь ниже.
   if (
     input.type === AchievementEventType.ResourceGained &&
     "before" in input.data
@@ -33,6 +41,7 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     const gained: Record<string, number> = {}
     for (const [resource, amount] of Object.entries(after)) {
       const previous = before[resource]
+      // Неизвестный старый баланс не считаем нулём — иначе запишем лишний доход.
       if (!Number.isFinite(amount) || !Number.isFinite(previous)) continue
       const received = amount - previous
       if (Number.isFinite(received) && received > 0) gained[resource] = received
@@ -43,16 +52,22 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     ]
   }
 
+  // Крафт/разбор карты или лидера: расходы/доходы по балансам + факт операции.
+  // actor и recipe сохраняются для фильтров по карте, фракции и способу крафта.
   if (input.type === AchievementEventType.ActorTransition) {
     return trackActorTransition(input.data)
   }
 
-  // сценарий перехода между ресурсами - крафт, милл итп
+  // Покупка/продажа/крафт/разбор ресурса: учитываем quantity, step и рецепт.
+  // Получатся расходы/доходы и ResourceTransformed для контрактов самой операции.
   if (input.type === AchievementEventType.ResourceTransition) {
     return trackResourceTransition(input.data)
   }
 
-  // любое изменение любого ресурса - как в плюс, так и минус
+  // Общее изменение баланса, когда отдельного факта покупки/крафта не требуется.
+  // Разделяем словарь на расход и доход; subtype/item сохраняем для фильтров.
+  // Затем проверяем текущий баланс: «заработайте за всё время» и «имейте сейчас»
+  // — разные контракты, поэтому одного ResourceGained для обоих недостаточно.
   if (input.type === AchievementEventType.ResourcesChanged) {
     const { spent, gained } = getResourceChanges(input.data)
     return [
@@ -66,6 +81,9 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     ]
   }
 
+  // Поражение относится к активному бою: режим берём из сохранённого battle.
+  // Закрываем его сразу, чтобы повторная проверка поражения не создала событие.
+  // GameLost может сбросить streak, но конкретные правила сброса заданы конфигом.
   if (input.type === AchievementEventType.GameLost) {
     const battle = store.state.achievements.battle
     if (!battle) return [] // Повторная проверка поражения не создаёт второй факт.
@@ -78,11 +96,15 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     store.commit("enqueueAchievementEvent", event)
     return [event.id]
   }
+  // До записи старта сохраняем исходную колоду/лидера/сложность и обнуляем
+  // число применений лидера. Здесь не выходим: сам GameStarted ещё надо записать.
   if (input.type === AchievementEventType.GameStarted) {
     startAchievementBattle(
       input.mode ?? resolveAchievementGameMode(store.state.game)
     )
   }
+  // Отсутствие color отличает лидера от карты. Только его сыгранный заряд
+  // увеличивает статистику боя; PassiveTriggered сюда не попадает.
   if (
     input.type === AchievementEventType.ActionPlayed &&
     !("color" in input.actor)
@@ -91,8 +113,15 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     store.commit("recordAchievementLeaderUse")
   }
 
-  // Снимок всех полей КАРТЫ ИЛИ ЛИДЕРА, включая вложенные объекты и массивы.
-  // Более поздние изменения игровой карты не должны менять уже записанное событие.
+  // Приводим разные входные формы к единому event.data:
+  // - игра карты/лидера и пассивка: полный actor + mode, для пассивки ещё location;
+  // - победа: сохранённая статистика боя + текущий состав кладбища врагов;
+  //   finishAchievementBattle после чтения закрывает локальную статистику боя;
+  // - убийство/снятие защиты: полный enemy + mode, для брони ещё amount;
+  // - готовый data: сохраняем как передан (ресурсы, колоды, инвентарь и т. д.);
+  // - оставшийся GameStarted: достаточно режима, явного или определённого из игры.
+  // Делаем независимую копию со всеми вложенными полями: последующие изменения
+  // карты, врага или стора не должны менять уже поставленное в очередь событие.
   // undefined, как и при обычной отправке JSON, не сохраняется в полях объекта.
   const data: AchievementEvent["data"] = JSON.parse(
     JSON.stringify(
@@ -128,10 +157,15 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
 
   const event: AchievementEvent = { id: uuidv4(), type: input.type, data }
 
+  // Здесь только очередь и локальный предварительный прогресс. HTTP-запросом
+  // занимается синхронизация; награду подтверждает и начисляет только бэк.
   store.commit("enqueueAchievementEvent", event)
 
   if (input.type === AchievementEventType.DeckCreated) {
     // Создание также является сохранением состава, но это разные контракты.
+    // DeckCreated считает факт создания, DeckSaved проверяет состав, а
+    // checkCurrentDecks — сколько колод теперь хранится у пользователя.
+    // Повторный вход конечен: у DeckSaved нет этой ветки с дополнительным событием.
     const savedIds = trackAchievementEvent({
       type: AchievementEventType.DeckSaved,
       data: input.data,
@@ -139,6 +173,8 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     return [event.id, ...savedIds, ...checkCurrentDecks()]
   }
   if (input.type === AchievementEventType.DeckDeleted) {
+    // Удаление уже записано. Дополнительно обновляем current по числу колод,
+    // чтобы предварительный прогресс незавершённых контрактов мог уменьшиться.
     return [event.id, ...checkCurrentDecks()]
   }
   return [event.id]
@@ -155,6 +191,8 @@ function trackUpgradeChange(
   const ids = trackResourceChanges(getResourceChanges({ before, after }))
   const snapshot = buildUpgradeSnapshot(store.getters.upgradesConfig, upgrades)
   const purchased = snapshot.upgrades[upgrade_type]?.[upgrade_subtype]
+  // Если параметр не найден в снимке, не придумываем уровень покупки.
+  // Изменения ресурсов и проверки текущего состояния всё равно учитываются.
   if (purchased) {
     ids.push(
       ...trackAchievementEvent({
@@ -195,6 +233,9 @@ function trackResourceTransition(
   >["data"]
 ): string[] {
   const { resource, action, quantity, step, recipe, before, after } = data
+  // quantity — число операций, step — количество предметов за одну операцию.
+  // Например, 10 покупок по 100 scraps дают amount = 1000, а не 10.
+  // Некорректные входные данные не должны создавать события с выдуманной суммой.
   if (
     !Number.isFinite(step) ||
     step <= 0 ||
@@ -203,6 +244,7 @@ function trackResourceTransition(
   )
     return []
   const increase = action === "buy" || action === "craft"
+  // Сам предмет прибавляется при покупке/крафте и убывает при продаже/разборе.
   if (!increase && action !== "sell" && action !== "mill") return []
   const transformedAmount = quantity * step
   if (!Number.isFinite(transformedAmount)) return []
@@ -259,6 +301,8 @@ function getResourceChanges({
         ])
     )
   for (const [resource, amount] of Object.entries(changes)) {
+    // Нули игнорируем. Расход из переданной операции переводим в положительное
+    // число; доход ниже дополнительно ограничиваем фактическим изменением баланса.
     if (!Number.isFinite(amount)) continue
     if (amount < 0) spent[resource] = -amount
     else if (amount > 0) {
@@ -297,6 +341,7 @@ function trackResourceChanges({
   // Вызывающий код передаёт весь словарь. Разделение нужно только здесь.
   // Пустые события не создаём; исходный словарь не изменяем.
   const ids: string[] = []
+  // Одно событие содержит сразу все потраченные ресурсы, не по событию на ресурс.
   if (Object.keys(spent).length) {
     ids.push(
       ...trackAchievementEvent({
@@ -306,6 +351,8 @@ function trackResourceChanges({
     )
   }
   if (Object.keys(gained).length) {
+    // Доход идёт отдельным типом, поэтому одно изменение может продвинуть
+    // одновременно контракты на расход одного ресурса и получение другого.
     ids.push(
       ...trackAchievementEvent({
         type: AchievementEventType.ResourceGained,

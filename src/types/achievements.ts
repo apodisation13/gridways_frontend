@@ -20,47 +20,88 @@ export enum AchievementGameMode {
 }
 
 export enum AchievementEventType {
-  // любая сыгранная карта или лидер в любом режиме
-  ActionPlayed = "action.played",
-  PassiveTriggered = "passive.triggered",
-  EnemyKilled = "enemy.killed",
-  EnemyShieldRemoved = "enemy.shield_removed",
-  EnemyArmorRemoved = "enemy.armor_removed",
+  // Бой. События содержат mode; нужные режимы выбирает фильтр контракта.
+  // После начала боя: сохраняем исходную колоду и начинаем учитывать заряды лидера.
   GameStarted = "game.started",
+  // При победе: исходная колода, сложность, применения лидера и состав кладбища врагов.
   GameWon = "game.won",
+  // При фактическом поражении. Выход из игры сам по себе не считается поражением.
   GameLost = "game.lost",
-  ActorTransition = "actor.transition", // Локальный сигнал с балансами до/после.
-  ActorTransformed = "actor.transformed",
-  UpgradeChanged = "upgrade.changed", // Локальный сигнал после покупки.
-  UpgradePurchased = "upgrade.purchased",
-  UpgradesChecked = "upgrades.checked",
 
-  // общий ивент об изменении ресурсов - потом он преобразуется в один из двух ниже
-  ResourcesChanged = "resources.changed",
-  // Обмен превращается в расходы, доходы и факт операции с ресурсом.
-  ResourceTransition = "resource.transition",
-  // --------------- настоящие которые отправляются ---------------
+  // Карты и лидеры в бою. actor — полный снимок владельца действия/пассивки.
+  // Один применённый заряд, независимо от количества целей способности.
+  ActionPlayed = "action.played",
+  // Активация пассивки с указанием зоны. run_passive учитывает разрешённый вызов
+  // обработчика; реакции на игру карты и начало боя — только подтверждённый эффект.
+  PassiveTriggered = "passive.triggered",
+
+  // Враги. Снимок enemy берём до очистки статусов и восстановления параметров.
+  // Убийство/уничтожение врага или лидера, включая уничтожение в колоде.
+  EnemyKilled = "enemy.killed",
+  // Снятие существующего щита любым подключённым способом, не только ударом.
+  EnemyShieldRemoved = "enemy.shield_removed",
+  // Снятие брони у одного врага: count считает факт, sum по amount — единицы брони.
+  EnemyArmorRemoved = "enemy.armor_removed",
+
+  // Ресурсы. В расходах и доходах количества всегда положительные.
+  // Фактическое списание: ресурсы уже потрачены, событие повторно их не списывает.
   ResourceSpent = "resource.spent",
+  // Фактически полученные ресурсы с учётом лимитов, а не обещанная награда.
   ResourceGained = "resource.gained",
+  // Успешный buy/sell/craft/mill ресурса: предмет, количество, расход и доход операции.
   ResourceTransformed = "resource.transformed",
-
-  // любое открытие ключа, бочек или коробки
+  // Успешное открытие keys/kegs/big_kegs/chests; отдельно от списания и выдачи награды.
   ResourceOpened = "resource.opened",
-  // Фактический результат применения предмета, отдельно от его списания.
+
+  // Инвентарь в бою, включая арену.
+  // Применение предмета и его результат (например, реально взятые карты).
   InventoryUsed = "inventory.used",
+  // Восстановление предмета кнопкой в арене, не покупка прокачки восстановления.
   InventoryRestored = "inventory.restored",
+
+  // Создание/разбор карт и лидеров, а не ресурсов из BonusPage.
+  // Успешный craft/mill: снимок actor, рецепт и фактические расходы/доходы.
+  ActorTransformed = "actor.transformed",
+
+  // Прокачки пользователя и отдельные события арены.
+  // Успешная покупка обычной прокачки: тип, подтип и достигнутая ступень/значение.
+  UpgradePurchased = "upgrade.purchased",
+  // Успешная покупка прокачки внутри арены.
   ArenaUpgradePurchased = "arena.upgrade.purchased",
+  // Переход на следующий уровень арены после победы: передаём достигнутый номер.
   ArenaLevelReached = "arena.level.reached",
+
+  // Пользовательские колоды. События создаются после успешной операции.
+  // Новая колода; трекер также создаёт DeckSaved для проверки её состава.
   DeckCreated = "deck.created",
+  // Состав колоды после создания или редактирования, но не при обычной загрузке.
   DeckSaved = "deck.saved",
+  // Удаление колоды; передаём снимок удалённой колоды.
   DeckDeleted = "deck.deleted",
+
+  // Проверки текущего состояния (counter.current), а не факты заработка/покупки.
+  // Вызываются при загрузке данных и после соответствующих изменений.
+  // На бэк уходят с пустым data: сервер сам читает актуальные значения из БД.
+  // Текущий баланс: например, «накопите 40000 денег».
+  ResourcesChecked = "resources.checked",
+  // Текущие уровни/значения прокачек и сводки «всё на максимум».
+  UpgradesChecked = "upgrades.checked",
+  // Число хранящихся колод, включая базовую.
   DecksChecked = "decks.checked",
 
-  // проверка ресурсов на накопление типа накопите 40000 денег
-  ResourcesChecked = "resources.checked",
+  // Только локальные входы мастер-функции. Их нельзя указывать в event контракта:
+  // трекер преобразует их в события выше; эти четыре типа в API не отправляются.
+  // Изменение ресурсов со знаками и/или балансами до/после → расход, доход, current.
+  ResourcesChanged = "resources.changed",
+  // Обмен ресурса с рецептом, quantity и step → расходы/доходы + ResourceTransformed.
+  ResourceTransition = "resource.transition",
+  // Крафт/разбор карты или лидера с балансами до/после → ресурсы + ActorTransformed.
+  ActorTransition = "actor.transition",
+  // Покупка прокачки с ответом сервера → ресурсы + UpgradePurchased + current.
+  UpgradeChanged = "upgrade.changed",
 }
 
-// Изменение со знаками — только входной сигнал. В очередь идут отдельные факты.
+// Типы для очереди, API и event в конфиге: без четырёх локальных входов выше.
 export type AchievementRecordedEventType = Exclude<
   AchievementEventType,
   | AchievementEventType.ResourcesChanged
