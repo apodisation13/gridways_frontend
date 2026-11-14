@@ -27,8 +27,6 @@ import type {
 import type { UpgradesConfig, UserUpgrades } from "@/types/upgrades"
 
 export interface AchievementsState {
-  // Применения лидера в текущем бою; обнуляем при запуске следующего.
-  leader_uses: number
   // Описания заданий: условия, цели, награды. Permanent приходит из game_const.
   achievementsConfig: AchievementCatalog
   // Только подтверждённый бэком прогресс. Локальные ходы сюда не прибавляем.
@@ -45,10 +43,11 @@ export interface AchievementsState {
   session: number
   // Только память приложения: после перезагрузки или выхода список пустой.
   pinnedAchievements: PinnedAchievement[]
+  // Применения лидера в текущем бою; обнуляем при запуске следующего.
+  leader_uses: number
 }
 
 const state: AchievementsState = {
-  leader_uses: 0,
   achievementsConfig: {
     permanent: { title: "Постоянные", categories: {} },
     daily: null,
@@ -61,6 +60,7 @@ const state: AchievementsState = {
   sending: false,
   session: 0,
   pinnedAchievements: [],
+  leader_uses: 0,
 }
 
 export const MAX_PINNED_ACHIEVEMENTS = 5
