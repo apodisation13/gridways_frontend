@@ -3,7 +3,6 @@ import type {
   Enemy,
   EnemyLeader,
   Leader,
-  LevelDifficulty,
   UserResources,
 } from "./database"
 import type { InventoryItem } from "./inventory"
@@ -21,8 +20,6 @@ export enum AchievementGameMode {
 
 export enum AchievementEventType {
   // Бой. События содержат mode; нужные режимы выбирает фильтр контракта.
-  // После начала боя: сохраняем исходную колоду и начинаем учитывать заряды лидера.
-  GameStarted = "game.started",
   // При победе: исходная колода, сложность, применения лидера и состав кладбища врагов.
   GameWon = "game.won",
   // При фактическом поражении. Выход из игры сам по себе не считается поражением.
@@ -275,14 +272,6 @@ export interface AchievementUpgradeSnapshot {
   summary: Record<string, AchievementUpgradeSummary>
 }
 
-// Только текущий бой; не часть сохраняемого пользовательского прогресса.
-export interface AchievementBattle {
-  mode: AchievementGameMode
-  difficulty?: LevelDifficulty
-  starting_deck: Record<string, AchievementEventValue>
-  leader_uses: number
-}
-
 export type AchievementPassiveLocation =
   | "hand"
   | "deck"
@@ -315,13 +304,8 @@ export type AchievementEventInput =
       type: AchievementEventType.InventoryRestored
       data: { item: InventoryItem; mode: AchievementGameMode }
     }
-  | {
-      type:
-        | AchievementEventType.GameStarted
-        | AchievementEventType.GameWon
-        | AchievementEventType.GameLost
-      mode?: AchievementGameMode
-    }
+  | { type: AchievementEventType.GameWon; mode?: AchievementGameMode }
+  | { type: AchievementEventType.GameLost; mode?: AchievementGameMode }
   | { type: AchievementEventType.DecksChecked; data: Record<string, never> }
   | {
       type:
