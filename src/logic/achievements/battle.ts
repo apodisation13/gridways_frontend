@@ -1,13 +1,15 @@
 import store from "@/store"
-import type { AchievementGameMode } from "@/types"
 import { CardColor } from "@/types/game"
+
+import { resolveAchievementGameMode } from "./gameMode"
 
 export function startAchievementBattle(): void {
   // Только счётчик применений лидера. Данные игры уже хранятся в игровом сторе.
   store.commit("startAchievementBattle")
 }
 
-export function finishAchievementBattle(mode: AchievementGameMode) {
+export function finishAchievementBattle() {
+  const mode = resolveAchievementGameMode()
   // Состав кладбища именно на победе: это не история всех убийств за бой.
   // Лидеры в кладбище не попадают. Ничего не добавляем к его размеру.
   const grave = store.state.game.enemies_grave

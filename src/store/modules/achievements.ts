@@ -61,9 +61,6 @@ const state: AchievementsState = {
   leader_uses: 0,
 }
 
-// Общий лимит для кнопки закрепления и отображения счётчика в игровом инвентаре.
-export const MAX_PINNED_ACHIEVEMENTS = 5
-
 // В закреплении хранятся только section и id. Описание находим в категориях конфига.
 // Один поиск используется и для показа карточки, и для удаления исчезнувших заданий.
 function findPinnedDefinition(

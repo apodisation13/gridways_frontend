@@ -118,7 +118,7 @@ import PinnedAchievementsModal from "@/components/Pages/AchievementsPage/PinnedA
 import ResourceDescriptionModal from "@/components/Pages/BonusPage/ResourceDescriptionModal.vue"
 import InventoryItemTile from "@/components/Pages/InventoryPage/InventoryItemTile.vue"
 import ButtonCloseImg from "@/components/UI/Buttons/ButtonCloseImg.vue"
-import { MAX_PINNED_ACHIEVEMENTS } from "@/store/modules/achievements"
+import { MAX_PINNED_ACHIEVEMENTS } from "@/logic/achievements/constants"
 import { InventoryItem, type ResourceActions } from "@/types"
 
 export default defineComponent({

@@ -304,7 +304,7 @@ export type AchievementEventInput =
       type: AchievementEventType.InventoryRestored
       data: { item: InventoryItem; mode: AchievementGameMode }
     }
-  | { type: AchievementEventType.GameWon; mode?: AchievementGameMode }
+  | { type: AchievementEventType.GameWon }
   | { type: AchievementEventType.GameLost; mode?: AchievementGameMode }
   | { type: AchievementEventType.DecksChecked; data: Record<string, never> }
   | {

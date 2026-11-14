@@ -54,7 +54,7 @@ import { defineComponent, type PropType } from "vue"
 import { useToast } from "vue-toastification"
 
 import ResourceList from "@/components/ResourceList.vue"
-import { MAX_PINNED_ACHIEVEMENTS } from "@/store/modules/achievements"
+import { MAX_PINNED_ACHIEVEMENTS } from "@/logic/achievements/constants"
 import type {
   AchievementDefinition,
   AchievementProgress,

@@ -128,7 +128,7 @@ export default defineComponent({
       const value = this.inventoryItemValues[item] ?? 0
       const randomEffectsValue =
         getters["inventoryEffectValues"].random_effects_value ?? 0
-      const mode = resolveAchievementGameMode(this.$store.state.game)
+      const mode = resolveAchievementGameMode()
       const result: { cards_drawn?: number } = {}
       this.inventoryBusy = true
       try {

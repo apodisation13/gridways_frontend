@@ -44,7 +44,7 @@
 import { defineComponent } from "vue"
 
 import AchievementCard from "@/components/Pages/AchievementsPage/AchievementCard.vue"
-import { MAX_PINNED_ACHIEVEMENTS } from "@/store/modules/achievements"
+import { MAX_PINNED_ACHIEVEMENTS } from "@/logic/achievements/constants"
 import type {
   AchievementDefinition,
   PinnedAchievement,

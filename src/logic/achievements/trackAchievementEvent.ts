@@ -88,7 +88,7 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
       id: uuidv4(),
       type: input.type,
       data: {
-        mode: input.mode ?? resolveAchievementGameMode(store.state.game),
+        mode: input.mode ?? resolveAchievementGameMode(),
       },
     }
     store.commit("enqueueAchievementEvent", event)
@@ -113,32 +113,36 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
   // Делаем независимую копию со всеми вложенными полями: последующие изменения
   // карты, врага или стора не должны менять уже поставленное в очередь событие.
   // undefined, как и при обычной отправке JSON, не сохраняется в полях объекта.
-  const data: AchievementEvent["data"] = JSON.parse(
-    JSON.stringify(
-      input.type === AchievementEventType.ActionPlayed ||
-        input.type === AchievementEventType.PassiveTriggered
-        ? {
-            actor: input.actor,
-            ...(input.type === AchievementEventType.PassiveTriggered
-              ? { location: input.location }
-              : {}),
-            mode: resolveAchievementGameMode(store.state.game),
-          }
-        : input.type === AchievementEventType.GameWon
-          ? finishAchievementBattle(
-              input.mode ?? resolveAchievementGameMode(store.state.game)
-            )
-          : "enemy" in input
-            ? {
-                enemy: input.enemy,
-                mode: resolveAchievementGameMode(store.state.game),
-                ...(input.type === AchievementEventType.EnemyArmorRemoved
-                  ? { amount: input.amount }
-                  : {}),
-              }
-            : input.data
-    )
-  )
+  let eventData: object
+  if (input.type === AchievementEventType.ActionPlayed) {
+    eventData = {
+      actor: input.actor,
+      mode: resolveAchievementGameMode(),
+    }
+  } else if (input.type === AchievementEventType.PassiveTriggered) {
+    eventData = {
+      actor: input.actor,
+      mode: resolveAchievementGameMode(),
+      location: input.location,
+    }
+  } else if (input.type === AchievementEventType.GameWon) {
+    eventData = finishAchievementBattle()
+  } else if (input.type === AchievementEventType.EnemyArmorRemoved) {
+    eventData = {
+      enemy: input.enemy,
+      mode: resolveAchievementGameMode(),
+      amount: input.amount,
+    }
+  } else if ("enemy" in input) {
+    eventData = {
+      enemy: input.enemy,
+      mode: resolveAchievementGameMode(),
+    }
+  } else {
+    eventData = input.data
+  }
+
+  const data: AchievementEvent["data"] = JSON.parse(JSON.stringify(eventData))
 
   const event: AchievementEvent = { id: uuidv4(), type: input.type, data }
 

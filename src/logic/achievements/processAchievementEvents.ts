@@ -62,6 +62,8 @@ export function processAchievementEvents(
     }
 
     if (event.type === AchievementEventType.GameWon) {
+      // Колода из события победы: по её картам считаем summary (размер, цвета,
+      // «все бронзовые» и т. п.) для фильтров контрактов на состав победившей колоды.
       const deck = data.starting_deck
       if (deck && typeof deck === "object" && !Array.isArray(deck)) {
         data = {
