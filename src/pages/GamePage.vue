@@ -171,7 +171,6 @@ import RedrawComp from "@/components/Pages/GamePage/RedrawComp.vue"
 import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbilities.vue"
 import UseInventory from "@/components/Pages/GamePage/UseInventory.vue"
 import frontendLogContext from "@/lib/frontend-logs/context"
-import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import {
   damage_ai_card,
   damage_ai_card_multi,
@@ -183,7 +182,6 @@ import fieldinteraction from "@/mixins/GamePage/fieldinteraction"
 import specialcaseabilities from "@/mixins/GamePage/specialcaseabilities"
 import startgame from "@/mixins/GamePage/startgame"
 import useInventory from "@/mixins/GamePage/useInventory"
-import { AchievementEventType } from "@/types"
 import {
   Card,
   Enemy,
@@ -305,7 +303,6 @@ export default defineComponent({
     }
     this.$store.commit("set_start_game_redirect", false)
     this.start_game() // в МИКСИНЕ теперь
-    trackAchievementEvent({ type: AchievementEventType.GameStarted })
   },
 
   methods: {

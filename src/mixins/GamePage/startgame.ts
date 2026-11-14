@@ -1,6 +1,7 @@
 import { defineComponent } from "vue"
 
 import { copyObj } from "@/lib/utils"
+import { startAchievementBattle } from "@/logic/achievements/battle"
 import { enemy_leader_ai_move_once } from "@/logic/ai_move/ai_leader_move_once"
 import { draw_hand } from "@/logic/game_logic/draw_hand"
 import { place_enemies } from "@/logic/game_logic/place_enemies"
@@ -12,6 +13,7 @@ export default defineComponent({
     // НАЧАЛО ИГРЫ: копируем лидера, лидера врагов, врагов, колоду
     // расставляем врагов, пассивка лидера врагов по началу, тянем руку и показываем окно редро
     start_game(): void {
+      startAchievementBattle()
       // оставили только card, нам уже не нужны id записей UserCard
       const deck: Card[] = this.$store.state.game.current_deck.map(
         (c: { card: Card }) => c.card
