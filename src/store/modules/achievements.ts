@@ -18,7 +18,6 @@ import type {
   AchievementEventsRequest,
   AchievementEventsResponse,
   AchievementGameConfig,
-  AchievementPreview,
   AchievementRewardNotification,
   PinnedAchievement,
   UserAchievementsProgress,
@@ -65,6 +64,8 @@ const state: AchievementsState = {
 // Общий лимит для кнопки закрепления и отображения счётчика в игровом инвентаре.
 export const MAX_PINNED_ACHIEVEMENTS = 5
 
+// В закреплении хранятся только section и id. Описание находим в категориях конфига.
+// Один поиск используется и для показа карточки, и для удаления исчезнувших заданий.
 function findPinnedDefinition(
   state: AchievementsState,
   pin: PinnedAchievement
@@ -88,14 +89,18 @@ function prunePins(state: AchievementsState) {
 }
 
 const getters = {
+  // Подготавливаем карточки для модалки в игре: к каждому закреплению добавляем
+  // актуальное описание. Если задания уже нет в конфиге, карточку не показываем.
   pinnedAchievementEntries: (state: AchievementsState) =>
     state.pinnedAchievements.flatMap(pin => {
       const definition = findPinnedDefinition(state, pin)
       return definition ? [{ ...pin, definition }] : []
     }),
+
   // Заново считаем от данных бэка + событий, ещё не подтверждённых ответом.
   // Поэтому повторный вызов getter не прибавляет один и тот же ход ещё раз.
-  achievementPreview: (
+  // Этот прогресс используют страница достижений и модалка закреплённых.
+  localUserAchievements: (
     state: AchievementsState,
     getters: {
       resource: Record<string, number>
@@ -103,12 +108,17 @@ const getters = {
       userUpgrades: UserUpgrades
       all_decks: unknown[]
     }
-  ): AchievementPreview => {
+  ): UserAchievementsProgress => {
+    // Сначала применяем события в порядке возникновения: отправленные раньше новых.
+    // Пока ответ не пришёл, inFlightEvents тоже нужны для отображения прогресса.
     const preview = processAchievementEvents(
       state.achievementsConfig.permanent,
       state.userAchievements,
       [...state.inFlightEvents, ...state.pendingEvents]
     )
+    // Затем уточняем контракты «имейте сейчас» по живому состоянию стора.
+    // Передаём результат дальше по цепочке, чтобы сохранить расчёт остальных заданий.
+    // Эти функции не отправляют запросы, не начисляют награды и не меняют userAchievements.
     const current = previewCurrentResources(
       state.achievementsConfig.permanent,
       preview.progress,
@@ -125,40 +135,31 @@ const getters = {
       upgrades.progress,
       getters.all_decks.length
     )
-    return {
-      progress: decks.progress,
-      reachedAchievementIds: [
-        ...new Set([
-          ...preview.reachedAchievementIds,
-          ...current.reachedAchievementIds,
-          ...upgrades.reachedAchievementIds,
-          ...decks.reachedAchievementIds,
-        ]),
-      ],
-    }
+    return decks.progress
   },
 
-  // Именно этот прогресс показывает страница: ход виден сразу, до ответа бэка.
-  localUserAchievements: (
-    _state: AchievementsState,
-    getters: { achievementPreview: AchievementPreview }
-  ): UserAchievementsProgress => getters.achievementPreview.progress,
-
+  // Каталог для страницы: названия, категории, условия и награды, без прогресса игрока.
   achievementsConfig: (state: AchievementsState) => state.achievementsConfig,
 }
 
 const mutations = {
+  // Новый бой: начинаем считать применения лидера с нуля. Событие старта не создаём.
   startAchievementBattle(state: AchievementsState) {
     state.leader_uses = 0
   },
+  // Один сыгранный заряд лидера. Нужно для условия победы «не используйте лидера».
+  // Пассивки и восстановление зарядов этот счётчик не меняют.
   recordAchievementLeaderUse(state: AchievementsState) {
     state.leader_uses += 1
   },
+  // Тост закрыт: удаляем только уведомление, не награду и не прогресс контракта.
   dismissAchievementReward(state: AchievementsState, notificationId: string) {
     state.grantedRewards = state.grantedRewards.filter(
       reward => reward.notification_id !== notificationId
     )
   },
+  // Переключаем закрепление. Лимит и выполнение уже проверила кнопка в карточке.
+  // Здесь только список: существующую запись удаляем, отсутствующую добавляем.
   toggleAchievementPin(state: AchievementsState, pin: PinnedAchievement) {
     const index = state.pinnedAchievements.findIndex(
       item => item.section === pin.section && item.id === pin.id
@@ -169,14 +170,18 @@ const mutations = {
       state.pinnedAchievements.push({ ...pin })
     }
   },
+  // Занимаем/освобождаем отправку: одновременно выполняется только один запрос.
   setAchievementSending(state: AchievementsState, sending: boolean) {
     state.sending = sending
   },
+  // Отделяем выбранную пачку от событий, которые придут во время ожидания ответа.
   startAchievementBatch(state: AchievementsState) {
     // Забираем всю очередь. Следующие ходы будут копиться уже в новой очереди.
     state.inFlightEvents = state.pendingEvents
     state.pendingEvents = []
   },
+  // Успешный ответ: применяем подтверждённый прогресс и готовим уведомления о наградах.
+  // Баланс ресурсов обновляется отдельно в экшене, после этой мутации.
   finishAchievementBatch(
     state: AchievementsState,
     response: AchievementEventsResponse
@@ -186,6 +191,8 @@ const mutations = {
     state.userAchievements = response.user_achievements
     prunePins(state)
     state.inFlightEvents = []
+    // Название берём из конфига, а суммы — из ответа: лимиты могли уменьшить награду.
+    // У каждого тоста свой ID, чтобы закрытие одного не удаляло другие уведомления.
     for (const reward of response.granted_rewards) {
       const section = state.achievementsConfig[reward.period_type]
       const definition = Object.values(section?.categories ?? {})
@@ -199,11 +206,14 @@ const mutations = {
       })
     }
   },
+  // Запрос закончился ошибкой: забываем его пачку согласно принятому правилу без повтора.
   discardAchievementBatch(state: AchievementsState) {
     // При ошибке теряем только отправленную пачку. Новые события остаются.
     // Предварительный прогресс на странице после этого может уменьшиться.
     state.inFlightEvents = []
   },
+  // Смена пользователя/выход: очищаем его временные данные и меняем номер сессии.
+  // Сам запрос это не отменяет; экшен по номеру сессии отбрасывает его поздний ответ.
   resetAchievementSession(state: AchievementsState) {
     // При входе/выходе не переносим прогресс и очередь между пользователями.
     state.session += 1
@@ -213,16 +223,19 @@ const mutations = {
     state.pendingEvents = []
     state.inFlightEvents = []
     state.grantedRewards = []
+    // Permanent — общий каталог игры, его сохраняем. Выбранные daily/weekly
+    // пока не реализованы; место под их данные очищаем вместе с сессией.
     state.achievementsConfig.daily = null
     state.achievementsConfig.weekly = null
     // sending снимет сам выполняющийся запрос в finally, когда завершится.
   },
+  // Добавляем подготовленное трекером событие. Подписка syncAchievementEvents
+  // решит, отправить сразу или дождаться таймера; сама мутация запрос не делает.
   enqueueAchievementEvent(state: AchievementsState, event: AchievementEvent) {
-    // Это защита от повторного добавления того же ID в локальную очередь.
-    if (!state.pendingEvents.some(pending => pending.id === event.id)) {
-      state.pendingEvents.push(event)
-    }
+    // Трекер создаёт новое событие с новым UUID перед каждым добавлением.
+    state.pendingEvents.push(event)
   },
+  // Пришёл каталог из game_const: заменяем описания и чистим устаревшие закрепления.
   setAchievementsConfig(
     state: AchievementsState,
     catalog: AchievementGameConfig
@@ -231,6 +244,8 @@ const mutations = {
     state.achievementsConfig.permanent = catalog.permanent
     prunePins(state)
   },
+  // Начальная загрузка подтверждённого прогресса; здесь не прибавляем локальные события.
+  // Для их отображения есть localUserAchievements, который считает поверх этих данных.
   setUserAchievements(
     state: AchievementsState,
     progress: UserAchievementsProgress
@@ -241,9 +256,11 @@ const mutations = {
   },
 }
 
+// Ограничение ожидания HTTP-ответа, не интервал отправки очереди (он в syncAchievementEvents).
 const REQUEST_TIMEOUT_MS = 15_000
 
 const actions = {
+  // Отправляем одну накопленную пачку. Когда вызывать этот экшен, решает планировщик.
   // true означает «запрос был запущен», а не «бэк успешно сохранил события».
   // По этому результату планировщик понимает, стоит ли проверить новую очередь.
   async sendAchievementEvents({
@@ -251,6 +268,8 @@ const actions = {
     getters,
     commit,
   }: ActionContext<AchievementsState, RootState>): Promise<boolean> {
+    // Таймер может вызвать экшен с пустой очередью или во время другого запроса.
+    // В этих случаях ничего не переносим в inFlightEvents и сразу выходим.
     if (state.sending || !getters.isLoggedIn || !state.pendingEvents.length)
       return false
     const userId = getters.getUser.user_id
@@ -286,6 +305,7 @@ const actions = {
         checkCurrentResources()
       }
     } catch (error) {
+      // Ошибка старого запроса тоже не должна очистить события новой сессии.
       if (state.session !== batchSession) return true
       // Бэк мог обработать запрос, а ответ потеряться. Повтор дал бы лишний прогресс.
       // Поэтому пачку не возвращаем в очередь даже при сетевой ошибке.
@@ -295,6 +315,7 @@ const actions = {
         error
       )
     } finally {
+      // Освобождаем отправку при любом исходе, включая выход из аккаунта во время await.
       commit("setAchievementSending", false)
     }
     return true
