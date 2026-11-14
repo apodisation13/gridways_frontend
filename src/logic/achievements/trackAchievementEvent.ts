@@ -87,9 +87,7 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     const event: AchievementEvent = {
       id: uuidv4(),
       type: input.type,
-      data: {
-        mode: input.mode ?? resolveAchievementGameMode(),
-      },
+      data: { mode: resolveAchievementGameMode() },
     }
     store.commit("enqueueAchievementEvent", event)
     return [event.id]
