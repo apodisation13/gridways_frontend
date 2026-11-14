@@ -1509,12 +1509,14 @@
             "counter": {
               "type": "streak",
               "length": 3,
-              "reset": {
-                "event": "game.lost",
-                "filters": {
-                  "mode": "normal"
+              "reset": [
+                {
+                  "event": "game.lost",
+                  "filters": {
+                    "mode": "normal"
+                  }
                 }
-              }
+              ]
             },
             "filters": {
               "mode": "normal"
@@ -1534,12 +1536,14 @@
             "counter": {
               "type": "streak",
               "length": 10,
-              "reset": {
-                "event": "game.lost",
-                "filters": {
-                  "mode": "normal"
+              "reset": [
+                {
+                  "event": "game.lost",
+                  "filters": {
+                    "mode": "normal"
+                  }
                 }
-              }
+              ]
             },
             "filters": {
               "mode": "normal"
@@ -1777,6 +1781,736 @@
               "actor.color": {
                 "type": "exists",
                 "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          }
+        }
+      },
+      "enemies": {
+        "id": "enemies",
+        "title": "Враги",
+        "ordering": 110,
+        "achievements": {
+          "kill_enemies_50": {
+            "id": "kill_enemies_50",
+            "title": "Убейте суммарно 50 врагов",
+            "ordering": 10,
+            "group": "kill_enemies",
+            "event": "enemy.killed",
+            "target": 50,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_enemies_250": {
+            "id": "kill_enemies_250",
+            "title": "Убейте суммарно 250 врагов",
+            "ordering": 20,
+            "group": "kill_enemies",
+            "event": "enemy.killed",
+            "target": 250,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_enemies_500": {
+            "id": "kill_enemies_500",
+            "title": "Убейте суммарно 500 врагов",
+            "ordering": 30,
+            "group": "kill_enemies",
+            "event": "enemy.killed",
+            "target": 500,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_enemies_1000": {
+            "id": "kill_enemies_1000",
+            "title": "Убейте суммарно 1000 врагов",
+            "ordering": 40,
+            "group": "kill_enemies",
+            "event": "enemy.killed",
+            "target": 1000,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_soldiers_50": {
+            "id": "kill_soldiers_50",
+            "title": "Убейте 50 врагов фракции Soldiers",
+            "ordering": 50,
+            "group": "kill_soldiers",
+            "event": "enemy.killed",
+            "target": 50,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              },
+              "enemy.faction": "Soldiers"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_soldiers_100": {
+            "id": "kill_soldiers_100",
+            "title": "Убейте 100 врагов фракции Soldiers",
+            "ordering": 60,
+            "group": "kill_soldiers",
+            "event": "enemy.killed",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              },
+              "enemy.faction": "Soldiers"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_soldiers_500": {
+            "id": "kill_soldiers_500",
+            "title": "Убейте 500 врагов фракции Soldiers",
+            "ordering": 70,
+            "group": "kill_soldiers",
+            "event": "enemy.killed",
+            "target": 500,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              },
+              "enemy.faction": "Soldiers"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_gold_enemies_100": {
+            "id": "kill_gold_enemies_100",
+            "title": "Убейте 100 золотых врагов",
+            "ordering": 80,
+            "event": "enemy.killed",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": "Gold"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_enemy_leaders_100": {
+            "id": "kill_enemy_leaders_100",
+            "title": "Убейте 100 лидеров врагов",
+            "ordering": 90,
+            "event": "enemy.killed",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": false
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_veil_enemies_100": {
+            "id": "kill_veil_enemies_100",
+            "title": "Убейте 100 врагов со статусом veil",
+            "ordering": 100,
+            "event": "enemy.killed",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              },
+              "enemy.data.status": "veil"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_deathwish_enemies_100": {
+            "id": "kill_deathwish_enemies_100",
+            "title": "Убейте 100 врагов с завещанием",
+            "ordering": 110,
+            "event": "enemy.killed",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              },
+              "enemy.deathwish.name": {
+                "type": "ne",
+                "value": null
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_high_hp_enemies_5": {
+            "id": "kill_high_hp_enemies_5",
+            "title": "Убейте 5 врагов с базовым здоровьем больше 50",
+            "ordering": 120,
+            "group": "kill_high_hp_enemies",
+            "event": "enemy.killed",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              },
+              "enemy.data.base.base_hp": {
+                "type": "gt",
+                "value": 50
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_high_hp_enemies_10": {
+            "id": "kill_high_hp_enemies_10",
+            "title": "Убейте 10 врагов с базовым здоровьем больше 50",
+            "ordering": 130,
+            "group": "kill_high_hp_enemies",
+            "event": "enemy.killed",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              },
+              "enemy.data.base.base_hp": {
+                "type": "gt",
+                "value": 50
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_high_hp_enemies_50": {
+            "id": "kill_high_hp_enemies_50",
+            "title": "Убейте 50 врагов с базовым здоровьем больше 50",
+            "ordering": 140,
+            "group": "kill_high_hp_enemies",
+            "event": "enemy.killed",
+            "target": 50,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              },
+              "enemy.data.base.base_hp": {
+                "type": "gt",
+                "value": 50
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "remove_enemy_shields_10": {
+            "id": "remove_enemy_shields_10",
+            "title": "Снимите щит у врагов 10 раз",
+            "ordering": 150,
+            "group": "remove_enemy_shields",
+            "event": "enemy.shield_removed",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "remove_enemy_shields_20": {
+            "id": "remove_enemy_shields_20",
+            "title": "Снимите щит у врагов 20 раз",
+            "ordering": 160,
+            "group": "remove_enemy_shields",
+            "event": "enemy.shield_removed",
+            "target": 20,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "remove_enemy_shields_50": {
+            "id": "remove_enemy_shields_50",
+            "title": "Снимите щит у врагов 50 раз",
+            "ordering": 170,
+            "group": "remove_enemy_shields",
+            "event": "enemy.shield_removed",
+            "target": 50,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "remove_enemy_armor_5": {
+            "id": "remove_enemy_armor_5",
+            "title": "Снимите броню у врагов 5 раз",
+            "ordering": 180,
+            "group": "remove_enemy_armor",
+            "event": "enemy.armor_removed",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "remove_enemy_armor_amount_5": {
+            "id": "remove_enemy_armor_amount_5",
+            "title": "Снимите суммарно 5 единиц брони у врагов",
+            "ordering": 190,
+            "group": "remove_enemy_armor_amount",
+            "event": "enemy.armor_removed",
+            "target": 5,
+            "counter": {
+              "type": "sum",
+              "field": "amount"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "remove_enemy_armor_10": {
+            "id": "remove_enemy_armor_10",
+            "title": "Снимите броню у врагов 10 раз",
+            "ordering": 200,
+            "group": "remove_enemy_armor",
+            "event": "enemy.armor_removed",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "remove_enemy_armor_amount_10": {
+            "id": "remove_enemy_armor_amount_10",
+            "title": "Снимите суммарно 10 единиц брони у врагов",
+            "ordering": 210,
+            "group": "remove_enemy_armor_amount",
+            "event": "enemy.armor_removed",
+            "target": 10,
+            "counter": {
+              "type": "sum",
+              "field": "amount"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "remove_enemy_armor_50": {
+            "id": "remove_enemy_armor_50",
+            "title": "Снимите броню у врагов 50 раз",
+            "ordering": 220,
+            "group": "remove_enemy_armor",
+            "event": "enemy.armor_removed",
+            "target": 50,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "remove_enemy_armor_amount_50": {
+            "id": "remove_enemy_armor_amount_50",
+            "title": "Снимите суммарно 50 единиц брони у врагов",
+            "ordering": 230,
+            "group": "remove_enemy_armor_amount",
+            "event": "enemy.armor_removed",
+            "target": 50,
+            "counter": {
+              "type": "sum",
+              "field": "amount"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_bronze_streak_5_1": {
+            "id": "kill_bronze_streak_5_1",
+            "title": "Убейте 5 бронзовых врагов подряд — 1 раз",
+            "ordering": 240,
+            "group": "kill_bronze_streak_5",
+            "event": "enemy.killed",
+            "target": 1,
+            "counter": {
+              "type": "streak",
+              "length": 5,
+              "reset": [
+                {
+                  "event": "enemy.killed",
+                  "filters": {
+                    "mode": "normal",
+                    "enemy.color": {
+                      "type": "ne",
+                      "value": "Bronze"
+                    }
+                  }
+                },
+                {
+                  "event": "enemy.killed",
+                  "filters": {
+                    "mode": "normal",
+                    "enemy.color": {
+                      "type": "exists",
+                      "value": false
+                    }
+                  }
+                }
+              ]
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": "Bronze"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_bronze_streak_5_5": {
+            "id": "kill_bronze_streak_5_5",
+            "title": "Убейте 5 бронзовых врагов подряд — 5 раз",
+            "ordering": 250,
+            "group": "kill_bronze_streak_5",
+            "event": "enemy.killed",
+            "target": 5,
+            "counter": {
+              "type": "streak",
+              "length": 5,
+              "reset": [
+                {
+                  "event": "enemy.killed",
+                  "filters": {
+                    "mode": "normal",
+                    "enemy.color": {
+                      "type": "ne",
+                      "value": "Bronze"
+                    }
+                  }
+                },
+                {
+                  "event": "enemy.killed",
+                  "filters": {
+                    "mode": "normal",
+                    "enemy.color": {
+                      "type": "exists",
+                      "value": false
+                    }
+                  }
+                }
+              ]
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": "Bronze"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_bronze_streak_5_10": {
+            "id": "kill_bronze_streak_5_10",
+            "title": "Убейте 5 бронзовых врагов подряд — 10 раз",
+            "ordering": 260,
+            "group": "kill_bronze_streak_5",
+            "event": "enemy.killed",
+            "target": 10,
+            "counter": {
+              "type": "streak",
+              "length": 5,
+              "reset": [
+                {
+                  "event": "enemy.killed",
+                  "filters": {
+                    "mode": "normal",
+                    "enemy.color": {
+                      "type": "ne",
+                      "value": "Bronze"
+                    }
+                  }
+                },
+                {
+                  "event": "enemy.killed",
+                  "filters": {
+                    "mode": "normal",
+                    "enemy.color": {
+                      "type": "exists",
+                      "value": false
+                    }
+                  }
+                }
+              ]
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": "Bronze"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_silver_streak_10_2": {
+            "id": "kill_silver_streak_10_2",
+            "title": "Убейте 10 серебряных врагов подряд — 2 раза",
+            "ordering": 270,
+            "event": "enemy.killed",
+            "target": 2,
+            "counter": {
+              "type": "streak",
+              "length": 10,
+              "reset": [
+                {
+                  "event": "enemy.killed",
+                  "filters": {
+                    "mode": "normal",
+                    "enemy.color": {
+                      "type": "ne",
+                      "value": "Silver"
+                    }
+                  }
+                },
+                {
+                  "event": "enemy.killed",
+                  "filters": {
+                    "mode": "normal",
+                    "enemy.color": {
+                      "type": "exists",
+                      "value": false
+                    }
+                  }
+                }
+              ]
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": "Silver"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_damage_over_20_streak_3_1": {
+            "id": "kill_damage_over_20_streak_3_1",
+            "title": "Убейте подряд 3 врагов с уроном больше 20",
+            "ordering": 280,
+            "event": "enemy.killed",
+            "target": 1,
+            "counter": {
+              "type": "streak",
+              "length": 3,
+              "reset": [
+                {
+                  "event": "enemy.killed",
+                  "filters": {
+                    "mode": "normal",
+                    "enemy.color": {
+                      "type": "exists",
+                      "value": true
+                    },
+                    "enemy.data.damage": {
+                      "type": "lte",
+                      "value": 20
+                    }
+                  }
+                }
+              ]
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              },
+              "enemy.data.damage": {
+                "type": "gt",
+                "value": 20
               }
             },
             "rewards": {

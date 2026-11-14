@@ -1,4 +1,11 @@
-import type { Card, Leader, LevelDifficulty, UserResources } from "./database"
+import type {
+  Card,
+  Enemy,
+  EnemyLeader,
+  Leader,
+  LevelDifficulty,
+  UserResources,
+} from "./database"
 import type { InventoryItem } from "./inventory"
 import type { UpgradeSubtype, UpgradeType, UserUpgrades } from "./upgrades"
 import type { PayResourcesSubtype } from "./user_actions"
@@ -16,6 +23,9 @@ export enum AchievementEventType {
   // любая сыгранная карта или лидер в любом режиме
   ActionPlayed = "action.played",
   PassiveTriggered = "passive.triggered",
+  EnemyKilled = "enemy.killed",
+  EnemyShieldRemoved = "enemy.shield_removed",
+  EnemyArmorRemoved = "enemy.armor_removed",
   GameStarted = "game.started",
   GameWon = "game.won",
   GameLost = "game.lost",
@@ -70,14 +80,16 @@ export enum AchievementCounterType {
   Streak = "streak",
 }
 
+export interface AchievementStreakReset {
+  event: AchievementRecordedEventType
+  filters: Record<string, AchievementFilter>
+}
+
 export type AchievementCounter =
   | {
       type: AchievementCounterType.Streak
       length: number
-      reset: {
-        event: AchievementRecordedEventType
-        filters: Record<string, AchievementFilter>
-      }
+      reset: [AchievementStreakReset, ...AchievementStreakReset[]]
     }
   | { type: AchievementCounterType.Count }
   | { type: AchievementCounterType.Sum; field: string }
@@ -237,6 +249,17 @@ export type AchievementPassiveLocation =
   | "passive_once"
 
 export type AchievementEventInput =
+  | {
+      type:
+        | AchievementEventType.EnemyKilled
+        | AchievementEventType.EnemyShieldRemoved
+      enemy: Enemy | EnemyLeader
+    }
+  | {
+      type: AchievementEventType.EnemyArmorRemoved
+      enemy: Enemy | EnemyLeader
+      amount: number
+    }
   | {
       type: AchievementEventType.PassiveTriggered
       actor: Card | Leader

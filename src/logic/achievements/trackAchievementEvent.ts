@@ -109,12 +109,20 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
           ? finishAchievementBattle(
               input.mode ?? resolveAchievementGameMode(store.state.game)
             )
-          : "data" in input
-            ? input.data
-            : {
-                mode:
-                  input.mode ?? resolveAchievementGameMode(store.state.game),
+          : "enemy" in input
+            ? {
+                enemy: input.enemy,
+                mode: resolveAchievementGameMode(store.state.game),
+                ...(input.type === AchievementEventType.EnemyArmorRemoved
+                  ? { amount: input.amount }
+                  : {}),
               }
+            : "data" in input
+              ? input.data
+              : {
+                  mode:
+                    input.mode ?? resolveAchievementGameMode(store.state.game),
+                }
     )
   )
 

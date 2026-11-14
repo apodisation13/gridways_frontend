@@ -123,10 +123,13 @@ def validate(catalog):
                     require(target == int(target), p, "unique/streak target must be an integer")
                 if kind == "streak":
                     require(type(counter["length"]) is int and counter["length"] > 0, p, "streak length must be a positive integer")
-                    reset = counter["reset"]
-                    require(isinstance(reset, dict) and set(reset) == {"event", "filters"}, p, "reset needs event and filters")
-                    require(isinstance(reset["event"], str) and reset["event"] in events, p, "unknown reset event")
-                    validate_filters(reset["filters"], p + ".counter.reset", operators)
+                    resets = counter["reset"]
+                    require(isinstance(resets, list) and len(resets) > 0, p, "reset must be a nonempty list")
+                    for index, reset in enumerate(resets):
+                        reset_path = f"{p}.counter.reset[{index}]"
+                        require(isinstance(reset, dict) and set(reset) == {"event", "filters"}, reset_path, "reset needs event and filters")
+                        require(isinstance(reset["event"], str) and reset["event"] in events, reset_path, "unknown reset event")
+                        validate_filters(reset["filters"], reset_path, operators)
                 if kind == "current":
                     parts = counter["field"].split(".")
                     if event == "resources.checked":

@@ -1,6 +1,8 @@
 import { choice } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { sound_destroy_enemy, sound_enemy_move_down } from "@/logic/play_sounds"
 import type { Enemy, EnemyLeader, GameObj } from "@/types"
+import { AchievementEventType } from "@/types"
 
 export function move_enemy(enemy: Enemy | EnemyLeader, gameObj: GameObj): void {
   // это если мы ткнули на лидера врагов! то здесь ничего не выполним
@@ -21,6 +23,10 @@ export function move_enemy(enemy: Enemy | EnemyLeader, gameObj: GameObj): void {
     sound_destroy_enemy()
     // предыдущий враг на той клетке
     const prev_enemy = field[target_index] as Enemy
+    trackAchievementEvent({
+      type: AchievementEventType.EnemyKilled,
+      enemy: prev_enemy,
+    })
     // убиваем его
     field[target_index] = ""
     // кладем в сброс и восстанавливаем его здорове

@@ -1,4 +1,5 @@
-import { choice_element } from "@/lib/utils"
+import { choice_element, copyObj } from "@/lib/utils"
+import { trackEnemyDefenceChanges } from "@/logic/achievements/enemyEvents"
 import { give_shields_to_all } from "@/logic/ai_move/deathwish_abilities/give_shields"
 import { damage_player } from "@/logic/ai_move/moves/damage"
 import { decrease_player_damage } from "@/logic/ai_move/passive_abilities/passives/decrease_player_damage"
@@ -89,8 +90,10 @@ export function applyEffectAtCell(
     effectDecrement(index, effect, gameObj)
   } else if (effect.type === EffectType.Fire) {
     if (enemy.data.shield || (enemy.data.armor ?? 0) > 0) {
+      const before = copyObj(enemy)
       enemy.data.shield = false
       enemy.data.armor = 0
+      trackEnemyDefenceChanges(before, enemy)
       fire_sound()
     }
   } else if (

@@ -1,6 +1,8 @@
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { deathwish } from "@/logic/ai_move/ai_deathwish_abilities"
 import { check_win } from "@/logic/player_move/service/check_win"
 import type { Enemy, EnemyLeader, GameObj } from "@/types"
+import { AchievementEventType } from "@/types"
 import { EnemyStatus } from "@/types"
 
 export function enemy_takes_damage(
@@ -28,6 +30,9 @@ export function remove_dead_enemy(
   timeout = 1000
 ): void {
   const { field, enemy_leader, enemies, enemies_grave } = gameObj
+
+  // Трекер копирует врага до очистки статуса, восстановления HP и завещания.
+  trackAchievementEvent({ type: AchievementEventType.EnemyKilled, enemy })
 
   if (!(enemy as Enemy).color) {
     enemy_leader.data.hp = 0

@@ -12,7 +12,7 @@ import { buildDeckSummary } from "./deckSummary"
 import { getAchievementField, matchesAchievementFilters } from "./filters"
 
 // Считает предварительный прогресс, не меняя исходные данные и не выдавая наград.
-// Пока поддерживаем постоянные задания с count, sum, current и unique. Для daily/weekly нужны их периоды.
+// Поддерживаем постоянные задания с count, sum, current, unique и streak. Для daily/weekly нужны их периоды.
 export function processAchievementEvents(
   section: AchievementSection,
   confirmedProgress: UserAchievementsProgress,
@@ -32,8 +32,9 @@ export function processAchievementEvents(
   for (const category of Object.values(section.categories)) {
     for (const definition of Object.values(category.achievements)) {
       const types = new Set([definition.event])
-      if (definition.counter.type === AchievementCounterType.Streak)
-        types.add(definition.counter.reset.event)
+      if (definition.counter.type === AchievementCounterType.Streak) {
+        for (const reset of definition.counter.reset) types.add(reset.event)
+      }
       for (const type of types) {
         const definitions = byEvent.get(type) ?? []
         definitions.push(definition)
@@ -101,8 +102,11 @@ export function processAchievementEvents(
           continue
         // Сброс имеет приоритет, если событие совпало с обоими условиями.
         if (
-          event.type === counter.reset.event &&
-          matchesAchievementFilters(data, counter.reset.filters)
+          counter.reset.some(
+            reset =>
+              event.type === reset.event &&
+              matchesAchievementFilters(data, reset.filters)
+          )
         ) {
           if (current?.streak) {
             progress.permanent ??= {}
