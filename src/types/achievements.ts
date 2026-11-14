@@ -90,6 +90,7 @@ export interface AchievementRewards {
 
 export interface AchievementDefinition {
   id: string
+  group?: string // Только группировка отображения, не влияет на подсчёт.
   ordering: number
   title: string
   event: AchievementRecordedEventType
@@ -97,6 +98,19 @@ export interface AchievementDefinition {
   counter: AchievementCounter
   target: number
   rewards: AchievementRewards
+}
+
+export interface AchievementDisplayEntry {
+  key: string
+  definition: AchievementDefinition
+  completed: boolean
+  completedAt: number
+}
+
+export interface AchievementDisplayRow {
+  key: string
+  entries: AchievementDisplayEntry[]
+  ordering: number
 }
 
 export interface AchievementCategory {

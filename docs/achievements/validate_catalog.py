@@ -105,6 +105,8 @@ def validate(catalog):
                 seen.add(task_id)
                 require(isinstance(task.get("title"), str) and type(task.get("ordering")) is int,
                         p, "title and integer ordering required")
+                if "group" in task:
+                    require(isinstance(task["group"], str) and bool(task["group"].strip()), p, "group must be a nonempty string")
                 event = task.get("event")
                 require(isinstance(event, str) and event in events, p, "unknown or local-only event")
                 target = task.get("target")

@@ -75,11 +75,11 @@
             </span>
           </summary>
           <div class="group-items">
-            <achievement-card
-              v-for="entry in group.visibleEntries"
-              :key="entry.key"
-              :definition="entry.definition"
-              :progress="progress.permanent?.[entry.key]"
+            <achievement-group-row
+              v-for="row in group.rows"
+              :key="row.key"
+              :entries="row.entries"
+              :progress="progress.permanent ?? {}"
             />
           </div>
         </details>
@@ -92,23 +92,17 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 
-import AchievementCard from "@/components/Pages/AchievementsPage/AchievementCard.vue"
 import AchievementFilters from "@/components/Pages/AchievementsPage/AchievementFilters.vue"
+import AchievementGroupRow from "@/components/Pages/AchievementsPage/AchievementGroupRow.vue"
 import ButtonIcon from "@/components/Pages/DeckbuildPage/Buttons/ButtonIcon.vue"
+import { groupAchievementEntries } from "@/logic/achievements/displayGroups"
 import type {
   AchievementCatalog,
-  AchievementDefinition,
+  AchievementDisplayEntry,
   AchievementPeriod,
   PinnedAchievement,
   UserAchievementsProgress,
 } from "@/types"
-
-interface AchievementEntry {
-  key: string
-  definition: AchievementDefinition
-  completed: boolean
-  completedAt: number
-}
 
 const TABS: Array<{ key: AchievementPeriod; title: string }> = [
   { key: "permanent", title: "Постоянные" },
@@ -118,7 +112,7 @@ const TABS: Array<{ key: AchievementPeriod; title: string }> = [
 
 export default defineComponent({
   name: "AchievementsPage",
-  components: { AchievementCard, ButtonIcon, AchievementFilters },
+  components: { AchievementGroupRow, ButtonIcon, AchievementFilters },
   data() {
     return {
       activeTab: "permanent" as AchievementPeriod,
@@ -149,7 +143,7 @@ export default defineComponent({
     groups(): Array<{
       key: string
       title: string
-      entries: AchievementEntry[]
+      entries: AchievementDisplayEntry[]
     }> {
       return Object.values(this.catalog.permanent.categories)
         .sort((a, b) => a.ordering - b.ordering || a.id.localeCompare(b.id))
@@ -197,7 +191,11 @@ export default defineComponent({
                 ))
           ),
         }))
-        .filter(group => group.visibleEntries.length > 0)
+        .map(group => ({
+          ...group,
+          rows: groupAchievementEntries(group.visibleEntries),
+        }))
+        .filter(group => group.rows.length > 0)
     },
     emptyMessage(): string {
       // The catalog is not the selected daily/weekly set. Do not expose
