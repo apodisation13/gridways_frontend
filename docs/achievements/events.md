@@ -19,7 +19,6 @@
 | `passive.triggered` | `{actor: <полный Card или Leader>, mode, location}` | count активаций, location hand/deck/grave/passive_once; лидер отличается отсутствием actor.color |
 | `action.played` | `{actor: <полный Card или Leader>, mode}` | count зарядов, unique actor.id, фильтры actor.color/faction/type/data.damage |
 | `game.lost` | `{mode}` | факт поражения, в том числе reset для streak |
-| `game.started` | `{mode}` | count начатых боёв, начало локальной статистики |
 | `game.won` | `{mode, difficulty?, starting_deck?, leader_uses?}` | count побед, условия по исходному составу и применению лидера |
 | `arena.upgrade.purchased` | `{upgrade_subtype, level}` | count успешных покупок прокачек арены |
 | `arena.level.reached` | `{level}` | count/target 1 с фильтром level gte N |
@@ -53,7 +52,7 @@ spent/gained содержат положительные количества и
 - `ActorTransition`: `{action, actor, recipe, before, after}`. Разница балансов + actor.transformed; снимок actor и recipe до await. Это заменяет старый ResourcesChanged в том же месте, а не добавляется рядом с ним.
 - `UpgradeChanged`: `{upgrade_type, upgrade_subtype, upgrades, before, after}`. Расход/доход, один upgrade.purchased, проверки current. Ответ postUserUpgrade теперь весь UpgradesResponse, не только resources.
 - `ActionPlayed` принимает `{type, actor}`; трекер добавляет текущий mode, в очереди будет `{type, data: {actor, mode}}`.
-- `GameStarted`/`GameWon` принимают `{type, mode?}`; трекер определяет режим, если он не задан. Wire-форма — `{type, data: {mode}}`.
+- `GameWon` принимает `{type, mode?}`; трекер определяет режим и дополняет событие статистикой боя и составом кладбища.
 
 Не считать награды из обещания в конфиге, когда уже есть серверный фактический доход. При лимите 5000 и изменении 4900 → 5000 награда 1000 даёт событие +100; повтор при 5000 → 5000 — ни одного доходного события.
 
@@ -125,15 +124,15 @@ AchievementGameMode: normal (обычные сезоны), random_n, random, mul
 
 ActionPlayed вызывается в двух общих обработчиках player_move. Считается один заряд карты/лидера; для контрактов только на карты нужен actor.color exists true. В мультиплеере каждый клиент вызывает обработчик для своей карты. Входящий GAME_STATE только обновляет поле, не воспроизводит attack и не создаёт событие карты напарника.
 
-GamePage после разрешённого перехода и start_game отправляет game.started (normal/random/random_n/arena). При отсутствии start_game_redirect делает return после перенаправления и не инициализирует бой. MultiplayerGamePage отправляет game.started отдельно на каждом клиенте после initAsHost/initFromStore; ожидание матчмейкинга не считается.
+GamePage после разрешённого перехода и start_game вызывает startAchievementBattle: только локальный снимок для условий победы, без события или запроса на бэк. При отсутствии start_game_redirect делает return после перенаправления и не инициализирует бой. MultiplayerGamePage сохраняет такой же локальный снимок на каждом клиенте после initAsHost/initFromStore.
 
 WinPage/ArenaWinPage отправляют game.won после проверки и потребления одноразового win_redirect, до отдельных запросов статистики/наград. Оба участника кооператива переходят в WinPage с этим флагом: каждый отправляет свою победу. Нет запроса за другого пользователя и нет гарантированного начисления офлайн-напарнику. Арена: старт/победа относятся к отдельному бою, не к полному забегу.
 
-`mode` обязателен в backend action.played/game.started/game.won. Существующие вызовы ActionPlayed в компонентах не требуют дополнительных аргументов. Фильтр режима всегда задаётся конфигом; отсутствие mode-фильтра означает все режимы. Чтобы ограничить старые permanent action.played обычным режимом, выполнить normal-mode-card-contracts.sql. Он не меняет прогресс, даты наград и уже явно заданные mode-фильтры. В config-examples.json оставлены характерные примеры режимов; другие режимы используют те же поля. Копировать нужно выбранные задания, а не весь файл поверх game_const. Эти файлы не применяются к БД автоматически.
+`mode` обязателен в backend action.played/game.won. Существующие вызовы ActionPlayed в компонентах не требуют дополнительных аргументов. Фильтр режима всегда задаётся конфигом; отсутствие mode-фильтра означает все режимы. Чтобы ограничить старые permanent action.played обычным режимом, выполнить normal-mode-card-contracts.sql. Он не меняет прогресс, даты наград и уже явно заданные mode-фильтры. В config-examples.json оставлены характерные примеры режимов; другие режимы используют те же поля. Копировать нужно выбранные задания, а не весь файл поверх game_const. Эти файлы не применяются к БД автоматически.
 
 ## Контракты арены и статистика боя
 
-AchievementsState.battle хранит mode, difficulty, независимые starting_deck.cards и starting_deck.leader, leader_uses. GameStarted заменяет снимок через battle.ts из game.current_deck; применённый лидер в ActionPlayed увеличивает leader_uses до постановки события в очередь. Возврат/изменение зарядов счётчик не уменьшает. На GameWon снимок копируется в событие и очищается. На LosePage и resetAchievementSession очищается; новый старт всегда заменяет предыдущий снимок, в том числе после выхода из боя. Если снимок отсутствует или режим не совпал, game.won не содержит starting_deck/leader_uses: отсутствие не считается нулём.
+AchievementsState.battle хранит mode, difficulty, независимые starting_deck.cards и starting_deck.leader, leader_uses. Прямой вызов startAchievementBattle из страницы игры заменяет снимок через battle.ts из game.current_deck; применённый лидер в ActionPlayed увеличивает leader_uses до постановки события в очередь. Возврат/изменение зарядов счётчик не уменьшает. На GameWon снимок копируется в событие и очищается. На LosePage и resetAchievementSession очищается; новый старт всегда заменяет предыдущий снимок, в том числе после выхода из боя. Если снимок отсутствует или режим не совпал, game.won не содержит starting_deck/leader_uses: отсутствие не считается нулём.
 
 Frontend preview и backend events.py пересчитывают starting_deck.summary общей функцией сводки состава, не доверяя переданному summary. Лидер исключён. Контракт без золотых требует непустой колоды и by_color.Gold = 0; только бронзовые — all_bronze = true. Три победы без лидера — count/target 3, leader_uses = 0, mode arena, не серия. Обычные game.won-контракты без этих фильтров работают как прежде. Бэк принимает исходный состав/счётчик от клиента, не симулирует бой.
 

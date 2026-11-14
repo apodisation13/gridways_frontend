@@ -77,7 +77,7 @@ python3 docs/achievements/validate_catalog.py docs/achievements/config-examples.
 
 ### Контракты по режимам
 
-mode = normal/random_n/random/multiplayer/arena. Для action.played добавьте mode и actor.color exists true, если лидер не должен учитываться. Пример Monsters: дополнительно actor.faction = Monsters. game.started/game.won используют count с target 100 и mode выбранного режима. В JSON оставлен один пример game.started для random_n. Для random, multiplayer и arena меняется только mode; дублировать весь набор не нужно.
+mode = normal/random_n/random/multiplayer/arena. Для action.played добавьте mode и actor.color exists true, если лидер не должен учитываться. Пример Monsters: дополнительно actor.faction = Monsters. game.won использует count и mode выбранного режима. Начало игры не является событием достижений. Для random, multiplayer и arena меняется только mode; дублировать весь набор не нужно.
 
 [normal-mode-card-contracts.sql](normal-mode-card-contracts.sql) добавляет mode:normal только permanent action.played без явно заданного mode. Скрипт необходимо применить отдельно; сами изменения кода не ограничивают ранее сохранённые конфиги. Накопленный прогресс сохраняется: прошлые события других режимов из него не вычитаются.
 

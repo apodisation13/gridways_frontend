@@ -611,31 +611,6 @@
           }
         }
       },
-      "random_n": {
-        "id": "random_n",
-        "title": "Random N",
-        "ordering": 70,
-        "achievements": {
-          "random_n_start_games_100": {
-            "id": "random_n_start_games_100",
-            "title": "Начните 100 боёв в режиме random_n",
-            "event": "game.started",
-            "ordering": 40,
-            "target": 100,
-            "counter": {
-              "type": "count"
-            },
-            "filters": {
-              "mode": "random_n"
-            },
-            "rewards": {
-              "resources": {
-                "money": 1000
-              }
-            }
-          }
-        }
-      },
       "arena": {
         "id": "arena",
         "title": "Арена",
