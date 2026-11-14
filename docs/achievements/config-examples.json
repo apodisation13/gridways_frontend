@@ -2518,6 +2518,97 @@
                 "money": 1000
               }
             }
+          },
+          "win_enemy_grave_total_30_5": {
+            "id": "win_enemy_grave_total_30_5",
+            "title": "Победите с 30 или более врагами в кладбище — 5 раз",
+            "ordering": 290,
+            "group": "win_enemy_grave_total",
+            "event": "game.won",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy_grave.total": {
+                "type": "gte",
+                "value": 30
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "win_enemy_grave_total_50_5": {
+            "id": "win_enemy_grave_total_50_5",
+            "title": "Победите с 50 или более врагами в кладбище — 5 раз",
+            "ordering": 300,
+            "group": "win_enemy_grave_total",
+            "event": "game.won",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy_grave.total": {
+                "type": "gte",
+                "value": 50
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "win_enemy_grave_total_70_5": {
+            "id": "win_enemy_grave_total_70_5",
+            "title": "Победите с 70 или более врагами в кладбище — 5 раз",
+            "ordering": 310,
+            "group": "win_enemy_grave_total",
+            "event": "game.won",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy_grave.total": {
+                "type": "gte",
+                "value": 70
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "win_enemy_grave_gold_20_5": {
+            "id": "win_enemy_grave_gold_20_5",
+            "title": "Победите с 20 или более золотыми врагами в кладбище — 5 раз",
+            "ordering": 320,
+            "event": "game.won",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy_grave.gold": {
+                "type": "gte",
+                "value": 20
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
           }
         }
       }

@@ -89,6 +89,8 @@ mode = normal/random_n/random/multiplayer/arena. Для action.played добав
 
 ### Скрытые серии
 
+В категории `enemies` есть `win_enemy_grave_total_30_5`, `win_enemy_grave_total_50_5`, `win_enemy_grave_total_70_5` и `win_enemy_grave_gold_20_5`: по 5 побед обычного режима с указанным минимумом врагов в текущем кладбище. Используют `game.won`, `count`, фильтры `enemy_grave.total/gold >= N`. Три общих порога объединены группой `win_enemy_grave_total`. Награды в примерах — по 1000 money, их можно настроить в БД.
+
 `counter.reset` всегда непустой массив объектов `{event, filters}`. Сброс происходит при совпадении любого элемента. Старый одиночный объект необходимо вручную обернуть в массив в БД; совместимости со старым форматом нет. В примерах серий убийств Bronze (1/5/10 серий) и Silver (2 серии) убийство лидера тоже сбрасывает текущую цепочку: уже добавлено вторым элементом `{ "event": "enemy.killed", "filters": { "mode": "normal", "enemy.color": { "type": "exists", "value": false } } }`.
 
 Два примера в normal: normal_win_streak_3_5 (length 3, target 5) и normal_win_streak_10_1 (length 10, target 1). Основной event game.won с mode normal; reset event game.lost с mode normal. Подходящая победа продвигает скрытый streak, поражение обнуляет только его, каждая полная серия увеличивает value. Серии непересекающиеся; неподходящие события не сбрасывают их. UI отображает только value/target. Существующие контракты менять не нужно.
