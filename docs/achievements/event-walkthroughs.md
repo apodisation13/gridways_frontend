@@ -1,6 +1,6 @@
 # События достижений: от вызова до контракта
 
-Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon` и `GameLost`; остальные события описаны в [events.md](events.md).
+Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost` и `ActionPlayed`; остальные события описаны в [events.md](events.md).
 
 ## GameWon — победа в бою
 
@@ -243,4 +243,177 @@ trackAchievementEvent({
 - Подготовка и очередь: [trackAchievementEvent.ts](../../src/logic/achievements/trackAchievementEvent.ts), [gameMode.ts](../../src/logic/achievements/gameMode.ts), [модуль achievements](../../src/store/modules/achievements.ts).
 - Сброс на фронте: [processAchievementEvents.ts](../../src/logic/achievements/processAchievementEvents.ts).
 - На бэке: `services/api/app/apps/user_achievements/schemas.py` (GameLostData/GameLostEvent), `logic/events.py` (общая обработка reset).
+
+## ActionPlayed — применение заряда карты или лидера
+
+### Как событие доходит до проверки контракта
+
+**1. Игрок применяет карту или лидера.**
+
+В [player_move.ts](../../src/logic/player_move/player_move.ts) есть два места вызова:
+
+- `damage_ai_card` — применение к одной цели.
+- `damage_ai_card_multi` — применение к нескольким целям. Вызов трекера стоит после цикла целей, поэтому несколько поражённых врагов не превращаются в несколько сыгранных зарядов.
+
+Это два варианта обработки хода, а не два обязательных вызова на каждый ход. Оба получают `card: Card | Leader`.
+
+**2. До эффекта хода сохраняем объект для достижения.**
+
+```ts
+const achievementActor = copyObj(card)
+```
+
+В нём остаются значения до эффекта и расхода заряда: например, текущий урон, число зарядов, способность и пассивка. Это полный объект конкретной сыгранной карты/лидера, а не повторная загрузка базовой карты по ID.
+
+Сообщаем о применении:
+
+```ts
+trackAchievementEvent({
+  type: AchievementEventType.ActionPlayed,
+  actor: achievementActor,
+})
+```
+
+Один такой вызов означает один применённый заряд. Не требуется, чтобы способность обязательно нанесла урон или убила врага. Реакции пассивок на ход обрабатываются далее отдельно и не создают дополнительные ActionPlayed.
+
+**3. Мастер-функция отдельно учитывает применение лидера.**
+
+Если у actor нет поля color, это лидер. Тогда `recordAchievementLeaderUse` прибавляет 1 к локальному `leader_uses`. Это нужно для будущего события GameWon и контракта «победите без применения лидера».
+
+При этом само ActionPlayed не пропускается: оно подходит для контрактов на заряды лидера. У карты есть color, поэтому её применение не увеличивает leader_uses. Здесь проверяется наличие поля, а не значение цвета.
+
+**4. Формируем данные события и кладём в очередь.**
+
+```ts
+eventData = {
+  actor: input.actor,
+  mode: resolveAchievementGameMode(),
+}
+```
+
+Мастер-функция создаёт независимую JSON-копию, добавляет локальный UUID и вызывает `enqueueAchievementEvent`. Первая копия в player_move сохранила состояние до эффекта; эта копия отделяет данные очереди от переданного объекта.
+
+**5. processAchievementEvents проверяет контракты.**
+
+Как и для GameWon, расчёт вызывается для предварительного прогресса интерфейса и для решения, пора ли немедленно отправить пачку. Для ActionPlayed дополнительной сводки нет: фильтры читают actor и mode непосредственно из события.
+
+Например, один бронзовый заряд может одновременно продвинуть задания на 10 бронзовых зарядов, 20 бронзовых зарядов и игру карт фракции Soldiers. Обработчик не содержит отдельных веток для этих заданий — условия находятся в конфиге.
+
+### Что отправляется и откуда берутся поля
+
+| Поле | Источник |
+|---|---|
+| `actor` | Полная копия аргумента card из player_move, снятая до эффекта хода и расхода заряда |
+| `mode` | Текущий игровой стор, который читает resolveAchievementGameMode() |
+
+Внешний запрос содержит массив events. Ниже один пример; поля actor сокращены для чтения, реальные вложенные объекты отправляются полностью.
+
+```json
+{
+  "events": [
+    {
+      "type": "action.played",
+      "data": {
+        "actor": {
+          "id": 7,
+          "color": "Gold",
+          "faction": "Soldiers",
+          "type": "Unit",
+          "ability": { "name": "damage-one" },
+          "passive_ability": { "name": "incr-self-dmg" },
+          "data": {
+            "damage": 7,
+            "charges": 2,
+            "base": { "base_damage": 7, "base_charges": 2 }
+          }
+        },
+        "mode": "normal"
+      }
+    }
+  ]
+}
+```
+
+Для лидера форма события такая же, но actor — полный объект лидера без color. Отдельного события leader.played нет. Локальный UUID на бэк не отправляется. leader_uses также не входит в ActionPlayed: его итог передаётся при победе.
+
+### Что делает бэк
+
+`ActionPlayedData` явно содержит `actor: dict[str, JsonValue]` и обязательный mode. Проверяется форма события; внутри actor разрешены произвольные JSON-поля, чтобы новые фильтры по уже переданным полям не требовали изменения схемы.
+
+`apply_events` переводит data в словарь и сразу использует общие условия и счётчики. Специального преобразования ActionPlayed, вычисления summary или увеличения отдельного счётчика применений лидера на бэке нет. Бэк не выполняет способность повторно и не списывает заряд — событие только сообщает о совершённом действии.
+
+Пути фильтров начинаются от data: `actor.color`, `actor.ability.name`, `actor.data.damage`. Значения цветов сохраняют регистр: Bronze/Silver/Gold. faction — строка, поэтому используется `actor.faction`, не `actor.faction.name`.
+
+### Какие контракты можно описать
+
+Все строки ниже используют event = `action.played`. Если нужен обычный режим, добавляем `"mode": "normal"`; без этого фильтра учитываются все режимы.
+
+| Контракт | filters | counter |
+|---|---|---|
+| Примените бронзовые карты 10 раз | `actor.color = Bronze` | count, target 10 |
+| Примените заряды лидера 10 раз | `actor.color exists false` | count, target 10 |
+| Примените 30 разных карт | `actor.color exists true` | unique по actor.id, target 30 |
+| Примените лидеров трёх фракций | `actor.color exists false`, faction in нужные фракции | unique по actor.faction, target 3 |
+| Примените бронзовые карты Soldiers | `actor.color = Bronze`, `actor.faction = Soldiers` | count |
+| Примените бронзовую карту с уроном >= 8 | `actor.color = Bronze`, `actor.data.damage >= 8` | count |
+| Примените карту со способностью damage-all | `actor.color exists true`, `actor.ability.name = damage-all` | count |
+| Примените Special-карту без пассивки | `actor.color exists true`, `actor.type = Special`, `actor.passive_ability.name = null` | count |
+
+Все условия в filters соединяются через И. Если нужны Monsters ИЛИ Animals, это один фильтр `actor.faction` с оператором in. Отсутствующее поле отличается от null: условие `actor.passive_ability.name = null` требует существующего поля со значением null.
+
+Событие передаёт параметры сыгранного объекта, а не результат способности. Например, actor.data.damage — урон карты перед ходом, не фактически нанесённый всем целям урон.
+
+### Серия: примените бронзовые карты 10 раз подряд
+
+Полный пример задания для вставки в achievements категории cards:
+
+```json
+{
+  "play_bronze_streak_10": {
+    "id": "play_bronze_streak_10",
+    "title": "Примените бронзовые карты 10 раз подряд",
+    "ordering": 60,
+    "event": "action.played",
+    "target": 1,
+    "counter": {
+      "type": "streak",
+      "length": 10,
+      "reset": [
+        {
+          "event": "action.played",
+          "filters": {
+            "mode": "normal",
+            "actor.color": { "type": "ne", "value": "Bronze" }
+          }
+        },
+        {
+          "event": "action.played",
+          "filters": {
+            "mode": "normal",
+            "actor.color": { "type": "exists", "value": false }
+          }
+        }
+      ]
+    },
+    "filters": { "mode": "normal", "actor.color": "Bronze" },
+    "rewards": { "resources": { "money": 1000 } }
+  }
+}
+```
+
+- Каждый заряд любой бронзовой карты в normal продолжает серию. Карты могут быть разными; одинаковый actor.id здесь не требуется.
+- Другой цвет сбрасывает серию первым условием reset, применение лидера — вторым. Одного ne Bronze недостаточно: отсутствующий у лидера color не проходит ne.
+- Пассивки, события врагов, победы, поражения и действия в других режимах эту серию не сбрасывают. Поэтому она продолжается между боями, а не ограничивается одним уровнем.
+- На десятом подходящем заряде value увеличивается на 1, streak обнуляется. target 1 означает одну полную серию, target 5 — пять непересекающихся серий.
+- Сам streak скрыт в интерфейсе; отображается число завершённых серий value/target. При достижении цели очередь получает основание для немедленной отправки, награда подтверждается бэком.
+
+Механизм уже общий для фронта и бэка: для такого задания достаточно конфига. Награда в примере демонстрационная.
+
+### Где смотреть код
+
+- Два места вызова и копия до эффекта: [player_move.ts](../../src/logic/player_move/player_move.ts).
+- Подготовка actor/mode и учёт заряда лидера: [trackAchievementEvent.ts](../../src/logic/achievements/trackAchievementEvent.ts).
+- Режим: [gameMode.ts](../../src/logic/achievements/gameMode.ts).
+- Предварительный подсчёт и reset: [processAchievementEvents.ts](../../src/logic/achievements/processAchievementEvents.ts), [filters.ts](../../src/logic/achievements/filters.ts).
+- На бэке: `services/api/app/apps/user_achievements/schemas.py` (ActionPlayedData/ActionPlayedEvent), `logic/events.py`, `logic/filters.py`.
 

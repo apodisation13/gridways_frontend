@@ -140,15 +140,6 @@ const getters = {
 }
 
 const mutations = {
-  // Новый бой: начинаем считать применения лидера с нуля. Событие старта не создаём.
-  startAchievementBattle(state: AchievementsState) {
-    state.leader_uses = 0
-  },
-  // Один сыгранный заряд лидера. Нужно для условия победы «не используйте лидера».
-  // Пассивки и восстановление зарядов этот счётчик не меняют.
-  recordAchievementLeaderUse(state: AchievementsState) {
-    state.leader_uses += 1
-  },
   // Тост закрыт: удаляем только уведомление, не награду и не прогресс контракта.
   dismissAchievementReward(state: AchievementsState, notificationId: string) {
     state.grantedRewards = state.grantedRewards.filter(
@@ -250,6 +241,16 @@ const mutations = {
     // Вызывается при загрузке общей базы пользователя через getUserDatabase.
     state.userAchievements = progress
     prunePins(state)
+  },
+
+  // Новый бой: начинаем считать применения лидера с нуля. Событие старта не создаём.
+  startAchievementBattle(state: AchievementsState) {
+    state.leader_uses = 0
+  },
+  // Один сыгранный заряд лидера. Нужно для условия победы «не используйте лидера».
+  // Пассивки и восстановление зарядов этот счётчик не меняют.
+  recordAchievementLeaderUse(state: AchievementsState) {
+    state.leader_uses += 1
   },
 }
 
