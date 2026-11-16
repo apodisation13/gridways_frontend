@@ -53,6 +53,6 @@ export function leader_passive_abilities_upon_playing_a_card(
     trackAchievementEvent({
       type: AchievementEventType.PassiveTriggered,
       actor,
-      location: "hand",
+      location: "leader_passive_upon_playing_a_card",
     })
 }

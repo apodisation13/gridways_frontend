@@ -273,10 +273,14 @@ export interface AchievementUpgradeSnapshot {
 }
 
 export type AchievementPassiveLocation =
+  // Зона обычной пассивки; обычная пассивка лидера также использует hand.
   | "hand"
   | "deck"
   | "grave"
+  // Отдельные ситуации запуска, а не физическое расположение карты.
   | "passive_once"
+  | "passive_upon_playing_a_card"
+  | "leader_passive_upon_playing_a_card"
 
 export type AchievementEventInput =
   | {

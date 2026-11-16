@@ -56,16 +56,11 @@ export function passives_upon_playing_a_card(
         timeout
       )
       if (applied) {
-        // Флаги зон взаимоисключающие по конфигу игры.
-        const location = card.data.passive?.has_passive_in_hand
-          ? "hand"
-          : card.data.passive?.has_passive_in_deck
-            ? "deck"
-            : "grave"
+        // Отдельная ситуация: реакция на сыгранную карту, независимо от зоны владельца.
         trackAchievementEvent({
           type: AchievementEventType.PassiveTriggered,
           actor,
-          location,
+          location: "passive_upon_playing_a_card",
         })
       }
     }

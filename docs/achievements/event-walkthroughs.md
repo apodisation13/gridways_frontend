@@ -1,6 +1,6 @@
 # События достижений: от вызова до контракта
 
-Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost` и `ActionPlayed`; остальные события описаны в [events.md](events.md).
+Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost`, `ActionPlayed` и `PassiveTriggered`; остальные события описаны в [events.md](events.md).
 
 ## GameWon — победа в бою
 
@@ -416,4 +416,116 @@ eventData = {
 - Режим: [gameMode.ts](../../src/logic/achievements/gameMode.ts).
 - Предварительный подсчёт и reset: [processAchievementEvents.ts](../../src/logic/achievements/processAchievementEvents.ts), [filters.ts](../../src/logic/achievements/filters.ts).
 - На бэке: `services/api/app/apps/user_achievements/schemas.py` (ActionPlayedData/ActionPlayedEvent), `logic/events.py`, `logic/filters.py`.
+
+## PassiveTriggered — активация пассивной способности
+
+### Как событие доходит до проверки контракта
+
+**1. Игровой обработчик запускает пассивку и сохраняет её владельца.**
+
+Перед эффектом создаётся `actor = copyObj(card)` или `copyObj(leader)`. Это полный объект того, чья пассивка сработала. Если игра одной карты вызвала реакцию лидера, actor — лидер, а не сыгранная карта.
+
+**2. После обработки сообщаем об активации:**
+
+```ts
+trackAchievementEvent({
+  type: AchievementEventType.PassiveTriggered,
+  actor,
+  location: "passive_upon_playing_a_card",
+})
+```
+
+`location` — имя поля. Строка справа — одно из разрешённых значений. Добавление строки в AchievementPassiveLocation расширяет допустимые значения этого поля, а не добавляет новое поле в объект события.
+
+Есть четыре источника события, у них немного разный смысл «сработала»:
+
+| Источник | Когда создаётся событие | location |
+|---|---|---|
+| `run_passive` | Таймер разрешил запуск и вызван поддерживаемый обработчик. Даже если эффект оказался бесполезен, это активация. При отказе таймера или неизвестной способности события нет. | hand/deck/grave, как передал вызывающий код |
+| `passives_upon_beginning` | Обработчик разовой пассивки в начале боя вернул true. | passive_once |
+| `passives_upon_playing_a_card` | Реакция конкретной карты на игру карты вернула true. Событие для каждой сработавшей карты. | passive_upon_playing_a_card |
+| `leader_passive_abilities_upon_playing_a_card` | Реакция лидера на игру карты вернула true. Максимум одно событие за вызов диспетчера, даже при нескольких целях. | leader_passive_upon_playing_a_card |
+
+Список карт для реакции на ход по-прежнему выбирается по флагам пассивки в руке/колоде/сбросе. Новое location только отделяет этот вид активации в контрактах, не меняет игровые условия работы способности.
+
+**3. Мастер-функция добавляет режим и ставит событие в очередь.**
+
+```ts
+eventData = {
+  actor: input.actor,
+  mode: resolveAchievementGameMode(),
+  location: input.location,
+}
+```
+
+Далее — независимая JSON-копия, локальный UUID и `enqueueAchievementEvent`. Счётчик leader_uses не увеличивается: он относится к сыгранным зарядам ActionPlayed, а не к пассивкам.
+
+**4. Фронт и бэк применяют общие фильтры и счётчики.**
+
+Предварительный расчёт использует actor, mode и location без дополнительной сводки. На бэке `PassiveTriggeredData` явно описывает эти три обязательных поля: actor — полный JSON-объект, mode — режим, location — одно из шести разрешённых значений. В `apply_events` отдельной ветки для пассивок нет: работают обычные filters и counter. Бэк не запускает способность повторно и не вычисляет, был ли её эффект полезен.
+
+### Что означает location
+
+| Значение | Смысл |
+|---|---|
+| `hand` | Обычная пассивка в руке; обычная пассивка лидера тоже использует hand |
+| `deck` | Обычная пассивка в колоде |
+| `grave` | Обычная пассивка в сбросе |
+| `passive_once` | Разовая пассивка в начале боя |
+| `passive_upon_playing_a_card` | Реакция карты на сыгранную карту, независимо от зоны владельца |
+| `leader_passive_upon_playing_a_card` | Реакция лидера на сыгранную карту |
+
+Название поля сохранено, но для последних трёх значений оно обозначает ситуацию запуска, а не физическую зону. Лидер отличается от карты отсутствием actor.color.
+
+### Что отправляется на бэк
+
+Пример реакции лидера; actor сокращён для чтения, в запросе он полный:
+
+```json
+{
+  "events": [
+    {
+      "type": "passive.triggered",
+      "data": {
+        "actor": {
+          "id": 13,
+          "faction": "Soldiers",
+          "passive_ability": { "name": "add-charges-to-leader-if-play-special" }
+        },
+        "mode": "normal",
+        "location": "leader_passive_upon_playing_a_card"
+      }
+    }
+  ]
+}
+```
+
+Значения actor демонстрационные; имя способности берётся из реального объекта, не назначается трекером. Локальный UUID не отправляется.
+
+### Какие контракты можно описать
+
+Для всех строк event = `passive.triggered`, counter = count, target — нужное число активаций. Для ограничения режима добавляем mode. Несколько фильтров соединяются через И.
+
+| Контракт | filters |
+|---|---|
+| Пассивки карт в руке | location = hand, actor.color exists true |
+| Пассивки карт в колоде или сбросе | location = deck или grave соответственно, actor.color exists true |
+| Все пассивки лидера | actor.color exists false, без ограничения location |
+| Только обычная пассивка лидера | actor.color exists false, location = hand |
+| Разовые пассивки начала боя | location = passive_once |
+| Реакции карт на ход | location = passive_upon_playing_a_card |
+| Реакции лидера на ход | location = leader_passive_upon_playing_a_card |
+| Любая реакция на ход | location in [passive_upon_playing_a_card, leader_passive_upon_playing_a_card] |
+| Пассивки бронзовых карт с уроном >= 8 | actor.color = Bronze, actor.data.damage >= 8 |
+
+Можно дополнительно фильтровать фракцию, имя пассивки и любые переданные поля actor. Урон и прочие параметры относятся к снимку до эффекта, а не к фактическому результату пассивки. Общий unique также подходит, например по actor.id для разных карт, с actor.color exists true для исключения лидеров.
+
+### Где смотреть код
+
+- Обычные пассивки: [passives_dispatcher.ts](../../src/logic/player_move/passive_abilities/passives_dispatcher.ts).
+- Начало боя: [passives_upon_beginning.ts](../../src/logic/player_move/passive_abilities/passives_upon_beginning.ts).
+- Реакции карт: [passives_upon_playing_a_card.ts](../../src/logic/player_move/passive_abilities/passives_upon_playing_a_card.ts).
+- Реакции лидера: [leader_passive_abilities_upon_playing_a_card.ts](../../src/logic/player_move/leader_passive_abilities_upon_playing_a_card.ts).
+- Тип location: [achievements.ts](../../src/types/achievements.ts); подготовка события: [trackAchievementEvent.ts](../../src/logic/achievements/trackAchievementEvent.ts).
+- На бэке: `services/api/app/apps/user_achievements/schemas.py` (PassiveTriggeredData/PassiveTriggeredEvent), `logic/events.py` (общий подсчёт).
 
