@@ -33,7 +33,7 @@ export enum AchievementEventType {
   PassiveTriggered = "passive.triggered",
 
   // Враги. Снимок enemy берём до очистки статусов и восстановления параметров.
-  // Убийство/уничтожение врага или лидера, включая уничтожение в колоде.
+  // Смерть врага или лидера через remove_dead_enemy; удаление из колоды не считается.
   EnemyKilled = "enemy.killed",
   // Снятие существующего щита любым подключённым способом, не только ударом.
   EnemyShieldRemoved = "enemy.shield_removed",
