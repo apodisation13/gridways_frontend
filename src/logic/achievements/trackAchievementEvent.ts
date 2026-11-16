@@ -131,6 +131,11 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
       mode: resolveAchievementGameMode(),
       amount: input.amount,
     }
+  } else if (input.type === AchievementEventType.EnemyShieldRemoved) {
+    eventData = {
+      enemy: input.enemy,
+      mode: resolveAchievementGameMode(),
+    }
   } else if ("enemy" in input) {
     eventData = {
       enemy: input.enemy,

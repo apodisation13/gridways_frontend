@@ -1,6 +1,6 @@
 # События достижений: от вызова до контракта
 
-Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost`, `ActionPlayed`, `PassiveTriggered` и `EnemyKilled`; остальные события описаны в [events.md](events.md).
+Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost`, `ActionPlayed`, `PassiveTriggered`, `EnemyKilled`, `EnemyShieldRemoved` и `EnemyArmorRemoved`; остальные события описаны в [events.md](events.md).
 
 ## GameWon — победа в бою
 
@@ -637,4 +637,137 @@ EnemyKilled — факт обработки смерти. `GameWon.enemy_grave` 
 - Копирование enemy и добавление режима: [trackAchievementEvent.ts](../../src/logic/achievements/trackAchievementEvent.ts).
 - Общие фильтры и счётчики: [processAchievementEvents.ts](../../src/logic/achievements/processAchievementEvents.ts), [filters.ts](../../src/logic/achievements/filters.ts).
 - На бэке: `services/api/app/apps/user_achievements/schemas.py` (EnemyKilledEvent/EnemyEventData/GameModeData), `logic/events.py`, `logic/filters.py`.
+
+## EnemyShieldRemoved и EnemyArmorRemoved — снятие защиты врага
+
+### Как события доходят до проверки контракта
+
+**1. Игровой обработчик сохраняет врага до изменения защиты.**
+
+```ts
+const before = copyObj(enemy)
+// Здесь существующая игровая логика снимает щит или броню.
+trackEnemyDefenceChanges(before, enemy)
+```
+
+`before` — независимый полный снимок. Второй аргумент — тот же игровой враг после эффекта. Общая функция не снимает защиту сама: она сравнивает два состояния и сообщает о результате.
+
+**2. trackEnemyDefenceChanges определяет, что действительно снялось.**
+
+- Щит: до эффекта data.shield был включён, после — выключен или отсутствует. Тогда создаётся EnemyShieldRemoved. Если щита и так не было, события нет.
+- Броня: отсутствующее значение считается нулём; из неотрицательного значения до эффекта вычитается неотрицательное значение после. Если разница > 0, создаётся EnemyArmorRemoved с amount этой разницы. При неизменной/возросшей броне события нет; неконечные числа не учитываются.
+
+Примеры брони: 5 → 4 даёт amount 1; 5 → 0 даёт amount 5; 2 → 0 после способности «снять 10» даёт amount 2. То есть считаем реально снятую броню, а не запрошенную силу способности.
+
+Если эффект снял обе защиты, функция создаст два события: сначала щит, потом броню. Оба получают полный enemy из снимка before.
+
+**3. Мастер-функция добавляет режим и кладёт события в очередь.**
+
+Для щита:
+
+```ts
+trackAchievementEvent({
+  type: AchievementEventType.EnemyShieldRemoved,
+  enemy: before,
+})
+```
+
+Для брони:
+
+```ts
+trackAchievementEvent({
+  type: AchievementEventType.EnemyArmorRemoved,
+  enemy: before,
+  amount,
+})
+```
+
+У каждого события своя явная ветка в мастере. Она добавляет mode через resolveAchievementGameMode(). Затем создаются независимая JSON-копия и локальный UUID, событие передаётся в enqueueAchievementEvent. Режим в игровых местах вызова передавать не нужно.
+
+**4. Предварительный расчёт и бэк используют общие filters и counter.**
+
+Дополнительных сводок и специальной обработки этих событий нет. На бэке EnemyShieldRemovedData явно содержит enemy и mode; EnemyArmorRemovedData явно содержит enemy, mode и amount. Обе модели наследуют только общий Base, поля одного события не спрятаны в другом. Enemy — произвольный JSON-объект; amount — положительное конечное число.
+
+Бэк использует переданный факт и amount: не повторяет удар, не снимает защиту в игре и не вычисляет разницу состояний заново.
+
+### Где подключено сравнение защиты
+
+| Место | Что может быть засчитано |
+|---|---|
+| hit_one_enemy | Сначала щит; если его нет — 1 единица брони. После снятия защиты ветка возвращается, поэтому один такой удар не снимает сразу щит и броню. |
+| lock_enemy | Щит, если блокировка прошла. При Veil функция выходит до эффекта и события. |
+| purify | Щит. Снимок сделан до удаления статуса, пассивки и завещания, поэтому фильтры видят прежние признаки. Броню эта функция не снимает. |
+| Пассивка remove_shield | Щит выбранного врага |
+| remove_enemy_armor | Часть или вся броня одного врага |
+| remove_all_enemies_armor | Отдельное событие снятия брони для каждого врага, у которого она уменьшилась |
+| Эффект Fire в effects_interaction | Щит и вся броня; может создать оба события |
+
+Случайное снятие/поглощение брони, делегирующее в remove_enemy_armor, учитывается там же; второй вызов трекера в обёртке не нужен. Самостоятельная потеря брони вражеской пассивкой lose_armor не подключена к этим событиям.
+
+Причину снятия не передаём: удар, блокировка, очищение и огонь подходят под один тип события. Фильтры по «только ударом» здесь отсутствуют.
+
+### Что отправляется на бэк
+
+Пример: эффект снял щит и 3 единицы брони у одного врага. Enemy сокращён для чтения; в реальном запросе передаётся полный снимок до эффекта.
+
+```json
+{
+  "events": [
+    {
+      "type": "enemy.shield_removed",
+      "data": {
+        "enemy": {
+          "id": 7,
+          "color": "Bronze",
+          "faction": "Soldiers",
+          "data": { "shield": true, "armor": 3 }
+        },
+        "mode": "normal"
+      }
+    },
+    {
+      "type": "enemy.armor_removed",
+      "data": {
+        "enemy": {
+          "id": 7,
+          "color": "Bronze",
+          "faction": "Soldiers",
+          "data": { "shield": true, "armor": 3 }
+        },
+        "mode": "normal",
+        "amount": 3
+      }
+    }
+  ]
+}
+```
+
+enemy.data.armor — сколько брони было до эффекта, amount — сколько снялось. При снятии 1 из 3 эти значения будут 3 и 1 соответственно. У щита amount нет: его снятие — один факт. Локальные ID в запрос не входят.
+
+### Какие контракты можно описать
+
+| Контракт | event | counter | Дополнительные filters |
+|---|---|---|---|
+| Снимите щит 10 раз | enemy.shield_removed | count, target 10 | mode = normal, если нужен обычный режим |
+| Снимите броню 10 раз | enemy.armor_removed | count, target 10 | Аналогично |
+| Снимите суммарно 10 единиц брони | enemy.armor_removed | sum по amount, target 10 | Аналогично |
+| Снимите не менее 5 брони с одного врага за одно изменение — 3 раза | enemy.armor_removed | count, target 3 | amount >= 5 |
+| Снимите щиты у золотых врагов | enemy.shield_removed | count | enemy.color = Gold |
+| Снимите броню у лидеров | enemy.armor_removed | count или sum amount | enemy.color exists false |
+
+Если цвет не ограничен, подходят и враги-карты, и лидеры. Можно сочетать режим, фракцию, статус, завещание и другие поля снимка enemy обычными AND-фильтрами.
+
+Одна способность, снявшая всю броню у трёх врагов с запасами 2, 3 и 5, создаёт три события: count увеличится на 3, sum amount — на 10. Это не «один раз примените способность». Повторное получение и снятие защиты с того же врага считается новым фактом; unique по enemy.id, если использовать такой счётчик, считает разные ID, а не экземпляры.
+
+Старые контракты на снятие щита/брони менять не требуется: типы событий и поля запроса сохранились, mode присутствует у обоих.
+
+### Где смотреть код
+
+- Сравнение before/after: [enemyEvents.ts](../../src/logic/achievements/enemyEvents.ts).
+- Формирование события: [trackAchievementEvent.ts](../../src/logic/achievements/trackAchievementEvent.ts).
+- Удар: [hit_one_enemy.ts](../../src/logic/player_move/abilities/hit_one_enemy.ts).
+- Броня: [ability_enemy_armor.ts](../../src/logic/player_move/abilities/ability_enemy_armor.ts).
+- Блокировка/очищение: [ability_lock.ts](../../src/logic/player_move/abilities/ability_lock.ts), [ability_purify.ts](../../src/logic/player_move/abilities/ability_purify.ts).
+- Пассивка: [remove_shield.ts](../../src/logic/player_move/passive_abilities/passives_card/remove_shield.ts); огонь: [effects_interaction.ts](../../src/logic/ai_move/effects_interaction.ts).
+- На бэке: `services/api/app/apps/user_achievements/schemas.py` (EnemyShieldRemovedData/EnemyArmorRemovedData и их Event-модели), `logic/events.py` (общий подсчёт).
 

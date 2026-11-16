@@ -284,15 +284,17 @@ export type AchievementPassiveLocation =
 
 export type AchievementEventInput =
   | {
-      type:
-        | AchievementEventType.EnemyKilled
-        | AchievementEventType.EnemyShieldRemoved
+      type: AchievementEventType.EnemyKilled
       enemy: Enemy | EnemyLeader
     }
   | {
       type: AchievementEventType.EnemyArmorRemoved
       enemy: Enemy | EnemyLeader
       amount: number
+    }
+  | {
+      type: AchievementEventType.EnemyShieldRemoved
+      enemy: Enemy | EnemyLeader
     }
   | {
       type: AchievementEventType.PassiveTriggered
