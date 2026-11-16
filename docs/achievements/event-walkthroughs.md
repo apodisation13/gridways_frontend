@@ -1,6 +1,6 @@
 # События достижений: от вызова до контракта
 
-Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost`, `ActionPlayed` и `PassiveTriggered`; остальные события описаны в [events.md](events.md).
+Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost`, `ActionPlayed`, `PassiveTriggered` и `EnemyKilled`; остальные события описаны в [events.md](events.md).
 
 ## GameWon — победа в бою
 
@@ -528,4 +528,113 @@ eventData = {
 - Реакции лидера: [leader_passive_abilities_upon_playing_a_card.ts](../../src/logic/player_move/leader_passive_abilities_upon_playing_a_card.ts).
 - Тип location: [achievements.ts](../../src/types/achievements.ts); подготовка события: [trackAchievementEvent.ts](../../src/logic/achievements/trackAchievementEvent.ts).
 - На бэке: `services/api/app/apps/user_achievements/schemas.py` (PassiveTriggeredData/PassiveTriggeredEvent), `logic/events.py` (общий подсчёт).
+
+## EnemyKilled — смерть врага или лидера врагов
+
+### Как событие доходит до проверки контракта
+
+**1. Игровая логика вызывает remove_dead_enemy.**
+
+Единственное место создания EnemyKilled — функция `remove_dead_enemy` в `enemy_takes_damage.ts`. Обычный урон приходит сюда после проверки HP <= 0; также её вызывают обработчики яда/уничтожения и вражеская пассивка брони. Трекер не ищет причину смерти и не проверяет повторно здоровье: ему сообщает об этом обработчик смерти.
+
+Удаление случайного врага из колоды (`destroy_random_enemy_in_deck`), замена занятой клетки при перемещении (`move_enemy`) и замена своей картой (`place_self_in_field`) не создают EnemyKilled. Само исчезновение врага из игрового массива не считается этим событием.
+
+**2. До изменения мёртвого врага вызываем мастер-функцию:**
+
+```ts
+trackAchievementEvent({
+  type: AchievementEventType.EnemyKilled,
+  enemy,
+})
+```
+
+Вызов стоит до очистки статуса, восстановления HP, перемещения в кладбище и выполнения завещания. Поэтому фильтры видят признаки врага именно в момент обработки смерти: например veil или наличие deathwish. Текущее HP может быть нулевым/отрицательным при смерти от урона; для контрактов на исходные жизни используем `enemy.data.base.base_hp`.
+
+**3. Мастер-функция добавляет режим и копирует данные в очередь.**
+
+Для EnemyKilled используется общая ветка событий с enemy:
+
+```ts
+eventData = {
+  enemy: input.enemy,
+  mode: resolveAchievementGameMode(),
+}
+```
+
+Затем создаётся независимая JSON-копия, локальный UUID и вызывается `enqueueAchievementEvent`. Копирование происходит синхронно: дальнейшая очистка статуса или восстановление HP в remove_dead_enemy уже не меняют записанное событие.
+
+**4. Фронт и бэк проверяют обычные filters и counter.**
+
+На фронте `processAchievementEvents` использует enemy и mode напрямую. Дополнительной summary нет. Один враг может одновременно продвинуть контракты на общее число убийств, его цвет, фракцию и статус.
+
+На бэке `EnemyKilledEvent` использует `EnemyEventData`: полный `enemy: dict[str, JsonValue]` и обязательный mode. После проверки схемы `apply_events` передаёт словарь в общие фильтры и счётчики. Отдельной ветки подсчёта EnemyKilled нет. Бэк не убивает врага повторно и не проверяет состояние поля.
+
+### Что отправляется и откуда берутся поля
+
+| Поле | Источник |
+|---|---|
+| `enemy` | Полный аргумент enemy функции remove_dead_enemy, до очистки и восстановления |
+| `mode` | Текущий игровой стор, который читает resolveAchievementGameMode() |
+
+Пример запроса, enemy сокращён для чтения:
+
+```json
+{
+  "events": [
+    {
+      "type": "enemy.killed",
+      "data": {
+        "enemy": {
+          "id": 7,
+          "color": "Bronze",
+          "faction": "Soldiers",
+          "deathwish": { "name": null, "description": null },
+          "data": {
+            "hp": 0,
+            "damage": 7,
+            "status": "veil",
+            "base": { "base_hp": 7, "base_damage": 7 }
+          }
+        },
+        "mode": "normal"
+      }
+    }
+  ]
+}
+```
+
+Локальный ID события не отправляется. Если умер лидер врагов, enemy содержит полный объект лидера без color. Никакого отдельного события для него нет.
+
+### Какие контракты можно описать
+
+Для строк ниже event = `enemy.killed`, counter = count, target — нужное количество. Добавляем mode для ограничения режима. Фильтры соединяются через И.
+
+| Контракт | filters |
+|---|---|
+| Убейте 50 обычных врагов | enemy.color exists true |
+| Убейте 100 лидеров врагов | enemy.color exists false |
+| Убейте врагов Soldiers | enemy.color exists true, enemy.faction = Soldiers |
+| Убейте золотых врагов | enemy.color = Gold |
+| Убейте врагов со статусом veil | enemy.color exists true, enemy.data.status = veil |
+| Убейте врагов с завещанием | enemy.color exists true, enemy.deathwish.name ne null |
+| Убейте врагов с базовыми жизнями больше 50 | enemy.color exists true, enemy.data.base.base_hp > 50 |
+
+Без ограничения color контракт учитывает и обычных врагов, и лидеров. `deathwish.name ne null` требует существующего ненулевого имени; это не проверка того, что завещание уже выполнилось — событие создаётся перед ним.
+
+Поддерживается и streak. Для «5 Bronze подряд, повторить 5 раз» используются length 5, target 5, основной фильтр enemy.color = Bronze и два reset по enemy.killed: другой существующий цвет (ne Bronze) либо отсутствие color (лидер). Условия режима нужно указать и в основном фильтре, и в reset. Уже завершённые серии сохраняются; неподходящие события и границы боёв сами по себе серию не сбрасывают.
+
+Unique по enemy.id считает разные виды врагов, а не разные экземпляры одного вида. Две карты врага с одним id дают два факта для count, но одно уникальное значение для unique. Чтобы исключить пересечение ID карт и лидеров, такой контракт следует ограничить одним из этих видов через color.
+
+### Отличие от кладбища при победе
+
+EnemyKilled — факт обработки смерти. `GameWon.enemy_grave` — состав кладбища в конце боя. Это разные данные: лидер и враг со статусом Doomed не добавляются в обычное кладбище, но их смерть через remove_dead_enemy создаёт EnemyKilled. Поэтому для «убейте суммарно» используем EnemyKilled, а для «победите с минимум 30 врагами в кладбище» — GameWon.
+
+Защиты от повторного вызова remove_dead_enemy в трекере нет: каждый вызов создаёт новый факт. enemy.id не используется для подавления повторов, потому что в бою могут быть разные экземпляры одного врага. В мультиплеере событие создаётся у клиента, который выполняет обработчик смерти; получение состояния напарника само по себе не воспроизводит событие.
+
+### Где смотреть код
+
+- Единственное место вызова: [enemy_takes_damage.ts](../../src/logic/player_move/abilities/enemy_takes_damage.ts), функция remove_dead_enemy.
+- Копирование enemy и добавление режима: [trackAchievementEvent.ts](../../src/logic/achievements/trackAchievementEvent.ts).
+- Общие фильтры и счётчики: [processAchievementEvents.ts](../../src/logic/achievements/processAchievementEvents.ts), [filters.ts](../../src/logic/achievements/filters.ts).
+- На бэке: `services/api/app/apps/user_achievements/schemas.py` (EnemyKilledEvent/EnemyEventData/GameModeData), `logic/events.py`, `logic/filters.py`.
 

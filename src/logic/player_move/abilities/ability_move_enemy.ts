@@ -1,14 +1,12 @@
 import { choice } from "@/lib/utils"
-import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { sound_destroy_enemy, sound_enemy_move_down } from "@/logic/play_sounds"
 import type { Enemy, EnemyLeader, GameObj } from "@/types"
-import { AchievementEventType } from "@/types"
 
 export function move_enemy(enemy: Enemy | EnemyLeader, gameObj: GameObj): void {
   // это если мы ткнули на лидера врагов! то здесь ничего не выполним
   if (!(enemy as Enemy).color) return
 
-  const { field, enemies_grave } = gameObj
+  const { field } = gameObj
 
   const target_index = choice(field)
   const prev_index = (field as Enemy[]).indexOf(enemy as Enemy)
@@ -19,20 +17,9 @@ export function move_enemy(enemy: Enemy | EnemyLeader, gameObj: GameObj): void {
     field[target_index] = enemy as Enemy
     field[prev_index] = ""
   } else {
-    // если же там кто-то есть, мы убираем того в кладбище, а этого врага ставим сюда
+    // если же там кто-то есть, мы убираем того вообще, а этого врага ставим сюда
     sound_destroy_enemy()
-    // предыдущий враг на той клетке
-    const prev_enemy = field[target_index] as Enemy
-    trackAchievementEvent({
-      type: AchievementEventType.EnemyKilled,
-      enemy: prev_enemy,
-    })
-    // убиваем его
-    field[target_index] = ""
-    // кладем в сброс и восстанавливаем его здорове
-    enemies_grave.push(prev_enemy)
-    prev_enemy.data.hp = prev_enemy.data.base.base_hp
-    // новый враг прыгаем туда со своей старой клетки
+    // ставим туда нового врага вместо старого
     field[target_index] = enemy as Enemy
     field[prev_index] = ""
   }
