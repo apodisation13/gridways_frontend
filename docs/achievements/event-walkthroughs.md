@@ -1,6 +1,6 @@
 # События достижений: от вызова до контракта
 
-Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost`, `ActionPlayed`, `PassiveTriggered`, `EnemyKilled`, `EnemyShieldRemoved`, `EnemyArmorRemoved`, `DeckCreated`, `DeckSaved`, `DeckDeleted` и `DecksChecked`; остальные события описаны в [events.md](events.md).
+Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost`, `ActionPlayed`, `PassiveTriggered`, `EnemyKilled`, `EnemyShieldRemoved`, `EnemyArmorRemoved`, `DeckCreated`, `DeckSaved`, `DeckDeleted`, `DecksChecked`, `ResourcesChecked` и `UpgradesChecked`; остальные события описаны в [events.md](events.md).
 
 ## GameWon — победа в бою
 
@@ -1003,4 +1003,142 @@ trackAchievementEvent({
 - Прогресс на странице: localUserAchievements в [achievements.ts](../../src/store/modules/achievements.ts).
 - Общий current-счётчик: [processAchievementEvents.ts](../../src/logic/achievements/processAchievementEvents.ts).
 - На бэке: `services/api/app/apps/user_achievements/service.py` (чтение количества), `logic/events.py` (подстановка снимка и current), `schemas.py` (пустой вход и допустимый счётчик).
+
+## ResourcesChecked и UpgradesChecked — текущий баланс и прокачки
+
+У этих событий общий принцип с DecksChecked: **фронт замечает достигнутую цель, а сервер проверяет её по своим данным**. Поэтому общий путь описан один раз, а источники данных — отдельно ниже.
+
+ResourcesChecked отвечает на вопрос «сколько ресурсов есть сейчас», UpgradesChecked — «до чего сейчас прокачан пользователь». Получение денег за всё время считает ResourceGained, а количество покупок прокачек — UpgradePurchased. Загрузка состояния не является ни заработком, ни покупкой.
+
+### Общий путь: локальная проверка → пустой сигнал → серверное подтверждение
+
+**1. После загрузки вызываем проверку состояния.** Подписка installAchievementSync ждёт нужные мутации:
+
+| Проверка | Что должно загрузиться |
+|---|---|
+| checkCurrentResources | set_resource, setUserAchievements, setAchievementsConfig |
+| checkCurrentUpgrades | setUpgrades, setUserUpgrades, setUserAchievements, setAchievementsConfig |
+
+Каждая первичная проверка выполняется один раз после готовности своей группы. При входе/выходе из аккаунта её флаг сбрасывается. Это позволяет подтвердить контракт, условие которого было выполнено ещё до появления самого контракта.
+
+**2. Функция check сначала запускает локальный preview.** Для ресурсов она берёт getter resource; для прокачек — upgradesConfig и userUpgrades. Используется подтверждённый прогресс пользователя. Preview создаёт временное событие с данными и вызывает общий processAchievementEvents, не отправляя его в очередь.
+
+Если пользователь не авторизован или ни одна незавершённая цель не достигнута, сигнала не будет. Если такой тип уже есть в pendingEvents, второй сигнал не добавляется. Проверка касается ожидающей очереди, не inFlightEvents. У checkCurrentResources также есть предварительный выход, если в каталоге вообще нет счётчиков current.
+
+**3. При достижении цели мастер-функция получает только пустое data.** Например, если выполнены цели обоих типов, в запросе могут быть:
+
+```json
+{
+  "events": [
+    { "type": "resources.checked", "data": {} },
+    { "type": "upgrades.checked", "data": {} }
+  ]
+}
+```
+
+Это два независимых сигнала; они не обязаны отправляться вместе. Баланса, уровней и mode в запросе нет. На фронте используется обычная ветка input.data в трекере. Синхронизация запускает отправку сразу, без ожидания таймера или заполнения очереди; выполняющийся запрос сначала должен закончиться.
+
+На бэке оба события используют ResourcesCheckedData: пустую модель с extra="forbid". Она запрещает передавать произвольные поля вместо пустого объекта. UpgradesCheckedEvent не наследуется от события ресурсов — лишь использует ту же модель пустого data.
+
+**4. Бэк получает состояние из БД и подставляет его в обработчик.** Снимки читаются только для присутствующих в пачке checked-событий, один раз на тип за пачку. Затем apply_events заменяет пустое data серверным снимком. Все фильтры и current-счётчики читают уже его.
+
+**5. current заменяет value текущим числом, ограниченным target.** Он не прибавляет число при каждой проверке. Если цель достигнута, прогресс и награда сохраняются в общей транзакции. Подтверждённое выполнение впоследствии не отменяется.
+
+Геттер localUserAchievements вызывает оба preview и для отображения страницы. Поэтому промежуточный прогресс виден без запроса на каждое изменение. Preview не ставит даты выполнения и не выдаёт наград.
+
+### ResourcesChecked: откуда берётся баланс
+
+**На фронте** previewCurrentResources создаёт временные данные:
+
+```ts
+data: { resources: store.getters.resource }
+```
+
+Помимо первичной загрузки, checkCurrentResources вызывается централизованно после обработки следующих входов мастер-функции:
+
+- ResourcesChanged — обычное изменение ресурсов;
+- ResourceGained в форме before/after — получение награды по разнице балансов;
+- ResourceTransition — покупка, продажа, крафт или разбор ресурса;
+- ActorTransition — крафт или разбор карты/лидера;
+- UpgradeChanged — покупка прокачки.
+
+Эти вызовы используют уже обновлённый баланс стора. Прямая отправка готового ResourceGained с resources сама по себе не вызывает checkCurrentResources. Обычная мутация set_resource также не означает постоянную автоматическую проверку: подписка использует её для готовности первой загрузки.
+
+Отдельное место — sendAchievementEvents в сторе достижений. Если ответ содержит user_resources, сначала сохраняется подтверждённый прогресс, затем новый баланс, учитываются фактически выданные награды как доход и вызывается checkCurrentResources. Поэтому награда одного контракта может довести до цели другой контракт на накопление.
+
+**На бэке** AchievementsService блокирует строку user_resources и читает баланс через get_user_resources. Это фактический остаток, после игровых начислений, расходов и лимитов. В apply_events получается, например:
+
+```json
+{ "resources": { "money": 20000, "silk": 15 } }
+```
+
+Здесь для краткости показаны два ресурса; снимок содержит полный баланс. Поле счётчика — resources.<имя ресурса>, например resources.money. Схема конфига проверяет имя по ResourceType.
+
+Снимок читается **до наград этой пачки**. Внутри apply_events награды ещё не увеличивают баланс для текущей проверки. Их влияние проверится отдельным сигналом после ответа на фронт.
+
+Пример: при цели 20000 было 19000, получили фактически 1000 — preview показывает 20000/20000 и отправляет сигнал. Если до обработки успели потратить 500, сервер увидит 19500 и цель не подтвердит. Это проверка текущего остатка, а не максимума за историю. После подтверждения тратить деньги можно: выполненный контракт сохраняется.
+
+### UpgradesChecked: как получаются уровень, значение и максимум
+
+**На фронте** previewCurrentUpgrades вызывает buildUpgradeSnapshot(upgradesConfig, userUpgrades). **На бэке** сервис блокирует строку user_upgrades, читает её data и вызывает build_upgrade_snapshot с конфигом game_constants.upgrades. Алгоритм сборки один и тот же по смыслу; клиентский снимок на бэк не передаётся.
+
+Кроме первичной загрузки, checkCurrentUpgrades вызывается после UpgradeChanged. До неё покупка уже завершилась, а стор получил новые уровни. Прямое событие UpgradePurchased само по себе эту проверку не запускает.
+
+Снимок имеет два верхних ключа: upgrades и summary. Например, отдельный параметр может выглядеть так:
+
+```json
+{
+  "upgrades": {
+    "game": {
+      "max_cards_in_deck": { "level": 2, "value": 12, "maxed": false }
+    }
+  }
+}
+```
+
+Числа здесь иллюстративные. level — сохранённый номер ступени пользователя; value — эффект этой ступени из конфига. Для «достигните размера колоды 12» нужен value, а не level. maxed означает, что у текущей ступени next явно равен null.
+
+Сборщик обходит разделы resources, settings, game и inventory из UpgradeType. Если у пользователя нет записи параметра, берёт уровень 0. Если ступень не найдена в конфиге, параметр не получает выдуманного значения и не считается максимальным, но остаётся в общем количестве прокачек.
+
+Для каждого upgrade type, а также для групп all и non_settings формируется summary:
+
+| Поле | Что означает |
+|---|---|
+| total_count | Сколько параметров прокачки есть в этой группе |
+| maxed_count | Сколько параметров достигли максимума |
+| all_maxed | Число 1, если группа непустая и все параметры максимальны; иначе 0 |
+
+all включает settings; non_settings исключает этот раздел. Сводки разделов находятся, например, в summary.inventory и summary.settings. Это параметры прокачек пользователя, не покупки внутри аренного забега.
+
+Почему all_maxed — 0/1, а maxed — boolean? Фильтр может проверять boolean, но current читает число. Поэтому «всё на максимум» удобно задавать счётчиком по summary.all.all_maxed с target 1.
+
+Схема конфигов разрешает для UpgradesChecked поля upgrades.<upgrade_type>.<upgrade_subtype>.level/value и summary.<группа>.total_count/maxed_count/all_maxed. maxed можно использовать в filters, но не как поле current-счётчика.
+
+Цель должна быть достижима по актуальному конфигу прокачек. Список параметров для «всё» также берётся из текущего конфига: добавление параметра меняет условие ещё не выполненного контракта, но не отменяет уже подтверждённое выполнение.
+
+### Какие контракты описываются
+
+У всех строк counter.type = current. Бэк требует именно этот тип для checked-событий.
+
+| Контракт | event | counter.field | target |
+|---|---|---|---|
+| Накопите 20000 денег | resources.checked | resources.money | 20000 |
+| Накопите 15 silk | resources.checked | resources.silk | 15 |
+| Достигните размера колоды 12 | upgrades.checked | upgrades.game.max_cards_in_deck.value | 12 |
+| Достигните второго уровня этой прокачки | upgrades.checked | upgrades.game.max_cards_in_deck.level | 2 |
+| Прокачайте любой параметр, кроме settings, до максимума | upgrades.checked | summary.non_settings.maxed_count | 1 |
+| Прокачайте все параметры до максимума | upgrades.checked | summary.all.all_maxed | 1 |
+| Прокачайте весь inventory до максимума | upgrades.checked | summary.inventory.all_maxed | 1 |
+| Прокачайте весь settings до максимума | upgrades.checked | summary.settings.all_maxed | 1 |
+
+Для накопления значение может уменьшаться до подтверждения, а завершённые контракты остаются выполненными. Несколько целей по одному ресурсу или прокачкам проверяются одним сигналом своего типа.
+
+### Где смотреть код
+
+- Проверки и временные данные: [currentResources.ts](../../src/logic/achievements/currentResources.ts), [currentUpgrades.ts](../../src/logic/achievements/currentUpgrades.ts).
+- Сборка прокачек: [upgradeSnapshot.ts](../../src/logic/achievements/upgradeSnapshot.ts).
+- Проверки после операций: [trackAchievementEvent.ts](../../src/logic/achievements/trackAchievementEvent.ts).
+- Загрузка и отправка: [syncAchievementEvents.ts](../../src/logic/achievements/syncAchievementEvents.ts).
+- Отображение прогресса и проверка после наград: [achievements.ts](../../src/store/modules/achievements.ts).
+- На бэке: `services/api/app/apps/user_achievements/service.py` (чтение/блокировки), `logic/upgrades.py` (снимок прокачек), `logic/events.py` (подстановка снимков и current), `schemas.py` (пустые сигналы и допустимые поля счётчиков).
 
