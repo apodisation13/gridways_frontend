@@ -1,6 +1,6 @@
 # События достижений: от вызова до контракта
 
-Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost`, `ActionPlayed`, `PassiveTriggered`, `EnemyKilled`, `EnemyShieldRemoved` и `EnemyArmorRemoved`; остальные события описаны в [events.md](events.md).
+Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost`, `ActionPlayed`, `PassiveTriggered`, `EnemyKilled`, `EnemyShieldRemoved`, `EnemyArmorRemoved`, `DeckCreated`, `DeckSaved` и `DeckDeleted`; остальные события описаны в [events.md](events.md).
 
 ## GameWon — победа в бою
 
@@ -770,4 +770,132 @@ enemy.data.armor — сколько брони было до эффекта, amo
 - Блокировка/очищение: [ability_lock.ts](../../src/logic/player_move/abilities/ability_lock.ts), [ability_purify.ts](../../src/logic/player_move/abilities/ability_purify.ts).
 - Пассивка: [remove_shield.ts](../../src/logic/player_move/passive_abilities/passives_card/remove_shield.ts); огонь: [effects_interaction.ts](../../src/logic/ai_move/effects_interaction.ts).
 - На бэке: `services/api/app/apps/user_achievements/schemas.py` (EnemyShieldRemovedData/EnemyArmorRemovedData и их Event-модели), `logic/events.py` (общий подсчёт).
+
+## DeckCreated, DeckSaved и DeckDeleted — операции с колодами
+
+### Чем отличаются создание и сохранение
+
+**DeckCreated — появилась новая колода. DeckSaved — сохранён её состав.**
+
+При создании произошло и то, и другое. При редактировании новая колода не появилась, но состав снова сохранён. Поэтому:
+
+| Действие | События |
+|---|---|
+| Создать колоду | deck.created и затем deck.saved |
+| Сохранить редактирование колоды | Только deck.saved |
+| Удалить колоду | Только deck.deleted |
+| Загрузить/просмотреть/выбрать колоду | Ни одного из этих трёх |
+
+Так «создайте 5 колод» не выполняется пятью редактированиями одной колоды. А «соберите полностью бронзовую колоду» можно выполнить и сразу при создании, и изменив существующую.
+
+### Как события доходят до проверки контрактов
+
+**1. До запроса сохраняем данные колоды.**
+
+В DeckbuildPage функция `achievementDeckSnapshot()` создаёт независимую JSON-копию:
+
+```ts
+{
+  name: this.deck.deck_name.trim(),
+  leader: this.deck.leader,
+  cards: this.deck.deck_is_progress.map(entry => entry.card),
+  health: this.deck.health,
+}
+```
+
+Снимок нужен до await: успешный запрос сбрасывает форму сборки. Cards содержит полные объекты карт без обёрток, leader — полный объект лидера. Это данные формы, а не чтение колоды из уже очищенной формы после ответа.
+
+При удалении DeckSelection сначала находит колоду по ID, сохраняет копию `selected.deck` и заменяет cards на список полных объектов карт. Здесь сохраняются также id и остальные поля выбранной колоды. После удаления записи в сторе уже не будет.
+
+**2. После успешной операции вызываем мастер-функцию.**
+
+- `DeckbuildPage.save_deck`: после createUserDeck — `{type: DeckCreated, data: {deck}}`.
+- `DeckbuildPage.patch_deck`: после patchUserDeck — `{type: DeckSaved, data: {deck}}`.
+- `DeckSelection.confirm_delete`: после deleteUserDeck — `{type: DeckDeleted, data: {deck}}`.
+
+Если запрос завершился ошибкой, до вызова трекера выполнение не доходит. Для создания и редактирования сначала проходит существующая проверка формы.
+
+**3. Мастер-функция кладёт готовое data в очередь.**
+
+Общая ветка берёт `input.data`, делает независимую JSON-копию, добавляет локальный UUID и вызывает enqueueAchievementEvent. Режима mode у этих событий нет: работа с колодой не относится к конкретному бою.
+
+После записи DeckCreated трекер сам вызывает себя ещё раз с DeckSaved и тем же снимком колоды. Компоненту не нужно отправлять оба события вручную. Это конечный вызов: у DeckSaved нет ветки, создающей ещё одно DeckSaved.
+
+После создания и удаления дополнительно вызывается checkCurrentDecks для контрактов «имейте сейчас N колод». Это отдельная проверка: она ставит decks.checked с пустым data только при достижении цели current и отсутствии такого сигнала в очереди. Создание/удаление само по себе не означает обязательную отправку decks.checked. При редактировании число колод не меняется.
+
+**4. Для DeckSaved вычисляем сводку состава.**
+
+В processAchievementEvents фронт добавляет `deck.summary = buildDeckSummary(deck.cards)` к данным обработки. В событии очереди summary отсутствует. На бэке apply_events делает то же через build_deck_summary, используя проверенный `event.data.deck.cards`.
+
+Сводка содержит cards_count, by_color.Bronze/Silver/Gold, neutral_count и флаги all_bronze/all_silver/all_gold/all_neutral/no_neutral — такие же, как для колоды в GameWon. Лидер в подсчёт карт не входит. Пустая колода не проходит условия «все карты такие-то».
+
+У DeckCreated и DeckDeleted сводка автоматически не строится. Для проверки состава используем DeckSaved; для факта создания/удаления доступны исходные поля deck.
+
+**5. Общие filters и counter считают прогресс.**
+
+Бэк принимает все три типа через DeckEventData, в котором одно поле deck. UserDeckSnapshot явно перечисляет cards, leader, name и health; наследования от DeckComposition больше нет. Дополнительные поля колоды разрешены, чтобы сохранить id и другие сведения при удалении. Поля внутри карт и лидера остаются произвольным JSON для фильтров.
+
+Далее — общая обработка заданий. События не создают, не редактируют и не удаляют колоду повторно: игровая операция уже выполнена соответствующей ручкой.
+
+### Что отправляется на бэк
+
+Пример создания. Поля карты и лидера сокращены для чтения, в запросе они полные:
+
+```json
+{
+  "events": [
+    {
+      "type": "deck.created",
+      "data": {
+        "deck": {
+          "name": "Бронзовая колода",
+          "leader": { "id": 13, "faction": "Soldiers" },
+          "cards": [{ "id": 1, "color": "Bronze", "faction": "Soldiers" }],
+          "health": 100
+        }
+      }
+    },
+    {
+      "type": "deck.saved",
+      "data": {
+        "deck": {
+          "name": "Бронзовая колода",
+          "leader": { "id": 13, "faction": "Soldiers" },
+          "cards": [{ "id": 1, "color": "Bronze", "faction": "Soldiers" }],
+          "health": 100
+        }
+      }
+    }
+  ]
+}
+```
+
+Пример показывает два создаваемых события. Они не обязаны попасть в один HTTP-запрос: если первое довело контракт до цели, отправка может начаться до добавления второго.
+
+После редактирования структура та же, но событие только deck.saved. При удалении — deck.deleted и снимок удалённой колоды, включая её id. При создании/редактировании текущий snapshot не содержит ID колоды, поэтому unique по deck.id для этих событий использовать нельзя. Локальные UUID и вычисленная summary в запрос не входят.
+
+### Какие контракты можно описать
+
+| Контракт | event | counter и filters |
+|---|---|---|
+| Создайте суммарно 5 колод | deck.created | count, target 5 |
+| Создайте 5 колод за Soldiers | deck.created | count, target 5, deck.leader.faction = Soldiers |
+| Удалите 3 колоды | deck.deleted | count, target 3 |
+| Соберите полностью бронзовую колоду | deck.saved | count, target 1, deck.summary.all_bronze = true |
+| Соберите полностью серебряную/золотую колоду | deck.saved | Аналогично all_silver/all_gold |
+| Соберите колоду без нейтральных/только из нейтральных | deck.saved | Аналогично no_neutral/all_neutral |
+| Соберите колоду из 20 карт | deck.saved | count, target 1, deck.summary.cards_count = 20 |
+| Создайте колоды за три разные фракции | deck.created | unique по deck.leader.faction, target 3; при необходимости ограничить список фракций через in |
+
+«Имейте 5 колод» — другой контракт: decks.checked, current по decks.count. Он учитывает текущее хранение, включая базовую колоду, а не число созданий за всё время.
+
+DeckSaved означает факт сохранения, а не уникальную колоду и не доказанное изменение её состава. Если несколько раз успешно сохранить одну и ту же подходящую колоду, count увеличивается каждый раз, пока задание не завершено. Поэтому для «соберите бронзовую колоду» используется target 1; target 5 означал бы пять подходящих сохранений, а не пять разных колод.
+
+### Где смотреть код
+
+- Создание, редактирование и снимок формы: [DeckbuildPage.vue](../../src/pages/DeckbuildPage.vue).
+- Удаление и снимок выбранной колоды: [DeckSelection.vue](../../src/components/DeckSelection.vue).
+- Дополнительное DeckSaved и проверка количества: [trackAchievementEvent.ts](../../src/logic/achievements/trackAchievementEvent.ts), [currentDecks.ts](../../src/logic/achievements/currentDecks.ts).
+- Сводка и предварительный подсчёт: [deckSummary.ts](../../src/logic/achievements/deckSummary.ts), [processAchievementEvents.ts](../../src/logic/achievements/processAchievementEvents.ts).
+- На бэке: `services/api/app/apps/user_achievements/schemas.py` (UserDeckSnapshot/DeckEventData и три Event-модели), `logic/events.py`, `logic/decks.py`.
 
