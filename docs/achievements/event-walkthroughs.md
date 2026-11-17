@@ -1,6 +1,6 @@
 # События достижений: от вызова до контракта
 
-Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost`, `ActionPlayed`, `PassiveTriggered`, `EnemyKilled`, `EnemyShieldRemoved`, `EnemyArmorRemoved`, `DeckCreated`, `DeckSaved` и `DeckDeleted`; остальные события описаны в [events.md](events.md).
+Разбираем по одному событию: зачем оно нужно, откуда берутся данные, что отправляется и как считается прогресс. Здесь описан существующий код. Разобраны `GameWon`, `GameLost`, `ActionPlayed`, `PassiveTriggered`, `EnemyKilled`, `EnemyShieldRemoved`, `EnemyArmorRemoved`, `DeckCreated`, `DeckSaved`, `DeckDeleted` и `DecksChecked`; остальные события описаны в [events.md](events.md).
 
 ## GameWon — победа в бою
 
@@ -898,4 +898,109 @@ DeckSaved означает факт сохранения, а не уникаль
 - Дополнительное DeckSaved и проверка количества: [trackAchievementEvent.ts](../../src/logic/achievements/trackAchievementEvent.ts), [currentDecks.ts](../../src/logic/achievements/currentDecks.ts).
 - Сводка и предварительный подсчёт: [deckSummary.ts](../../src/logic/achievements/deckSummary.ts), [processAchievementEvents.ts](../../src/logic/achievements/processAchievementEvents.ts).
 - На бэке: `services/api/app/apps/user_achievements/schemas.py` (UserDeckSnapshot/DeckEventData и три Event-модели), `logic/events.py`, `logic/decks.py`.
+
+## DecksChecked — сколько колод сейчас хранится у игрока
+
+**DeckCreated считает создания за всё время. DecksChecked проверяет количество колод сейчас.** Например, создали пять колод, удалили четыре: число созданий осталось пять, а число хранящихся колод уменьшилось. Базовая колода тоже входит в хранение.
+
+Это событие — просьба проверить состояние. Фронт не сообщает серверу ни количество, ни список колод: сервер сам читает их из БД.
+
+### Как событие доходит до проверки контракта
+
+**1. Фронт проверяет количество после загрузки, создания и удаления.**
+
+При загрузке installAchievementSync ждёт три мутации: `set_decks`, `setUserAchievements` и `setAchievementsConfig`. Когда загружены колоды, прогресс и конфиги, один раз вызывает checkCurrentDecks. После входа/выхода из аккаунта флаги этой первичной проверки сбрасываются.
+
+Ещё два места вызова — мастер-функция после DeckCreated и DeckDeleted. Операция с колодой к этому моменту уже успешно завершилась. Редактирование не меняет количество, поэтому после DeckSaved такой проверки нет.
+
+**2. checkCurrentDecks сначала проверяет цель локально.**
+
+Функция берёт `store.getters.all_decks.length` и передаёт его в previewCurrentDecks вместе с конфигами и подтверждённым прогрессом. Preview создаёт временное событие:
+
+```ts
+{
+  id: "current-decks-preview",
+  type: AchievementEventType.DecksChecked,
+  data: { decks: { count } },
+}
+```
+
+Оно нужно только для локального вызова processAchievementEvents: в очередь и HTTP-запрос этот объект не попадает. Общий обработчик проверяет filters и подставляет число колод в current-счётчик.
+
+Если пользователь не авторизован, ни одна незавершённая цель не достигнута или в pendingEvents уже есть DecksChecked, новый сигнал не создаётся. Проверка наличия здесь относится именно к ожидающей очереди, не к уже отправленной пачке.
+
+**3. При достижении цели отправляем пустой сигнал.**
+
+```ts
+trackAchievementEvent({
+  type: AchievementEventType.DecksChecked,
+  data: {},
+})
+```
+
+Трекер использует общую ветку input.data и кладёт событие в очередь. installAchievementSync распознаёт DecksChecked и запускает отправку, не дожидаясь 10 секунд или 20 событий. Если другой запрос уже выполняется, новый сигнал остаётся в очереди до следующей отправки.
+
+На бэк уходит:
+
+```json
+{
+  "events": [
+    { "type": "decks.checked", "data": {} }
+  ]
+}
+```
+
+Ни mode, ни deck, ни count в запросе нет. В схеме бэка DecksCheckedEvent использует пустую модель ResourcesCheckedData. Название общее с проверкой ресурсов, но полей ресурсов в этой модели нет: она запрещает любые дополнительные поля через extra="forbid".
+
+**4. Бэк сам считает колоды пользователя.**
+
+В AchievementsService.process_events есть отдельная ветка: если в пачке присутствует DecksChecked, сервис блокирует строку пользователя в users и считает строки user_decks для его user_id. Базовая колода учитывается наравне с остальными. Количество читается один раз для всей пачки.
+
+Блокировка согласована с созданием/удалением колод: количество остаётся стабильным до завершения транзакции проверки и награждения. Получается серверный снимок `decks = {"count": число}`.
+
+В apply_events пустое data заменяется на:
+
+```json
+{ "decks": { "count": 5 } }
+```
+
+Именно этот объект видят фильтры и счётчик на бэке. Клиентское число из preview здесь не используется.
+
+**5. current заменяет прогресс текущим количеством.**
+
+Для DecksChecked схема конфигов разрешает только counter.type = current и counter.field = decks.count. Это не прибавление единицы и не сумма проверок: value становится текущим количеством, ограниченным target.
+
+Если цель достигнута, бэк обычным способом сохраняет выполнение и выдаёт награду. После подтверждения удаление колоды уже не отменяет выполненный контракт и награду.
+
+### Что показывается на странице
+
+Геттер localUserAchievements отдельно вызывает previewCurrentDecks с актуальным all_decks.length. Поэтому до подтверждения прогресс виден сразу и может уменьшаться: было 4/5, удалили колоду — стало 3/5. Для каждого такого изменения запрос не требуется; промежуточные числа в БД не обязаны совпадать с отображаемыми на странице.
+
+Сервер подтверждает количество **на момент обработки**, а не исторический максимум. Если фронт увидел 5 колод, но до серверной проверки одну удалили, бэк увидит 4 и цель 5 не подтвердит. Если же награду уже выдали, контракт остаётся выполненным.
+
+### Пример контракта
+
+```json
+"have_decks_5": {
+  "id": "have_decks_5",
+  "title": "Имейте в хранении 5 колод",
+  "event": "decks.checked",
+  "target": 5,
+  "counter": { "type": "current", "field": "decks.count" },
+  "filters": {},
+  "rewards": { "resources": { "money": 1000 } },
+  "ordering": 10
+}
+```
+
+Для целей 3, 7 или 10 меняются id, title и target. Несколько таких контрактов проверяются одним событием. Состав и фракцию конкретной колоды проверяем через DeckSaved/DeckCreated: у DecksChecked есть только общее число колод, без их объектов.
+
+### Где смотреть код
+
+- Локальная проверка и пустой сигнал: [currentDecks.ts](../../src/logic/achievements/currentDecks.ts).
+- Первичная проверка и немедленная отправка: [syncAchievementEvents.ts](../../src/logic/achievements/syncAchievementEvents.ts).
+- Проверки после создания/удаления: [trackAchievementEvent.ts](../../src/logic/achievements/trackAchievementEvent.ts).
+- Прогресс на странице: localUserAchievements в [achievements.ts](../../src/store/modules/achievements.ts).
+- Общий current-счётчик: [processAchievementEvents.ts](../../src/logic/achievements/processAchievementEvents.ts).
+- На бэке: `services/api/app/apps/user_achievements/service.py` (чтение количества), `logic/events.py` (подстановка снимка и current), `schemas.py` (пустой вход и допустимый счётчик).
 
