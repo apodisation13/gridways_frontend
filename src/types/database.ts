@@ -399,7 +399,7 @@ interface Multiplayer {
 }
 
 export interface GameConst {
-  achievements: AchievementGameConfig
+  achievements?: AchievementGameConfig
   max_random_n_enemies: number
   random_level_enemies_count: Record<string, unknown>
   resources_transitions: Record<string, unknown>

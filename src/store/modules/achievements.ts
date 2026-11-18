@@ -226,10 +226,13 @@ const mutations = {
   // Пришёл каталог из game_const: заменяем описания и чистим устаревшие закрепления.
   setAchievementsConfig(
     state: AchievementsState,
-    catalog: AchievementGameConfig
+    catalog: AchievementGameConfig | undefined
   ) {
     // Daily и weekly позднее загрузим отдельно; game_const присылает permanent.
-    state.achievementsConfig.permanent = catalog.permanent
+    state.achievementsConfig.permanent = catalog?.permanent ?? {
+      title: "Постоянные",
+      categories: {},
+    }
     prunePins(state)
   },
   // Начальная загрузка подтверждённого прогресса; здесь не прибавляем локальные события.
@@ -268,6 +271,9 @@ const actions = {
   }: ActionContext<AchievementsState, RootState>): Promise<boolean> {
     // Таймер может вызвать экшен с пустой очередью или во время другого запроса.
     // В этих случаях ничего не переносим в inFlightEvents и сразу выходим.
+    // Без конфигов контрактов очередь остаётся локальной, запрос не отправляем.
+    if (!Object.keys(state.achievementsConfig.permanent.categories).length)
+      return false
     if (state.sending || !getters.isLoggedIn || !state.pendingEvents.length)
       return false
     const userId = getters.getUser.user_id
