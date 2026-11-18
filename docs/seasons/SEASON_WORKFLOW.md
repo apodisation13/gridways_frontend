@@ -21,6 +21,25 @@ Reference it at the start of any new session to avoid rediscovering everything.
 
 ## TSV column formats
 
+### Working data and repository references
+
+`data/` is local and ignored by Git. The maintained instruction and generator are in `docs/seasons/`; the old `data/SEASON_WORKFLOW.md` pointer and `data/generate_enemies.py` wrapper were retained locally during migration.
+
+The committed `docs/seasons/reference/levels.tsv` and `connections.tsv` preserve the historical seasons 6–13 dataset (400 levels and 956 connections at the 2026-11-13 audit). They contain game definitions, not user progress. They are neither a live database export nor the generator's output directory. Verify IDs and enemy pools before extending them.
+
+After a fresh clone, if the working files do not already exist, prepare them from the repository root:
+
+```sh
+mkdir -p data
+cp docs/seasons/reference/levels.tsv data/levels.tsv
+cp docs/seasons/reference/connections.tsv data/connections.tsv
+python3 docs/seasons/generate_enemies.py --data-dir data
+```
+
+Do not overwrite newer working data with these reference copies. Generated `data/level_enemies.tsv` stays local. The old `data/user_seasons_s1_5.json` contains user IDs/progress and must not be committed as an example. Git does not back up ignored files.
+
+The generator overwrites `levels.tsv` and `level_enemies.tsv`. Use a temporary copy and `--data-dir` for experiments. Its historical rules cover seasons 6–13; enemy assignments for seasons outside the configured rules are not preserved in the regenerated output. Check the algorithm before expanding the dataset. Seed and execution details are described in Step 10 below.
+
 ### levels.tsv
 ```
 id	name	starting_enemies_number	difficulty	enemy_leader_id	unlocked	season_id	x	y

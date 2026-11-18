@@ -1,7 +1,8 @@
 # Gridways project context
 
-- For achievements/contracts (достижения/контракты), start with [docs/achievements/README.md](docs/achievements/README.md) and use the project skill [.agents/skills/gridways-achievements/SKILL.md](.agents/skills/gridways-achievements/SKILL.md). Read the detailed references relevant to the task, not every document for unrelated work.
-- For season trees and enemy generation, read [docs/seasons/SEASON_WORKFLOW.md](docs/seasons/SEASON_WORKFLOW.md). Working data stays in ignored `data/`; see [docs/data-layout.md](docs/data-layout.md).
+- For achievements/contracts (достижения/контракты), start with [docs/achievements/event-walkthroughs.md](docs/achievements/event-walkthroughs.md) and use the project skill [.agents/skills/gridways-achievements/SKILL.md](.agents/skills/gridways-achievements/SKILL.md). Read the detailed references relevant to the task, not every document for unrelated work.
+- For season trees and enemy generation, read [docs/seasons/SEASON_WORKFLOW.md](docs/seasons/SEASON_WORKFLOW.md), including reference data and workspace setup.
+- Keep local working data and user-progress dumps in ignored `data/`; Git does not back them up. Commit maintained documentation/examples in `docs/`, this `AGENTS.md`, and skills in `.agents/skills/`. Achievements documentation consists of one guide and one JSON example catalog. Do not commit local environment files or user data as examples.
 - Keep these maintained documents consistent with changes to events, counters, API contracts and call sites. Separate implemented behavior from plans. Code and current user instructions take precedence over historical notes.
 - The backend is a separate repository named `GridwaysBackend`. Locate its checkout in the current workspace or ask the user for its location when needed. Do not store personal absolute paths in tracked documentation or assume frontend changes alone update backend behavior.
 - Current project convention: do not run backend tests unless the user explicitly changes that instruction. Do not add a frontend test directory by default. Use relevant type/lint checks and focused temporary checks; report their actual scope.
