@@ -88,6 +88,7 @@ import YesnoModal from "@/components/ModalWindows/YesnoModal.vue"
 import ResourceList from "@/components/ResourceList.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 
 const ARENA_RESOURCE_KEYS = [
   "scraps",
@@ -101,6 +102,7 @@ const ARENA_RESOURCE_KEYS = [
 ]
 import { random_level_generator_by_number } from "@/logic/random_level"
 import {
+  AchievementEventType,
   DeckCardEntry,
   DeckEntry,
   Leader,
@@ -216,6 +218,10 @@ export default defineComponent({
       await this.$store.dispatch("processResources", {
         subtype: PayResourcesSubtype.startArenaLevel,
         data: payload,
+      })
+      trackAchievementEvent({
+        type: AchievementEventType.ResourcesChanged,
+        data: { resources: payload },
       })
 
       this.$store.commit("set_level", level)

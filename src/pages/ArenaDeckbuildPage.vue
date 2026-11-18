@@ -294,7 +294,9 @@ import InventoryItemTile from "@/components/Pages/InventoryPage/InventoryItemTil
 import ResourceList from "@/components/ResourceList.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import type { CardEntry, DeckCardEntry, Leader, LeaderEntry } from "@/types"
+import { AchievementEventType, AchievementGameMode } from "@/types"
 import { InventoryItem } from "@/types/inventory"
 import { UpgradeSubtype } from "@/types/upgrades"
 
@@ -522,7 +524,12 @@ export default defineComponent({
     },
     restore_inventory(index: number): void {
       if (!this.can_restore_inventory(index)) return
+      const item = this.arenaInventory[index]
       this.$store.commit("arena_restore_inventory_slot", index)
+      trackAchievementEvent({
+        type: AchievementEventType.InventoryRestored,
+        data: { item, mode: AchievementGameMode.Arena },
+      })
     },
     draw_cards(): void {
       this.offered_cards = pickRandom(this.all_cards, 3)

@@ -1,8 +1,11 @@
+import { copyObj } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { add_charges_if_overkill } from "@/logic/player_move/passive_abilities/passives_leader/add_charges_if_overkill"
 import { add_charges_to_leader_if_play_gold } from "@/logic/player_move/passive_abilities/passives_leader/add_charges_if_playing_gold"
 import { add_dmg_to_leader_when_kill_gold } from "@/logic/player_move/passive_abilities/passives_leader/add_dmg_to_leader_when_kill_gold"
 import { add_charges_if_playing_d_all } from "@/logic/player_move/passive_abilities/passives_leader/add-charges-if-playing-d-all"
 import { add_charges_to_leader_if_play_special } from "@/logic/player_move/passive_abilities/passives_leader/add-charges-to-leader-if-play-special"
+import { AchievementEventType } from "@/types"
 import {
   Card,
   CardPassiveAbility,
@@ -27,15 +30,29 @@ export function leader_passive_abilities_upon_playing_a_card(
   // надо выполнять пассивки для каждой цели
   const lpa = leader.passive_ability.name
   if (!lpa) return
+  const actor = copyObj(leader)
+  let applied = false
   if (lpa === CardPassiveAbility.AddChargesToLeaderIfPlaySpecial) {
-    add_charges_to_leader_if_play_special(player_card, leader)
+    applied = add_charges_to_leader_if_play_special(player_card, leader)
   } else if (lpa === CardPassiveAbility.AddChargesToLeaderIfPlayDAll) {
-    add_charges_if_playing_d_all(player_card, leader, true)
+    applied = add_charges_if_playing_d_all(player_card, leader, true)
   } else if (lpa === CardPassiveAbility.AddChargesToLeaderIfOverkill) {
-    add_charges_if_overkill(enemy, leader, targets, gameObj)
+    applied = add_charges_if_overkill(enemy, leader, targets, gameObj)
   } else if (lpa === CardPassiveAbility.AddChargesToLeaderIfGoldEntersGrave) {
-    add_charges_to_leader_if_play_gold(player_card, leader)
+    applied = add_charges_to_leader_if_play_gold(player_card, leader)
   } else if (lpa === CardPassiveAbility.AddDmgOfLeaderWhenKillGold) {
-    add_dmg_to_leader_when_kill_gold(enemy, leader, targets, gameObj, timeout)
+    applied = add_dmg_to_leader_when_kill_gold(
+      enemy,
+      leader,
+      targets,
+      gameObj,
+      timeout
+    )
   }
+  if (applied)
+    trackAchievementEvent({
+      type: AchievementEventType.PassiveTriggered,
+      actor,
+      location: "leader_passive_upon_playing_a_card",
+    })
 }

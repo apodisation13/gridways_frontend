@@ -1,7 +1,10 @@
+import { copyObj } from "@/lib/utils"
+import { trackEnemyDefenceChanges } from "@/logic/achievements/enemyEvents"
 import { purify_sound } from "@/logic/play_sounds"
 import type { Enemy, EnemyLeader } from "@/types"
 
 export function purify(enemy: Enemy | EnemyLeader): void {
+  const before = copyObj(enemy)
   let needSound = false
   if (enemy.deathwish?.name) {
     enemy.deathwish = null
@@ -20,4 +23,5 @@ export function purify(enemy: Enemy | EnemyLeader): void {
     needSound = true
   }
   if (needSound) purify_sound()
+  trackEnemyDefenceChanges(before, enemy)
 }

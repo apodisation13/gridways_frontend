@@ -85,7 +85,9 @@ import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vu
 import InventoryPreview from "@/components/Pages/InventoryPage/InventoryPreview.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import {
+  AchievementEventType,
   GameStatsRecordType,
   PayResourcesSubtype,
   ResolvedSeason,
@@ -174,6 +176,10 @@ export default defineComponent({
         await this.$store.dispatch("processResources", {
           subtype: PayResourcesSubtype.startSeasonLevel,
           data: payload,
+        })
+        trackAchievementEvent({
+          type: AchievementEventType.ResourcesChanged,
+          data: { resources: payload },
         })
         await this.$store.dispatch("postUserStatistic", {
           leader_id: this.selectedDeck.deck.leader.id,

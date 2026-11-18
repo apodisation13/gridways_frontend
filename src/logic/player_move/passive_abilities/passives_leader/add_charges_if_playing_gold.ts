@@ -4,9 +4,11 @@ import type { Card, Leader } from "@/types"
 export function add_charges_to_leader_if_play_gold(
   card: Card | Leader,
   leader: Leader
-): void {
-  if (!(card as Card).color) return
+): boolean {
+  if (!(card as Card).color) return false
   if ((card as Card).color === "Gold" && card.data.charges === 0) {
     change_card_charges(leader, 1)
+    return true
   }
+  return false
 }

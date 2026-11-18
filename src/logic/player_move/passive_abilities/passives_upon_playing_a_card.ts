@@ -1,4 +1,7 @@
+import { copyObj } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { damage_whenever_lock } from "@/logic/player_move/passive_abilities/passives_upon_playing_a_card/damage_whenever_lock"
+import { AchievementEventType } from "@/types"
 import {
   type Card,
   CardPassiveAbility,
@@ -44,13 +47,22 @@ export function passives_upon_playing_a_card(
   for (const card of pool) {
     const passive_ability = card.passive_ability.name
     if (passive_ability === CardPassiveAbility.DamageWheneverLock) {
-      damage_whenever_lock(
+      const actor = copyObj(card)
+      const applied = damage_whenever_lock(
         card as Card,
         enemy_before,
         enemy_after,
         gameObj,
         timeout
       )
+      if (applied) {
+        // Отдельная ситуация: реакция на сыгранную карту, независимо от зоны владельца.
+        trackAchievementEvent({
+          type: AchievementEventType.PassiveTriggered,
+          actor,
+          location: "passive_upon_playing_a_card",
+        })
+      }
     }
   }
 }

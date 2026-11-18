@@ -9,14 +9,22 @@ import Vue3TouchEvents from "vue3-touch-events"
 
 import App from "@/App.vue"
 import { installFrontendLogs } from "@/lib/frontend-logs"
+import {
+  filterAchievementRewardToasts,
+  installAchievementRewardToasts,
+} from "@/logic/achievements/achievementRewardToasts"
+import { installAchievementSync } from "@/logic/achievements/syncAchievementEvents"
 import router from "@/router/router"
 import store from "@/store"
 
 const app = createApp(App)
 installFrontendLogs(app)
+installAchievementSync()
 
 const toastOptions = {
   timeout: 2000,
+  shareAppContext: true,
+  filterToasts: filterAchievementRewardToasts,
 }
 
 app
@@ -27,3 +35,5 @@ app
   .use(VueKonva)
   .use(VueFullscreen)
   .mount("#app")
+
+installAchievementRewardToasts()

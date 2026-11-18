@@ -165,11 +165,17 @@ import DecksListModal from "@/components/ModalWindows/DecksListModal.vue"
 import SeasonTree from "@/components/Pages/LevelPage/SeasonTree.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import {
   random_level_generator,
   random_level_generator_by_number,
 } from "@/logic/random_level"
-import { LevelEntry, PayResourcesSubtype, SeasonEntry } from "@/types"
+import {
+  AchievementEventType,
+  LevelEntry,
+  PayResourcesSubtype,
+  SeasonEntry,
+} from "@/types"
 import type { UserResources } from "@/types/database"
 
 interface GameType {
@@ -375,9 +381,14 @@ export default defineComponent({
     async enter_arena(): Promise<void> {
       if (this.insufficientArenaResources) return
 
+      const resources = { ...this.arena_enter_price_real }
       await this.$store.dispatch("processResources", {
         subtype: PayResourcesSubtype.enterArena,
-        data: this.arena_enter_price_real,
+        data: resources,
+      })
+      trackAchievementEvent({
+        type: AchievementEventType.ResourcesChanged,
+        data: { resources },
       })
       this.$store.commit("arena_reset")
       this.$router.push("/arena/deckbuild")

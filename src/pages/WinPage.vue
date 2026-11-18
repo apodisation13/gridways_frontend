@@ -152,8 +152,10 @@ import { defineComponent } from "vue"
 import LevelSeasonReward from "@/components/Pages/LevelPage/LevelSeasonReward.vue"
 import ButtonClose from "@/components/UI/Buttons/ButtonClose.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { getRewardForLevel } from "@/logic/random_rewards"
 import {
+  AchievementEventType,
   GameStatsRecordType,
   LeaderboardGameMode,
   LevelEntry,
@@ -176,6 +178,8 @@ export default defineComponent({
   async created() {
     if (!this.$store.state.user_actions.win_redirect) return
     this.$store.commit("set_win_redirect", false)
+    // Флаг одноразовый: повторное открытие страницы не даёт новую победу.
+    trackAchievementEvent({ type: AchievementEventType.GameWon })
     const leader_id = this.$store.state.game.leader!.id
     const max_kills = this.$store.getters["enemies_grave"].length + 1
     const level_name = this.$store.state.game.level?.name
@@ -211,9 +215,19 @@ export default defineComponent({
       const difficulty = this.$store.state.game.level.difficulty
       const win_level_rewards = this.$store.getters["win_level_rewards"]
       this.pay_data = getRewardForLevel(win_level_rewards[difficulty])
+      // Сохраняем баланс до запроса: processResources заменит его ответом бэка.
+      const before = { ...this.$store.getters["resource"] }
       await this.$store.dispatch("processResources", {
         subtype: PayResourcesSubtype.winSeasonLevel,
         data: this.pay_data,
+      })
+      trackAchievementEvent({
+        type: AchievementEventType.ResourcesChanged,
+        data: {
+          resources: this.pay_data,
+          before,
+          after: { ...this.$store.getters["resource"] },
+        },
       })
     },
     // открытие всех связанных уровней при прохождении уровня
@@ -239,7 +253,18 @@ export default defineComponent({
       // если уровень УЖЕ пройден, то нет смысла открывать его детей
       if (!userLevel || userLevel.finished) return
 
-      await this.$store.dispatch("openRelatedLevels", userLevel.id)
+      // Обычная награда за победу уже начислена — здесь считаем только новые награды.
+      const before = { ...this.$store.getters["resource"] }
+      const resources = await this.$store.dispatch(
+        "openRelatedLevels",
+        userLevel.id
+      )
+      if (resources != null) {
+        trackAchievementEvent({
+          type: AchievementEventType.ResourceGained,
+          data: { before, after: { ...resources } },
+        })
+      }
       const rewards = userLevel.level.data?.rewards
       if (rewards && Object.keys(rewards).length) {
         this.levelRewards = rewards

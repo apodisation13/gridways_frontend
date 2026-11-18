@@ -112,8 +112,13 @@ import { defineComponent } from "vue"
 import ResourceList from "@/components/ResourceList.vue"
 import ThemedButton from "@/components/UI/Buttons/ThemedButton.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { getRewardForLevel } from "@/logic/random_rewards"
-import { LeaderboardGameMode, PayResourcesSubtype } from "@/types"
+import {
+  AchievementEventType,
+  LeaderboardGameMode,
+  PayResourcesSubtype,
+} from "@/types"
 
 const ARENA_RESOURCE_KEYS = [
   "scraps",
@@ -145,6 +150,8 @@ export default defineComponent({
   async created() {
     if (!this.$store.state.user_actions.win_redirect) return
     this.$store.commit("set_win_redirect", false)
+    // Флаг одноразовый: повторное открытие страницы не даёт новую победу.
+    trackAchievementEvent({ type: AchievementEventType.GameWon })
     const completed_level = this.$store.state.arena.current_level
     const leaderboardRequest = this.$store.dispatch("postUserLeaderboard", {
       leader_id: this.$store.state.game.leader!.id,
@@ -153,6 +160,10 @@ export default defineComponent({
       max_arena_level: completed_level,
     })
     this.$store.commit("arena_advance_level")
+    trackAchievementEvent({
+      type: AchievementEventType.ArenaLevelReached,
+      data: { level: this.$store.state.arena.current_level },
+    })
     await Promise.all([
       leaderboardRequest,
       this.compute_rewards(completed_level),
@@ -175,9 +186,19 @@ export default defineComponent({
         })
       )
 
+      // До запроса сохраняем баланс, чтобы учесть фактический доход с лимитами.
+      const before = { ...this.$store.getters["resource"] }
       await this.$store.dispatch("processResources", {
         subtype: PayResourcesSubtype.winArenaLevel,
         data: this.pay_data,
+      })
+      trackAchievementEvent({
+        type: AchievementEventType.ResourcesChanged,
+        data: {
+          resources: this.pay_data,
+          before,
+          after: { ...this.$store.getters["resource"] },
+        },
       })
     },
     go_forward(): void {

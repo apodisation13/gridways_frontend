@@ -299,6 +299,7 @@ export default defineComponent({
     // если мы перешли на эту страницу НЕ со страницы начала игры, где стоит этот флаг, нас отсюда перекинет
     if (!this.$store.state.game.start_game_redirect) {
       this.$router.push("/start_game")
+      return
     }
     this.$store.commit("set_start_game_redirect", false)
     this.start_game() // в МИКСИНЕ теперь

@@ -6,8 +6,8 @@ function processSingleEnemy(
   enemy: Enemy | EnemyLeader,
   leader: Leader,
   timeout: number = 1000
-) {
-  if (!(enemy as Enemy).color) return // если убили лидера врагов - сразу выходим
+): boolean {
+  if (!(enemy as Enemy).color) return false // если убили лидера врагов - сразу выходим
 
   if (enemy.data.hp <= 0 && (enemy as Enemy).color == CardColor.Gold) {
     timeoutAnimationFlag(
@@ -21,7 +21,9 @@ function processSingleEnemy(
       leader.p_dmg_delta = null
     }, timeout * 0.5)
     leader.data.damage += leader.data.passive?.value ?? 0
+    return (leader.data.passive?.value ?? 0) !== 0
   }
+  return false
 }
 
 export function add_dmg_to_leader_when_kill_gold(
@@ -30,11 +32,11 @@ export function add_dmg_to_leader_when_kill_gold(
   targets: Array<{ isLeader: boolean; fieldValue: Enemy | null }> = [],
   gameObj: GameObj,
   timeout: number = 1000
-): void {
+): boolean {
+  let applied = false
   // для обычного режима, без multi-целей
   if (targets.length === 0) {
-    processSingleEnemy(enemy, leader, timeout)
-    return
+    return processSingleEnemy(enemy, leader, timeout)
   }
   // для режима multi-целей, тут проверяем каждую карту из тех, в которых стреляли
   for (const target of targets) {
@@ -42,6 +44,8 @@ export function add_dmg_to_leader_when_kill_gold(
       ? (gameObj.enemy_leader ?? null)
       : target.fieldValue
     if (!e) continue
-    processSingleEnemy(e, leader, timeout)
+    // Не используем short-circuit: эффект нужен каждой подходящей цели.
+    if (processSingleEnemy(e, leader, timeout)) applied = true
   }
+  return applied
 }

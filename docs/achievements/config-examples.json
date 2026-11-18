@@ -1,0 +1,1130 @@
+{
+  "permanent": {
+    "title": "Постоянные",
+    "categories": {
+      "cards": {
+        "id": "cards",
+        "title": "Карты",
+        "ordering": 10,
+        "achievements": {
+          "play_bronze_damage_8_10": {
+            "id": "play_bronze_damage_8_10",
+            "title": "Примените бронзовые карты с уроном от 8 десять раз",
+            "ordering": 20,
+            "event": "action.played",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "actor.color": "Bronze",
+              "actor.data.damage": {
+                "type": "gte",
+                "value": 8
+              },
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "play_monsters_leader_10": {
+            "id": "play_monsters_leader_10",
+            "title": "Используйте 10 зарядов лидера Monsters с пассивной способностью",
+            "ordering": 30,
+            "event": "action.played",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "actor.color": {
+                "type": "exists",
+                "value": false
+              },
+              "actor.faction": "Monsters",
+              "actor.passive_ability.name": {
+                "type": "ne",
+                "value": null
+              },
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "play_unique_cards_30": {
+            "id": "play_unique_cards_30",
+            "title": "Примените 30 разных карт",
+            "ordering": 40,
+            "event": "action.played",
+            "target": 30,
+            "counter": {
+              "type": "unique",
+              "field": "actor.id"
+            },
+            "filters": {
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "play_special_low_damage_10": {
+            "id": "play_special_low_damage_10",
+            "title": "Примените Special-карты без пассивки, с уроном меньше 10 и базовыми жизнями не более 20 — 10 раз",
+            "ordering": 50,
+            "event": "action.played",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "actor.type": {
+                "type": "eq",
+                "value": "Special"
+              },
+              "actor.data.damage": {
+                "type": "lt",
+                "value": 10
+              },
+              "actor.data.base.base_hp": {
+                "type": "lte",
+                "value": 20
+              },
+              "actor.passive_ability.name": null
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          }
+        }
+      },
+      "resources": {
+        "id": "resources",
+        "title": "Ресурсы",
+        "ordering": 20,
+        "achievements": {
+          "spend_money_10000": {
+            "id": "spend_money_10000",
+            "title": "Потратьте суммарно 10000 денег",
+            "ordering": 10,
+            "event": "resource.spent",
+            "target": 10000,
+            "counter": {
+              "type": "sum",
+              "field": "resources.money"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "gain_scraps_3000": {
+            "id": "gain_scraps_3000",
+            "title": "Заработайте суммарно 3000 обломков",
+            "ordering": 20,
+            "event": "resource.gained",
+            "target": 3000,
+            "counter": {
+              "type": "sum",
+              "field": "resources.scraps"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "accumulate_rare_gem_3": {
+            "id": "accumulate_rare_gem_3",
+            "title": "Накопите 3 rare_gem",
+            "ordering": 30,
+            "event": "resources.checked",
+            "target": 3,
+            "counter": {
+              "type": "current",
+              "field": "resources.rare_gem"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "open_kegs_10": {
+            "id": "open_kegs_10",
+            "title": "Откройте 10 бочек",
+            "ordering": 40,
+            "event": "resource.opened",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "resource": "kegs"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "buy_flowers_3000": {
+            "id": "buy_flowers_3000",
+            "title": "Купите 3000 flowers",
+            "ordering": 50,
+            "event": "resource.transformed",
+            "target": 3000,
+            "counter": {
+              "type": "sum",
+              "field": "amount"
+            },
+            "filters": {
+              "action": "buy",
+              "resource": "flowers"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "buy_level_resources_for_10000": {
+            "id": "buy_level_resources_for_10000",
+            "title": "Купите ресурсы уровней на 10000 денег",
+            "ordering": 60,
+            "event": "resource.transformed",
+            "target": 10000,
+            "counter": {
+              "type": "sum",
+              "field": "spent.money"
+            },
+            "filters": {
+              "action": "buy",
+              "resource": {
+                "type": "in",
+                "value": [
+                  "crops",
+                  "wood",
+                  "silk"
+                ]
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "sell_items_for_30000": {
+            "id": "sell_items_for_30000",
+            "title": "Продайте предметы на 30000 денег",
+            "ordering": 70,
+            "event": "resource.transformed",
+            "target": 30000,
+            "counter": {
+              "type": "sum",
+              "field": "gained.money"
+            },
+            "filters": {
+              "action": "sell"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "craft_all_inventory_items": {
+            "id": "craft_all_inventory_items",
+            "title": "Создайте каждый предмет инвентаря",
+            "ordering": 90,
+            "event": "resource.transformed",
+            "target": 9,
+            "counter": {
+              "type": "unique",
+              "field": "resource"
+            },
+            "filters": {
+              "action": "craft",
+              "resource": {
+                "type": "in",
+                "value": [
+                  "first_aid_kits",
+                  "shields",
+                  "immune_magics",
+                  "draw_cards",
+                  "mega_bombs",
+                  "random_bombs",
+                  "clears",
+                  "purifies",
+                  "random_effects"
+                ]
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "use_all_inventory_items": {
+            "id": "use_all_inventory_items",
+            "title": "Используйте каждый предмет инвентаря",
+            "ordering": 140,
+            "event": "resource.spent",
+            "target": 9,
+            "counter": {
+              "type": "unique",
+              "field": "item"
+            },
+            "filters": {
+              "subtype": "use_inventory_item",
+              "item": {
+                "type": "in",
+                "value": [
+                  "first_aid_kits",
+                  "shields",
+                  "immune_magics",
+                  "draw_cards",
+                  "mega_bombs",
+                  "random_bombs",
+                  "clears",
+                  "purifies",
+                  "random_effects"
+                ]
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "draw_three_cards_5": {
+            "id": "draw_three_cards_5",
+            "title": "Возьмите ровно 3 карты предметом draw_cards пять раз",
+            "ordering": 90,
+            "event": "inventory.used",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "item": "draw_cards",
+              "result.cards_drawn": 3
+            },
+            "rewards": {
+              "resources": {
+                "money": 500
+              }
+            }
+          }
+        }
+      },
+      "craft_mills": {
+        "id": "craft_mills",
+        "title": "Крафт и разбор",
+        "ordering": 30,
+        "achievements": {
+          "mill_leaders_3": {
+            "id": "mill_leaders_3",
+            "title": "Разберите 3 лидеров",
+            "ordering": 20,
+            "event": "actor.transformed",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "action": "mill",
+              "actor.color": {
+                "type": "exists",
+                "value": false
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "craft_leaders_three_factions": {
+            "id": "craft_leaders_three_factions",
+            "title": "Создайте лидеров Soldiers, Monsters и Animals",
+            "ordering": 30,
+            "event": "actor.transformed",
+            "target": 3,
+            "counter": {
+              "type": "unique",
+              "field": "actor.faction"
+            },
+            "filters": {
+              "action": "craft",
+              "actor.color": {
+                "type": "exists",
+                "value": false
+              },
+              "actor.faction": {
+                "type": "in",
+                "value": [
+                  "Soldiers",
+                  "Monsters",
+                  "Animals"
+                ]
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "craft_with_rare_gem_1": {
+            "id": "craft_with_rare_gem_1",
+            "title": "Создайте карту или лидера через rare_gem",
+            "ordering": 40,
+            "event": "actor.transformed",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "action": "craft",
+              "recipe.rare_gem": {
+                "type": "ne",
+                "value": 0
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          }
+        }
+      },
+      "upgrades": {
+        "id": "upgrades",
+        "title": "Прокачки",
+        "ordering": 40,
+        "achievements": {
+          "purchase_upgrades_5": {
+            "id": "purchase_upgrades_5",
+            "title": "Совершите 5 прокачек",
+            "ordering": 10,
+            "event": "upgrade.purchased",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "max_any_upgrade_except_settings": {
+            "id": "max_any_upgrade_except_settings",
+            "title": "Прокачайте любой параметр кроме Settings до максимума",
+            "ordering": 20,
+            "event": "upgrades.checked",
+            "target": 1,
+            "counter": {
+              "type": "current",
+              "field": "summary.non_settings.maxed_count"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "max_all_upgrades": {
+            "id": "max_all_upgrades",
+            "title": "Все прокачки до максимума",
+            "ordering": 30,
+            "event": "upgrades.checked",
+            "target": 1,
+            "counter": {
+              "type": "current",
+              "field": "summary.all.all_maxed"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "max_inventory_upgrades": {
+            "id": "max_inventory_upgrades",
+            "title": "Все прокачки Inventory до максимума",
+            "ordering": 40,
+            "event": "upgrades.checked",
+            "target": 1,
+            "counter": {
+              "type": "current",
+              "field": "summary.inventory.all_maxed"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "reach_max_cards_in_deck_12": {
+            "id": "reach_max_cards_in_deck_12",
+            "title": "Увеличьте размер колоды до 12",
+            "ordering": 60,
+            "event": "upgrades.checked",
+            "target": 12,
+            "counter": {
+              "type": "current",
+              "field": "upgrades.game.max_cards_in_deck.value"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          }
+        }
+      },
+      "decks": {
+        "id": "decks",
+        "title": "Колоды",
+        "ordering": 60,
+        "achievements": {
+          "create_soldiers_decks_5": {
+            "id": "create_soldiers_decks_5",
+            "title": "Создайте 5 колод фракции Soldiers",
+            "ordering": 20,
+            "event": "deck.created",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "deck.leader.faction": "Soldiers"
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "delete_decks_3": {
+            "id": "delete_decks_3",
+            "title": "Удалите 3 созданные вами колоды",
+            "ordering": 30,
+            "event": "deck.deleted",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "own_decks_3": {
+            "id": "own_decks_3",
+            "title": "Имейте в хранении 3 колоды",
+            "ordering": 40,
+            "event": "decks.checked",
+            "target": 3,
+            "counter": {
+              "type": "current",
+              "field": "decks.count"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "save_bronze_deck": {
+            "id": "save_bronze_deck",
+            "title": "Соберите колоду полностью из бронзовых карт",
+            "ordering": 50,
+            "event": "deck.saved",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "deck.summary.all_bronze": true
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          },
+          "save_20_card_deck": {
+            "id": "save_20_card_deck",
+            "title": "Соберите колоду из 20 карт",
+            "ordering": 100,
+            "event": "deck.saved",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "deck.summary.cards_count": 20
+            },
+            "rewards": {
+              "resources": {
+                "money": 100
+              }
+            }
+          }
+        }
+      },
+      "arena": {
+        "id": "arena",
+        "title": "Арена",
+        "ordering": 100,
+        "achievements": {
+          "arena_buy_upgrades_10": {
+            "id": "arena_buy_upgrades_10",
+            "title": "Купите 10 прокачек арены",
+            "ordering": 50,
+            "event": "arena.upgrade.purchased",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {},
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_restore_inventory_10": {
+            "id": "arena_restore_inventory_10",
+            "title": "Восстановите предметы инвентаря в арене 10 раз",
+            "ordering": 70,
+            "event": "inventory.restored",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "arena"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_reach_level_5": {
+            "id": "arena_reach_level_5",
+            "title": "Достигните 5-го уровня арены",
+            "ordering": 80,
+            "event": "arena.level.reached",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "level": {
+                "type": "gte",
+                "value": 5
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "arena_win_without_gold": {
+            "id": "arena_win_without_gold",
+            "title": "Выиграйте бой арены стартовой колодой без золотых карт",
+            "ordering": 110,
+            "event": "game.won",
+            "target": 1,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "arena",
+              "starting_deck.summary.cards_count": {
+                "type": "gt",
+                "value": 0
+              },
+              "starting_deck.summary.by_color.Gold": 0
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          }
+        }
+      },
+      "normal": {
+        "id": "normal",
+        "title": "Обычная игра",
+        "ordering": 65,
+        "achievements": {
+          "normal_win_soldiers_100": {
+            "id": "normal_win_soldiers_100",
+            "title": "Выиграйте 100 игр за фракцию Soldiers",
+            "ordering": 20,
+            "event": "game.won",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "starting_deck.leader.faction": "Soldiers"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_hard_100": {
+            "id": "normal_win_hard_100",
+            "title": "Выиграйте 100 обычных боёв сложной сложности",
+            "ordering": 110,
+            "event": "game.won",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "difficulty": "hard"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_without_leader_3": {
+            "id": "normal_win_without_leader_3",
+            "title": "Выиграйте 3 обычных боя без применения лидера",
+            "ordering": 120,
+            "event": "game.won",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "leader_uses": 0
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_streak_3_5": {
+            "id": "normal_win_streak_3_5",
+            "title": "Выиграйте 3 игр подряд — 5 раз",
+            "ordering": 130,
+            "event": "game.won",
+            "target": 5,
+            "counter": {
+              "type": "streak",
+              "length": 3,
+              "reset": [
+                {
+                  "event": "game.lost",
+                  "filters": {
+                    "mode": "normal"
+                  }
+                }
+              ]
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          }
+        }
+      },
+      "passives": {
+        "id": "passives",
+        "title": "Пассивные способности",
+        "ordering": 15,
+        "achievements": {
+          "passive_hand_10": {
+            "id": "passive_hand_10",
+            "title": "Активируйте пассивные способности карты в руке 10 раз",
+            "ordering": 10,
+            "event": "passive.triggered",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              },
+              "location": "hand"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "passive_leader_10": {
+            "id": "passive_leader_10",
+            "title": "Активируйте пассивные способности лидера 10 раз",
+            "ordering": 70,
+            "event": "passive.triggered",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "actor.color": {
+                "type": "exists",
+                "value": false
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "passive_once_10": {
+            "id": "passive_once_10",
+            "title": "Активируйте пассивные способности начала боя 10 раз",
+            "ordering": 90,
+            "event": "passive.triggered",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "location": "passive_once",
+              "actor.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          }
+        }
+      },
+      "enemies": {
+        "id": "enemies",
+        "title": "Враги",
+        "ordering": 110,
+        "achievements": {
+          "kill_enemies_50": {
+            "id": "kill_enemies_50",
+            "title": "Убейте суммарно 50 врагов",
+            "ordering": 10,
+            "group": "kill_enemies",
+            "event": "enemy.killed",
+            "target": 50,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_enemies_250": {
+            "id": "kill_enemies_250",
+            "title": "Убейте суммарно 250 врагов",
+            "ordering": 20,
+            "group": "kill_enemies",
+            "event": "enemy.killed",
+            "target": 250,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_deathwish_enemies_100": {
+            "id": "kill_deathwish_enemies_100",
+            "title": "Убейте 100 врагов с завещанием",
+            "ordering": 110,
+            "event": "enemy.killed",
+            "target": 100,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              },
+              "enemy.deathwish.name": {
+                "type": "ne",
+                "value": null
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "remove_enemy_shields_10": {
+            "id": "remove_enemy_shields_10",
+            "title": "Снимите щит у врагов 10 раз",
+            "ordering": 150,
+            "event": "enemy.shield_removed",
+            "target": 10,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "remove_enemy_armor_5": {
+            "id": "remove_enemy_armor_5",
+            "title": "Снимите броню у врагов 5 раз",
+            "ordering": 180,
+            "event": "enemy.armor_removed",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "remove_enemy_armor_amount_5": {
+            "id": "remove_enemy_armor_amount_5",
+            "title": "Снимите суммарно 5 единиц брони у врагов",
+            "ordering": 190,
+            "event": "enemy.armor_removed",
+            "target": 5,
+            "counter": {
+              "type": "sum",
+              "field": "amount"
+            },
+            "filters": {
+              "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_bronze_streak_5_5": {
+            "id": "kill_bronze_streak_5_5",
+            "title": "Убейте 5 бронзовых врагов подряд — 5 раз",
+            "ordering": 250,
+            "event": "enemy.killed",
+            "target": 5,
+            "counter": {
+              "type": "streak",
+              "length": 5,
+              "reset": [
+                {
+                  "event": "enemy.killed",
+                  "filters": {
+                    "mode": "normal",
+                    "enemy.color": {
+                      "type": "ne",
+                      "value": "Bronze"
+                    }
+                  }
+                },
+                {
+                  "event": "enemy.killed",
+                  "filters": {
+                    "mode": "normal",
+                    "enemy.color": {
+                      "type": "exists",
+                      "value": false
+                    }
+                  }
+                }
+              ]
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": "Bronze"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "kill_damage_over_20_streak_3_1": {
+            "id": "kill_damage_over_20_streak_3_1",
+            "title": "Убейте подряд 3 врагов с уроном больше 20",
+            "ordering": 280,
+            "event": "enemy.killed",
+            "target": 1,
+            "counter": {
+              "type": "streak",
+              "length": 3,
+              "reset": [
+                {
+                  "event": "enemy.killed",
+                  "filters": {
+                    "mode": "normal",
+                    "enemy.color": {
+                      "type": "exists",
+                      "value": true
+                    },
+                    "enemy.data.damage": {
+                      "type": "lte",
+                      "value": 20
+                    }
+                  }
+                }
+              ]
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy.color": {
+                "type": "exists",
+                "value": true
+              },
+              "enemy.data.damage": {
+                "type": "gt",
+                "value": 20
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "win_enemy_grave_total_30_5": {
+            "id": "win_enemy_grave_total_30_5",
+            "title": "Победите с 30 или более врагами в кладбище — 5 раз",
+            "ordering": 290,
+            "event": "game.won",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy_grave.total": {
+                "type": "gte",
+                "value": 30
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "win_enemy_grave_gold_20_5": {
+            "id": "win_enemy_grave_gold_20_5",
+            "title": "Победите с 20 или более золотыми врагами в кладбище — 5 раз",
+            "ordering": 320,
+            "event": "game.won",
+            "target": 5,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "enemy_grave.gold": {
+                "type": "gte",
+                "value": 20
+              }
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

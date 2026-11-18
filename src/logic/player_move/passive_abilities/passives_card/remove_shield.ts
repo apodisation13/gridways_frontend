@@ -1,4 +1,5 @@
-import { choice_element } from "@/lib/utils"
+import { choice_element, copyObj } from "@/lib/utils"
+import { trackEnemyDefenceChanges } from "@/logic/achievements/enemyEvents"
 import { get_all_enemies } from "@/logic/player_move/service/service_for_player_move"
 import type { Card, GameObj } from "@/types"
 
@@ -18,7 +19,9 @@ export function remove_shield(
 
   if (!target) return
 
+  const before = copyObj(target)
   target.data.shield = false
+  trackEnemyDefenceChanges(before, target)
 
   card.passive_destroying = true
   setTimeout(() => {

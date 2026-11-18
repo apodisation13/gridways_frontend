@@ -90,6 +90,7 @@ import ButtonDecks from "@/components/Pages/DeckbuildPage/Buttons/ButtonDecks.vu
 import DeckbuilderFilters from "@/components/Pages/DeckbuildPage/DeckbuilderFilters.vue"
 import DeckbuilderTopButtonsBlock from "@/components/Pages/DeckbuildPage/DeckbuilderTopButtonsBlock.vue"
 import { copyObj } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import type {
   CardEntry,
   CardFilterQuery,
@@ -97,6 +98,7 @@ import type {
   Leader,
   LeaderEntry,
 } from "@/types"
+import { AchievementEventType } from "@/types"
 
 interface ActiveDeck {
   deck_id: number | null
@@ -317,12 +319,29 @@ export default defineComponent({
       return true
     },
 
+    // Снимок до запроса: успешное сохранение сбрасывает форму.
+    achievementDeckSnapshot() {
+      return JSON.parse(
+        JSON.stringify({
+          name: this.deck.deck_name.trim(),
+          leader: this.deck.leader,
+          cards: this.deck.deck_is_progress.map(entry => entry.card),
+          health: this.deck.health,
+        })
+      )
+    },
+
     async save_deck(): Promise<void> {
       if (!this.validate_deck()) return
+      const deck = this.achievementDeckSnapshot()
       await this.send_data_to_store("createUserDeck", {
         deck_name: this.deck.deck_name.trim(),
         cards: this.deck.deck_body,
         leader_id: this.deck.leader!.id,
+      })
+      trackAchievementEvent({
+        type: AchievementEventType.DeckCreated,
+        data: { deck },
       })
     },
 
@@ -368,11 +387,16 @@ export default defineComponent({
 
     async patch_deck(): Promise<void> {
       if (!this.validate_deck()) return
+      const deck = this.achievementDeckSnapshot()
       await this.send_data_to_store("patchUserDeck", {
         deck_name: this.deck.deck_name.trim(),
         cards: this.deck.deck_body,
         leader_id: this.deck.leader?.id,
         deck_id: this.deck.deck_id,
+      })
+      trackAchievementEvent({
+        type: AchievementEventType.DeckSaved,
+        data: { deck },
       })
     },
 

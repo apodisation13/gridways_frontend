@@ -231,6 +231,8 @@ import { useToast } from "vue-toastification"
 import ConfirmModal from "@/components/ModalWindows/ConfirmModal.vue"
 import ResourceList from "@/components/ResourceList.vue"
 import ResourceItem from "@/components/UI/ResourceItem.vue"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
+import { AchievementEventType } from "@/types"
 import {
   ModalState,
   UpgradeCategory,
@@ -322,9 +324,6 @@ export default defineComponent({
       )
     },
   },
-  async created() {
-    await this.$store.dispatch("getUserUpgrades")
-  },
   methods: {
     userLevel(category: UpgradeType, key: UpgradeSubtype): number {
       return (this.userUpgrades[category]?.[key] as number) ?? 0
@@ -412,9 +411,20 @@ export default defineComponent({
     async handleUpgrade(modalState: ModalState): Promise<void> {
       this.upgrading = true
       try {
-        await this.$store.dispatch("postUserUpgrade", {
+        const before = { ...this.$store.getters["resource"] }
+        const result = await this.$store.dispatch("postUserUpgrade", {
           upgradeType: modalState.category,
           upgradeSubtype: modalState.key,
+        })
+        trackAchievementEvent({
+          type: AchievementEventType.UpgradeChanged,
+          data: {
+            upgrade_type: modalState.category,
+            upgrade_subtype: modalState.key,
+            upgrades: result.upgrades,
+            before,
+            after: { ...result.resources },
+          },
         })
         this.closeModal()
         this.toast.success("Прокачано!")

@@ -166,7 +166,7 @@ const actions = {
     body: ResourcesPayload
   ) {
     // в body придет обязательно subtype, data
-    // data: { wood: 201, crops: 210 } - для оплаты игры на уровне сезона
+    // data: { wood: -201, crops: -210 } - для оплаты игры на уровне сезона
     // data: { wood: 201, scraps: 185, etc } - для получения ресурсов после прохождения уровня сезона
     // data: { action:buy/sell/crart/mill, resource: kegs, quantity: int, recipe: {money: -1000, etc} }
     // - для получения и списания ресурсов на странице бонусов
@@ -188,7 +188,7 @@ const actions = {
   async processCraftMillCard(
     { getters, commit, dispatch }: ActionContext,
     body: ProcessCraftMillPayload
-  ) {
+  ): Promise<UserResources> {
     const userId = getters["getUser"].user_id
     const subtype = body.subtype
     try {
@@ -219,6 +219,7 @@ const actions = {
       ) {
         commit("set_leaders", response.data.cards)
       }
+      return response.data.resources
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при создании карты")
@@ -265,6 +266,7 @@ const actions = {
       if (resources != null) commit("set_resource", resources)
       if (cards != null) commit("set_cards", cards)
       if (leaders != null) commit("set_leaders", leaders)
+      return resources
     } catch (err) {
       dispatch("error_action", err)
       throw new Error("Какая-то ошибка при открытии уровней")

@@ -9,9 +9,9 @@ export function damage_whenever_lock(
   enemy_after: Enemy | EnemyLeader,
   gameObj: GameObj,
   timeout = 1000
-): void {
+): boolean {
   const passive_value = card.data?.passive?.value
-  if (!passive_value) return
+  if (!passive_value) return false
 
   if (!enemy_before.locked && enemy_after.locked) {
     console.log("ВРАГ НЕ БЫЛ ЗАЛОЧЕН, А ТЕПЕРЬ ЗАЛОЧЕН!")
@@ -27,5 +27,7 @@ export function damage_whenever_lock(
       sound_damage_one,
       timeout * 0.5
     )
+    return true
   }
+  return false
 }

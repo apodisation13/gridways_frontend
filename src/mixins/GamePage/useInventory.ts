@@ -1,6 +1,8 @@
 import { defineComponent } from "vue"
 
 import { choice_pop } from "@/lib/utils"
+import { resolveAchievementGameMode } from "@/logic/achievements/gameMode"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { change_health } from "@/logic/game_logic/change_health"
 import { sound_destroy_enemy } from "@/logic/play_sounds"
 import { add_armor } from "@/logic/player_move/abilities/ability_armor"
@@ -16,6 +18,7 @@ import {
   get_negative_effects_indexes,
 } from "@/logic/player_move/service/service_for_player_move"
 import {
+  AchievementEventType,
   type CardEntry,
   type EffectInfo,
   type Enemy,
@@ -125,6 +128,8 @@ export default defineComponent({
       const value = this.inventoryItemValues[item] ?? 0
       const randomEffectsValue =
         getters["inventoryEffectValues"].random_effects_value ?? 0
+      const mode = resolveAchievementGameMode()
+      const result: { cards_drawn?: number } = {}
       this.inventoryBusy = true
       try {
         if (this.$store.state.game.arena_mode) {
@@ -133,6 +138,15 @@ export default defineComponent({
           await this.$store.dispatch("processResources", {
             subtype: PayResourcesSubtype.useInventoryItem,
             data: { [item]: -1 },
+          })
+          // Считаем только успешное списание предмета из обычного инвентаря.
+          trackAchievementEvent({
+            type: AchievementEventType.ResourcesChanged,
+            data: {
+              resources: { [item]: -1 },
+              item,
+              subtype: PayResourcesSubtype.useInventoryItem,
+            },
           })
         }
 
@@ -144,6 +158,7 @@ export default defineComponent({
         } else if (item === InventoryItem.IMMUNE_MAGICS) {
           add_invulnerability(value)
         } else if (item === InventoryItem.DRAW_CARDS) {
+          const handSizeBefore = this.gameObj.hand.length
           const count = Math.min(
             value,
             getters["handSize"] - this.gameObj.hand.length
@@ -151,6 +166,8 @@ export default defineComponent({
           for (let i = 0; i < count; i++) {
             spawn_random_in_hand(null, this.gameObj)
           }
+          // Только реально появившиеся карты, а не значение прокачки.
+          result.cards_drawn = this.gameObj.hand.length - handSizeBefore
         } else if (
           item === InventoryItem.MEGA_BOMBS ||
           item === InventoryItem.RANDOM_BOMBS
@@ -193,6 +210,10 @@ export default defineComponent({
             randomEffectsValue
           )
         }
+        trackAchievementEvent({
+          type: AchievementEventType.InventoryUsed,
+          data: { item, mode, result },
+        })
         this.can_draw = this.calc_can_draw()
         this.afterInventoryItemApplied()
       } catch {
