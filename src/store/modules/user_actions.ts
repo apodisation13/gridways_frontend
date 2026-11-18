@@ -172,8 +172,6 @@ const actions = {
     // - для получения и списания ресурсов на странице бонусов
     const userId = getters["getUser"].user_id
 
-    console.log("23333333333333333333333333", body)
-
     try {
       const response = await callApi<UserResources>({
         method: HttpMethod.PATCH,
