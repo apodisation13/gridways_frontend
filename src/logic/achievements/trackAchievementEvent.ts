@@ -126,6 +126,12 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
       mode: resolveAchievementGameMode(),
       location: input.location,
     }
+  } else if (input.type === AchievementEventType.EnemyEffectPlaced) {
+    eventData = {
+      enemy: input.enemy,
+      effect: input.effect,
+      mode: resolveAchievementGameMode(),
+    }
   } else if (input.type === AchievementEventType.EnemyPassiveTriggered) {
     eventData = {
       enemy: input.enemy,

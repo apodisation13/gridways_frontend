@@ -1,4 +1,5 @@
 import { copyObj } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { effectsSounds } from "@/logic/game_logic/effects"
 import {
   get_effects_indexes,
@@ -6,6 +7,7 @@ import {
 } from "@/logic/player_move/service/service_for_player_move"
 import store from "@/store"
 import {
+  AchievementEventType,
   EffectInfo,
   EffectObject,
   EffectType,
@@ -19,7 +21,7 @@ export function spawn_effect_random(
   enemyIndex: number | null,
   gameObj: GameObj
 ) {
-  if (!enemyIndex) return
+  if (enemyIndex === null) return
 
   // генерим рандомный негативный эффект в той клетке где умер враг
   // берем из конфига (из game_const) информацию о всех эффектов, оттуда рандомный
@@ -33,6 +35,7 @@ export function spawn_effect_random(
   const negativeEffects = Object.entries(effectsInfo).filter(
     ([_, v]) => v.negative
   )
+  if (!negativeEffects.length) return
   const [randomKey, randomValue] = negativeEffects[
     Math.floor(Math.random() * negativeEffects.length)
   ] as [EffectType, EffectInfo]
@@ -49,6 +52,11 @@ export function spawn_effect_random(
   }
 
   effects[enemyIndex] = copyObj(realEffect)
+  trackAchievementEvent({
+    type: AchievementEventType.EnemyEffectPlaced,
+    enemy,
+    effect: realEffect,
+  })
   effectsSounds(realEffect)
 }
 
@@ -57,7 +65,7 @@ export function spawn_effect(
   enemyIndex: number | null,
   gameObj: GameObj
 ) {
-  if (!enemyIndex) return
+  if (enemyIndex === null) return
 
   const { effects } = gameObj
   let effectObject = enemy.data?.deathwish?.field_interaction
@@ -65,6 +73,11 @@ export function spawn_effect(
   if (!effectObject) return
 
   effects[enemyIndex] = copyObj(effectObject)
+  trackAchievementEvent({
+    type: AchievementEventType.EnemyEffectPlaced,
+    enemy,
+    effect: effectObject,
+  })
   effectsSounds(effectObject)
 }
 
@@ -86,6 +99,12 @@ export function spawn_effect_everywhere(
 
   for (const index of available) {
     effects[index] = copyObj(effectObject)
+    // Массовое размещение: каждый реально записанный эффект — отдельный факт.
+    trackAchievementEvent({
+      type: AchievementEventType.EnemyEffectPlaced,
+      enemy,
+      effect: effectObject,
+    })
   }
   effectsSounds(effectObject)
 }

@@ -5,6 +5,7 @@ import type {
   Leader,
   UserResources,
 } from "./database"
+import type { EffectObject } from "./game"
 import type { InventoryItem } from "./inventory"
 import type { UpgradeSubtype, UpgradeType, UserUpgrades } from "./upgrades"
 import type { PayResourcesSubtype } from "./user_actions"
@@ -43,6 +44,8 @@ export enum AchievementEventType {
   EnemyKilled = "enemy.killed",
   // Таймер разрешил запуск поддерживаемой пассивки врага; эффект может быть бесполезным.
   EnemyPassiveTriggered = "enemy.passive_triggered",
+  // Один эффект фактически размещён врагом в одной клетке поля.
+  EnemyEffectPlaced = "enemy.effect_placed",
   // Снятие существующего щита любым подключённым способом, не только ударом.
   EnemyShieldRemoved = "enemy.shield_removed",
   // Снятие брони у одного врага: count считает факт, sum по amount — единицы брони.
@@ -296,6 +299,11 @@ export type AchievementPassiveLocation =
   | "leader_passive_upon_playing_a_card"
 
 export type AchievementEventInput =
+  | {
+      type: AchievementEventType.EnemyEffectPlaced
+      enemy: Enemy | EnemyLeader
+      effect: EffectObject
+    }
   | {
       type: AchievementEventType.EnemyPassiveTriggered
       enemy: Enemy | EnemyLeader

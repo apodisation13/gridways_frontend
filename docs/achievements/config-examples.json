@@ -931,6 +931,17 @@
         "title": "Враги",
         "ordering": 110,
         "achievements": {
+          "make_enemy_spawn_negative_effect_10": {
+            "id": "make_enemy_spawn_negative_effect_10",
+            "title": "Допустите размещение врагами 10 негативных эффектов",
+            "ordering": 4,
+            "group": "make_enemy_spawn_negative_effect",
+            "event": "enemy.effect_placed",
+            "target": 10,
+            "counter": { "type": "count" },
+            "filters": { "effect.negative": true },
+            "rewards": { "resources": { "money": 100 } }
+          },
           "trigger_enemy_passive_in_field_10": {
             "id": "trigger_enemy_passive_in_field_10",
             "title": "Допустите 10 срабатываний пассивок врагов на поле",

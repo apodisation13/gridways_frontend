@@ -1,4 +1,5 @@
 import { choice_element, copyObj } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { effectsSounds } from "@/logic/game_logic/effects"
 import {
   get_effects_indexes,
@@ -8,6 +9,7 @@ import {
 } from "@/logic/player_move/service/service_for_player_move"
 import store from "@/store"
 import {
+  AchievementEventType,
   EffectInfo,
   EffectObject,
   EffectType,
@@ -34,12 +36,13 @@ export function spawn_effect_random(
   const available = emptyIndexes.filter(i => !effectSet.has(i))
   const randomIndex = choice_element(available)
 
-  if (!randomIndex) return
+  if (randomIndex === undefined) return
 
   const effectsInfo = store.getters["effectsInfo"] as Record<string, EffectInfo>
   const negativeEffects = Object.entries(effectsInfo).filter(
     ([_, v]) => v.negative
   )
+  if (!negativeEffects.length) return
   const [randomKey, randomValue] = negativeEffects[
     Math.floor(Math.random() * negativeEffects.length)
   ] as [EffectType, EffectInfo]
@@ -56,6 +59,11 @@ export function spawn_effect_random(
   }
 
   effects[randomIndex] = copyObj(realEffect)
+  trackAchievementEvent({
+    type: AchievementEventType.EnemyEffectPlaced,
+    enemy,
+    effect: realEffect,
+  })
   effectsSounds(realEffect)
 }
 
@@ -71,9 +79,14 @@ export function spawn_effect(enemy: Enemy | EnemyLeader, gameObj: GameObj) {
   const available = emptyIndexes.filter(i => !effectSet.has(i))
   const randomIndex = choice_element(available)
 
-  if (!randomIndex) return
+  if (randomIndex === undefined) return
 
   effects[randomIndex] = copyObj(effectObject)
+  trackAchievementEvent({
+    type: AchievementEventType.EnemyEffectPlaced,
+    enemy,
+    effect: effectObject,
+  })
   effectsSounds(effectObject)
 }
 
