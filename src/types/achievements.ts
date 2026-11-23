@@ -10,6 +10,12 @@ import type { UpgradeSubtype, UpgradeType, UserUpgrades } from "./upgrades"
 import type { PayResourcesSubtype } from "./user_actions"
 
 // Обычный режим — сезоны. Значения используются в фильтре mode.
+export interface AchievementBattleStats {
+  leader_uses: number
+  damage_taken: number
+  enemy_passives_in_field: number
+}
+
 export enum AchievementGameMode {
   Normal = "normal",
   Random = "random",

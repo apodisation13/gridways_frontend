@@ -13,6 +13,7 @@ import { trackAchievementRewards } from "@/logic/achievements/trackAchievementRe
 import type { RootState } from "@/store"
 import { USER_ACHIEVEMENTS } from "@/store/const/api_urls"
 import type {
+  AchievementBattleStats,
   AchievementCatalog,
   AchievementEvent,
   AchievementEventsRequest,
@@ -41,8 +42,8 @@ export interface AchievementsState {
   session: number
   // Только память приложения: после перезагрузки или выхода список пустой.
   pinnedAchievements: PinnedAchievement[]
-  // Применения лидера в текущем бою; обнуляем при запуске следующего.
-  leader_uses: number
+  // Накопленная статистика только текущего боя.
+  battleStats: AchievementBattleStats
 }
 
 const state: AchievementsState = {
@@ -58,7 +59,7 @@ const state: AchievementsState = {
   sending: false,
   session: 0,
   pinnedAchievements: [],
-  leader_uses: 0,
+  battleStats: { leader_uses: 0, damage_taken: 0, enemy_passives_in_field: 0 },
 }
 
 // В закреплении хранятся только section и id. Описание находим в категориях конфига.
@@ -205,7 +206,10 @@ const mutations = {
   resetAchievementSession(state: AchievementsState) {
     // При входе/выходе не переносим прогресс и очередь между пользователями.
     state.session += 1
-    state.leader_uses = 0
+    for (const key of Object.keys(
+      state.battleStats
+    ) as (keyof AchievementBattleStats)[])
+      state.battleStats[key] = 0
     state.pinnedAchievements = []
     state.userAchievements = {}
     state.pendingEvents = []
@@ -246,14 +250,19 @@ const mutations = {
     prunePins(state)
   },
 
-  // Новый бой: начинаем считать применения лидера с нуля. Событие старта не создаём.
+  // Новый бой: сбрасываем все показатели. Событие старта не создаём.
   startAchievementBattle(state: AchievementsState) {
-    state.leader_uses = 0
+    for (const key of Object.keys(
+      state.battleStats
+    ) as (keyof AchievementBattleStats)[])
+      state.battleStats[key] = 0
   },
-  // Один сыгранный заряд лидера. Нужно для условия победы «не используйте лидера».
-  // Пассивки и восстановление зарядов этот счётчик не меняют.
-  recordAchievementLeaderUse(state: AchievementsState) {
-    state.leader_uses += 1
+  // Прибавляем факт или количество к выбранному показателю боя.
+  incrementAchievementBattleStat(
+    state: AchievementsState,
+    { key, amount }: { key: keyof AchievementBattleStats; amount: number }
+  ) {
+    state.battleStats[key] += amount
   },
 }
 

@@ -100,7 +100,10 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
     !("color" in input.actor)
   ) {
     // Факт применения надёжнее остатка зарядов: пассивки могут вернуть заряды.
-    store.commit("recordAchievementLeaderUse")
+    store.commit("incrementAchievementBattleStat", {
+      key: "leader_uses",
+      amount: 1,
+    })
   }
 
   // Приводим разные входные формы к единому event.data:

@@ -750,7 +750,7 @@
             },
             "filters": {
               "mode": "normal",
-              "leader_uses": 0
+              "battleStats.leader_uses": 0
             },
             "rewards": {
               "resources": {
@@ -778,6 +778,46 @@
             },
             "filters": {
               "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_no_damage_3": {
+            "id": "normal_win_no_damage_3",
+            "title": "Выиграйте 3 сложных боя без полученного урона",
+            "ordering": 140,
+            "event": "game.won",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "difficulty": "hard",
+              "battleStats.damage_taken": 0
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_no_enemy_passives_3": {
+            "id": "normal_win_no_enemy_passives_3",
+            "title": "Выиграйте 3 сложных боя без пассивок врагов на поле",
+            "ordering": 140,
+            "event": "game.won",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "difficulty": "hard",
+              "battleStats.enemy_passives_in_field": 0
             },
             "rewards": {
               "resources": {

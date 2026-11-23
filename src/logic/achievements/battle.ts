@@ -4,7 +4,7 @@ import { CardColor } from "@/types/game"
 import { resolveAchievementGameMode } from "./gameMode"
 
 export function startAchievementBattle(): void {
-  // Только счётчик применений лидера. Данные игры уже хранятся в игровом сторе.
+  // Обнуляем статистику боя; исходные игровые объекты уже находятся в сторе.
   store.commit("startAchievementBattle")
 }
 
@@ -28,7 +28,16 @@ export function finishAchievementBattle() {
       cards: store.state.game.current_deck.map(entry => entry.card),
       leader: store.state.game.leader,
     },
-    leader_uses: store.state.achievements.leader_uses,
+    battleStats: { ...store.state.achievements.battleStats },
     enemy_grave,
   }
+}
+
+// Величина прошедшего урона после защиты, без ограничения оставшимися HP.
+export function recordAchievementDamage(amount: number): void {
+  if (amount > 0)
+    store.commit("incrementAchievementBattleStat", {
+      key: "damage_taken",
+      amount,
+    })
 }

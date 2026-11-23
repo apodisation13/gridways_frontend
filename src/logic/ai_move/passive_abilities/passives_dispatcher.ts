@@ -53,7 +53,7 @@ export function run_passive(
   enemy: Enemy,
   gameObj: GameObj,
   timeout = 1000
-): void {
+): boolean {
   const { enemy_leader, field, hand } = gameObj
   const pea = enemy.passive_ability?.name
 
@@ -133,5 +133,7 @@ export function run_passive(
     add_armor_to_leader(enemy, gameObj)
   } else if (pea === EnemyPassive.LoseArmor) {
     lose_armor(enemy)
-  }
+  } else return false
+  // Поддерживаемый обработчик вызван, даже если его эффект оказался бесполезным.
+  return true
 }

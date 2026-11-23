@@ -1,3 +1,4 @@
+import { recordAchievementDamage } from "@/logic/achievements/battle"
 import { check_lose } from "@/logic/ai_move/service/check_lose"
 import { timeoutAnimationFlag } from "@/logic/game_logic/timers"
 import {
@@ -41,6 +42,7 @@ export function damage_player(source: DamageSource, timeout = 1000): void {
 
   sound_enemy_damage_player()
   store.commit("change_health", -source.data.damage)
+  recordAchievementDamage(source.data.damage)
   timeoutAnimationFlag(source, "damages_player", null, timeout * 0.5)
   check_lose()
 }
