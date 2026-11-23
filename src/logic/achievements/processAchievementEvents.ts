@@ -10,6 +10,7 @@ import { AchievementCounterType, AchievementEventType } from "@/types"
 
 import { buildDeckSummary } from "./deckSummary"
 import { getAchievementField, matchesAchievementFilters } from "./filters"
+import { getUniqueValue, hasUniqueValue } from "./uniqueValues"
 
 // Считает предварительный прогресс, не меняя исходные данные и не выдавая наград.
 // Поддерживаем постоянные задания с count, sum, current, unique и streak. Для daily/weekly нужны их периоды.
@@ -137,7 +138,27 @@ export function processAchievementEvents(
         definition.counter.type === AchievementCounterType.Current
       ) {
         // Берём число из указанного поля: например, amount при расходе ресурса.
-        const amount = getAchievementField(data, definition.counter.field)
+        let amount
+        if ("fields" in definition.counter) {
+          if (event.type !== AchievementEventType.ResourcesChecked) continue
+          // Все поля должны присутствовать: неполный снимок не выдаёт награду.
+          const amounts = definition.counter.fields.map(field =>
+            getAchievementField(data, field)
+          )
+          if (
+            !amounts.length ||
+            amounts.some(
+              value =>
+                typeof value !== "number" ||
+                !Number.isFinite(value) ||
+                value < 0
+            )
+          )
+            continue
+          amount = Math.max(...(amounts as number[]))
+        } else {
+          amount = getAchievementField(data, definition.counter.field)
+        }
         if (
           typeof amount !== "number" ||
           !Number.isFinite(amount) ||
@@ -147,14 +168,10 @@ export function processAchievementEvents(
         }
         increment = amount
       } else if (definition.counter.type === AchievementCounterType.Unique) {
-        const item = getAchievementField(data, definition.counter.field)
-        // Собираем названия или числовые ID. null, объекты и отсутствующие поля не считаем.
-        if (
-          typeof item !== "string" &&
-          !(typeof item === "number" && Number.isFinite(item))
-        )
-          continue
-        if (current?.seen?.includes(item)) continue
+        const raw = getAchievementField(data, definition.counter.field)
+        const item = getUniqueValue(raw)
+        if (item === undefined) continue
+        if (hasUniqueValue(current?.seen ?? [], raw, item)) continue
         // Копируем список: предварительный расчёт не должен менять прогресс бэка.
         seen = [...(current?.seen ?? []), item]
         increment = 0

@@ -138,6 +138,11 @@ export type AchievementCounter =
   | { type: AchievementCounterType.Count }
   | { type: AchievementCounterType.Sum; field: string }
   | { type: AchievementCounterType.Current; field: string }
+  | {
+      type: AchievementCounterType.Current
+      fields: [string, ...string[]]
+      aggregation: "max"
+    }
   | { type: AchievementCounterType.Unique; field: string }
 
 export interface AchievementRewards {
@@ -365,6 +370,8 @@ export type AchievementEventInput =
         action: "buy" | "sell" | "craft" | "mill"
         resource: string
         amount: number
+        // Исходный рецепт одной операции, без умножения на quantity.
+        recipe: Record<string, number>
         // Стоимость и фактический доход именно этого обмена. Нули не включаем.
         spent: Record<string, number>
         gained: Record<string, number>

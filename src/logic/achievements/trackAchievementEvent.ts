@@ -260,7 +260,7 @@ function trackResourceTransition(
   ids.push(
     ...trackAchievementEvent({
       type: AchievementEventType.ResourceTransformed,
-      data: { action, resource, amount: transformedAmount, ...changes },
+      data: { action, resource, amount: transformedAmount, recipe, ...changes },
     })
   )
   ids.push(...checkCurrentResources())

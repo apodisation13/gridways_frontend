@@ -173,6 +173,30 @@
               }
             }
           },
+          "accumulate_any_raw_100": {
+            "id": "accumulate_any_raw_100",
+            "title": "Накопите 100 необработанных камней одного вида",
+            "ordering": 31,
+            "event": "resources.checked",
+            "target": 100,
+            "counter": {
+              "type": "current",
+              "fields": ["resources.raw_bronze", "resources.raw_silver", "resources.raw_gold"],
+              "aggregation": "max"
+            },
+            "filters": {},
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "craft_unique_recipes_3": {
+            "id": "craft_unique_recipes_3",
+            "title": "Используйте 3 разных рецепта крафта ресурсов",
+            "ordering": 32,
+            "event": "resource.transformed",
+            "target": 3,
+            "counter": { "type": "unique", "field": "recipe" },
+            "filters": { "action": "craft" },
+            "rewards": { "resources": { "money": 100 } }
+          },
           "open_kegs_10": {
             "id": "open_kegs_10",
             "title": "Откройте 10 бочек",
