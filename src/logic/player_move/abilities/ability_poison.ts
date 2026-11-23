@@ -18,12 +18,14 @@ export function poison_one_enemy(
 
   // если у врага уже есть яд, убиваем его (снимаем ему в кладбище статус)
   if (enemy.data.status === EnemyStatus.Poison) {
+    // При эффекте удаление отложено; HP фиксируем в момент повторного яда.
+    const hpBeforeDeath = enemy.data.hp
     poison_sound()
     if (fromEffect) {
       setTimeout(() => {
-        remove_dead_enemy(enemy, gameObj, timeout)
+        remove_dead_enemy(enemy, gameObj, hpBeforeDeath, timeout)
       }, timeout)
-    } else remove_dead_enemy(enemy, gameObj, timeout)
+    } else remove_dead_enemy(enemy, gameObj, hpBeforeDeath, timeout)
     return true
   }
 

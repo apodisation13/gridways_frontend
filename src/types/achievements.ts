@@ -38,6 +38,9 @@ export enum AchievementEventType {
   // Активация пассивки с указанием зоны. run_passive учитывает разрешённый вызов
   // обработчика; реакции на игру карты и начало боя — только подтверждённый эффект.
   PassiveTriggered = "passive.triggered",
+  // Фактически добавленная защита игрока после ограничения прокачками.
+  ArmorGained = "armor.gained",
+  InvulnerabilityGained = "invulnerability.gained",
 
   // Враги. Снимок enemy берём до очистки статусов и восстановления параметров.
   // Смерть врага или лидера через remove_dead_enemy; удаление из колоды не считается.
@@ -131,7 +134,7 @@ export enum AchievementCounterType {
 
 export interface AchievementStreakReset {
   event: AchievementRecordedEventType
-  filters: Record<string, AchievementFilter>
+  filters: AchievementFilters
 }
 
 export type AchievementCounter =
@@ -160,7 +163,7 @@ export interface AchievementDefinition {
   ordering: number
   title: string
   event: AchievementRecordedEventType
-  filters: Record<string, AchievementFilter>
+  filters: AchievementFilters
   counter: AchievementCounter
   target: number
   rewards: AchievementRewards
@@ -238,6 +241,19 @@ export enum AchievementFilterOperator {
   Exists = "exists",
 }
 
+// Вариант внутри any — обычный набор И, без вложенных групп any.
+export type AchievementFilterGroup = Record<string, AchievementFilter> & {
+  any?: never
+}
+export type AchievementFilterAlternatives = [
+  AchievementFilterGroup,
+  ...AchievementFilterGroup[],
+]
+export type AchievementFilters = Record<
+  string,
+  AchievementFilter | AchievementFilterAlternatives
+> & { any?: AchievementFilterAlternatives }
+
 export type AchievementFilter =
   | AchievementScalar
   | {
@@ -300,6 +316,14 @@ export type AchievementPassiveLocation =
 
 export type AchievementEventInput =
   | {
+      type: AchievementEventType.ArmorGained
+      amount: number
+    }
+  | {
+      type: AchievementEventType.InvulnerabilityGained
+      amount: number
+    }
+  | {
       type: AchievementEventType.EnemyEffectPlaced
       enemy: Enemy | EnemyLeader
       effect: EffectObject
@@ -312,6 +336,7 @@ export type AchievementEventInput =
   | {
       type: AchievementEventType.EnemyKilled
       enemy: Enemy | EnemyLeader
+      hp_before_death: number
     }
   | {
       type: AchievementEventType.EnemyArmorRemoved

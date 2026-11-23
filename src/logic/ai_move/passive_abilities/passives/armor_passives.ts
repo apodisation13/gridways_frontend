@@ -48,7 +48,7 @@ export function transform_armor_to_health(
 ): void {
   const enemyArmor = enemy.data?.armor
   if (!enemyArmor) {
-    remove_dead_enemy(enemy, gameObj, timeout * 0.75)
+    remove_dead_enemy(enemy, gameObj, enemy.data.hp, timeout * 0.75)
     return
   }
   enemy.data.hp = enemyArmor

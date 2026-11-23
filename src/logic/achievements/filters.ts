@@ -1,4 +1,8 @@
-import type { AchievementEventValue, AchievementFilter } from "@/types"
+import type {
+  AchievementEventValue,
+  AchievementFilter,
+  AchievementFilters,
+} from "@/types"
 import { AchievementFilterOperator } from "@/types"
 
 // Пути считаются от event.data: actor.color, actor.data.damage, actor.tags.0.
@@ -64,10 +68,23 @@ function matchesCondition(
 
 export function matchesAchievementFilters(
   data: Record<string, AchievementEventValue>,
-  filters: Record<string, AchievementFilter>
+  filters: AchievementFilters
 ): boolean {
-  // Все условия соединены через И. Пустой словарь подходит любому событию этого типа.
-  return Object.entries(filters).every(([path, condition]) =>
-    matchesCondition(getAchievementField(data, path), condition)
-  )
+  // Соседние поля — И; any требует хотя бы один подходящий набор условий.
+  // Пустой filters по-прежнему подходит любому событию этого типа.
+  return Object.entries(filters).every(([path, condition]) => {
+    if (path === "any") {
+      if (!Array.isArray(condition) || !condition.length) return false
+      return condition.some(group =>
+        Object.entries(group).every(
+          ([field, rule]) =>
+            field !== "any" &&
+            !Array.isArray(rule) &&
+            matchesCondition(getAchievementField(data, field), rule)
+        )
+      )
+    }
+    if (Array.isArray(condition)) return false
+    return matchesCondition(getAchievementField(data, path), condition)
+  })
 }

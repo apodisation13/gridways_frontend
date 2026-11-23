@@ -115,7 +115,17 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
   // карты, врага или стора не должны менять уже поставленное в очередь событие.
   // undefined, как и при обычной отправке JSON, не сохраняется в полях объекта.
   let eventData: object
-  if (input.type === AchievementEventType.ActionPlayed) {
+  if (
+    input.type === AchievementEventType.ArmorGained ||
+    input.type === AchievementEventType.InvulnerabilityGained
+  ) {
+    // При достигнутом лимите или отсутствии прироста получения не произошло.
+    if (!Number.isFinite(input.amount) || input.amount <= 0) return []
+    eventData = {
+      amount: input.amount,
+      mode: resolveAchievementGameMode(),
+    }
+  } else if (input.type === AchievementEventType.ActionPlayed) {
     eventData = {
       actor: input.actor,
       mode: resolveAchievementGameMode(),
@@ -151,10 +161,11 @@ export function trackAchievementEvent(input: AchievementEventInput): string[] {
       enemy: input.enemy,
       mode: resolveAchievementGameMode(),
     }
-  } else if ("enemy" in input) {
+  } else if (input.type === AchievementEventType.EnemyKilled) {
     eventData = {
       enemy: input.enemy,
       mode: resolveAchievementGameMode(),
+      hp_before_death: input.hp_before_death,
     }
   } else {
     eventData = input.data

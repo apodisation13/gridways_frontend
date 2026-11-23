@@ -174,6 +174,9 @@ export interface Card {
   p_damages_enemy?: boolean | null
   trigger_deck_passive?: boolean | null
   trigger_grave_passive?: boolean | null
+
+  // Карта создана из врага во время боя; у обычных карт поле отсутствует.
+  from_enemy?: boolean
 }
 
 export interface Leader {

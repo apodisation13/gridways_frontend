@@ -7,6 +7,61 @@
         "title": "Карты",
         "ordering": 10,
         "achievements": {
+          "play_enemy_cards_3": {
+            "id": "play_enemy_cards_3",
+            "title": "Примените карты врагов 3 раза",
+            "ordering": 5,
+            "group": "play_enemy_cards",
+            "event": "action.played",
+            "target": 3,
+            "counter": { "type": "count" },
+            "filters": { "actor.from_enemy": true },
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "gain_armor_3": {
+            "id": "gain_armor_3",
+            "title": "Получите броню 3 раза",
+            "ordering": 1,
+            "group": "gain_armor",
+            "event": "armor.gained",
+            "target": 3,
+            "counter": { "type": "count" },
+            "filters": {},
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "gain_armor_value_20": {
+            "id": "gain_armor_value_20",
+            "title": "Получите суммарно 20 брони",
+            "ordering": 2,
+            "group": "gain_armor_value",
+            "event": "armor.gained",
+            "target": 20,
+            "counter": { "type": "sum", "field": "amount" },
+            "filters": {},
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "gain_invulnerability_3": {
+            "id": "gain_invulnerability_3",
+            "title": "Получите неуязвимость 3 раза",
+            "ordering": 3,
+            "group": "gain_invulnerability",
+            "event": "invulnerability.gained",
+            "target": 3,
+            "counter": { "type": "count" },
+            "filters": {},
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "gain_invulnerability_value_10": {
+            "id": "gain_invulnerability_value_10",
+            "title": "Получите суммарно 10 ходов неуязвимости",
+            "ordering": 4,
+            "group": "gain_invulnerability_value",
+            "event": "invulnerability.gained",
+            "target": 10,
+            "counter": { "type": "sum", "field": "amount" },
+            "filters": {},
+            "rewards": { "resources": { "money": 100 } }
+          },
           "play_bronze_damage_8_10": {
             "id": "play_bronze_damage_8_10",
             "title": "Примените бронзовые карты с уроном от 8 десять раз",
@@ -997,6 +1052,22 @@
                 "money": 1000
               }
             }
+          },
+          "kill_enemies_hp_50_5": {
+            "id": "kill_enemies_hp_50_5",
+            "title": "Убейте 5 врагов с базовым или текущим здоровьем от 50",
+            "ordering": 11,
+            "event": "enemy.killed",
+            "target": 5,
+            "counter": { "type": "count" },
+            "filters": {
+              "enemy.color": { "type": "exists", "value": true },
+              "any": [
+                { "enemy.data.base.base_hp": { "type": "gte", "value": 50 } },
+                { "hp_before_death": { "type": "gte", "value": 50 } }
+              ]
+            },
+            "rewards": { "resources": { "money": 100 } }
           },
           "kill_enemies_250": {
             "id": "kill_enemies_250",
