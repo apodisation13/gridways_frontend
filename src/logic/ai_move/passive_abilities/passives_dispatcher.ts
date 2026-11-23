@@ -1,3 +1,5 @@
+import { copyObj } from "@/lib/utils"
+import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import {
   add_armor_all,
   add_armor_self,
@@ -47,15 +49,18 @@ import {
 } from "@/logic/ai_move/passive_abilities/passives/spawns"
 import { give_random_veil } from "@/logic/ai_move/passive_abilities/passives/statuses"
 import type { Enemy, GameObj } from "@/types"
-import { EnemyPassive } from "@/types"
+import { AchievementEventType, EnemyPassive } from "@/types"
 
 export function run_passive(
   enemy: Enemy,
   gameObj: GameObj,
+  location: "field" | "deck" | "grave",
   timeout = 1000
 ): boolean {
   const { enemy_leader, field, hand } = gameObj
   const pea = enemy.passive_ability?.name
+  // Обработчик может сразу изменить врага. Для фильтров нужен снимок до эффекта.
+  const snapshot = copyObj(enemy)
 
   if (pea === EnemyPassive.IncrSelfDmg) {
     incr_self_dmg(enemy, timeout)
@@ -135,5 +140,10 @@ export function run_passive(
     lose_armor(enemy)
   } else return false
   // Поддерживаемый обработчик вызван, даже если его эффект оказался бесполезным.
+  trackAchievementEvent({
+    type: AchievementEventType.EnemyPassiveTriggered,
+    enemy: snapshot,
+    location,
+  })
   return true
 }

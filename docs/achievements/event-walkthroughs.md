@@ -1,6 +1,6 @@
 # События достижений: от вызова до контракта
 
-Документ охватывает все 23 типа событий, отправляемых на бэк. Локальные входы трекера упоминаются только там, где нужны для объяснения формирования события.
+Документ охватывает все типы событий, отправляемых на бэк. Локальные входы трекера упоминаются только там, где нужны для объяснения формирования события.
 
 Для каждого события описаны назначение, источники полей, запрос и подсчёт на фронте и бэке. Здесь зафиксирован существующий код, а не планы развития.
 
@@ -670,6 +670,45 @@ eventData = {
 - Реакции лидера: [leader_passive_abilities_upon_playing_a_card.ts](../../src/logic/player_move/leader_passive_abilities_upon_playing_a_card.ts).
 - Тип location: [achievements.ts](../../src/types/achievements.ts); подготовка события: [trackAchievementEvent.ts](../../src/logic/achievements/trackAchievementEvent.ts).
 - На бэке: `services/api/app/apps/user_achievements/schemas.py` (PassiveTriggeredData/PassiveTriggeredEvent), `logic/events.py` (общий подсчёт).
+
+## EnemyPassiveTriggered — запуск пассивки врага
+
+Событие `enemy.passive_triggered` означает: таймер разрешил запуск и вызван поддерживаемый обработчик пассивки. Полезность результата не проверяется: лечение полностью здорового врага тоже считается. Пустое/неизвестное имя пассивки не создаёт событие.
+
+### Откуда берутся данные
+
+1. `enemy_passive_abilities_end_turn` собирает врагов с активными пассивками и живого лидера врагов.
+2. `field_passives`, `deck_passives`, `grave_passives` проверяют `allowActionTimer`. При отказе до диспетчера выполнение не доходит.
+3. Общий `run_passive` получает явную location и сохраняет копию всего enemy **до эффекта**, затем вызывает обработчик. После поддерживаемой ветки вызывает трекер с копией врага и location. Если обработчик планирует эффект через таймер, учитывается его запуск, а не завершение анимации.
+4. Трекер добавляет mode через `resolveAchievementGameMode()` и кладёт независимый JSON-снимок в обычную очередь.
+
+```json
+{
+  "type": "enemy.passive_triggered",
+  "data": {
+    "enemy": {
+      "id": 7,
+      "color": "Bronze",
+      "faction": "Soldiers",
+      "passive_ability": { "name": "heal-self" }
+    },
+    "location": "field",
+    "mode": "normal"
+  }
+}
+```
+
+В примере enemy сокращён; реально передаётся полный объект. Зоны — `field`, `deck`, `grave`. Лидер врагов также проходит через field; чтобы учитывать только карты, нужен `enemy.color exists true`, только лидера — `exists false`.
+
+### Подсчёт и контракты
+
+Бэк принимает явную модель `EnemyPassiveTriggeredData`: enemy, mode, location, без наследования других Data-моделей. Дальше работают общие filters и counter: count для количества запусков, unique по enemy.id для разных видов врагов, фильтры по фракции/цвету/имени пассивки и вложенным параметрам. Отдельного подсчёта этого события в service нет.
+
+Три примера контрактов в каталоге используют count, target 10 и соответствующую location. Режим намеренно не ограничен. Статистика `battleStats.enemy_passives_in_field` для условия победы остаётся отдельным счётчиком текущего боя: её увеличивает только field_passives после успешного диспетчера, без второго инкремента в трекере.
+
+В мультиплеере событие получает клиент, который выполняет обработчик пассивки. Получение состояния от другого игрока не повторяет событие и не даёт обоим общий прогресс; синхронизация этих фактов не добавлялась.
+
+Код: `src/logic/ai_move/passive_abilities/passives_{field,deck,grave,dispatcher}.ts`, `src/logic/achievements/trackAchievementEvent.ts`, `src/types/achievements.ts`; на бэке — `user_achievements/schemas.py` и общий `logic/events.py`.
 
 ## EnemyKilled — смерть врага или лидера врагов
 

@@ -41,6 +41,8 @@ export enum AchievementEventType {
   // Враги. Снимок enemy берём до очистки статусов и восстановления параметров.
   // Смерть врага или лидера через remove_dead_enemy; удаление из колоды не считается.
   EnemyKilled = "enemy.killed",
+  // Таймер разрешил запуск поддерживаемой пассивки врага; эффект может быть бесполезным.
+  EnemyPassiveTriggered = "enemy.passive_triggered",
   // Снятие существующего щита любым подключённым способом, не только ударом.
   EnemyShieldRemoved = "enemy.shield_removed",
   // Снятие брони у одного врага: count считает факт, sum по amount — единицы брони.
@@ -294,6 +296,11 @@ export type AchievementPassiveLocation =
   | "leader_passive_upon_playing_a_card"
 
 export type AchievementEventInput =
+  | {
+      type: AchievementEventType.EnemyPassiveTriggered
+      enemy: Enemy | EnemyLeader
+      location: "field" | "deck" | "grave"
+    }
   | {
       type: AchievementEventType.EnemyKilled
       enemy: Enemy | EnemyLeader

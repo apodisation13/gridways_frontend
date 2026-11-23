@@ -931,6 +931,39 @@
         "title": "Враги",
         "ordering": 110,
         "achievements": {
+          "trigger_enemy_passive_in_field_10": {
+            "id": "trigger_enemy_passive_in_field_10",
+            "title": "Допустите 10 срабатываний пассивок врагов на поле",
+            "ordering": 1,
+            "group": "trigger_enemy_passive_in_field",
+            "event": "enemy.passive_triggered",
+            "target": 10,
+            "counter": { "type": "count" },
+            "filters": { "location": "field" },
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "trigger_enemy_passive_in_deck_10": {
+            "id": "trigger_enemy_passive_in_deck_10",
+            "title": "Допустите 10 срабатываний пассивок врагов в колоде",
+            "ordering": 2,
+            "group": "trigger_enemy_passive_in_deck",
+            "event": "enemy.passive_triggered",
+            "target": 10,
+            "counter": { "type": "count" },
+            "filters": { "location": "deck" },
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "trigger_enemy_passive_in_grave_10": {
+            "id": "trigger_enemy_passive_in_grave_10",
+            "title": "Допустите 10 срабатываний пассивок врагов в сбросе",
+            "ordering": 3,
+            "group": "trigger_enemy_passive_in_grave",
+            "event": "enemy.passive_triggered",
+            "target": 10,
+            "counter": { "type": "count" },
+            "filters": { "location": "grave" },
+            "rewards": { "resources": { "money": 100 } }
+          },
           "kill_enemies_50": {
             "id": "kill_enemies_50",
             "title": "Убейте суммарно 50 врагов",

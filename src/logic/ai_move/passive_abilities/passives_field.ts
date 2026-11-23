@@ -9,7 +9,7 @@ export function field_passives(
   timeout = 1000
 ): void {
   if (!allowActionTimer(enemy)) return
-  if (run_passive(enemy, gameObj, timeout))
+  if (run_passive(enemy, gameObj, "field", timeout))
     store.commit("incrementAchievementBattleStat", {
       key: "enemy_passives_in_field",
       amount: 1,
