@@ -34,12 +34,12 @@ export function installAchievementSync(): () => void {
     // after — добавляем к нему новые ходы из очереди.
     // Если именно новые ходы довели задание до цели, ждать таймера не нужно.
     const before = processAchievementEvents(
-      state.achievementsConfig.permanent,
+      state.achievementsByEvent,
       state.userAchievements,
       state.inFlightEvents
     )
     const after = processAchievementEvents(
-      state.achievementsConfig.permanent,
+      state.achievementsByEvent,
       before.progress,
       state.pendingEvents
     )

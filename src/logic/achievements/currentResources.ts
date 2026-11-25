@@ -1,17 +1,17 @@
 import store from "@/store"
-import type { AchievementSection, UserAchievementsProgress } from "@/types"
-import { AchievementCounterType, AchievementEventType } from "@/types"
+import type { AchievementsByEvent, UserAchievementsProgress } from "@/types"
+import { AchievementEventType } from "@/types"
 
 import { processAchievementEvents } from "./processAchievementEvents"
 import { trackAchievementEvent } from "./trackAchievementEvent"
 
 // Для отображения берём живой баланс. Этот снимок существует только на фронте.
 export function previewCurrentResources(
-  section: AchievementSection,
+  byEvent: AchievementsByEvent,
   progress: UserAchievementsProgress,
   resources: Record<string, number>
 ) {
-  return processAchievementEvents(section, progress, [
+  return processAchievementEvents(byEvent, progress, [
     {
       id: "current-resource-preview",
       type: AchievementEventType.ResourcesChecked,
@@ -25,16 +25,10 @@ export function previewCurrentResources(
 export function checkCurrentResources(): string[] {
   const state = store.state.achievements
   if (!store.getters.isLoggedIn) return []
-  const hasCurrent = Object.values(
-    state.achievementsConfig.permanent.categories
-  ).some(category =>
-    Object.values(category.achievements).some(
-      definition => definition.counter.type === AchievementCounterType.Current
-    )
-  )
-  if (!hasCurrent) return []
+  if (!state.achievementsByEvent.has(AchievementEventType.ResourcesChecked))
+    return []
   const preview = previewCurrentResources(
-    state.achievementsConfig.permanent,
+    state.achievementsByEvent,
     state.userAchievements,
     store.getters.resource
   )

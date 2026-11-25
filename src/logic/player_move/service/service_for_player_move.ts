@@ -141,5 +141,6 @@ export function enemy_as_card(enemy: Enemy, charges: number): Card {
     },
     image: enemy.image,
     newly_added: false,
+    from_enemy: true,
   }
 }

@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid"
 import type { ActionContext } from "vuex"
 
 import { callApi, HttpMethod } from "@/lib/api/api"
+import { buildAchievementIndex } from "@/logic/achievements/buildAchievementIndex"
 import { previewCurrentDecks } from "@/logic/achievements/currentDecks"
 import {
   checkCurrentResources,
@@ -13,12 +14,14 @@ import { trackAchievementRewards } from "@/logic/achievements/trackAchievementRe
 import type { RootState } from "@/store"
 import { USER_ACHIEVEMENTS } from "@/store/const/api_urls"
 import type {
+  AchievementBattleStats,
   AchievementCatalog,
   AchievementEvent,
   AchievementEventsRequest,
   AchievementEventsResponse,
   AchievementGameConfig,
   AchievementRewardNotification,
+  AchievementsByEvent,
   PinnedAchievement,
   UserAchievementsProgress,
 } from "@/types"
@@ -27,6 +30,8 @@ import type { UpgradesConfig, UserUpgrades } from "@/types/upgrades"
 export interface AchievementsState {
   // Описания заданий: условия, цели, награды. Permanent приходит из game_const.
   achievementsConfig: AchievementCatalog
+  // Индекс permanent: пересоздаётся только вместе с конфигом.
+  achievementsByEvent: AchievementsByEvent
   // Только подтверждённый бэком прогресс. Локальные ходы сюда не прибавляем.
   userAchievements: UserAchievementsProgress
   // Новые события, которые ещё ни разу не отправляли.
@@ -41,8 +46,8 @@ export interface AchievementsState {
   session: number
   // Только память приложения: после перезагрузки или выхода список пустой.
   pinnedAchievements: PinnedAchievement[]
-  // Применения лидера в текущем бою; обнуляем при запуске следующего.
-  leader_uses: number
+  // Накопленная статистика только текущего боя.
+  battleStats: AchievementBattleStats
 }
 
 const state: AchievementsState = {
@@ -51,6 +56,7 @@ const state: AchievementsState = {
     daily: null,
     weekly: null,
   },
+  achievementsByEvent: new Map(),
   userAchievements: {},
   pendingEvents: [],
   inFlightEvents: [],
@@ -58,7 +64,7 @@ const state: AchievementsState = {
   sending: false,
   session: 0,
   pinnedAchievements: [],
-  leader_uses: 0,
+  battleStats: { leader_uses: 0, damage_taken: 0, enemy_passives_in_field: 0 },
 }
 
 // В закреплении хранятся только section и id. Описание находим в категориях конфига.
@@ -109,7 +115,7 @@ const getters = {
     // Сначала применяем события в порядке возникновения: отправленные раньше новых.
     // Пока ответ не пришёл, inFlightEvents тоже нужны для отображения прогресса.
     const preview = processAchievementEvents(
-      state.achievementsConfig.permanent,
+      state.achievementsByEvent,
       state.userAchievements,
       [...state.inFlightEvents, ...state.pendingEvents]
     )
@@ -117,18 +123,18 @@ const getters = {
     // Передаём результат дальше по цепочке, чтобы сохранить расчёт остальных заданий.
     // Эти функции не отправляют запросы, не начисляют награды и не меняют userAchievements.
     const current = previewCurrentResources(
-      state.achievementsConfig.permanent,
+      state.achievementsByEvent,
       preview.progress,
       getters.resource
     )
     const upgrades = previewCurrentUpgrades(
-      state.achievementsConfig.permanent,
+      state.achievementsByEvent,
       current.progress,
       getters.upgradesConfig,
       getters.userUpgrades
     )
     const decks = previewCurrentDecks(
-      state.achievementsConfig.permanent,
+      state.achievementsByEvent,
       upgrades.progress,
       getters.all_decks.length
     )
@@ -205,7 +211,10 @@ const mutations = {
   resetAchievementSession(state: AchievementsState) {
     // При входе/выходе не переносим прогресс и очередь между пользователями.
     state.session += 1
-    state.leader_uses = 0
+    for (const key of Object.keys(
+      state.battleStats
+    ) as (keyof AchievementBattleStats)[])
+      state.battleStats[key] = 0
     state.pinnedAchievements = []
     state.userAchievements = {}
     state.pendingEvents = []
@@ -233,6 +242,9 @@ const mutations = {
       title: "Постоянные",
       categories: {},
     }
+    state.achievementsByEvent = buildAchievementIndex(
+      state.achievementsConfig.permanent
+    )
     prunePins(state)
   },
   // Начальная загрузка подтверждённого прогресса; здесь не прибавляем локальные события.
@@ -246,14 +258,19 @@ const mutations = {
     prunePins(state)
   },
 
-  // Новый бой: начинаем считать применения лидера с нуля. Событие старта не создаём.
+  // Новый бой: сбрасываем все показатели. Событие старта не создаём.
   startAchievementBattle(state: AchievementsState) {
-    state.leader_uses = 0
+    for (const key of Object.keys(
+      state.battleStats
+    ) as (keyof AchievementBattleStats)[])
+      state.battleStats[key] = 0
   },
-  // Один сыгранный заряд лидера. Нужно для условия победы «не используйте лидера».
-  // Пассивки и восстановление зарядов этот счётчик не меняют.
-  recordAchievementLeaderUse(state: AchievementsState) {
-    state.leader_uses += 1
+  // Прибавляем факт или количество к выбранному показателю боя.
+  incrementAchievementBattleStat(
+    state: AchievementsState,
+    { key, amount }: { key: keyof AchievementBattleStats; amount: number }
+  ) {
+    state.battleStats[key] += amount
   },
 }
 

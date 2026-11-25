@@ -7,6 +7,61 @@
         "title": "Карты",
         "ordering": 10,
         "achievements": {
+          "play_enemy_cards_3": {
+            "id": "play_enemy_cards_3",
+            "title": "Примените карты врагов 3 раза",
+            "ordering": 5,
+            "group": "play_enemy_cards",
+            "event": "action.played",
+            "target": 3,
+            "counter": { "type": "count" },
+            "filters": { "actor.from_enemy": true },
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "gain_armor_3": {
+            "id": "gain_armor_3",
+            "title": "Получите броню 3 раза",
+            "ordering": 1,
+            "group": "gain_armor",
+            "event": "armor.gained",
+            "target": 3,
+            "counter": { "type": "count" },
+            "filters": {},
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "gain_armor_value_20": {
+            "id": "gain_armor_value_20",
+            "title": "Получите суммарно 20 брони",
+            "ordering": 2,
+            "group": "gain_armor_value",
+            "event": "armor.gained",
+            "target": 20,
+            "counter": { "type": "sum", "field": "amount" },
+            "filters": {},
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "gain_invulnerability_3": {
+            "id": "gain_invulnerability_3",
+            "title": "Получите неуязвимость 3 раза",
+            "ordering": 3,
+            "group": "gain_invulnerability",
+            "event": "invulnerability.gained",
+            "target": 3,
+            "counter": { "type": "count" },
+            "filters": {},
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "gain_invulnerability_value_10": {
+            "id": "gain_invulnerability_value_10",
+            "title": "Получите суммарно 10 ходов неуязвимости",
+            "ordering": 4,
+            "group": "gain_invulnerability_value",
+            "event": "invulnerability.gained",
+            "target": 10,
+            "counter": { "type": "sum", "field": "amount" },
+            "filters": {},
+            "rewards": { "resources": { "money": 100 } }
+          },
           "play_bronze_damage_8_10": {
             "id": "play_bronze_damage_8_10",
             "title": "Примените бронзовые карты с уроном от 8 десять раз",
@@ -172,6 +227,30 @@
                 "money": 100
               }
             }
+          },
+          "accumulate_any_raw_100": {
+            "id": "accumulate_any_raw_100",
+            "title": "Накопите 100 необработанных камней одного вида",
+            "ordering": 31,
+            "event": "resources.checked",
+            "target": 100,
+            "counter": {
+              "type": "current",
+              "fields": ["resources.raw_bronze", "resources.raw_silver", "resources.raw_gold"],
+              "aggregation": "max"
+            },
+            "filters": {},
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "craft_unique_recipes_3": {
+            "id": "craft_unique_recipes_3",
+            "title": "Используйте 3 разных рецепта крафта ресурсов",
+            "ordering": 32,
+            "event": "resource.transformed",
+            "target": 3,
+            "counter": { "type": "unique", "field": "recipe" },
+            "filters": { "action": "craft" },
+            "rewards": { "resources": { "money": 100 } }
           },
           "open_kegs_10": {
             "id": "open_kegs_10",
@@ -750,7 +829,7 @@
             },
             "filters": {
               "mode": "normal",
-              "leader_uses": 0
+              "battleStats.leader_uses": 0
             },
             "rewards": {
               "resources": {
@@ -778,6 +857,46 @@
             },
             "filters": {
               "mode": "normal"
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_no_damage_3": {
+            "id": "normal_win_no_damage_3",
+            "title": "Выиграйте 3 сложных боя без полученного урона",
+            "ordering": 140,
+            "event": "game.won",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "difficulty": "hard",
+              "battleStats.damage_taken": 0
+            },
+            "rewards": {
+              "resources": {
+                "money": 1000
+              }
+            }
+          },
+          "normal_win_no_enemy_passives_3": {
+            "id": "normal_win_no_enemy_passives_3",
+            "title": "Выиграйте 3 сложных боя без пассивок врагов на поле",
+            "ordering": 140,
+            "event": "game.won",
+            "target": 3,
+            "counter": {
+              "type": "count"
+            },
+            "filters": {
+              "mode": "normal",
+              "difficulty": "hard",
+              "battleStats.enemy_passives_in_field": 0
             },
             "rewards": {
               "resources": {
@@ -867,6 +986,50 @@
         "title": "Враги",
         "ordering": 110,
         "achievements": {
+          "make_enemy_spawn_negative_effect_10": {
+            "id": "make_enemy_spawn_negative_effect_10",
+            "title": "Допустите размещение врагами 10 негативных эффектов",
+            "ordering": 4,
+            "group": "make_enemy_spawn_negative_effect",
+            "event": "enemy.effect_placed",
+            "target": 10,
+            "counter": { "type": "count" },
+            "filters": { "effect.negative": true },
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "trigger_enemy_passive_in_field_10": {
+            "id": "trigger_enemy_passive_in_field_10",
+            "title": "Допустите 10 срабатываний пассивок врагов на поле",
+            "ordering": 1,
+            "group": "trigger_enemy_passive_in_field",
+            "event": "enemy.passive_triggered",
+            "target": 10,
+            "counter": { "type": "count" },
+            "filters": { "location": "field" },
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "trigger_enemy_passive_in_deck_10": {
+            "id": "trigger_enemy_passive_in_deck_10",
+            "title": "Допустите 10 срабатываний пассивок врагов в колоде",
+            "ordering": 2,
+            "group": "trigger_enemy_passive_in_deck",
+            "event": "enemy.passive_triggered",
+            "target": 10,
+            "counter": { "type": "count" },
+            "filters": { "location": "deck" },
+            "rewards": { "resources": { "money": 100 } }
+          },
+          "trigger_enemy_passive_in_grave_10": {
+            "id": "trigger_enemy_passive_in_grave_10",
+            "title": "Допустите 10 срабатываний пассивок врагов в сбросе",
+            "ordering": 3,
+            "group": "trigger_enemy_passive_in_grave",
+            "event": "enemy.passive_triggered",
+            "target": 10,
+            "counter": { "type": "count" },
+            "filters": { "location": "grave" },
+            "rewards": { "resources": { "money": 100 } }
+          },
           "kill_enemies_50": {
             "id": "kill_enemies_50",
             "title": "Убейте суммарно 50 врагов",
@@ -889,6 +1052,22 @@
                 "money": 1000
               }
             }
+          },
+          "kill_enemies_hp_50_5": {
+            "id": "kill_enemies_hp_50_5",
+            "title": "Убейте 5 врагов с базовым или текущим здоровьем от 50",
+            "ordering": 11,
+            "event": "enemy.killed",
+            "target": 5,
+            "counter": { "type": "count" },
+            "filters": {
+              "enemy.color": { "type": "exists", "value": true },
+              "any": [
+                { "enemy.data.base.base_hp": { "type": "gte", "value": 50 } },
+                { "hp_before_death": { "type": "gte", "value": 50 } }
+              ]
+            },
+            "rewards": { "resources": { "money": 100 } }
           },
           "kill_enemies_250": {
             "id": "kill_enemies_250",

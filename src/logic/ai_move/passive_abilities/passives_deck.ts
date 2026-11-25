@@ -17,5 +17,5 @@ export function deck_passives(
     null,
     timeout * 0.5
   )
-  run_passive(enemy, gameObj, timeout)
+  run_passive(enemy, gameObj, "deck", timeout)
 }

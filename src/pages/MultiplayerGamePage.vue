@@ -312,7 +312,10 @@ import SpecialCaseAbilities from "@/components/Pages/GamePage/SpecialCaseAbiliti
 import UseInventory from "@/components/Pages/GamePage/UseInventory.vue"
 import frontendLogContext from "@/lib/frontend-logs/context"
 import { copyObj, randInt } from "@/lib/utils"
-import { startAchievementBattle } from "@/logic/achievements/battle"
+import {
+  recordAchievementDamage,
+  startAchievementBattle,
+} from "@/logic/achievements/battle"
 import { trackAchievementEvent } from "@/logic/achievements/trackAchievementEvent"
 import { enemy_leader_ai_move_once } from "@/logic/ai_move/ai_leader_move_once"
 import { ai_move } from "@/logic/ai_move/ai_move"
@@ -727,6 +730,7 @@ export default defineComponent({
                 this.$store.commit("change_armor", -1)
               } else {
                 this.$store.commit("change_health", -damage)
+                recordAchievementDamage(damage)
               }
             }
           }
@@ -828,6 +832,7 @@ export default defineComponent({
       this.gameObj.enemy_leader = enemy_leader
       this.gameObj.enemies = enemies
 
+      startAchievementBattle()
       // Расставляем первую волну врагов на поле и применяем способность лидера
       enemy_leader_ai_move_once(this.gameObj)
       place_enemies(this.gameObj.field, this.gameObj.enemies)
@@ -846,7 +851,6 @@ export default defineComponent({
 
       this.draw = true // открываем окно редро
       this.gameInitialized = true
-      startAchievementBattle()
       this.myTurn = true // хост ходит первым
       this.lastSentHealth = this.$store.getters["health"]
       this.lastSentArmor = this.$store.getters["armor"]

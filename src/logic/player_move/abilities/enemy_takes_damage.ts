@@ -17,22 +17,33 @@ export function enemy_takes_damage(
     enemy.hp_delta = null
   }, timeout)
 
+  const hpBeforeDeath = enemy.data.hp
   enemy.data.hp -= card.data.damage
 
-  setTimeout(() => {
-    if (enemy.data.hp <= 0) remove_dead_enemy(enemy, gameObj, timeout)
-  }, timeout)
+  // Только смертельный удар сохраняет HP для события смерти. Иначе таймер
+  // более раннего, несмертельного удара мог бы передать HP до другого удара.
+  if (enemy.data.hp <= 0) {
+    setTimeout(() => {
+      if (enemy.data.hp <= 0)
+        remove_dead_enemy(enemy, gameObj, hpBeforeDeath, timeout)
+    }, timeout)
+  }
 }
 
 export function remove_dead_enemy(
   enemy: Enemy | EnemyLeader,
   gameObj: GameObj,
+  hpBeforeDeath: number,
   timeout = 1000
 ): void {
   const { field, enemy_leader, enemies, enemies_grave } = gameObj
 
   // Трекер копирует врага до очистки статуса, восстановления HP и завещания.
-  trackAchievementEvent({ type: AchievementEventType.EnemyKilled, enemy })
+  trackAchievementEvent({
+    type: AchievementEventType.EnemyKilled,
+    enemy,
+    hp_before_death: hpBeforeDeath,
+  })
 
   if (!(enemy as Enemy).color) {
     enemy_leader.data.hp = 0

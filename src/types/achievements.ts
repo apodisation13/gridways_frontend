@@ -5,11 +5,18 @@ import type {
   Leader,
   UserResources,
 } from "./database"
+import type { EffectObject } from "./game"
 import type { InventoryItem } from "./inventory"
 import type { UpgradeSubtype, UpgradeType, UserUpgrades } from "./upgrades"
 import type { PayResourcesSubtype } from "./user_actions"
 
 // Обычный режим — сезоны. Значения используются в фильтре mode.
+export interface AchievementBattleStats {
+  leader_uses: number
+  damage_taken: number
+  enemy_passives_in_field: number
+}
+
 export enum AchievementGameMode {
   Normal = "normal",
   Random = "random",
@@ -31,10 +38,17 @@ export enum AchievementEventType {
   // Активация пассивки с указанием зоны. run_passive учитывает разрешённый вызов
   // обработчика; реакции на игру карты и начало боя — только подтверждённый эффект.
   PassiveTriggered = "passive.triggered",
+  // Фактически добавленная защита игрока после ограничения прокачками.
+  ArmorGained = "armor.gained",
+  InvulnerabilityGained = "invulnerability.gained",
 
   // Враги. Снимок enemy берём до очистки статусов и восстановления параметров.
   // Смерть врага или лидера через remove_dead_enemy; удаление из колоды не считается.
   EnemyKilled = "enemy.killed",
+  // Таймер разрешил запуск поддерживаемой пассивки врага; эффект может быть бесполезным.
+  EnemyPassiveTriggered = "enemy.passive_triggered",
+  // Один эффект фактически размещён врагом в одной клетке поля.
+  EnemyEffectPlaced = "enemy.effect_placed",
   // Снятие существующего щита любым подключённым способом, не только ударом.
   EnemyShieldRemoved = "enemy.shield_removed",
   // Снятие брони у одного врага: count считает факт, sum по amount — единицы брони.
@@ -120,7 +134,7 @@ export enum AchievementCounterType {
 
 export interface AchievementStreakReset {
   event: AchievementRecordedEventType
-  filters: Record<string, AchievementFilter>
+  filters: AchievementFilters
 }
 
 export type AchievementCounter =
@@ -132,6 +146,11 @@ export type AchievementCounter =
   | { type: AchievementCounterType.Count }
   | { type: AchievementCounterType.Sum; field: string }
   | { type: AchievementCounterType.Current; field: string }
+  | {
+      type: AchievementCounterType.Current
+      fields: [string, ...string[]]
+      aggregation: "max"
+    }
   | { type: AchievementCounterType.Unique; field: string }
 
 export interface AchievementRewards {
@@ -144,11 +163,17 @@ export interface AchievementDefinition {
   ordering: number
   title: string
   event: AchievementRecordedEventType
-  filters: Record<string, AchievementFilter>
+  filters: AchievementFilters
   counter: AchievementCounter
   target: number
   rewards: AchievementRewards
 }
+
+// Подготовленные списки постоянных заданий для каждого события, включая сбросы серий.
+export type AchievementsByEvent = Map<
+  AchievementRecordedEventType,
+  AchievementDefinition[]
+>
 
 export interface AchievementDisplayEntry {
   key: string
@@ -222,6 +247,19 @@ export enum AchievementFilterOperator {
   Exists = "exists",
 }
 
+// Вариант внутри any — обычный набор И, без вложенных групп any.
+export type AchievementFilterGroup = Record<string, AchievementFilter> & {
+  any?: never
+}
+export type AchievementFilterAlternatives = [
+  AchievementFilterGroup,
+  ...AchievementFilterGroup[],
+]
+export type AchievementFilters = Record<
+  string,
+  AchievementFilter | AchievementFilterAlternatives
+> & { any?: AchievementFilterAlternatives }
+
 export type AchievementFilter =
   | AchievementScalar
   | {
@@ -284,8 +322,27 @@ export type AchievementPassiveLocation =
 
 export type AchievementEventInput =
   | {
+      type: AchievementEventType.ArmorGained
+      amount: number
+    }
+  | {
+      type: AchievementEventType.InvulnerabilityGained
+      amount: number
+    }
+  | {
+      type: AchievementEventType.EnemyEffectPlaced
+      enemy: Enemy | EnemyLeader
+      effect: EffectObject
+    }
+  | {
+      type: AchievementEventType.EnemyPassiveTriggered
+      enemy: Enemy | EnemyLeader
+      location: "field" | "deck" | "grave"
+    }
+  | {
       type: AchievementEventType.EnemyKilled
       enemy: Enemy | EnemyLeader
+      hp_before_death: number
     }
   | {
       type: AchievementEventType.EnemyArmorRemoved
@@ -359,6 +416,8 @@ export type AchievementEventInput =
         action: "buy" | "sell" | "craft" | "mill"
         resource: string
         amount: number
+        // Исходный рецепт одной операции, без умножения на quantity.
+        recipe: Record<string, number>
         // Стоимость и фактический доход именно этого обмена. Нули не включаем.
         spent: Record<string, number>
         gained: Record<string, number>
