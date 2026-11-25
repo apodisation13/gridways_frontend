@@ -1,5 +1,5 @@
 import store from "@/store"
-import type { AchievementSection, UserAchievementsProgress } from "@/types"
+import type { AchievementsByEvent, UserAchievementsProgress } from "@/types"
 import { AchievementEventType } from "@/types"
 import type { UpgradesConfig, UserUpgrades } from "@/types/upgrades"
 
@@ -8,13 +8,13 @@ import { trackAchievementEvent } from "./trackAchievementEvent"
 import { buildUpgradeSnapshot } from "./upgradeSnapshot"
 
 export function previewCurrentUpgrades(
-  section: AchievementSection,
+  byEvent: AchievementsByEvent,
   progress: UserAchievementsProgress,
   config: UpgradesConfig,
   user: UserUpgrades
 ) {
   const snapshot = buildUpgradeSnapshot(config, user)
-  return processAchievementEvents(section, progress, [
+  return processAchievementEvents(byEvent, progress, [
     {
       id: "current-upgrades-preview",
       type: AchievementEventType.UpgradesChecked,
@@ -28,7 +28,7 @@ export function checkCurrentUpgrades(): string[] {
   const state = store.state.achievements
   if (!store.getters.isLoggedIn) return []
   const preview = previewCurrentUpgrades(
-    state.achievementsConfig.permanent,
+    state.achievementsByEvent,
     state.userAchievements,
     store.getters.upgradesConfig,
     store.getters.userUpgrades

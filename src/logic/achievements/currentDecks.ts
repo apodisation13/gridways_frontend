@@ -1,16 +1,16 @@
 import store from "@/store"
-import type { AchievementSection, UserAchievementsProgress } from "@/types"
+import type { AchievementsByEvent, UserAchievementsProgress } from "@/types"
 import { AchievementEventType } from "@/types"
 
 import { processAchievementEvents } from "./processAchievementEvents"
 import { trackAchievementEvent } from "./trackAchievementEvent"
 
 export function previewCurrentDecks(
-  section: AchievementSection,
+  byEvent: AchievementsByEvent,
   progress: UserAchievementsProgress,
   count: number
 ) {
-  return processAchievementEvents(section, progress, [
+  return processAchievementEvents(byEvent, progress, [
     {
       id: "current-decks-preview",
       type: AchievementEventType.DecksChecked,
@@ -24,7 +24,7 @@ export function checkCurrentDecks(): string[] {
   if (!store.getters.isLoggedIn) return []
   // Базовая колода тоже находится в хранении и входит в количество.
   const preview = previewCurrentDecks(
-    state.achievementsConfig.permanent,
+    state.achievementsByEvent,
     state.userAchievements,
     store.getters.all_decks.length
   )

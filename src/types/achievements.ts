@@ -169,6 +169,12 @@ export interface AchievementDefinition {
   rewards: AchievementRewards
 }
 
+// Подготовленные списки постоянных заданий для каждого события, включая сбросы серий.
+export type AchievementsByEvent = Map<
+  AchievementRecordedEventType,
+  AchievementDefinition[]
+>
+
 export interface AchievementDisplayEntry {
   key: string
   definition: AchievementDefinition

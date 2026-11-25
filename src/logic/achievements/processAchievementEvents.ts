@@ -1,9 +1,7 @@
 import type {
-  AchievementDefinition,
   AchievementEvent,
   AchievementPreview,
-  AchievementRecordedEventType,
-  AchievementSection,
+  AchievementsByEvent,
   UserAchievementsProgress,
 } from "@/types"
 import { AchievementCounterType, AchievementEventType } from "@/types"
@@ -15,7 +13,7 @@ import { getUniqueValue, hasUniqueValue } from "./uniqueValues"
 // Считает предварительный прогресс, не меняя исходные данные и не выдавая наград.
 // Поддерживаем постоянные задания с count, sum, current, unique и streak. Для daily/weekly нужны их периоды.
 export function processAchievementEvents(
-  section: AchievementSection,
+  byEvent: AchievementsByEvent,
   confirmedProgress: UserAchievementsProgress,
   events: readonly AchievementEvent[]
 ): AchievementPreview {
@@ -24,25 +22,7 @@ export function processAchievementEvents(
   if (confirmedProgress.permanent) {
     progress.permanent = { ...confirmedProgress.permanent }
   }
-  // Собираем задания по типу события, чтобы для карты не проверять задания на ресурсы.
-  // Категории нужны для страницы, в подсчёте ориентируемся на event и ID задания.
-  const byEvent = new Map<
-    AchievementRecordedEventType,
-    AchievementDefinition[]
-  >()
-  for (const category of Object.values(section.categories)) {
-    for (const definition of Object.values(category.achievements)) {
-      const types = new Set([definition.event])
-      if (definition.counter.type === AchievementCounterType.Streak) {
-        for (const reset of definition.counter.reset) types.add(reset.event)
-      }
-      for (const type of types) {
-        const definitions = byEvent.get(type) ?? []
-        definitions.push(definition)
-        byEvent.set(type, definitions)
-      }
-    }
-  }
+  // Индекс уже подготовлен при загрузке конфига; здесь только расчёт прогресса.
 
   // Одно событие учитываем один раз в этом расчёте. Это не защита от повторов на бэке.
   const processedIds = new Set<string>()

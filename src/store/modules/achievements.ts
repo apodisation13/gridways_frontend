@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid"
 import type { ActionContext } from "vuex"
 
 import { callApi, HttpMethod } from "@/lib/api/api"
+import { buildAchievementIndex } from "@/logic/achievements/buildAchievementIndex"
 import { previewCurrentDecks } from "@/logic/achievements/currentDecks"
 import {
   checkCurrentResources,
@@ -20,6 +21,7 @@ import type {
   AchievementEventsResponse,
   AchievementGameConfig,
   AchievementRewardNotification,
+  AchievementsByEvent,
   PinnedAchievement,
   UserAchievementsProgress,
 } from "@/types"
@@ -28,6 +30,8 @@ import type { UpgradesConfig, UserUpgrades } from "@/types/upgrades"
 export interface AchievementsState {
   // Описания заданий: условия, цели, награды. Permanent приходит из game_const.
   achievementsConfig: AchievementCatalog
+  // Индекс permanent: пересоздаётся только вместе с конфигом.
+  achievementsByEvent: AchievementsByEvent
   // Только подтверждённый бэком прогресс. Локальные ходы сюда не прибавляем.
   userAchievements: UserAchievementsProgress
   // Новые события, которые ещё ни разу не отправляли.
@@ -52,6 +56,7 @@ const state: AchievementsState = {
     daily: null,
     weekly: null,
   },
+  achievementsByEvent: new Map(),
   userAchievements: {},
   pendingEvents: [],
   inFlightEvents: [],
@@ -110,7 +115,7 @@ const getters = {
     // Сначала применяем события в порядке возникновения: отправленные раньше новых.
     // Пока ответ не пришёл, inFlightEvents тоже нужны для отображения прогресса.
     const preview = processAchievementEvents(
-      state.achievementsConfig.permanent,
+      state.achievementsByEvent,
       state.userAchievements,
       [...state.inFlightEvents, ...state.pendingEvents]
     )
@@ -118,18 +123,18 @@ const getters = {
     // Передаём результат дальше по цепочке, чтобы сохранить расчёт остальных заданий.
     // Эти функции не отправляют запросы, не начисляют награды и не меняют userAchievements.
     const current = previewCurrentResources(
-      state.achievementsConfig.permanent,
+      state.achievementsByEvent,
       preview.progress,
       getters.resource
     )
     const upgrades = previewCurrentUpgrades(
-      state.achievementsConfig.permanent,
+      state.achievementsByEvent,
       current.progress,
       getters.upgradesConfig,
       getters.userUpgrades
     )
     const decks = previewCurrentDecks(
-      state.achievementsConfig.permanent,
+      state.achievementsByEvent,
       upgrades.progress,
       getters.all_decks.length
     )
@@ -237,6 +242,9 @@ const mutations = {
       title: "Постоянные",
       categories: {},
     }
+    state.achievementsByEvent = buildAchievementIndex(
+      state.achievementsConfig.permanent
+    )
     prunePins(state)
   },
   // Начальная загрузка подтверждённого прогресса; здесь не прибавляем локальные события.
